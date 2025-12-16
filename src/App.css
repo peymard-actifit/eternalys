@@ -1,0 +1,206 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: 
+    radial-gradient(ellipse at top, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(139, 0, 0, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, var(--color-bg-gradient-start) 0%, var(--color-bg-dark) 50%, var(--color-bg-gradient-end) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.app::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 100px,
+      rgba(212, 175, 55, 0.02) 100px,
+      rgba(212, 175, 55, 0.02) 101px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 100px,
+      rgba(212, 175, 55, 0.02) 100px,
+      rgba(212, 175, 55, 0.02) 101px
+    );
+  pointer-events: none;
+}
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.title-container {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 
+    0 0 20px rgba(212, 175, 55, 0.4),
+    0 0 40px rgba(212, 175, 55, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.15em;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from {
+    text-shadow: 
+      0 0 20px rgba(212, 175, 55, 0.4),
+      0 0 40px rgba(212, 175, 55, 0.2),
+      0 4px 8px rgba(0, 0, 0, 0.8);
+  }
+  to {
+    text-shadow: 
+      0 0 30px rgba(212, 175, 55, 0.6),
+      0 0 60px rgba(212, 175, 55, 0.3),
+      0 4px 8px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text-muted);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.rune {
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  opacity: 0.8;
+}
+
+.line {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+}
+
+.description {
+  max-width: 600px;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--color-text);
+  margin-bottom: 3rem;
+}
+
+.cta-container {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cta-button {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem 2.5rem;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button.primary {
+  background: linear-gradient(135deg, var(--color-gold-dark) 0%, var(--color-gold) 50%, var(--color-gold-light) 100%);
+  color: var(--color-bg-dark);
+  box-shadow: 
+    0 4px 15px rgba(212, 175, 55, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.cta-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(212, 175, 55, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.cta-button.secondary {
+  background: transparent;
+  color: var(--color-gold);
+  border: 1px solid var(--color-gold);
+}
+
+.cta-button.secondary:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.footer p {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.copyright {
+  margin-top: 0.5rem;
+  font-size: 0.8rem !important;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1.5rem;
+  }
+  
+  .description {
+    font-size: 1.1rem;
+  }
+  
+  .cta-button {
+    padding: 0.875rem 2rem;
+  }
+  
+  .line {
+    width: 40px;
+  }
+}
+
