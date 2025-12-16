@@ -1,9 +1,9 @@
 {
   "name": "eternalys",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Eternalys - Jeu de rÃ´le par Antoine Eymard",
+  "description": "Eternalys - Jeu de rôle par Antoine Eymard",
   "author": "Antoine Eymard",
   "scripts": {
     "dev": "vite",
