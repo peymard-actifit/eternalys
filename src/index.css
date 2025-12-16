@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --color-bg-dark: #0a0a0f;
+  --color-bg-gradient-start: #12121a;
+  --color-bg-gradient-end: #1a1a2e;
+  --color-gold: #d4af37;
+  --color-gold-light: #f4d35e;
+  --color-gold-dark: #9a7b2c;
+  --color-crimson: #8b0000;
+  --color-text: #e8e6e3;
+  --color-text-muted: #9a9a9a;
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Cormorant Garamond', serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg-dark);
+  color: var(--color-text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
