@@ -1,0 +1,144 @@
+.gameover-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.gameover-screen.victory {
+  background: 
+    radial-gradient(ellipse at center, rgba(241, 196, 15, 0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #1a1a0a 0%, #2a2a15 50%, #1a1a0a 100%);
+}
+
+.gameover-screen.defeat {
+  background: 
+    radial-gradient(ellipse at center, rgba(231, 76, 60, 0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #1a0a0a 0%, #2a1515 50%, #1a0a0a 100%);
+}
+
+.gameover-content {
+  text-align: center;
+  max-width: 500px;
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gameover-icon {
+  font-size: 6rem;
+  margin-bottom: 1.5rem;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.05); }
+}
+
+.gameover-title {
+  font-family: 'Cinzel', serif;
+  font-size: 3.5rem;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.1em;
+}
+
+.victory .gameover-title {
+  color: #f1c40f;
+  text-shadow: 
+    0 0 30px rgba(241, 196, 15, 0.6),
+    0 0 60px rgba(241, 196, 15, 0.3);
+}
+
+.defeat .gameover-title {
+  color: #e74c3c;
+  text-shadow: 
+    0 0 30px rgba(231, 76, 60, 0.6),
+    0 0 60px rgba(231, 76, 60, 0.3);
+}
+
+.gameover-message {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  color: #b0b0b0;
+  margin-bottom: 2rem;
+}
+
+.gameover-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.deco-line {
+  width: 80px;
+  height: 2px;
+}
+
+.victory .deco-line {
+  background: linear-gradient(90deg, transparent, #f1c40f, transparent);
+}
+
+.defeat .deco-line {
+  background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+}
+
+.deco-symbol {
+  font-size: 1.5rem;
+}
+
+.menu-button {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 3rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.victory .menu-button {
+  background: linear-gradient(135deg, #d4ac0d, #f1c40f);
+  color: #1a1a0a;
+  box-shadow: 0 4px 20px rgba(241, 196, 15, 0.4);
+}
+
+.defeat .menu-button {
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  color: white;
+  box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4);
+}
+
+.menu-button:hover {
+  transform: translateY(-3px);
+}
+
+.victory .menu-button:hover {
+  box-shadow: 0 8px 30px rgba(241, 196, 15, 0.5);
+}
+
+.defeat .menu-button:hover {
+  box-shadow: 0 8px 30px rgba(231, 76, 60, 0.5);
+}
+
+
+

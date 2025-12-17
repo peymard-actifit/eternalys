@@ -1,0 +1,450 @@
+.summary-screen {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-screen.victory {
+  background: 
+    radial-gradient(ellipse at center, rgba(241, 196, 15, 0.1) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1a0a 0%, #2a2a15 50%, #1a1a0a 100%);
+}
+
+.summary-screen.defeat {
+  background: 
+    radial-gradient(ellipse at center, rgba(231, 76, 60, 0.1) 0%, transparent 70%),
+    linear-gradient(180deg, #1a0a0a 0%, #2a1515 50%, #1a0a0a 100%);
+}
+
+.summary-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.summary-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 3rem;
+  margin: 0 0 0.5rem 0;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+.summary-screen.victory .summary-header h1 {
+  color: #f1c40f;
+  text-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
+}
+
+.summary-screen.defeat .summary-header h1 {
+  color: #e74c3c;
+  text-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.summary-header .subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  margin: 0 0 1rem 0;
+}
+
+.adventure-info {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: #888;
+}
+
+.summary-tabs {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.summary-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.8rem 1.2rem;
+  background: rgba(100, 100, 100, 0.15);
+  border: 2px solid rgba(100, 100, 100, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.summary-tab:hover {
+  background: rgba(155, 89, 182, 0.15);
+  border-color: rgba(155, 89, 182, 0.5);
+}
+
+.summary-tab.active {
+  background: rgba(155, 89, 182, 0.25);
+  border-color: #9b59b6;
+  box-shadow: 0 0 20px rgba(155, 89, 182, 0.3);
+}
+
+.summary-tab.dead {
+  opacity: 0.6;
+}
+
+.summary-tab.dead .tab-portrait {
+  filter: grayscale(1);
+}
+
+.tab-portrait {
+  font-size: 2rem;
+}
+
+.tab-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #c0c0c0;
+}
+
+.summary-content {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(20, 15, 30, 0.9);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.character-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.char-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.char-header .char-portrait {
+  font-size: 4rem;
+}
+
+.char-header .char-info h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.char-header .char-class {
+  font-size: 1rem;
+  color: #9b59b6;
+  display: block;
+}
+
+.char-header .status {
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+.char-header .status.alive {
+  color: #2ecc71;
+}
+
+.char-header .status.dead {
+  color: #e74c3c;
+}
+
+.final-hp {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 0.3rem;
+}
+
+.stats-section h3,
+.monsters-section h3,
+.inventory-section h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: #9b59b6;
+  margin: 0 0 1rem 0;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.stat-card .stat-icon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  display: block;
+}
+
+.stat-card.damage .stat-value { color: #e74c3c; }
+.stat-card.taken .stat-value { color: #e67e22; }
+.stat-card.healing .stat-value { color: #2ecc71; }
+
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.monsters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.monster-killed {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(100, 100, 100, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.monster-killed.boss {
+  background: rgba(241, 196, 15, 0.2);
+  border: 1px solid rgba(241, 196, 15, 0.4);
+}
+
+.monster-portrait {
+  font-size: 1.2rem;
+}
+
+.monster-name {
+  color: #c0c0c0;
+}
+
+.boss-badge {
+  font-size: 0.6rem;
+  background: #f1c40f;
+  color: #1a1a1a;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.no-kills, .no-items {
+  font-style: italic;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.strongest-killed {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  background: rgba(241, 196, 15, 0.1);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  border-radius: 8px;
+}
+
+.strongest-killed .label {
+  font-size: 0.85rem;
+  color: #f1c40f;
+}
+
+.strongest-killed .monster-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.item-obtained {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(30, 30, 50, 0.6);
+  border-left: 3px solid #666;
+  border-radius: 6px;
+}
+
+.item-obtained .item-icon {
+  font-size: 1.3rem;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-details .item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+}
+
+.item-details .item-rarity {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.team-totals {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(20, 15, 30, 0.9);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.team-totals h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: #9b59b6;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.totals-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.total-item {
+  text-align: center;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.total-item .total-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.total-item .total-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e0e0e0;
+  display: block;
+}
+
+.total-item .total-label {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.return-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  padding: 1rem 3rem;
+  background: linear-gradient(135deg, #8e44ad, #9b59b6);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(155, 89, 182, 0.4);
+}
+
+.return-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(155, 89, 182, 0.5);
+}
+
+.summary-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.next-level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.2rem 3rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 50%, #d35400 100%);
+  border: 3px solid #f1c40f;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(243, 156, 18, 0.4);
+  animation: nextLevelPulse 2s ease-in-out infinite;
+}
+
+.next-level-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(243, 156, 18, 0.6);
+}
+
+.next-level-info {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  font-weight: normal;
+  opacity: 0.9;
+}
+
+@keyframes nextLevelPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(243, 156, 18, 0.4); }
+  50% { box-shadow: 0 4px 30px rgba(243, 156, 18, 0.7); }
+}
+
+@media (max-width: 700px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .totals-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .adventure-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .summary-header h1 {
+    font-size: 2rem;
+  }
+}
+

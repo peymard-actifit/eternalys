@@ -1,0 +1,320 @@
+.character-select-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 100%);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.select-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.select-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  color: #9b59b6;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+}
+
+.select-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0;
+}
+
+.select-hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.team-slots {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.team-slot {
+  width: 120px;
+  height: 140px;
+  border: 2px dashed rgba(155, 89, 182, 0.5);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(155, 89, 182, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.5rem;
+}
+
+.team-slot.filled {
+  border-style: solid;
+  border-color: #9b59b6;
+  background: rgba(155, 89, 182, 0.15);
+}
+
+.slot-portrait {
+  font-size: 2.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.slot-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: #c0c0c0;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot-name.editable {
+  cursor: pointer;
+  position: relative;
+  padding-right: 1.2rem;
+}
+
+.slot-name.editable:hover {
+  color: #9b59b6;
+}
+
+.edit-icon {
+  font-size: 0.6rem;
+  position: absolute;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.slot-name.editable:hover .edit-icon {
+  opacity: 1;
+}
+
+.slot-class {
+  font-size: 0.65rem;
+  color: #9b59b6;
+  margin-top: 0.2rem;
+}
+
+.name-input {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  width: 90%;
+  padding: 0.3rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #9b59b6;
+  border-radius: 4px;
+  color: #e0e0e0;
+  text-align: center;
+  outline: none;
+}
+
+.name-input:focus {
+  box-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.team-slot.filled:hover .remove-btn {
+  opacity: 1;
+}
+
+.remove-btn:hover {
+  background: #e74c3c;
+}
+
+.slot-empty {
+  font-size: 2rem;
+  color: rgba(155, 89, 182, 0.3);
+}
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.character-card {
+  background: linear-gradient(135deg, rgba(30, 20, 50, 0.9) 0%, rgba(20, 10, 40, 0.95) 100%);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.character-card:hover:not(.disabled) {
+  transform: translateY(-5px);
+  border-color: #9b59b6;
+  box-shadow: 0 10px 30px rgba(155, 89, 182, 0.3);
+}
+
+.character-card.selected {
+  border-color: #9b59b6;
+  background: linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(30, 20, 50, 0.9) 100%);
+  box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+}
+
+.character-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card-portrait {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.card-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  color: #e0e0e0;
+  margin: 0 0 0.3rem 0;
+}
+
+.card-class {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: #9b59b6;
+  margin: 0;
+  font-style: italic;
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #b0b0b0;
+}
+
+.stat-icon {
+  font-size: 0.8rem;
+}
+
+.stat-value {
+  font-family: 'Cinzel', serif;
+}
+
+.card-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.skill-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 15px;
+  color: #c0c0c0;
+  cursor: help;
+}
+
+.skill-tag.physical {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+}
+
+.skill-tag.magical {
+  background: rgba(52, 152, 219, 0.15);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+}
+
+.skill-tag.holy {
+  background: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.4);
+}
+
+.selected-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background: #9b59b6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.select-actions {
+  margin-top: auto;
+}
+
+.start-dungeon-button {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 1rem 3rem;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(155, 89, 182, 0.4);
+}
+
+.start-dungeon-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(155, 89, 182, 0.5);
+}
+
+.start-dungeon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+

@@ -13,3 +13,5 @@ export const supabase = createClient<Database>(
   supabaseAnonKey || ''
 )
 
+
+

@@ -1,6 +1,64 @@
-import { Character, Monster, GameEvent, Room, GameState } from '../types/game.types';
-import { getRandomMonster, getRandomBoss } from '../data/monsters';
-import { getRandomEvent, getRandomTreasure } from '../data/events';
+import { Character, Monster, GameEvent, Room, GameState, HistoryEntry, TreasureLegacy, PendingTreasureData } from '../types/game.types';
+import { getRandomMonster, getRandomBoss, MONSTERS, resetLegendaryActions } from '../data/monsters';
+import { getRandomEvent } from '../data/events';
+import { getRandomTreasure, Treasure } from '../data/treasures';
+
+// Calculer le modificateur D&D à partir d'une caractéristique
+const getModifier = (score: number): number => Math.floor((score - 10) / 2);
+
+// Appliquer les bonus des caractéristiques D&D aux stats de combat
+const applyAbilityBonuses = (char: Character): Character => {
+  if (!char.abilities) return char;
+  
+  const strMod = getModifier(char.abilities.strength);
+  const intMod = getModifier(char.abilities.intelligence);
+  const conMod = getModifier(char.abilities.constitution);
+  const wisMod = getModifier(char.abilities.wisdom);
+  
+  return {
+    ...char,
+    // Force augmente l'attaque physique
+    attack: char.attack + strMod * 2,
+    // Intelligence augmente l'attaque magique
+    magicAttack: (char.magicAttack || 0) + intMod * 2,
+    // Constitution augmente les PV et la défense
+    maxHp: char.maxHp + conMod * 5,
+    hp: char.hp + conMod * 5,
+    defense: char.defense + Math.floor(conMod * 1.5),
+    // Sagesse augmente la défense magique
+    magicDefense: char.magicDefense + wisMod * 2,
+    // Sauvegarder les stats de base
+    baseAttack: char.attack + strMod * 2,
+    baseMagicAttack: (char.magicAttack || 0) + intMod * 2,
+    baseDefense: char.defense + Math.floor(conMod * 1.5),
+    baseMagicDefense: char.magicDefense + wisMod * 2,
+    baseSpeed: char.speed
+  };
+};
+
+// Récupérer les monstres accompagnateurs d'un boss
+const getBossMinions = (boss: Monster): Monster[] => {
+  if (!boss.minions || boss.minions.length === 0) return [];
+  
+  const minions: Monster[] = [];
+  // Sélectionner 1-2 monstres accompagnateurs aléatoires parmi la liste du boss
+  const minionCount = Math.floor(Math.random() * 2) + 1; // 1 ou 2 monstres
+  
+  for (let i = 0; i < minionCount; i++) {
+    const minionId = boss.minions[Math.floor(Math.random() * boss.minions.length)];
+    const minionTemplate = MONSTERS.find(m => m.id === minionId);
+    
+    if (minionTemplate) {
+      minions.push({
+        ...minionTemplate,
+        id: `${minionTemplate.id}_minion_${i}_${Date.now()}`,
+        skills: minionTemplate.skills?.map(s => ({ ...s }))
+      });
+    }
+  }
+  
+  return minions;
+};
 
 // État initial du jeu
 const createInitialRooms = (): Room[][] => {
@@ -34,9 +92,23 @@ const initialState: GameState = {
   currentRoom: { x: 10, y: 10 },
   rooms: createInitialRooms(),
   encounterCount: 0,
+  combatCount: 0, // Compteur de combats pour le scaling du boss
+  bossScaling: 0, // 0% au début, +5% par combat
+  currentEnemies: [], // Plusieurs monstres possibles
   combatLog: [],
+  combatHistory: [],
+  combatTurn: 1,
   turnOrder: [],
-  currentTurnIndex: 0
+  currentTurnIndex: 0,
+  history: [],
+  pendingTreasures: [],
+  selectedEnemyIndex: 0,
+  // Système de niveaux
+  dungeonLevel: 1,
+  roomsPerLevel: 10, // 10 salles au niveau 1
+  previousBossId: undefined,
+  monsterScaling: 0, // Pas de scaling au niveau 1
+  bossScalingMultiplier: 0 // Pas de scaling au niveau 1
 };
 
 // Store simple avec listeners
@@ -65,13 +137,36 @@ export const gameStore = {
   },
   
   selectTeam: (team: Character[]) => {
+    // Appliquer les bonus des caractéristiques D&D aux stats de combat
+    // puis s'assurer que les buffs sont initialisés
+    const initializedTeam = team.map(c => {
+      const withBonuses = applyAbilityBonuses(c);
+      return { 
+        ...withBonuses, 
+        buffs: [],
+        magicDefense: withBonuses.magicDefense || 10
+      };
+    });
+    
     gameStore.setState({
-      team: team.map(c => ({ ...c })),
+      team: initializedTeam,
       phase: 'dungeon',
       rooms: createInitialRooms(),
       currentRoom: { x: 10, y: 10 },
-      encounterCount: 0
+      encounterCount: 0,
+      history: [],
+      pendingTreasures: [],
+      dungeonLevel: 1,
+      roomsPerLevel: 10,
+      previousBossId: undefined,
+      monsterScaling: 0,
+      bossScalingMultiplier: 0
     });
+  },
+  
+  addToHistory: (entry: HistoryEntry) => {
+    const history = [...state.history, entry];
+    gameStore.setState({ history });
   },
   
   moveToRoom: (x: number, y: number) => {
@@ -82,45 +177,156 @@ export const gameStore = {
     rooms[y][x].discovered = true;
     rooms[y][x].visited = true;
     
-    // Déterminer le type de rencontre
-    if (encounterCount >= 10) {
-      // Boss final
-      roomType = 'boss';
-      const boss = getRandomBoss();
+    // Nombre de salles avant le boss selon le niveau
+    const roomsBeforeBoss = state.roomsPerLevel;
+    
+    // Scaling des monstres et boss selon le niveau
+    const monsterMultiplier = 1 + (state.monsterScaling / 100);
+    const bossMultiplier = 1 + (state.bossScalingMultiplier / 100);
+    
+    // La Xème rencontre est le boss (selon roomsPerLevel)
+    if (encounterCount >= roomsBeforeBoss) {
+      // Choisir un boss adapté au niveau du donjon, différent du précédent
+      let boss = getRandomBoss(state.dungeonLevel);
+      let attempts = 0;
+      while (boss.id === state.previousBossId && attempts < 10) {
+        boss = getRandomBoss(state.dungeonLevel);
+        attempts++;
+      }
+      
+      // Scaling du boss = bossScaling (combats) + bossScalingMultiplier (niveau)
+      const totalBossScaling = (state.bossScaling / 100) + (bossMultiplier - 1);
+      
+      // Appliquer le scaling au boss
+      const scaledBoss: Monster = {
+        ...boss,
+        hp: Math.floor(boss.hp * (1 + totalBossScaling)),
+        maxHp: Math.floor(boss.maxHp * (1 + totalBossScaling)),
+        attack: Math.floor(boss.attack * (1 + totalBossScaling)),
+        magicAttack: boss.magicAttack ? Math.floor(boss.magicAttack * (1 + totalBossScaling)) : undefined,
+        defense: Math.floor(boss.defense * (1 + totalBossScaling)),
+        magicDefense: Math.floor(boss.magicDefense * (1 + totalBossScaling)),
+        ultimateUsed: false,
+        ultimateTurnTrigger: boss.ultimateTurnTrigger || 5,
+        ultimateSkill: boss.ultimateSkill ? {
+          ...boss.ultimateSkill,
+          damage: Math.floor((boss.ultimateSkill.damage || 0) * (1 + totalBossScaling))
+        } : undefined,
+        skills: boss.skills?.map(s => ({
+          ...s,
+          damage: Math.floor(s.damage * (1 + totalBossScaling))
+        }))
+      };
+      
+      // Récupérer les monstres accompagnateurs thématiques (avec scaling)
+      const minions = getBossMinions(boss).map(m => ({
+        ...m,
+        hp: Math.floor(m.hp * monsterMultiplier),
+        maxHp: Math.floor(m.maxHp * monsterMultiplier),
+        attack: Math.floor(m.attack * monsterMultiplier),
+        magicAttack: m.magicAttack ? Math.floor(m.magicAttack * monsterMultiplier) : undefined,
+        defense: Math.floor(m.defense * monsterMultiplier),
+        magicDefense: Math.floor(m.magicDefense * monsterMultiplier)
+      }));
+      const allEnemies = [scaledBoss, ...minions];
+      
       rooms[y][x].type = 'boss';
-      rooms[y][x].content = boss;
+      rooms[y][x].content = scaledBoss;
+      
+      const levelText = state.dungeonLevel > 1 ? ` [Niveau ${state.dungeonLevel}]` : '';
+      const scalingText = totalBossScaling > 0 ? ` (Renforcé +${Math.round(totalBossScaling * 100)}%)` : '';
+      const minionText = minions.length > 0 ? ` et ${minions.length} serviteur(s)` : '';
+      gameStore.addToHistory({
+        turn: encounterCount,
+        type: 'boss',
+        title: `Boss${levelText} : ${scaledBoss.name}${scalingText}${minionText}`,
+        description: `Vous affrontez le boss${minionText} !${scalingText}`,
+        icon: scaledBoss.portrait,
+        isPositive: false
+      });
       
       gameStore.setState({
         rooms,
         currentRoom: { x, y },
         encounterCount,
-        currentEnemy: boss,
+        currentEnemies: allEnemies,
+        currentEnemy: scaledBoss,
         phase: 'combat'
       });
-      gameStore.initCombat(boss);
+      gameStore.initCombatMultiple(allEnemies);
     } else {
       // Rencontre aléatoire
       const roll = Math.random();
       
       if (roll < 0.5) {
         // Combat (50%)
-        const monster = getRandomMonster();
+        // Générer 1-3 monstres selon la progression
+        const monsterCount = gameStore.getMonsterCount(encounterCount);
+        const monsters: Monster[] = [];
+        
+        for (let i = 0; i < monsterCount; i++) {
+          const monster = getRandomMonster();
+          // Appliquer le scaling des monstres selon le niveau
+          const scaledMonster: Monster = {
+            ...monster,
+            id: `${monster.id}_${i}_${Date.now()}`,
+            hp: Math.floor(monster.hp * monsterMultiplier),
+            maxHp: Math.floor(monster.maxHp * monsterMultiplier),
+            attack: Math.floor(monster.attack * monsterMultiplier),
+            magicAttack: monster.magicAttack ? Math.floor(monster.magicAttack * monsterMultiplier) : undefined,
+            defense: Math.floor(monster.defense * monsterMultiplier),
+            magicDefense: Math.floor(monster.magicDefense * monsterMultiplier),
+            skills: monster.skills?.map(s => ({
+              ...s,
+              damage: Math.floor(s.damage * monsterMultiplier)
+            }))
+          };
+          monsters.push(scaledMonster);
+        }
+        
         rooms[y][x].type = 'combat';
-        rooms[y][x].content = monster;
+        rooms[y][x].content = monsters[0];
+        
+        const levelText = state.dungeonLevel > 1 ? ` [Niv.${state.dungeonLevel}]` : '';
+        const monsterNames = monsters.map(m => m.name).join(', ');
+        gameStore.addToHistory({
+          turn: encounterCount,
+          type: 'combat',
+          title: monsterCount > 1 ? `Combat${levelText} : ${monsterCount} ennemis` : `Combat${levelText} : ${monsters[0].name}`,
+          description: `Vous affrontez ${monsterNames} !`,
+          icon: monsters[0].portrait,
+          isPositive: false
+        });
+        
+        // Incrémenter le scaling du boss
+        const newBossScaling = state.bossScaling + 5;
+        const newCombatCount = state.combatCount + 1;
         
         gameStore.setState({
           rooms,
           currentRoom: { x, y },
           encounterCount,
-          currentEnemy: monster,
+          combatCount: newCombatCount,
+          bossScaling: newBossScaling,
+          currentEnemies: monsters,
+          currentEnemy: monsters[0],
           phase: 'combat'
         });
-        gameStore.initCombat(monster);
+        gameStore.initCombatMultiple(monsters);
       } else if (roll < 0.8) {
         // Événement (30%)
         const event = getRandomEvent();
         rooms[y][x].type = 'event';
         rooms[y][x].content = event;
+        
+        gameStore.addToHistory({
+          turn: encounterCount,
+          type: 'event',
+          title: event.name,
+          description: event.description,
+          icon: event.type === 'positive' ? '✨' : '⚠️',
+          isPositive: event.type === 'positive'
+        });
         
         gameStore.setState({
           rooms,
@@ -131,32 +337,332 @@ export const gameStore = {
         });
       } else {
         // Trésor (20%)
-        const treasure = getRandomTreasure();
-        rooms[y][x].type = 'treasure';
-        rooms[y][x].content = treasure;
-        
-        // Appliquer le trésor
-        gameStore.applyTreasure(treasure);
-        
-        gameStore.setState({
-          rooms,
-          currentRoom: { x, y },
-          encounterCount,
-          phase: 'dungeon'
-        });
+        gameStore.generateTreasure(x, y, rooms, encounterCount);
       }
     }
   },
   
+  // Déterminer le nombre de monstres selon la progression
+  getMonsterCount: (encounterCount: number): number => {
+    // Plus on avance, plus il y a de chances d'avoir plusieurs monstres
+    const roll = Math.random();
+    if (encounterCount <= 3) {
+      // Début : 90% 1 monstre, 10% 2 monstres
+      return roll < 0.9 ? 1 : 2;
+    } else if (encounterCount <= 6) {
+      // Milieu : 60% 1 monstre, 30% 2 monstres, 10% 3 monstres
+      if (roll < 0.6) return 1;
+      if (roll < 0.9) return 2;
+      return 3;
+    } else {
+      // Fin : 40% 1 monstre, 40% 2 monstres, 20% 3 monstres
+      if (roll < 0.4) return 1;
+      if (roll < 0.8) return 2;
+      return 3;
+    }
+  },
+  
+  generateTreasure: (x: number, y: number, rooms: Room[][], encounterCount: number) => {
+    const treasure = getRandomTreasure();
+    
+    // Créer les données du trésor en attente (sans attribution)
+    const pendingTreasure: PendingTreasureData = {
+      treasureId: treasure.id,
+      treasureName: treasure.name,
+      treasureIcon: treasure.icon,
+      treasureRarity: treasure.rarity,
+      treasureDescription: treasure.description,
+      assignedToId: '', // Sera choisi par le joueur
+      assignedToName: '',
+      effects: []
+    };
+    
+    // Ajouter à l'historique (assignedTo sera mis à jour plus tard)
+    gameStore.addToHistory({
+      turn: encounterCount,
+      type: 'treasure',
+      title: `${treasure.icon} ${treasure.name}`,
+      description: treasure.description,
+      icon: treasure.icon,
+      isPositive: true,
+      treasureId: treasure.id,
+      treasureRarity: treasure.rarity,
+      assignedTo: ''
+    });
+    
+    // Conversion vers l'ancien format pour compatibilité
+    const legacyTreasure: TreasureLegacy = {
+      id: treasure.id,
+      name: treasure.name,
+      description: treasure.description,
+      effect: {
+        type: 'heal_all',
+        value: 0
+      }
+    };
+    
+    rooms[y][x].type = 'treasure';
+    rooms[y][x].content = legacyTreasure;
+    
+    gameStore.setState({
+      rooms,
+      currentRoom: { x, y },
+      encounterCount,
+      pendingTreasures: [pendingTreasure],
+      phase: 'treasure'
+    });
+  },
+  
+  // Finaliser l'attribution du trésor après le choix du joueur
+  finalizeTreasure: (selectedCharacter: Character, effects: string[]) => {
+    const team = [...state.team];
+    const pendingTreasure = state.pendingTreasures?.[0];
+    
+    if (pendingTreasure) {
+      // Ajouter l'objet à l'inventaire du personnage
+      const charIndex = team.findIndex(c => c.id === selectedCharacter.id);
+      if (charIndex !== -1) {
+        if (!team[charIndex].inventory) {
+          team[charIndex].inventory = [];
+        }
+        team[charIndex].inventory!.push({
+          id: pendingTreasure.treasureId,
+          name: pendingTreasure.treasureName,
+          icon: pendingTreasure.treasureIcon,
+          rarity: pendingTreasure.treasureRarity,
+          description: pendingTreasure.treasureDescription,
+          obtainedAt: state.encounterCount
+        });
+      }
+      
+      // Mettre à jour l'historique avec le personnage choisi
+      const history = [...state.history];
+      const lastTreasureEntry = history.find(h => h.treasureId === pendingTreasure.treasureId);
+      if (lastTreasureEntry) {
+        lastTreasureEntry.assignedTo = selectedCharacter.name;
+      }
+      
+      gameStore.setState({
+        team,
+        history,
+        pendingTreasures: [],
+        phase: 'dungeon'
+      });
+    } else {
+      gameStore.setState({
+        pendingTreasures: [],
+        phase: 'dungeon'
+      });
+    }
+  },
+  
+  closeTreasureModal: () => {
+    gameStore.setState({
+      pendingTreasures: [],
+      phase: 'dungeon'
+    });
+  },
+  
   initCombat: (enemy: Monster) => {
-    const allCombatants = [...state.team, enemy];
+    // Rétro-compatibilité: utiliser initCombatMultiple
+    gameStore.initCombatMultiple([enemy]);
+  },
+  
+  initCombatMultiple: (enemies: Monster[]) => {
+    // Initialiser les baseStats des personnages et réinitialiser les cooldowns
+    const teamWithBaseStats = state.team.map(c => ({
+      ...c,
+      baseAttack: c.baseAttack ?? c.attack,
+      baseMagicAttack: c.baseMagicAttack ?? (c.magicAttack || 0),
+      baseDefense: c.baseDefense ?? c.defense,
+      baseMagicDefense: c.baseMagicDefense ?? c.magicDefense,
+      baseSpeed: c.baseSpeed ?? c.speed,
+      buffs: c.buffs || [],
+      // Réinitialiser les cooldowns au début du combat
+      skills: c.skills.map(skill => ({ ...skill, currentCooldown: 0 }))
+    }));
+    
+    // Mettre à jour l'équipe avec les baseStats
+    gameStore.setState({ team: teamWithBaseStats });
+    
+    const aliveTeam = teamWithBaseStats.filter(c => c.hp > 0);
+    
+    // Ajouter les stats de base aux monstres pour le tracking des modificateurs
+    const monstersWithBaseStats = enemies.map(e => {
+      // Réinitialiser les actions légendaires pour les créatures légendaires
+      if (e.legendaryActionsPerTurn) {
+        resetLegendaryActions(e);
+      }
+      
+      return {
+        ...e,
+        baseAttack: e.baseAttack ?? e.attack,
+        baseMagicAttack: e.baseMagicAttack ?? (e.magicAttack || 0),
+        baseDefense: e.baseDefense ?? e.defense,
+        baseMagicDefense: e.baseMagicDefense ?? e.magicDefense,
+        baseSpeed: e.baseSpeed ?? e.speed,
+        buffs: e.buffs || [],
+        ultimateUsed: e.ultimateUsed ?? false,
+        legendaryActionsRemaining: e.legendaryActionsPerTurn || 0
+      };
+    });
+    
+    const allCombatants = [...aliveTeam, ...monstersWithBaseStats];
     const turnOrder = allCombatants.sort((a, b) => b.speed - a.speed);
+    
+    const enemyNames = monstersWithBaseStats.map(e => e.name).join(', ');
+    const combatTitle = monstersWithBaseStats.length > 1 
+      ? `Combat contre ${monstersWithBaseStats.length} ennemis : ${enemyNames} !`
+      : `Combat contre ${monstersWithBaseStats[0].name} !`;
     
     gameStore.setState({
       turnOrder,
       currentTurnIndex: 0,
-      combatLog: [`Combat contre ${enemy.name} !`]
+      combatLog: [combatTitle],
+      combatHistory: [],
+      combatTurn: 1,
+      currentEnemies: monstersWithBaseStats,
+      currentEnemy: monstersWithBaseStats[0],
+      selectedEnemyIndex: 0
     });
+  },
+  
+  // Recalculer les stats d'un personnage à partir des valeurs de base + buffs actifs
+  recalculateStats: (character: Character): Character => {
+    // Récupérer les stats de base (ou utiliser les stats actuelles si baseStats non définis)
+    const baseAttack = character.baseAttack ?? character.attack;
+    const baseMagicAttack = character.baseMagicAttack ?? (character.magicAttack || 0);
+    const baseDefense = character.baseDefense ?? character.defense;
+    const baseMagicDefense = character.baseMagicDefense ?? character.magicDefense;
+    const baseSpeed = character.baseSpeed ?? character.speed;
+    
+    // Calculer les bonus de tous les buffs actifs
+    let attackBonus = 0;
+    let magicAttackBonus = 0;
+    let defenseBonus = 0;
+    let magicDefenseBonus = 0;
+    let speedBonus = 0;
+    
+    if (character.buffs) {
+      character.buffs.forEach(buff => {
+        if (buff.type === 'attack') attackBonus += buff.value;
+        else if (buff.type === 'magicAttack') magicAttackBonus += buff.value;
+        else if (buff.type === 'defense') defenseBonus += buff.value;
+        else if (buff.type === 'magicDefense') magicDefenseBonus += buff.value;
+        else if (buff.type === 'speed') speedBonus += buff.value;
+      });
+    }
+    
+    return {
+      ...character,
+      attack: Math.max(1, baseAttack + attackBonus),
+      magicAttack: Math.max(0, baseMagicAttack + magicAttackBonus),
+      defense: Math.max(0, baseDefense + defenseBonus),
+      magicDefense: Math.max(0, baseMagicDefense + magicDefenseBonus),
+      speed: Math.max(1, baseSpeed + speedBonus),
+      // S'assurer que les baseStats sont définies
+      baseAttack,
+      baseMagicAttack,
+      baseDefense,
+      baseMagicDefense,
+      baseSpeed
+    };
+  },
+  
+  // Décrémenter la durée des buffs et les supprimer si expirés
+  decrementBuffs: () => {
+    const team = state.team.map(character => {
+      if (!character.buffs || character.buffs.length === 0) return character;
+      
+      // Décrémenter la durée et filtrer les buffs expirés
+      const updatedBuffs = character.buffs
+        .map(buff => ({
+          ...buff,
+          turnsRemaining: buff.turnsRemaining - 1
+        }))
+        .filter(buff => buff.turnsRemaining > 0);
+      
+      // Mettre à jour le personnage avec les buffs restants
+      const charWithUpdatedBuffs = { ...character, buffs: updatedBuffs };
+      
+      // Recalculer les stats à partir des valeurs de base + buffs restants
+      return gameStore.recalculateStats(charWithUpdatedBuffs);
+    });
+    
+    gameStore.setState({ team });
+  },
+  
+  // Réinitialiser les actions légendaires des monstres à chaque nouveau tour (round complet)
+  resetLegendaryActionsForAll: () => {
+    const currentEnemies = state.currentEnemies.map(enemy => {
+      if (enemy.legendaryActionsPerTurn) {
+        return {
+          ...enemy,
+          legendaryActionsRemaining: enemy.legendaryActionsPerTurn
+        };
+      }
+      return enemy;
+    });
+    
+    gameStore.setState({ currentEnemies, currentEnemy: currentEnemies[0] });
+  },
+  
+  // Utiliser une action légendaire
+  useLegendaryAction: (enemyId: string, actionId: string) => {
+    const currentEnemies = state.currentEnemies.map(enemy => {
+      if (enemy.id === enemyId && enemy.legendaryActions) {
+        const action = enemy.legendaryActions.find(a => a.id === actionId);
+        if (action && enemy.legendaryActionsRemaining && enemy.legendaryActionsRemaining >= action.cost) {
+          return {
+            ...enemy,
+            legendaryActionsRemaining: enemy.legendaryActionsRemaining - action.cost
+          };
+        }
+      }
+      return enemy;
+    });
+    
+    gameStore.setState({ currentEnemies, currentEnemy: currentEnemies[0] });
+    return currentEnemies.find(e => e.id === enemyId);
+  },
+  
+  // Supprimer tous les buffs à la fin du combat
+  clearAllBuffs: () => {
+    const team = state.team.map(character => {
+      // Supprimer tous les buffs et recalculer les stats
+      const charWithNoBuffs = { ...character, buffs: [] };
+      return gameStore.recalculateStats(charWithNoBuffs);
+    });
+    
+    gameStore.setState({ team });
+  },
+  
+  // Fin du combat - nettoyer les buffs
+  endCombat: (victory: boolean) => {
+    gameStore.clearAllBuffs();
+    
+    if (victory) {
+      const isBossFight = state.currentEnemies.some(e => e.isBoss);
+      if (isBossFight) {
+        gameStore.setState({ 
+          phase: 'victory', 
+          currentEnemies: [],
+          currentEnemy: undefined 
+        });
+      } else {
+        gameStore.setState({ 
+          phase: 'dungeon', 
+          currentEnemies: [],
+          currentEnemy: undefined 
+        });
+      }
+    } else {
+      gameStore.setState({ 
+        phase: 'defeat', 
+        currentEnemies: [],
+        currentEnemy: undefined 
+      });
+    }
   },
   
   performAttack: (attacker: Character | Monster, target: Character | Monster, damage: number) => {
@@ -167,20 +673,38 @@ export const gameStore = {
     
     // Vérifier si le combat est terminé
     if ('isBoss' in target && target.hp <= 0) {
-      // Ennemi vaincu
+      // Ennemi vaincu - nettoyer les buffs
+      gameStore.clearAllBuffs();
+      
       if (target.isBoss) {
         gameStore.setState({ phase: 'victory', combatLog: [...log, 'VICTOIRE ! Le boss est vaincu !'] });
       } else {
-        gameStore.setState({ phase: 'dungeon', combatLog: [...log, `${target.name} est vaincu !`] });
+        gameStore.setState({ 
+          phase: 'dungeon', 
+          combatLog: [...log, `${target.name} est vaincu !`],
+          currentEnemy: undefined 
+        });
       }
     } else {
       // Vérifier si l'équipe est vaincue
       const teamAlive = state.team.some(c => c.hp > 0);
       if (!teamAlive) {
+        gameStore.clearAllBuffs();
         gameStore.setState({ phase: 'defeat', combatLog: [...log, 'DÉFAITE...'] });
       } else {
-        // Passer au tour suivant
-        const nextIndex = (state.currentTurnIndex + 1) % state.turnOrder.length;
+        // Passer au tour suivant (en sautant les morts)
+        let nextIndex = (state.currentTurnIndex + 1) % state.turnOrder.length;
+        let attempts = 0;
+        while (state.turnOrder[nextIndex].hp <= 0 && attempts < state.turnOrder.length) {
+          nextIndex = (nextIndex + 1) % state.turnOrder.length;
+          attempts++;
+        }
+        
+        // Décrémenter les buffs quand on revient au premier personnage
+        if (nextIndex === 0) {
+          gameStore.decrementBuffs();
+        }
+        
         gameStore.setState({ currentTurnIndex: nextIndex, combatLog: log });
       }
     }
@@ -191,19 +715,26 @@ export const gameStore = {
     const { effect } = event;
     
     let targets: Character[] = [];
+    const aliveTeam = team.filter(c => c.hp > 0);
     
     switch (effect.target) {
       case 'all':
-        targets = team;
+        targets = aliveTeam;
         break;
       case 'random':
-        targets = [team[Math.floor(Math.random() * team.length)]];
+        if (aliveTeam.length > 0) {
+          targets = [aliveTeam[Math.floor(Math.random() * aliveTeam.length)]];
+        }
         break;
       case 'weakest':
-        targets = [team.reduce((min, c) => c.hp < min.hp ? c : min, team[0])];
+        if (aliveTeam.length > 0) {
+          targets = [aliveTeam.reduce((min, c) => c.hp < min.hp ? c : min, aliveTeam[0])];
+        }
         break;
       case 'strongest':
-        targets = [team.reduce((max, c) => c.hp > max.hp ? c : max, team[0])];
+        if (aliveTeam.length > 0) {
+          targets = [aliveTeam.reduce((max, c) => c.hp > max.hp ? c : max, aliveTeam[0])];
+        }
         break;
     }
     
@@ -218,11 +749,17 @@ export const gameStore = {
         case 'buff_attack':
           t.attack += effect.value;
           break;
+        case 'buff_magic_attack':
+          t.magicAttack = (t.magicAttack || 0) + effect.value;
+          break;
         case 'buff_defense':
           t.defense += effect.value;
           break;
         case 'debuff_attack':
           t.attack = Math.max(1, t.attack - effect.value);
+          break;
+        case 'debuff_magic_attack':
+          t.magicAttack = Math.max(1, (t.magicAttack || 0) - effect.value);
           break;
         case 'debuff_defense':
           t.defense = Math.max(0, t.defense - effect.value);
@@ -230,16 +767,18 @@ export const gameStore = {
       }
     });
     
-    gameStore.setState({ team, phase: 'dungeon' });
+    gameStore.setState({ team, phase: 'dungeon', currentEvent: undefined });
   },
   
-  applyTreasure: (treasure: any) => {
+  applyTreasure: (treasure: TreasureLegacy) => {
     const team = [...state.team];
     
     switch (treasure.effect.type) {
       case 'heal_all':
         team.forEach(c => {
-          c.hp = Math.min(c.maxHp, c.hp + treasure.effect.value);
+          if (c.hp > 0) {
+            c.hp = Math.min(c.maxHp, c.hp + treasure.effect.value);
+          }
         });
         break;
       case 'buff_permanent':
@@ -280,9 +819,96 @@ export const gameStore = {
     return adjacent;
   },
   
+  // Récupérer les infos d'un trésor par son ID
+  getTreasureInfo: (treasureId: string): Treasure | null => {
+    const { allTreasures } = require('../data/treasures');
+    return allTreasures.find((t: Treasure) => t.id === treasureId) || null;
+  },
+  
+  // Passer au niveau suivant après avoir vaincu le boss
+  advanceToNextLevel: () => {
+    const currentLevel = state.dungeonLevel;
+    const newLevel = currentLevel + 1;
+    
+    // Calculer le scaling pour le nouveau niveau (équilibré)
+    // Niveau 2: monstres +25%, boss +35%
+    // Niveau 3: monstres +50%, boss +70%
+    // Niveau 4+: monstres +75%, boss +100%
+    let newMonsterScaling: number;
+    let newBossScaling: number;
+    
+    if (newLevel <= 2) {
+      newMonsterScaling = (newLevel - 1) * 25; // +25% par niveau
+      newBossScaling = (newLevel - 1) * 35; // +35% par niveau
+    } else if (newLevel === 3) {
+      newMonsterScaling = 50; // +50%
+      newBossScaling = 70; // +70%
+    } else {
+      // Niveau 4+ : scaling plus progressif
+      newMonsterScaling = 50 + (newLevel - 3) * 25; // +50% + 25% par niveau après 3
+      newBossScaling = 70 + (newLevel - 3) * 30; // +70% + 30% par niveau après 3
+    }
+    
+    // Nombre de salles : niveau 1 = 10, niveau 2 = 12, niveau 3 = 14, niveau 4+ = 16
+    const newRoomsPerLevel = newLevel === 1 ? 10 : (newLevel === 2 ? 12 : (newLevel === 3 ? 14 : 16));
+    
+    // Récupérer l'ID du boss actuel pour éviter de le régénérer
+    const currentBossId = state.currentEnemies.find(e => e.isBoss)?.id.split('_')[0];
+    
+    // Ressusciter tous les personnages vaincus et les soigner complètement
+    // Ils gardent leurs objets !
+    const revivedTeam = state.team.map(char => ({
+      ...char,
+      hp: char.maxHp, // Restaurer tous les PV
+      buffs: [] // Nettoyer les buffs
+    }));
+    
+    gameStore.setState({
+      team: revivedTeam,
+      dungeonLevel: newLevel,
+      roomsPerLevel: newRoomsPerLevel,
+      previousBossId: currentBossId,
+      monsterScaling: newMonsterScaling,
+      bossScalingMultiplier: newBossScaling,
+      encounterCount: 0,
+      combatCount: 0,
+      bossScaling: 0, // Reset le scaling de combat pour ce niveau
+      rooms: createInitialRooms(),
+      currentRoom: { x: 10, y: 10 },
+      currentEnemies: [],
+      currentEnemy: undefined,
+      combatLog: [
+        `🎉 Bienvenue au Niveau ${newLevel} !`, 
+        `✨ Toute l'équipe a été ressuscitée et soignée !`,
+        `Monstres +${newMonsterScaling}% | Boss +${newBossScaling}%`, 
+        `${newRoomsPerLevel} salles avant le boss`
+      ],
+      phase: 'dungeon'
+    });
+    
+    gameStore.addToHistory({
+      turn: 0,
+      type: 'event',
+      title: `Niveau ${newLevel} débloqué !`,
+      description: `Les monstres sont renforcés de ${newMonsterScaling}% et le boss de ${newBossScaling}%`,
+      icon: '🏰',
+      isPositive: true
+    });
+  },
+  
   resetGame: () => {
-    state = { ...initialState, rooms: createInitialRooms() };
+    state = { 
+      ...initialState, 
+      rooms: createInitialRooms(), 
+      history: [], 
+      pendingTreasures: [], 
+      combatHistory: [],
+      dungeonLevel: 1,
+      roomsPerLevel: 10,
+      previousBossId: undefined,
+      monsterScaling: 0,
+      bossScalingMultiplier: 0
+    };
     listeners.forEach(l => l());
   }
 };
-

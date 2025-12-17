@@ -1,4 +1,4 @@
-// Types pour la base de données Supabase - eternalys-db
+// Types pour la base de données Supabase - ethernalys-db
 // Ces types seront générés automatiquement avec: npx supabase gen types typescript
 
 export type Json =

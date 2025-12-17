@@ -1,170 +1,1910 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { gameStore } from '../store/gameStore';
-import { GameState, Character, Monster } from '../types/game.types';
+import { GameState, Character, Monster, Skill, MonsterSkill, CombatHistoryEntry, ActiveBuff, InventoryItem } from '../types/game.types';
+import { getMonsterAction, getMonsterTaunt } from '../lib/openai';
+import { getMonsterDrops, applyDropEffect } from '../data/monsterDrops';
 import './CombatPage.css';
 
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
+  const [monsterDialogue, setMonsterDialogue] = useState<string>('');
+  const [showDialogue, setShowDialogue] = useState(false);
+  const [selectingTarget, setSelectingTarget] = useState<'ally' | 'enemy' | null>(null);
+  const [pendingSkill, setPendingSkill] = useState<Skill | null>(null);
+  const [combatHistory, setCombatHistory] = useState<CombatHistoryEntry[]>([]);
+  const [combatTurn, setCombatTurn] = useState(1);
+  const lastTurnRef = useRef<string | null>(null);
+  // Utiliser une ref pour accumuler les drops de manière SYNCHRONE
+  // (useState est asynchrone et causerait des problèmes avec checkCombatEnd)
+  const accumulatedDropsRef = useRef<InventoryItem[]>([]);
+  // Drops à distribuer (affiché seulement quand TOUS les monstres sont morts)
+  const [pendingDrops, setPendingDrops] = useState<{ drops: InventoryItem[] } | null>(null);
+  const [selectingDropCharacter, setSelectingDropCharacter] = useState<InventoryItem | null>(null);
+  const [screenShake, setScreenShake] = useState(false);
+  // Compteur de tours complets (tous ont joué au moins une fois)
+  const [fullRounds, setFullRounds] = useState(0);
+  // Effet de dégâts visuels
+  const [damageEffect, setDamageEffect] = useState<{ targetId: string; type: 'physical' | 'magical' } | null>(null);
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
   }, []);
 
-  const { team, currentEnemy, turnOrder, currentTurnIndex, combatLog } = state;
-  
-  if (!currentEnemy) return null;
-
-  const currentTurn = turnOrder[currentTurnIndex];
-  const isPlayerTurn = currentTurn && 'class' in currentTurn;
-  const isEnemyTurn = currentTurn && 'isBoss' in currentTurn;
-
-  // IA de l'ennemi
+  // Réinitialiser l'historique au début d'un combat
   useEffect(() => {
-    if (isEnemyTurn && !isAnimating) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        // L'ennemi attaque un membre aléatoire de l'équipe vivante
-        const aliveTeam = team.filter(c => c.hp > 0);
-        if (aliveTeam.length > 0) {
-          const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
-          gameStore.performAttack(currentEnemy, target, currentEnemy.attack);
-        }
-        setIsAnimating(false);
-      }, 1500);
+    const hasEnemies = state.currentEnemies && state.currentEnemies.length > 0;
+    if (hasEnemies && state.combatLog.length === 1) {
+      setCombatHistory([]);
+      setCombatTurn(1);
+      setFullRounds(0); // Réinitialiser les tours complets
+      lastTurnRef.current = null;
+      // Réinitialiser les drops accumulés au début du combat
+      accumulatedDropsRef.current = [];
+      setPendingDrops(null);
     }
-  }, [currentTurnIndex, isEnemyTurn]);
+  }, [state.currentEnemies?.length]);
+
+  const { team, currentEnemies, currentEnemy, turnOrder, currentTurnIndex, combatLog, selectedEnemyIndex, bossScaling } = state;
+  
+  // Support multi-monstres
+  const enemies = currentEnemies || (currentEnemy ? [currentEnemy] : []);
+  if (enemies.length === 0) return null;
+  
+  // L'ennemi sélectionné par défaut ou par le joueur
+  const selectedEnemy = enemies[selectedEnemyIndex || 0] || enemies[0];
+  
+  // Ennemis en vie
+  const aliveEnemies = enemies.filter(e => e.hp > 0);
+
+  // IMPORTANT: turnOrder contient des références qui ne sont pas mises à jour quand team change
+  // On doit donc obtenir le personnage actuel depuis team (qui EST mis à jour) pour avoir les stats correctes
+  const currentTurnFromOrder = turnOrder[currentTurnIndex];
+  
+  // Si c'est un personnage, obtenir la version mise à jour depuis team
+  // Sinon (monstre), obtenir depuis currentEnemies
+  let currentTurn: Character | Monster | undefined = currentTurnFromOrder;
+  if (currentTurnFromOrder && 'class' in currentTurnFromOrder) {
+    // C'est un personnage - obtenir la version mise à jour depuis team
+    currentTurn = team.find(c => c.id === currentTurnFromOrder.id) || currentTurnFromOrder;
+  } else if (currentTurnFromOrder && 'isBoss' in currentTurnFromOrder) {
+    // C'est un monstre - obtenir depuis currentEnemies
+    currentTurn = enemies.find(e => e.id === (currentTurnFromOrder as Monster).id) || currentTurnFromOrder;
+  }
+  
+  const isPlayerTurn = currentTurn && 'class' in currentTurn;
+  const isEnemyTurn = currentTurn && 'isBoss' in currentTurn && aliveEnemies.some(e => e.id === (currentTurn as Monster).id);
+
+  // Calcul dynamique de la couleur de la barre de vie
+  const getHpBarColor = (currentHp: number, maxHp: number): string => {
+    const percentage = (currentHp / maxHp) * 100;
+    if (percentage <= 0) return '#1a1a1a'; // Noir
+    if (percentage <= 33) return '#c0392b'; // Rouge
+    if (percentage <= 66) return '#f39c12'; // Jaune/Orange
+    return '#27ae60'; // Vert
+  };
+
+  // Calcul des modifications de stats pour le tooltip
+  const getStatModifiers = (entity: Character | Monster) => {
+    const mods: { stat: string; base: number; current: number; diff: number }[] = [];
+    
+    // Utiliser baseStats si disponibles, sinon utiliser les stats actuelles comme base
+    const baseAttack = 'baseAttack' in entity && entity.baseAttack !== undefined ? entity.baseAttack : entity.attack;
+    const baseMagicAttack = 'baseMagicAttack' in entity && entity.baseMagicAttack !== undefined ? entity.baseMagicAttack : (entity.magicAttack || 0);
+    const baseDefense = 'baseDefense' in entity && entity.baseDefense !== undefined ? entity.baseDefense : entity.defense;
+    const baseMagicDefense = 'baseMagicDefense' in entity && entity.baseMagicDefense !== undefined ? entity.baseMagicDefense : entity.magicDefense;
+    const baseSpeed = 'baseSpeed' in entity && entity.baseSpeed !== undefined ? entity.baseSpeed : entity.speed;
+    
+    mods.push({ stat: 'Attaque', base: baseAttack, current: entity.attack, diff: entity.attack - baseAttack });
+    mods.push({ stat: 'Att. Magique', base: baseMagicAttack, current: entity.magicAttack || 0, diff: (entity.magicAttack || 0) - baseMagicAttack });
+    mods.push({ stat: 'Défense', base: baseDefense, current: entity.defense, diff: entity.defense - baseDefense });
+    mods.push({ stat: 'Déf. Magique', base: baseMagicDefense, current: entity.magicDefense, diff: entity.magicDefense - baseMagicDefense });
+    mods.push({ stat: 'Vitesse', base: baseSpeed, current: entity.speed, diff: entity.speed - baseSpeed });
+    
+    return mods;
+  };
+
+  // Rendu du tooltip de stats
+  const renderStatsTooltip = (entity: Character | Monster) => {
+    const mods = getStatModifiers(entity);
+    const hasModifiers = mods.some(m => m.diff !== 0);
+    
+    return (
+      <div className="stats-tooltip">
+        <div className="tooltip-header">📊 Statistiques détaillées</div>
+        {mods.map((m, i) => (
+          <div key={i} className={`stat-line ${m.diff > 0 ? 'buff' : m.diff < 0 ? 'debuff' : ''}`}>
+            <span className="stat-name">{m.stat}</span>
+            <span className="stat-values">
+              <span className="base-value">{m.base}</span>
+              {m.diff !== 0 && (
+                <>
+                  <span className="arrow">→</span>
+                  <span className="current-value">{m.current}</span>
+                  <span className={`diff ${m.diff > 0 ? 'positive' : 'negative'}`}>
+                    ({m.diff > 0 ? '+' : ''}{m.diff})
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+        ))}
+        {hasModifiers && entity.buffs && entity.buffs.length > 0 && (
+          <div className="active-effects">
+            <div className="effects-header">Effets actifs:</div>
+            {entity.buffs.map((buff, i) => (
+              <span key={i} className="effect-badge" title={`${buff.value} pendant ${buff.turnsRemaining} tours`}>
+                {buff.icon} {buff.type} {buff.turnsRemaining}t
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Déclencher un effet visuel de dégâts
+  const triggerDamageEffect = (targetId: string, damageType: 'physical' | 'magical') => {
+    setDamageEffect({ targetId, type: damageType });
+    setTimeout(() => setDamageEffect(null), 500);
+  };
+
+  // Décrémenter les buffs et cooldowns du personnage actuel à chaque nouveau tour
+  const processBuffsForCharacter = useCallback((characterId: string) => {
+    const logs: string[] = [...state.combatLog];
+    
+    const updatedTeam = state.team.map(char => {
+      if (char.id !== characterId) return char;
+      
+      let updatedChar = { ...char };
+      
+      // =============================================
+      // DÉCRÉMENTER LES COOLDOWNS DES COMPÉTENCES
+      // =============================================
+      if (updatedChar.skills) {
+        updatedChar.skills = updatedChar.skills.map(skill => {
+          if (skill.currentCooldown && skill.currentCooldown > 0) {
+            return { ...skill, currentCooldown: skill.currentCooldown - 1 };
+          }
+          return skill;
+        });
+      }
+      
+      // =============================================
+      // TRAITER LES BUFFS
+      // =============================================
+      if (!updatedChar.buffs || updatedChar.buffs.length === 0) {
+        return updatedChar;
+      }
+      
+      const updatedBuffs: ActiveBuff[] = [];
+      const expiredBuffNames: string[] = [];
+      
+      char.buffs?.forEach(buff => {
+        if (buff.ownerId === characterId) {
+          // Appliquer les effets de début de tour (régén, poison)
+          if (buff.type === 'regen') {
+            const healAmount = Math.min(buff.value, updatedChar.maxHp - updatedChar.hp);
+            updatedChar.hp = Math.min(updatedChar.maxHp, updatedChar.hp + buff.value);
+            if (healAmount > 0) {
+              logs.push(`💚 ${updatedChar.name} régénère ${healAmount} PV`);
+              if (updatedChar.stats) {
+                updatedChar.stats.totalHealingDone += healAmount;
+              }
+            }
+          } else if (buff.type === 'poison') {
+            const poisonDmg = buff.value;
+            updatedChar.hp = Math.max(0, updatedChar.hp - poisonDmg);
+            logs.push(`🧪 ${updatedChar.name} subit ${poisonDmg} dégâts de poison`);
+            if (updatedChar.stats) {
+              updatedChar.stats.totalDamageTaken += poisonDmg;
+            }
+          }
+          
+          // Décrémenter la durée du buff
+          const newTurns = buff.turnsRemaining - 1;
+          
+          if (newTurns <= 0) {
+            // Buff expiré - noter son nom pour le log
+            if (buff.type === 'attack') {
+              expiredBuffNames.push('attaque');
+            } else if (buff.type === 'magicAttack') {
+              expiredBuffNames.push('attaque magique');
+            } else if (buff.type === 'defense') {
+              expiredBuffNames.push('défense');
+            } else if (buff.type === 'magicDefense') {
+              expiredBuffNames.push('résistance magique');
+            } else if (buff.type === 'speed') {
+              expiredBuffNames.push('vitesse');
+            } else if (buff.type === 'damage_reflect') {
+              logs.push(`${updatedChar.name} ne renvoie plus les dégâts`);
+            }
+            // NE PAS ajouter aux buffs (supprimé de la liste)
+          } else {
+            // Buff toujours actif, on le garde
+            updatedBuffs.push({ ...buff, turnsRemaining: newTurns });
+          }
+        } else {
+          // Buff d'un autre personnage, garder tel quel
+          updatedBuffs.push(buff);
+        }
+      });
+      
+      // Mettre à jour les buffs du personnage
+      updatedChar.buffs = updatedBuffs;
+      
+      // IMPORTANT: Recalculer les stats à partir des baseStats + buffs restants
+      // Cela garantit que les stats reviennent à la normale quand un buff expire
+      const recalculated = gameStore.recalculateStats(updatedChar);
+      updatedChar.attack = recalculated.attack;
+      updatedChar.magicAttack = recalculated.magicAttack;
+      updatedChar.defense = recalculated.defense;
+      updatedChar.magicDefense = recalculated.magicDefense;
+      updatedChar.speed = recalculated.speed;
+      
+      // Logger les buffs expirés
+      if (expiredBuffNames.length > 0) {
+        logs.push(`⏳ ${updatedChar.name} perd le(s) buff(s) de ${expiredBuffNames.join(', ')}`);
+      }
+      
+      return updatedChar;
+    });
+    
+    gameStore.setState({ team: updatedTeam, combatLog: logs });
+  }, [state.team, state.combatLog]);
+
+  // Vérifier si c'est un nouveau tour pour un personnage
+  useEffect(() => {
+    if (isPlayerTurn && currentTurn) {
+      const currentCharId = (currentTurn as Character).id;
+      if (lastTurnRef.current !== currentCharId) {
+        lastTurnRef.current = currentCharId;
+        // Nouveau tour pour ce personnage, traiter ses buffs
+        processBuffsForCharacter(currentCharId);
+      }
+    }
+  }, [currentTurnIndex, isPlayerTurn, processBuffsForCharacter]);
+
+  // Ajouter une entrée à l'historique de combat
+  const addCombatHistoryEntry = (entry: Omit<CombatHistoryEntry, 'id' | 'timestamp'>) => {
+    const newEntry: CombatHistoryEntry = {
+      ...entry,
+      id: Date.now().toString(),
+      timestamp: Date.now()
+    };
+    setCombatHistory(prev => [...prev, newEntry]);
+  };
+
+  // Tracker les stats de combat
+  const trackDamageDealt = (attackerId: string, damage: number) => {
+    const team = [...state.team];
+    const attacker = team.find(c => c.id === attackerId);
+    if (attacker) {
+      if (!attacker.stats) {
+        attacker.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+      }
+      attacker.stats.totalDamageDealt += damage;
+      gameStore.setState({ team });
+    }
+  };
+
+  const trackDamageTaken = (targetId: string, damage: number) => {
+    const team = [...state.team];
+    const target = team.find(c => c.id === targetId);
+    if (target) {
+      if (!target.stats) {
+        target.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+      }
+      target.stats.totalDamageTaken += damage;
+      gameStore.setState({ team });
+    }
+  };
+
+  const trackHealing = (healerId: string, healing: number) => {
+    const team = [...state.team];
+    const healer = team.find(c => c.id === healerId);
+    if (healer) {
+      if (!healer.stats) {
+        healer.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+      }
+      healer.stats.totalHealingDone += healing;
+      gameStore.setState({ team });
+    }
+  };
+
+  // Choisir la cible du monstre en tenant compte de la Provocation
+  const getMonsterTarget = (aliveTeam: Character[]): Character => {
+    // Vérifier si un personnage a le buff Provocation (damage_reflect avec défense)
+    const tauntingChars = aliveTeam.filter(c => 
+      c.buffs?.some(b => b.type === 'damage_reflect' && b.isApplied)
+    );
+    
+    if (tauntingChars.length > 0) {
+      // Cibler prioritairement le personnage qui provoque
+      return tauntingChars[Math.floor(Math.random() * tauntingChars.length)];
+    }
+    
+    // Sinon, cible aléatoire
+    return aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
+  };
+
+  // Appliquer le renvoi de dégâts si le personnage a ce buff
+  const applyDamageReflect = (target: Character, damage: number, enemy: Monster, logs: string[]): number => {
+    const reflectBuff = target.buffs?.find(b => b.type === 'damage_reflect');
+    if (reflectBuff && damage > 0) {
+      // Minimum 1 dégât renvoyé si le personnage a reçu des dégâts
+      const reflectedDamage = Math.max(1, Math.floor(damage * reflectBuff.value / 100));
+      enemy.hp = Math.max(0, enemy.hp - reflectedDamage);
+      
+      logs.push(`🔄 ${target.name} renvoie ${reflectedDamage} dégâts à ${enemy.name} !`);
+      trackDamageDealt(target.id, reflectedDamage);
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: target.name,
+        actorPortrait: target.portrait,
+        action: 'Renvoi de dégâts',
+        target: enemy.name,
+        damage: reflectedDamage,
+        isPlayerAction: true,
+        damageType: 'physical'
+      });
+      
+      return reflectedDamage;
+    }
+    return 0;
+  };
+
+  const trackMonsterKill = (killerId: string, monster: Monster) => {
+    const team = [...state.team];
+    const killer = team.find(c => c.id === killerId);
+    if (killer) {
+      if (!killer.stats) {
+        killer.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+      }
+      killer.stats.monstersKilled.push({ ...monster });
+      // Mettre à jour le monstre le plus puissant
+      if (!killer.stats.strongestMonsterKilled || 
+          (monster.attack + monster.defense) > (killer.stats.strongestMonsterKilled.attack + killer.stats.strongestMonsterKilled.defense)) {
+        killer.stats.strongestMonsterKilled = { ...monster };
+      }
+      gameStore.setState({ team });
+    }
+  };
+
+  // Calculer les dégâts en tenant compte du type (physique/magique)
+  // Types de dégâts physiques D&D
+  const physicalDamageTypes = ['physical', 'bludgeoning', 'piercing', 'slashing'];
+  // Types de dégâts magiques D&D
+  const magicalDamageTypes = ['magical', 'holy', 'fire', 'cold', 'lightning', 'acid', 'poison', 'necrotic', 'radiant', 'force', 'psychic', 'thunder'];
+  
+  const isPhysicalDamage = (type: string): boolean => physicalDamageTypes.includes(type);
+  const isMagicalDamage = (type: string): boolean => magicalDamageTypes.includes(type);
+  
+  const calculateDamage = (
+    baseDamage: number, 
+    attacker: Character | Monster, 
+    target: Character | Monster,
+    damageType: string = 'physical',
+    skill?: Skill
+  ): number => {
+    let totalDamage = baseDamage;
+    
+    const isPhysical = isPhysicalDamage(damageType);
+    
+    if ('class' in attacker) {
+      if (isPhysical) {
+        // Bonus d'attaque physique (Force via les stats de base)
+        const attackBonus = Math.floor(attacker.attack * 0.3);
+        totalDamage += attackBonus;
+      } else {
+        // Bonus d'attaque magique (Intelligence via les stats de base)
+        const magicStat = attacker.magicAttack || 0;
+        const magicBonus = Math.floor(magicStat * 0.3);
+        totalDamage += magicBonus;
+      }
+    }
+    
+    // Bonus contre certains types de monstres
+    if (skill && 'isBoss' in target) {
+      // Bonus vs démons (fiends en D&D)
+      if (skill.bonusVsDemon && (target.monsterType === 'demon' || target.creatureType === 'fiend')) {
+        totalDamage += skill.bonusVsDemon;
+      }
+      // Bonus vs morts-vivants
+      if (skill.bonusVsUndead && (target.monsterType === 'undead' || target.creatureType === 'undead')) {
+        totalDamage += skill.bonusVsUndead;
+      }
+    }
+    
+    // Calculer la défense appropriée
+    let defense = 0;
+    if (isPhysical) {
+      defense = target.defense;
+    } else {
+      defense = 'magicDefense' in target ? target.magicDefense : Math.floor(target.defense * 0.5);
+    }
+    
+    // Vérifier les résistances/immunités/vulnérabilités (D&D)
+    if ('resistances' in target && target.resistances?.includes(damageType as any)) {
+      totalDamage = Math.floor(totalDamage * 0.5); // Résistance = 50% de dégâts
+    }
+    if ('immunities' in target && target.immunities?.includes(damageType as any)) {
+      totalDamage = 0; // Immunité = 0 dégâts
+    }
+    if ('vulnerabilities' in target && target.vulnerabilities?.includes(damageType as any)) {
+      totalDamage = Math.floor(totalDamage * 2); // Vulnérabilité = 200% de dégâts
+    }
+    
+    return Math.max(1, totalDamage - defense);
+  };
+
+  const displayMonsterDialogue = (dialogue: string) => {
+    setMonsterDialogue(dialogue);
+    setShowDialogue(true);
+    setTimeout(() => setShowDialogue(false), 2500);
+  };
+
+  // IA du monstre avec compétences (multi-monstres)
+  useEffect(() => {
+    // Le monstre actuel est celui dont c'est le tour
+    const currentMonster = isEnemyTurn ? currentTurn as Monster : null;
+    
+    if (isEnemyTurn && !isAnimating && currentMonster && currentMonster.hp > 0) {
+      setIsAnimating(true);
+      
+      const executeMonsterTurn = async () => {
+        try {
+          // Vérifier si le boss peut utiliser son ultime (après X tours COMPLETS)
+          // Un tour complet = tous les personnages et monstres ont joué au moins une fois
+          if (currentMonster.isBoss && 
+              currentMonster.ultimateSkill && 
+              !currentMonster.ultimateUsed && 
+              fullRounds >= (currentMonster.ultimateTurnTrigger || 4)) {
+            
+            // Utiliser la compétence ultime !
+            displayMonsterDialogue(`💀 ${currentMonster.name} prépare son attaque ULTIME !`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Activer le tremblement d'écran (2 secondes) !
+            setScreenShake(true);
+            setTimeout(() => setScreenShake(false), 2000);
+            
+            // Marquer l'ultime comme utilisé
+            currentMonster.ultimateUsed = true;
+            
+            // Exécuter l'ultime sur tous les personnages
+            const logs = [...combatLog, `⚡ ${currentMonster.name} utilise ${currentMonster.ultimateSkill.name} !`];
+            const aliveTeam = team.filter(c => c.hp > 0);
+            const ultimate = currentMonster.ultimateSkill;
+            let totalDamage = 0;
+            
+            for (const target of aliveTeam) {
+              const damage = calculateDamage(ultimate.damage, currentMonster, target, ultimate.damageType || 'magical');
+              target.hp = Math.max(0, target.hp - damage);
+              totalDamage += damage;
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, ultimate.damageType === 'physical' ? 'physical' : 'magical');
+              logs.push(`💥 ${target.name} subit ${damage} dégâts !`);
+              
+              // Appliquer les effets spéciaux de l'ultime
+              if (ultimate.effect) {
+                const effect = ultimate.effect as { type: string; stat?: string; value?: number; turns?: number; poison?: number; hits?: number };
+                
+                // Debuff sur toute l'équipe
+                if (effect.type === 'debuff_all' && effect.stat && effect.value && effect.turns) {
+                  const debuffValue = effect.value;
+                  const debuffIcon = effect.stat === 'speed' ? '🥶' : effect.stat === 'defense' ? '💔' : '📉';
+                  
+                  if (!target.buffs) target.buffs = [];
+                  target.buffs.push({
+                    type: effect.stat as 'attack' | 'defense' | 'speed' | 'magicAttack' | 'magicDefense',
+                    value: -debuffValue,
+                    turnsRemaining: effect.turns,
+                    name: `Debuff ${effect.stat}`,
+                    icon: debuffIcon,
+                    isApplied: true
+                  });
+                  
+                  // Appliquer le debuff
+                  if (effect.stat === 'defense') target.defense = Math.max(0, target.defense - debuffValue);
+                  else if (effect.stat === 'speed') target.speed = Math.max(1, target.speed - debuffValue);
+                  else if (effect.stat === 'attack') target.attack = Math.max(1, target.attack - debuffValue);
+                  else if (effect.stat === 'magicDefense') target.magicDefense = Math.max(0, target.magicDefense - debuffValue);
+                  
+                  logs.push(`⬇️ ${target.name} subit -${debuffValue} ${effect.stat} !`);
+                }
+                
+                // Poison sur toute l'équipe
+                if ((effect.type === 'poison_all' || effect.type === 'burn_all') && effect.value && effect.turns) {
+                  if (!target.buffs) target.buffs = [];
+                  target.buffs.push({
+                    type: 'poison',
+                    value: effect.value,
+                    turnsRemaining: effect.turns,
+                    name: effect.type === 'burn_all' ? 'Brûlure' : 'Poison',
+                    icon: effect.type === 'burn_all' ? '🔥' : '🧪',
+                    isApplied: true
+                  });
+                  logs.push(`${effect.type === 'burn_all' ? '🔥' : '🧪'} ${target.name} est ${effect.type === 'burn_all' ? 'brûlé' : 'empoisonné'} !`);
+                }
+                
+                // Gel (freeze_all)
+                if (effect.type === 'freeze_all' && effect.value && effect.turns) {
+                  if (!target.buffs) target.buffs = [];
+                  target.buffs.push({
+                    type: 'speed',
+                    value: -effect.value,
+                    turnsRemaining: effect.turns,
+                    name: 'Gelé',
+                    icon: '❄️',
+                    isApplied: true
+                  });
+                  target.speed = Math.max(1, target.speed - effect.value);
+                  logs.push(`❄️ ${target.name} est gelé ! (Vitesse -${effect.value})`);
+                }
+              }
+            }
+            
+            // Lifesteal pour le boss
+            if (ultimate.effect && (ultimate.effect as { type: string }).type === 'lifesteal_all') {
+              const healAmount = Math.floor(totalDamage * 0.5);
+              currentMonster.hp = Math.min(currentMonster.maxHp, currentMonster.hp + healAmount);
+              logs.push(`🧛 ${currentMonster.name} récupère ${healAmount} PV !`);
+            }
+            
+            addCombatHistoryEntry({
+              turn: combatTurn,
+              actor: currentMonster.name,
+              actorPortrait: currentMonster.portrait,
+              action: `⚡ ${ultimate.name} (ULTIME)`,
+              target: 'Toute l\'équipe',
+              damage: totalDamage,
+              isPlayerAction: false,
+              damageType: ultimate.damageType || 'magical'
+            });
+            
+            gameStore.setState({ team: [...team] });
+            checkCombatEnd(logs, null, undefined, enemies);
+            setIsAnimating(false);
+            return;
+          }
+          
+          const useSkill = currentMonster.skills && currentMonster.skills.length > 0 && Math.random() > 0.3;
+          
+          if (useSkill && currentMonster.skills) {
+            const availableSkills = currentMonster.skills.filter(s => !s.currentCooldown || s.currentCooldown <= 0);
+            if (availableSkills.length > 0) {
+              const skill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+              await executeMonsterSkill(skill, currentMonster);
+              setIsAnimating(false);
+              return;
+            }
+          }
+          
+          const action = await getMonsterAction(currentMonster, team, combatLog);
+          displayMonsterDialogue(action.dialogue);
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          const aliveTeam = team.filter(c => c.hp > 0);
+          if (aliveTeam.length > 0) {
+            // Vérifier la Provocation en priorité
+            const target = getMonsterTarget(aliveTeam);
+            
+            const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+            target.hp = Math.max(0, target.hp - damage);
+            trackDamageTaken(target.id, damage);
+            triggerDamageEffect(target.id, 'physical');
+            
+            const logs = [...combatLog, `${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`];
+            
+            // Appliquer le renvoi de dégâts si le personnage provoque
+            applyDamageReflect(target, damage, currentMonster, logs);
+            
+            addCombatHistoryEntry({
+              turn: combatTurn,
+              actor: currentMonster.name,
+              actorPortrait: currentMonster.portrait,
+              action: 'Attaque',
+              target: target.name,
+              damage,
+              isPlayerAction: false,
+              damageType: 'physical'
+            });
+            
+            checkCombatEnd(logs, null, undefined, enemies);
+          }
+        } catch (error) {
+          console.error('Error in monster turn:', error);
+          const aliveTeam = team.filter(c => c.hp > 0);
+          if (aliveTeam.length > 0) {
+            // Utiliser getMonsterTarget pour la Provocation
+            const target = getMonsterTarget(aliveTeam);
+            displayMonsterDialogue('GRAAAH!');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+            target.hp = Math.max(0, target.hp - damage);
+            trackDamageTaken(target.id, damage);
+            triggerDamageEffect(target.id, 'physical');
+            
+            const logs = [...combatLog, `${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`];
+            
+            // Appliquer le renvoi de dégâts si le personnage provoque
+            applyDamageReflect(target, damage, currentMonster, logs);
+            
+            addCombatHistoryEntry({
+              turn: combatTurn,
+              actor: currentMonster.name,
+              actorPortrait: currentMonster.portrait,
+              action: 'Attaque',
+              target: target.name,
+              damage,
+              isPlayerAction: false,
+              damageType: 'physical'
+            });
+            
+            checkCombatEnd(logs, null, undefined, enemies);
+          }
+        }
+        
+        setIsAnimating(false);
+      };
+      
+      executeMonsterTurn();
+    }
+  }, [currentTurnIndex, isEnemyTurn, isAnimating]);
+
+  const executeMonsterSkill = async (skill: MonsterSkill, monster: Monster) => {
+    displayMonsterDialogue(`${skill.name}!`);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const aliveTeam = team.filter(c => c.hp > 0);
+    const logs: string[] = [...combatLog];
+    
+    if (skill.type === 'attack' || skill.type === 'special') {
+      if (aliveTeam.length > 0) {
+        // Utiliser getMonsterTarget pour la Provocation
+        const target = getMonsterTarget(aliveTeam);
+        const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
+        target.hp = Math.max(0, target.hp - damage);
+        trackDamageTaken(target.id, damage);
+        triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+        
+        logs.push(`${monster.name} utilise ${skill.name} ! (${damage} dégâts ${skill.damageType === 'magical' ? 'magiques' : 'physiques'} à ${target.name})`);
+        
+        // Appliquer le renvoi de dégâts si le personnage provoque (seulement pour dégâts physiques)
+        if (skill.damageType === 'physical') {
+          applyDamageReflect(target, damage, monster, logs);
+        }
+        
+        addCombatHistoryEntry({
+          turn: combatTurn,
+          actor: monster.name,
+          actorPortrait: monster.portrait,
+          action: skill.name,
+          target: target.name,
+          damage,
+          isPlayerAction: false,
+          damageType: skill.damageType
+        });
+        
+        if (skill.effect?.type === 'lifesteal') {
+          const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
+          monster.hp = Math.min(monster.maxHp, monster.hp + healed);
+          logs.push(`${monster.name} récupère ${healed} PV !`);
+        }
+      }
+    } else if (skill.type === 'buff' && skill.effect) {
+      if (skill.effect.type === 'heal') {
+        monster.hp = Math.min(monster.maxHp, monster.hp + (skill.effect.value || 0));
+        logs.push(`${monster.name} se régénère de ${skill.effect.value} PV !`);
+      } else {
+        logs.push(`${monster.name} utilise ${skill.name} !`);
+      }
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: monster.name,
+        actorPortrait: monster.portrait,
+        action: skill.name,
+        heal: skill.effect.type === 'heal' ? skill.effect.value : undefined,
+        isPlayerAction: false
+      });
+    }
+    
+    if (skill.cooldown) {
+      skill.currentCooldown = skill.cooldown;
+    }
+    
+    checkCombatEnd(logs, null, undefined, enemies);
+  };
+
+  // Vérifier fin de combat (multi-monstres)
+  // updatedEnemies contient les ennemis avec leurs HP à jour (passé directement car setState est asynchrone)
+  const checkCombatEnd = (logs: string[], lastAttackerId: string | null, killedEnemy?: Monster, updatedEnemies?: Monster[]) => {
+    // IMPORTANT: Utiliser les ennemis passés en paramètre (car setState est asynchrone)
+    const currentEnemiesList = updatedEnemies || enemies;
+    const stillAliveEnemies = currentEnemiesList.filter(e => e.hp > 0);
+    
+    // Si un ennemi a été tué, ACCUMULER ses drops dans la ref (synchrone)
+    if (killedEnemy && killedEnemy.hp <= 0) {
+      if (lastAttackerId) {
+        trackMonsterKill(lastAttackerId, killedEnemy);
+      }
+      
+      // Générer les drops du monstre et les ACCUMULER dans la ref
+      const drops = getMonsterDrops(killedEnemy);
+      const encounterCount = state.encounterCount;
+      const dropsWithTurn = drops.map(d => ({ ...d, obtainedAt: encounterCount }));
+      
+      logs.push(`💀 ${killedEnemy.name} est vaincu !`);
+      
+      if (dropsWithTurn.length > 0) {
+        logs.push(`💎 ${killedEnemy.name} laisse tomber ${dropsWithTurn.length} objet(s) !`);
+        // ACCUMULER les drops de manière SYNCHRONE via ref
+        accumulatedDropsRef.current = [...accumulatedDropsRef.current, ...dropsWithTurn];
+      }
+    }
+    
+    // Vérifier si TOUS les monstres sont morts
+    if (stillAliveEnemies.length === 0) {
+      // TOUS les ennemis sont vaincus !
+      const cleanTeam = state.team.map(c => {
+        let cleanChar = { ...c };
+        if (c.buffs) {
+          c.buffs.forEach(buff => {
+            if (buff.isApplied) {
+              if (buff.type === 'attack') cleanChar.attack = Math.max(1, cleanChar.attack - buff.value);
+              else if (buff.type === 'magicAttack') cleanChar.magicAttack = Math.max(1, (cleanChar.magicAttack || 0) - buff.value);
+              else if (buff.type === 'defense') cleanChar.defense = Math.max(0, cleanChar.defense - buff.value);
+              else if (buff.type === 'magicDefense') cleanChar.magicDefense = Math.max(0, cleanChar.magicDefense - buff.value);
+              else if (buff.type === 'speed') cleanChar.speed = Math.max(1, cleanChar.speed - buff.value);
+            }
+          });
+        }
+        cleanChar.buffs = [];
+        return cleanChar;
+      });
+      
+      const isBossFight = currentEnemiesList.some(e => e.isBoss);
+      
+      // Récupérer TOUS les drops accumulés (ref est synchrone)
+      const allDrops = [...accumulatedDropsRef.current];
+      
+      // S'il y a des drops à distribuer, afficher le modal
+      if (allDrops.length > 0) {
+        setPendingDrops({ drops: allDrops });
+        gameStore.setState({ combatLog: [...logs, 'Victoire ! Récupération du butin...'], team: cleanTeam });
+      } else {
+        // Pas de drops, terminer le combat directement
+        if (isBossFight) {
+          gameStore.setState({ 
+            phase: 'summary', 
+            combatLog: [...logs, 'VICTOIRE ! Le boss est vaincu !'],
+            currentEnemies: [],
+            currentEnemy: undefined,
+            team: cleanTeam
+          });
+        } else {
+          gameStore.setState({ 
+            phase: 'dungeon', 
+            combatLog: [...logs, 'Victoire ! Tous les ennemis sont vaincus !'],
+            currentEnemies: [],
+            currentEnemy: undefined,
+            team: cleanTeam
+          });
+        }
+      }
+      
+      // Reset des drops accumulés
+      accumulatedDropsRef.current = [];
+      return;
+    }
+    
+    // Il reste des monstres en vie - le combat continue
+    const teamAlive = team.some(c => c.hp > 0);
+    if (!teamAlive) {
+      // L'équipe est vaincue
+      const cleanTeam = state.team.map(c => {
+        let cleanChar = { ...c };
+        if (c.buffs) {
+          c.buffs.forEach(buff => {
+            if (buff.isApplied) {
+              if (buff.type === 'attack') cleanChar.attack = Math.max(1, cleanChar.attack - buff.value);
+              else if (buff.type === 'magicAttack') cleanChar.magicAttack = Math.max(1, (cleanChar.magicAttack || 0) - buff.value);
+              else if (buff.type === 'defense') cleanChar.defense = Math.max(0, cleanChar.defense - buff.value);
+              else if (buff.type === 'magicDefense') cleanChar.magicDefense = Math.max(0, cleanChar.magicDefense - buff.value);
+              else if (buff.type === 'speed') cleanChar.speed = Math.max(1, cleanChar.speed - buff.value);
+            }
+          });
+        }
+        cleanChar.buffs = [];
+        return cleanChar;
+      });
+      gameStore.setState({ 
+        phase: 'summary', 
+        combatLog: [...logs, 'DÉFAITE...'],
+        currentEnemies: [],
+        currentEnemy: undefined,
+        team: cleanTeam
+      });
+      accumulatedDropsRef.current = [];
+    } else {
+      // Le combat continue - passer au tour suivant
+      // On doit vérifier les HP à jour (pas ceux dans turnOrder qui peuvent être obsolètes)
+      const getEntityHp = (entity: Character | Monster): number => {
+        // Si c'est un monstre, récupérer son HP à jour depuis currentEnemiesList
+        if ('isBoss' in entity) {
+          const updatedMonster = currentEnemiesList.find(e => e.id === entity.id);
+          return updatedMonster ? updatedMonster.hp : entity.hp;
+        }
+        // Si c'est un personnage, récupérer son HP à jour depuis team
+        const updatedChar = team.find(c => c.id === entity.id);
+        return updatedChar ? updatedChar.hp : entity.hp;
+      };
+      
+      let nextIndex = (currentTurnIndex + 1) % turnOrder.length;
+      let attempts = 0;
+      while (getEntityHp(turnOrder[nextIndex]) <= 0 && attempts < turnOrder.length) {
+        nextIndex = (nextIndex + 1) % turnOrder.length;
+        attempts++;
+      }
+      
+      // Décrémenter les buffs et incrémenter les tours complets quand on revient au premier
+      if (nextIndex === 0) {
+        gameStore.decrementBuffs();
+        setFullRounds(prev => prev + 1); // Un tour complet est terminé !
+        // Réinitialiser les actions légendaires pour le prochain round
+        gameStore.resetLegendaryActionsForAll();
+      }
+      
+      // Exécuter les actions légendaires après un tour de joueur
+      // (le tour actuel était celui d'un joueur si currentTurn est un Character)
+      const wasPlayerTurn = currentTurn && 'class' in currentTurn;
+      let finalLogs = logs;
+      if (wasPlayerTurn) {
+        finalLogs = executeLegendaryAction(logs);
+      }
+      
+      setCombatTurn(prev => prev + 1);
+      gameStore.setState({ 
+        currentTurnIndex: nextIndex, 
+        combatLog: finalLogs, 
+        currentEnemies: currentEnemiesList,
+        team: [...team]
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (aliveEnemies.length > 0 && combatLog.length === 1) {
+      const taunt = getMonsterTaunt(aliveEnemies[0], 'start');
+      setTimeout(() => displayMonsterDialogue(taunt), 500);
+    }
+  }, []);
+  
+  // Fonction pour exécuter une action légendaire d'un monstre après un tour de joueur
+  const executeLegendaryAction = useCallback((logs: string[]): string[] => {
+    const updatedLogs = [...logs];
+    
+    // Trouver les monstres légendaires vivants avec des actions légendaires restantes
+    const legendaryMonsters = aliveEnemies.filter(
+      e => e.isLegendary && e.legendaryActions && e.legendaryActionsRemaining && e.legendaryActionsRemaining > 0
+    );
+    
+    if (legendaryMonsters.length === 0) return updatedLogs;
+    
+    // Choisir un monstre légendaire au hasard
+    const monster = legendaryMonsters[Math.floor(Math.random() * legendaryMonsters.length)];
+    if (!monster.legendaryActions) return updatedLogs;
+    
+    // Filtrer les actions qu'il peut se permettre
+    const affordableActions = monster.legendaryActions.filter(
+      a => a.cost <= (monster.legendaryActionsRemaining || 0)
+    );
+    
+    if (affordableActions.length === 0) return updatedLogs;
+    
+    // Choisir une action au hasard (30% de chance d'utiliser une action légendaire)
+    if (Math.random() > 0.3) return updatedLogs;
+    
+    const action = affordableActions[Math.floor(Math.random() * affordableActions.length)];
+    
+    // Exécuter l'action
+    const updatedMonster = gameStore.useLegendaryAction(monster.id, action.id);
+    if (!updatedMonster) return updatedLogs;
+    
+    updatedLogs.push(`⚡ ${monster.name} utilise ${action.name} ! (Action légendaire)`);
+    
+    // Appliquer les effets de l'action
+    if (action.damage && action.damage > 0) {
+      const aliveTeam = team.filter(c => c.hp > 0);
+      if (aliveTeam.length > 0) {
+        const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
+        const damage = Math.max(1, action.damage - target.defense);
+        target.hp = Math.max(0, target.hp - damage);
+        
+        updatedLogs.push(`  → ${target.name} subit ${damage} dégâts !`);
+        
+        if (action.damageType) {
+          triggerDamageEffect(target.id, action.damageType === 'fire' || action.damageType === 'cold' || 
+            action.damageType === 'lightning' || action.damageType === 'psychic' || 
+            action.damageType === 'necrotic' || action.damageType === 'radiant' ? 'magical' : 'physical');
+        }
+        
+        addCombatHistoryEntry({
+          turn: combatTurn,
+          actor: monster.name,
+          actorPortrait: monster.portrait,
+          action: action.name + ' (Légendaire)',
+          target: target.name,
+          damage,
+          isPlayerAction: false,
+          damageType: action.damageType || 'physical'
+        });
+      }
+    }
+    
+    // Appliquer les effets spéciaux
+    if (action.effect) {
+      if (action.effect.type === 'heal' && action.effect.value) {
+        monster.hp = Math.min(monster.maxHp, monster.hp + action.effect.value);
+        updatedLogs.push(`  → ${monster.name} récupère ${action.effect.value} PV !`);
+      }
+    }
+    
+    return updatedLogs;
+  }, [aliveEnemies, team, combatTurn, triggerDamageEffect, addCombatHistoryEntry]);
 
   const handleAttack = () => {
-    if (!isPlayerTurn || isAnimating) return;
+    if (!isPlayerTurn || isAnimating || selectingTarget) return;
+    if (aliveEnemies.length === 0) return;
     
     setIsAnimating(true);
     const attacker = currentTurn as Character;
-    gameStore.performAttack(attacker, currentEnemy, attacker.attack);
+    // Cibler l'ennemi sélectionné
+    const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
+    
+    // Attaque de base = valeur d'attaque du personnage (pas de bonus supplémentaire)
+    // Les dégâts suivent directement la stat d'attaque (avec buffs/debuffs appliqués)
+    const baseDamage = attacker.attack;
+    const defense = target.defense;
+    const damage = Math.max(1, baseDamage - defense);
+    target.hp = Math.max(0, target.hp - damage);
+    trackDamageDealt(attacker.id, damage);
+    triggerDamageEffect(target.id, 'physical');
+    
+    // Mettre à jour les HP dans la liste locale des ennemis
+    const updatedEnemies = enemies.map(e => 
+      e.id === target.id ? { ...e, hp: target.hp } : e
+    );
+    
+    // Mettre à jour le state avec les HP modifiés des ennemis
+    gameStore.setState({ currentEnemies: updatedEnemies });
+    
+    addCombatHistoryEntry({
+      turn: combatTurn,
+      actor: attacker.name,
+      actorPortrait: attacker.portrait,
+      action: 'Attaque',
+      target: target.name,
+      damage,
+      isPlayerAction: true,
+      damageType: 'physical'
+    });
+    
+    const logs = [...combatLog, `${attacker.name} inflige ${damage} dégâts à ${target.name} !`];
+    
+    // Vérifier si l'ennemi ciblé est mort
+    const killedEnemy = target.hp <= 0 ? { ...target } : undefined;
+    
+    if (target.hp > 0) {
+      const hpPercent = target.hp / target.maxHp;
+      if (hpPercent < 0.3) {
+        setTimeout(() => displayMonsterDialogue(getMonsterTaunt(target, 'low_hp')), 500);
+      } else {
+        setTimeout(() => displayMonsterDialogue(getMonsterTaunt(target, 'hurt')), 500);
+      }
+    }
+    
+    // Passer updatedEnemies directement car setState est asynchrone
+    checkCombatEnd(logs, attacker.id, killedEnemy, updatedEnemies);
     setIsAnimating(false);
   };
 
-  const handleSkill = (skillIndex: number) => {
+  const handleSkillSelect = (skill: Skill) => {
     if (!isPlayerTurn || isAnimating) return;
     
-    const attacker = currentTurn as Character;
-    const skill = attacker.skills[skillIndex];
-    
-    setIsAnimating(true);
-    
-    if (skill.type === 'heal') {
-      // Soigner un allié (le plus faible)
-      const target = team.reduce((min, c) => c.hp < min.hp && c.hp > 0 ? c : min, team[0]);
-      target.hp = Math.min(target.maxHp, target.hp + Math.abs(skill.damage));
-      const log = [...state.combatLog, `${attacker.name} utilise ${skill.name} sur ${target.name} ! (+${Math.abs(skill.damage)} PV)`];
-      const nextIndex = (currentTurnIndex + 1) % turnOrder.length;
-      gameStore.setState({ currentTurnIndex: nextIndex, combatLog: log, team: [...team] });
-    } else {
-      gameStore.performAttack(attacker, currentEnemy, skill.damage);
+    // Vérifier le cooldown
+    if (skill.currentCooldown && skill.currentCooldown > 0) {
+      return; // Compétence en cooldown, ne rien faire
     }
     
+    // Pour les compétences de type 'damage' (obtenues via objets), cibler ennemi par défaut
+    const targetType = skill.targetType || (skill.type === 'heal' || skill.type === 'buff' ? 'ally' : 'enemy');
+    
+    if (targetType === 'all_allies' || targetType === 'self') {
+      executeSkill(skill, currentTurn as Character, targetType === 'self' ? currentTurn as Character : null);
+      return;
+    }
+    
+    if (targetType === 'ally') {
+      setSelectingTarget('ally');
+      setPendingSkill(skill);
+    } else {
+      // Cibler l'ennemi sélectionné (s'applique aussi aux compétences de type 'damage')
+      const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
+      executeSkill(skill, currentTurn as Character, target);
+    }
+  };
+
+  const handleTargetSelect = (target: Character) => {
+    if (!pendingSkill || !selectingTarget) return;
+    executeSkill(pendingSkill, currentTurn as Character, target);
+    setSelectingTarget(null);
+    setPendingSkill(null);
+  };
+
+  const cancelTargetSelection = () => {
+    setSelectingTarget(null);
+    setPendingSkill(null);
+  };
+
+  const executeSkill = (skill: Skill, attacker: Character, target: Character | Monster | null) => {
+    setIsAnimating(true);
+    const logs: string[] = [...combatLog];
+    const damageType = skill.damageType || 'physical';
+    
+    // Appliquer le cooldown à la compétence utilisée
+    if (skill.cooldown && skill.cooldown > 0) {
+      const updatedTeam = state.team.map(char => {
+        if (char.id === attacker.id) {
+          return {
+            ...char,
+            skills: char.skills.map(s => 
+              s.id === skill.id ? { ...s, currentCooldown: skill.cooldown } : s
+            )
+          };
+        }
+        return char;
+      });
+      gameStore.setState({ team: updatedTeam });
+    }
+    
+    if (skill.type === 'heal') {
+      const updatedTeam = [...team];
+      const targetIndices: number[] = [];
+      
+      // Déterminer les cibles de soin
+      if (skill.targetType === 'all_allies') {
+        // Soin de groupe - soigner tous les alliés vivants
+        updatedTeam.forEach((c, i) => { if (c.hp > 0) targetIndices.push(i); });
+      } else if (skill.targetType === 'self') {
+        const idx = updatedTeam.findIndex(c => c.id === attacker.id);
+        if (idx !== -1) targetIndices.push(idx);
+      } else if (target && 'class' in target) {
+        const idx = updatedTeam.findIndex(c => c.id === target.id);
+        if (idx !== -1) targetIndices.push(idx);
+      }
+      
+      let totalHealing = 0;
+      targetIndices.forEach(idx => {
+        const t = updatedTeam[idx];
+        const healAmount = Math.min(Math.abs(skill.damage), t.maxHp - t.hp);
+        t.hp = Math.min(t.maxHp, t.hp + Math.abs(skill.damage));
+        totalHealing += healAmount;
+        
+        if (skill.healOverTime) {
+          const regen: ActiveBuff = {
+            id: 'regen_' + Date.now() + '_' + t.id,
+            name: 'Régénération',
+            type: 'regen',
+            value: skill.healOverTime.value,
+            turnsRemaining: skill.healOverTime.turns,
+            ownerId: t.id,
+            icon: '💚',
+            isApplied: false
+          };
+          t.buffs = [...(t.buffs || []), regen];
+        }
+      });
+      
+      trackHealing(attacker.id, totalHealing);
+      
+      if (targetIndices.length > 1) {
+        logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe ! (+${Math.abs(skill.damage)} PV chacun)`);
+        if (skill.healOverTime) {
+          logs.push(`Toute l'équipe régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
+        }
+      } else if (targetIndices.length === 1) {
+        const t = updatedTeam[targetIndices[0]];
+        logs.push(`${attacker.name} utilise ${skill.name} sur ${t.name} ! (+${Math.abs(skill.damage)} PV)`);
+        if (skill.healOverTime) {
+          logs.push(`${t.name} régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
+        }
+      }
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: attacker.name,
+        actorPortrait: attacker.portrait,
+        action: skill.name,
+        target: targetIndices.length > 1 ? 'Équipe' : (targetIndices.length === 1 ? updatedTeam[targetIndices[0]].name : 'Personne'),
+        heal: totalHealing,
+        isPlayerAction: true,
+        damageType
+      });
+      
+      // Mettre à jour l'équipe
+      gameStore.setState({ team: updatedTeam });
+    } else if (skill.type === 'buff') {
+      // Créer une copie modifiable de l'équipe
+      const updatedTeam = [...team];
+      const targetIndices: number[] = [];
+      
+      // Déterminer les cibles
+      if (skill.targetType === 'all_allies') {
+        updatedTeam.forEach((c, i) => { if (c.hp > 0) targetIndices.push(i); });
+      } else if (skill.targetType === 'self') {
+        const idx = updatedTeam.findIndex(c => c.id === attacker.id);
+        if (idx !== -1) targetIndices.push(idx);
+      } else if (target && 'class' in target) {
+        const idx = updatedTeam.findIndex(c => c.id === target.id);
+        if (idx !== -1) targetIndices.push(idx);
+      }
+      
+      targetIndices.forEach(idx => {
+        const t = updatedTeam[idx];
+        if (skill.buffStats) {
+          const getBuffIcon = (stat: string) => {
+            switch (stat) {
+              case 'attack': return '⚔️';
+              case 'magicAttack': return '✨';
+              case 'defense': return '🛡️';
+              case 'magicDefense': return '🔮';
+              case 'speed': return '💨';
+              default: return '📈';
+            }
+          };
+          
+          const getStatLabel = (stat: string) => {
+            switch (stat) {
+              case 'attack': return 'Attaque';
+              case 'magicAttack': return 'Att. Magique';
+              case 'defense': return 'Défense';
+              case 'magicDefense': return 'Rés. Magique';
+              case 'speed': return 'Vitesse';
+              default: return stat;
+            }
+          };
+          
+          const buff: ActiveBuff = {
+            id: skill.id + '_' + Date.now() + '_' + t.id,
+            name: skill.name,
+            type: skill.buffStats.stat as any,
+            value: skill.buffStats.value,
+            turnsRemaining: skill.buffStats.turns,
+            ownerId: t.id,
+            icon: getBuffIcon(skill.buffStats.stat),
+            isApplied: true
+          };
+          
+          // Initialiser buffs si nécessaire
+          if (!t.buffs) t.buffs = [];
+          t.buffs = [...t.buffs, buff];
+          
+          // Recalculer les stats à partir des baseStats + tous les buffs actifs
+          const recalculated = gameStore.recalculateStats(t);
+          t.attack = recalculated.attack;
+          t.magicAttack = recalculated.magicAttack;
+          t.defense = recalculated.defense;
+          t.magicDefense = recalculated.magicDefense;
+          t.speed = recalculated.speed;
+          t.baseAttack = recalculated.baseAttack;
+          t.baseMagicAttack = recalculated.baseMagicAttack;
+          t.baseDefense = recalculated.baseDefense;
+          t.baseMagicDefense = recalculated.baseMagicDefense;
+          t.baseSpeed = recalculated.baseSpeed;
+          
+          logs.push(`${t.name} gagne +${skill.buffStats.value} ${getStatLabel(skill.buffStats.stat)} pendant ${skill.buffStats.turns} tours !`);
+        }
+        
+        if (skill.damageReflect) {
+          const reflect: ActiveBuff = {
+            id: 'reflect_' + Date.now() + '_' + t.id,
+            name: 'Renvoi de dégâts',
+            type: 'damage_reflect',
+            value: skill.damageReflect,
+            turnsRemaining: 3,
+            ownerId: t.id,
+            icon: '🔄',
+            isApplied: true
+          };
+          if (!t.buffs) t.buffs = [];
+          t.buffs = [...t.buffs, reflect];
+          logs.push(`${t.name} renvoie ${skill.damageReflect}% des dégâts pendant 3 tours !`);
+        }
+      });
+      
+      // Mettre à jour le state avec l'équipe modifiée
+      gameStore.setState({ team: updatedTeam });
+      
+      logs.push(`${attacker.name} utilise ${skill.name} !`);
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: attacker.name,
+        actorPortrait: attacker.portrait,
+        action: skill.name,
+        target: targetIndices.length === 1 ? updatedTeam[targetIndices[0]].name : 'Équipe',
+        effect: skill.buffStats ? `+${skill.buffStats.value} ${skill.buffStats.stat} (${skill.buffStats.turns}t)` : skill.damageReflect ? `Renvoi ${skill.damageReflect}%` : '',
+        isPlayerAction: true
+      });
+    } else if ((skill.type === 'debuff' || skill.type === 'attack' || skill.type === 'damage') && target && 'isBoss' in target) {
+      let damage = skill.damage;
+      
+      if (damage > 0) {
+        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill);
+        target.hp = Math.max(0, target.hp - actualDamage);
+        trackDamageDealt(attacker.id, actualDamage);
+        triggerDamageEffect(target.id, damageType === 'magical' || damageType === 'holy' ? 'magical' : 'physical');
+        
+        // Mettre à jour les HP dans la liste locale des ennemis
+        const updatedEnemies = enemies.map(e => 
+          e.id === target.id ? { ...e, hp: target.hp } : e
+        );
+        gameStore.setState({ currentEnemies: updatedEnemies });
+        
+        logs.push(`${attacker.name} utilise ${skill.name} ! (${actualDamage} dégâts ${damageType === 'magical' ? 'magiques' : damageType === 'holy' ? 'sacrés' : 'physiques'} à ${target.name})`);
+        
+        addCombatHistoryEntry({
+          turn: combatTurn,
+          actor: attacker.name,
+          actorPortrait: attacker.portrait,
+          action: skill.name,
+          target: target.name,
+          damage: actualDamage,
+          isPlayerAction: true,
+          damageType
+        });
+        
+        if (skill.lifesteal && skill.lifesteal > 0) {
+          const stolen = Math.floor(actualDamage * skill.lifesteal / 100);
+          attacker.hp = Math.min(attacker.maxHp, attacker.hp + stolen);
+          trackHealing(attacker.id, stolen);
+          logs.push(`${attacker.name} récupère ${stolen} PV !`);
+        }
+        
+        if (target.hp > 0) {
+          const hpPercent = target.hp / target.maxHp;
+          if (hpPercent < 0.3) {
+            setTimeout(() => displayMonsterDialogue(getMonsterTaunt(target, 'low_hp')), 500);
+          } else {
+            setTimeout(() => displayMonsterDialogue(getMonsterTaunt(target, 'hurt')), 500);
+          }
+        }
+        
+        // Vérifier si l'ennemi ciblé est mort (pour le tracking)
+        const killedEnemy = target.hp <= 0 ? { ...target } : undefined;
+        checkCombatEnd(logs, attacker.id, killedEnemy, updatedEnemies);
+        setIsAnimating(false);
+        return;
+      }
+      
+      checkCombatEnd(logs, attacker.id, undefined, enemies);
+      setIsAnimating(false);
+      return;
+    }
+    
+    checkCombatEnd(logs, attacker.id, undefined, enemies);
     setIsAnimating(false);
+  };
+
+  const renderBuffs = (character: Character) => {
+    if (!character.buffs || character.buffs.length === 0) return null;
+    return (
+      <div className="active-buffs">
+        {character.buffs.map((buff, i) => (
+          <span key={i} className="buff-icon" title={`${buff.name}: ${buff.turnsRemaining} tour(s) restant(s)`}>
+            {buff.icon}<sub>{buff.turnsRemaining}</sub>
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  // Rendu des buffs pour les monstres
+  const renderMonsterBuffs = (monster: Monster) => {
+    if (!monster.buffs || monster.buffs.length === 0) return null;
+    return (
+      <div className="active-buffs monster-buffs">
+        {monster.buffs.map((buff, i) => (
+          <span key={i} className="buff-icon" title={`${buff.name}: ${buff.turnsRemaining} tour(s) restant(s)`}>
+            {buff.icon}<sub>{buff.turnsRemaining}</sub>
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const getSkillIcon = (skill: Skill) => {
+    if (skill.type === 'heal') return '💚';
+    if (skill.type === 'buff') return '⬆️';
+    if (skill.type === 'debuff') return '⬇️';
+    if (skill.damageType === 'magical') return '🔮';
+    if (skill.damageType === 'holy') return '✝️';
+    if (skill.lifesteal) return '🧛';
+    if (skill.poison) return '🧪';
+    if (skill.damageReflect) return '🔄';
+    return '⚔️';
+  };
+
+  // Détermine si un type de dégâts est physique (utilise ATK) ou magique (utilise MAG)
+  const isPhysicalDamageType = (type?: string): boolean => {
+    if (!type) return true; // Par défaut physique
+    return ['physical', 'bludgeoning', 'piercing', 'slashing'].includes(type);
+  };
+
+  const getDamageTypeLabel = (type?: string) => {
+    if (!type) return 'Physique';
+    
+    // Types physiques D&D
+    if (isPhysicalDamageType(type)) {
+      switch (type) {
+        case 'bludgeoning': return 'Contondant';
+        case 'piercing': return 'Perforant';
+        case 'slashing': return 'Tranchant';
+        default: return 'Physique';
+      }
+    }
+    
+    // Types magiques/élémentaires D&D
+    switch (type) {
+      case 'magical': return 'Magique';
+      case 'holy': 
+      case 'radiant': return 'Radiant ✨';
+      case 'fire': return 'Feu 🔥';
+      case 'cold': return 'Froid ❄️';
+      case 'lightning': return 'Foudre ⚡';
+      case 'thunder': return 'Tonnerre 🔊';
+      case 'acid': return 'Acide 🧪';
+      case 'poison': return 'Poison ☠️';
+      case 'necrotic': return 'Nécrotique 💀';
+      case 'force': return 'Force 💫';
+      case 'psychic': return 'Psychique 🧠';
+      default: return 'Magique';
+    }
+  };
+
+  // Générer le tooltip des stats avec les modifications
+  const getStatsTooltip = (entity: Character | Monster): string => {
+    const lines: string[] = [];
+    
+    if ('class' in entity) {
+      // C'est un personnage
+      const char = entity as Character;
+      lines.push(`📊 ${char.name} - ${char.class}`);
+      lines.push(`─────────────────`);
+      lines.push(`⚔️ Attaque: ${char.attack}`);
+      lines.push(`✨ Att. Magique: ${char.magicAttack || 0}`);
+      lines.push(`🛡️ Défense: ${char.defense}`);
+      lines.push(`🔮 Rés. Magique: ${char.magicDefense}`);
+      lines.push(`💨 Vitesse: ${char.speed}`);
+      
+      if (char.buffs && char.buffs.length > 0) {
+        lines.push(`─────────────────`);
+        lines.push(`✨ Buffs actifs:`);
+        char.buffs.forEach(buff => {
+          const sign = buff.type === 'regen' || buff.type === 'damage_reflect' ? '' : '+';
+          let statName = '';
+          switch (buff.type) {
+            case 'attack': statName = 'ATK'; break;
+            case 'magicAttack': statName = 'MAG'; break;
+            case 'defense': statName = 'DEF'; break;
+            case 'magicDefense': statName = 'RÉS'; break;
+            case 'speed': statName = 'VIT'; break;
+            case 'regen': statName = 'Régén PV/tour'; break;
+            case 'damage_reflect': statName = 'Renvoi %'; break;
+            case 'poison': statName = 'Poison'; break;
+          }
+          lines.push(`  ${buff.icon} ${buff.name}: ${sign}${buff.value} ${statName} (${buff.turnsRemaining}t)`);
+        });
+      }
+    } else {
+      // C'est un monstre
+      const monster = entity as Monster;
+      lines.push(`👹 ${monster.name}`);
+      if (monster.isBoss) lines.push(`👑 BOSS`);
+      lines.push(`─────────────────`);
+      lines.push(`⚔️ Attaque: ${monster.attack}`);
+      lines.push(`🛡️ Défense: ${monster.defense}`);
+      lines.push(`🔮 Rés. Magique: ${monster.magicDefense}`);
+      lines.push(`💨 Vitesse: ${monster.speed}`);
+    }
+    
+    return lines.join('\n');
+  };
+
+  // Obtenir la couleur de stat modifiée (pour personnages et monstres)
+  const getStatModClass = (entity: Character | Monster, statType: string): string => {
+    if (!entity.buffs) return '';
+    const buff = entity.buffs.find(b => b.type === statType);
+    if (buff) {
+      return buff.value > 0 ? 'stat-buffed' : 'stat-debuffed';
+    }
+    return '';
+  };
+
+  // Obtenir l'indicateur de modification pour les monstres
+  const getStatModIndicator = (entity: Character | Monster, statType: string): JSX.Element | null => {
+    if (!entity.buffs) return null;
+    const buff = entity.buffs.find(b => b.type === statType);
+    if (buff) {
+      return buff.value > 0 
+        ? <span className="stat-mod-indicator buff">⬆</span> 
+        : <span className="stat-mod-indicator debuff">⬇</span>;
+    }
+    return null;
+  };
+
+  // Sélectionner un personnage pour recevoir un drop
+  const handleSelectDropCharacter = (item: InventoryItem) => {
+    setSelectingDropCharacter(item);
+  };
+
+  // Assigner un drop à un personnage
+  const handleAssignDrop = (characterId: string) => {
+    if (!selectingDropCharacter || !pendingDrops) return;
+    
+    const team = [...state.team];
+    const character = team.find(c => c.id === characterId);
+    if (!character) return;
+    
+    // Appliquer les effets de l'objet
+    const effects = applyDropEffect(selectingDropCharacter, character);
+    
+    // Ajouter à l'inventaire
+    if (!character.inventory) character.inventory = [];
+    character.inventory.push(selectingDropCharacter);
+    
+    // Mettre à jour le state
+    gameStore.setState({ team });
+    
+    // Retirer l'item des drops en attente
+    const remainingDrops = pendingDrops.drops.filter(d => d.id !== selectingDropCharacter.id);
+    
+    // Log l'attribution
+    const logs = [...combatLog, `${character.name} obtient ${selectingDropCharacter.icon} ${selectingDropCharacter.name} ! ${effects.join(', ')}`];
+    gameStore.setState({ combatLog: logs });
+    
+    setSelectingDropCharacter(null);
+    
+    if (remainingDrops.length === 0) {
+      // TOUS les drops distribués - maintenant terminer le combat
+      setPendingDrops(null);
+      
+      // Vérifier si c'était un boss fight (utiliser enemies qui contient tous les monstres du combat)
+      const isBossFight = enemies.some(e => e.isBoss);
+      
+      if (isBossFight) {
+        gameStore.setState({ 
+          phase: 'summary', 
+          combatLog: [...logs, 'VICTOIRE ! Le boss est vaincu !'],
+          currentEnemies: [],
+          currentEnemy: undefined
+        });
+      } else {
+        gameStore.setState({ 
+          phase: 'dungeon', 
+          combatLog: [...logs, `Combat terminé !`],
+          currentEnemies: [],
+          currentEnemy: undefined
+        });
+      }
+    } else {
+      setPendingDrops({ drops: remainingDrops });
+    }
+  };
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return '#a0a0a0';
+      case 'rare': return '#4a9eff';
+      case 'epic': return '#a855f7';
+      case 'legendary': return '#fbbf24';
+      default: return '#fff';
+    }
   };
 
   return (
-    <div className="combat-page">
+    <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
       <div className="combat-header">
         <h2>⚔️ COMBAT ⚔️</h2>
-        {currentEnemy.isBoss && <span className="boss-label">👑 BOSS</span>}
+        {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
+        {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
       </div>
 
-      <div className="combat-arena">
-        {/* Ennemi */}
-        <div className={`enemy-section ${isEnemyTurn ? 'active-turn' : ''}`}>
-          <div className="enemy-portrait">{currentEnemy.portrait}</div>
-          <h3 className="enemy-name">{currentEnemy.name}</h3>
-          <div className="enemy-hp-bar">
-            <div 
-              className="hp-fill enemy" 
-              style={{ width: `${(currentEnemy.hp / currentEnemy.maxHp) * 100}%` }}
-            ></div>
-            <span className="hp-text">{currentEnemy.hp}/{currentEnemy.maxHp}</span>
-          </div>
-          <div className="enemy-stats">
-            <span>⚔️ {currentEnemy.attack}</span>
-            <span>🛡️ {currentEnemy.defense}</span>
-            <span>💨 {currentEnemy.speed}</span>
+      {selectingTarget && (
+        <div className="target-selection-overlay">
+          <div className="target-selection-modal">
+            <h3>🎯 Choisir la cible de {pendingSkill?.name}</h3>
+            <p className="skill-desc">{pendingSkill?.description}</p>
+            <div className="target-list">
+              {team.filter(c => c.hp > 0).map(character => (
+                <button
+                  key={character.id}
+                  className="target-btn"
+                  onClick={() => handleTargetSelect(character)}
+                >
+                  <span className="target-portrait">{character.portrait}</span>
+                  <div className="target-info">
+                    <span className="target-name">{character.name}</span>
+                    <span className="target-class">{character.class}</span>
+                    <div className="target-hp">
+                      <div 
+                        className="hp-fill" 
+                        style={{ 
+                          width: `${(character.hp / character.maxHp) * 100}%`,
+                          background: getHpBarColor(character.hp, character.maxHp)
+                        }}
+                      ></div>
+                      <span className="hp-text">{character.hp}/{character.maxHp}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button className="cancel-btn" onClick={cancelTargetSelection}>
+              ❌ Annuler
+            </button>
           </div>
         </div>
+      )}
 
-        <div className="versus">VS</div>
-
-        {/* Équipe */}
-        <div className="team-section">
-          {team.map(character => {
-            const isCurrent = currentTurn && 'id' in currentTurn && currentTurn.id === character.id;
-            const isDead = character.hp <= 0;
-            
-            return (
-              <div 
-                key={character.id} 
-                className={`team-fighter ${isCurrent ? 'active-turn' : ''} ${isDead ? 'dead' : ''}`}
-              >
-                <span className="fighter-portrait">{character.portrait}</span>
-                <span className="fighter-name">{character.name}</span>
-                <div className="fighter-hp-bar">
-                  <div 
-                    className="hp-fill" 
-                    style={{ width: `${(character.hp / character.maxHp) * 100}%` }}
-                  ></div>
-                  <span className="hp-text">{character.hp}/{character.maxHp}</span>
+      <div className="combat-main-layout">
+        <div className="combat-history-panel">
+          <h4>📜 Actions</h4>
+          <div className="combat-history-list">
+            {combatHistory.length === 0 ? (
+              <p className="history-empty">Le combat commence...</p>
+            ) : (
+              [...combatHistory].reverse().slice(0, 12).map(entry => (
+                <div 
+                  key={entry.id} 
+                  className={`combat-history-entry ${entry.isPlayerAction ? 'player' : 'enemy'}`}
+                >
+                  <div className="history-actor">
+                    <span className="history-portrait">{entry.actorPortrait}</span>
+                    <span className="history-turn">T{entry.turn}</span>
+                  </div>
+                  <div className="history-details">
+                    <span className="history-action">{entry.action}</span>
+                    {entry.target && <span className="history-target">→ {entry.target}</span>}
+                    {entry.damage !== undefined && (
+                      <span className={`history-damage ${entry.damageType || 'physical'}`}>
+                        -{entry.damage} {entry.damageType === 'magical' ? '🔮' : entry.damageType === 'holy' ? '✝️' : '⚔️'}
+                      </span>
+                    )}
+                    {entry.heal !== undefined && (
+                      <span className="history-heal">+{entry.heal} 💚</span>
+                    )}
+                    {entry.effect && (
+                      <span className="history-effect">{entry.effect}</span>
+                    )}
+                  </div>
                 </div>
-                {isCurrent && <span className="turn-indicator">⚡ Tour actuel</span>}
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="combat-arena">
+          {/* Section des ennemis - Support multi-monstres */}
+          <div className="enemies-section">
+            {enemies.length > 1 && (
+              <div className="enemy-count-badge">
+                {aliveEnemies.length} / {enemies.length} ennemis
               </div>
-            );
-          })}
+            )}
+            
+            {/* Indicateur scaling boss */}
+            {enemies.some(e => e.isBoss) && bossScaling > 0 && (
+              <div className="boss-scaling-badge">
+                ⚡ Renforcé +{bossScaling}%
+              </div>
+            )}
+            
+            <div className="enemies-grid">
+              {enemies.map((enemy, idx) => {
+                const isCurrentTurn = currentTurn && 'isBoss' in currentTurn && (currentTurn as Monster).id === enemy.id;
+                const isSelected = idx === (selectedEnemyIndex || 0);
+                const isDead = enemy.hp <= 0;
+                const isReceivingDamage = damageEffect?.targetId === enemy.id;
+                const dmgType = damageEffect?.type;
+                
+                return (
+                  <div 
+                    key={enemy.id}
+                    className={`enemy-card ${isCurrentTurn ? 'active-turn' : ''} ${isSelected ? 'selected' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${dmgType}` : ''}`}
+                    onClick={() => !isDead && gameStore.setState({ selectedEnemyIndex: idx })}
+                  >
+                    <div className="enemy-portrait-container">
+                      <div className={`enemy-portrait ${isAnimating && isCurrentTurn ? 'attacking' : ''}`}>
+                        {enemy.portrait}
+                      </div>
+                      
+                      {showDialogue && isSelected && (
+                        <div className="monster-dialogue">
+                          <div className="dialogue-bubble">
+                            <span className="dialogue-text">{monsterDialogue}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <h3 className="enemy-name">{enemy.name}</h3>
+                    {enemy.isBoss && <span className="boss-badge">👑 BOSS</span>}
+                    {enemy.monsterType && (
+                      <span className="monster-type">{enemy.monsterType}</span>
+                    )}
+                    {renderMonsterBuffs(enemy)}
+                    <div className="enemy-hp-bar">
+                      <div 
+                        className="hp-fill enemy" 
+                        style={{ 
+                          width: `${Math.max(0, (enemy.hp / enemy.maxHp) * 100)}%`,
+                          background: getHpBarColor(enemy.hp, enemy.maxHp)
+                        }}
+                      ></div>
+                      <span className="hp-text">{Math.max(0, enemy.hp)}/{enemy.maxHp}</span>
+                    </div>
+                    
+                    {/* Stats avec tooltip détaillé */}
+                    <div className="enemy-stats stats-with-tooltip">
+                      <span className={getStatModClass(enemy, 'attack')}>
+                        ⚔️ {enemy.attack}
+                        {getStatModIndicator(enemy, 'attack')}
+                      </span>
+                      <span className={getStatModClass(enemy, 'magicAttack')}>
+                        ✨ {enemy.magicAttack || 0}
+                        {getStatModIndicator(enemy, 'magicAttack')}
+                      </span>
+                      <span className={getStatModClass(enemy, 'defense')}>
+                        🛡️ {enemy.defense}
+                        {getStatModIndicator(enemy, 'defense')}
+                      </span>
+                      <span className={getStatModClass(enemy, 'magicDefense')}>
+                        🔮 {enemy.magicDefense}
+                        {getStatModIndicator(enemy, 'magicDefense')}
+                      </span>
+                      <span className={getStatModClass(enemy, 'speed')}>
+                        💨 {enemy.speed}
+                        {getStatModIndicator(enemy, 'speed')}
+                      </span>
+                      {renderStatsTooltip(enemy)}
+                    </div>
+                    
+                    {enemy.skills && enemy.skills.length > 0 && !isDead && (
+                      <div className="monster-skills">
+                        <span className="skills-label">Compétences:</span>
+                        <div className="skills-list">
+                          {enemy.skills.map(skill => (
+                            <span 
+                              key={skill.id} 
+                              className={`monster-skill-tag ${skill.damageType}`}
+                              title={skill.description}
+                            >
+                              {skill.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {isDead && <div className="enemy-dead-overlay">💀 VAINCU</div>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="versus">VS</div>
+
+          <div className="team-section">
+            {team.map(character => {
+              const isCurrent = currentTurn && 'id' in currentTurn && currentTurn.id === character.id;
+              const isDead = character.hp <= 0;
+              const isReceivingDamage = damageEffect?.targetId === character.id;
+              const damageType = damageEffect?.type;
+              
+              return (
+                <div 
+                  key={character.id} 
+                  className={`team-fighter ${isCurrent ? 'active-turn' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${damageType}` : ''}`}
+                  title={getStatsTooltip(character)}
+                >
+                  <span className="fighter-portrait">{character.portrait}</span>
+                  <div className="fighter-info">
+                    <span className="fighter-name">{character.name}</span>
+                    <span className="fighter-class">{character.class}</span>
+                    {renderBuffs(character)}
+                    <div className="fighter-hp-bar">
+                      <div 
+                        className="hp-fill" 
+                        style={{ 
+                          width: `${Math.max(0, (character.hp / character.maxHp) * 100)}%`,
+                          background: getHpBarColor(character.hp, character.maxHp)
+                        }}
+                      ></div>
+                      <span className="hp-text">{Math.max(0, character.hp)}/{character.maxHp}</span>
+                    </div>
+                    <div className="fighter-all-stats stats-with-tooltip">
+                      <span className={getStatModClass(character, 'attack')}>
+                        ⚔️{character.attack}
+                        {character.buffs?.find(b => b.type === 'attack') && <span className="stat-mod-indicator">⬆</span>}
+                      </span>
+                      <span className={getStatModClass(character, 'magicAttack')}>
+                        ✨{character.magicAttack || 0}
+                        {character.buffs?.find(b => b.type === 'magicAttack') && <span className="stat-mod-indicator">⬆</span>}
+                      </span>
+                      <span className={getStatModClass(character, 'defense')}>
+                        🛡️{character.defense}
+                        {character.buffs?.find(b => b.type === 'defense') && <span className="stat-mod-indicator">⬆</span>}
+                      </span>
+                      <span className={getStatModClass(character, 'magicDefense')}>
+                        🔮{character.magicDefense}
+                        {character.buffs?.find(b => b.type === 'magicDefense') && <span className="stat-mod-indicator">⬆</span>}
+                      </span>
+                      <span className={getStatModClass(character, 'speed')}>
+                        💨{character.speed}
+                        {character.buffs?.find(b => b.type === 'speed') && <span className="stat-mod-indicator">⬆</span>}
+                      </span>
+                      {renderStatsTooltip(character)}
+                    </div>
+                  </div>
+                  {isCurrent && <span className="turn-indicator">⚡</span>}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Actions */}
-      {isPlayerTurn && !isAnimating && (currentTurn as Character).hp > 0 && (
+      {isPlayerTurn && !isAnimating && !selectingTarget && (currentTurn as Character).hp > 0 && (
         <div className="combat-actions">
           <h4>Actions de {(currentTurn as Character).name}</h4>
           <div className="action-buttons">
-            <button className="action-btn attack" onClick={handleAttack}>
-              ⚔️ Attaque
-              <span className="damage-preview">({(currentTurn as Character).attack} dégâts)</span>
-            </button>
-            {(currentTurn as Character).skills.map((skill, i) => (
-              <button 
-                key={skill.id} 
-                className={`action-btn skill ${skill.type}`}
-                onClick={() => handleSkill(i)}
-              >
-                {skill.type === 'heal' ? '💚' : '✨'} {skill.name}
-                <span className="damage-preview">
-                  ({skill.type === 'heal' ? '+' : ''}{Math.abs(skill.damage)} {skill.type === 'heal' ? 'soin' : 'dégâts'})
-                </span>
+            <div className="skill-btn-wrapper">
+              <button className="action-btn attack" onClick={handleAttack}>
+                ⚔️ Attaque
+                <span className="damage-preview">({(currentTurn as Character).attack} physique)</span>
               </button>
-            ))}
+              <div className="skill-tooltip">
+                <div className="tooltip-header">⚔️ Attaque de base</div>
+                <div className="tooltip-stats">
+                  <div className="tooltip-stat">
+                    <span className="stat-name">Dégâts de base:</span>
+                    <span className="stat-value">{(currentTurn as Character).attack}</span>
+                  </div>
+                  <div className="tooltip-stat bonus">
+                    <span className="stat-name">Type:</span>
+                    <span className="stat-value">Physique</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {(currentTurn as Character).skills.map((skill) => {
+              const attacker = currentTurn as Character;
+              // Les types physiques (physical, slashing, piercing, bludgeoning) utilisent ATK
+              // Les types magiques (fire, cold, lightning, etc.) utilisent MAG
+              const isPhysical = isPhysicalDamageType(skill.damageType);
+              const baseBonus = isPhysical 
+                ? Math.floor(attacker.attack * 0.3)
+                : Math.floor((attacker.magicAttack || 0) * 0.3);
+              const totalDamage = skill.damage > 0 ? skill.damage + baseBonus : skill.damage;
+              const isOnCooldown = skill.currentCooldown && skill.currentCooldown > 0;
+              
+              return (
+                <div key={skill.id} className="skill-btn-wrapper">
+                  <button 
+                    className={`action-btn skill ${skill.type} ${skill.damageType || 'physical'} ${isOnCooldown ? 'on-cooldown' : ''}`}
+                    onClick={() => handleSkillSelect(skill)}
+                    disabled={isOnCooldown}
+                  >
+                    {getSkillIcon(skill)} {skill.name}
+                    {isOnCooldown ? (
+                      <span className="cooldown-indicator">⏳ {skill.currentCooldown}t</span>
+                    ) : (
+                      <span className="damage-preview">
+                        {skill.type === 'heal' ? `+${Math.abs(skill.damage)} soin` : 
+                         skill.type === 'buff' ? `Buff ${skill.buffStats?.turns || 3}t` :
+                         skill.type === 'debuff' ? 'Debuff' :
+                         `${totalDamage} ${getDamageTypeLabel(skill.damageType)}`}
+                      </span>
+                    )}
+                  </button>
+                  <div className="skill-tooltip">
+                    <div className="tooltip-header">{getSkillIcon(skill)} {skill.name}</div>
+                    <p className="tooltip-desc">{skill.description}</p>
+                    <div className="tooltip-stats">
+                      {skill.type === 'heal' ? (
+                        <div className="tooltip-stat">
+                          <span className="stat-name">Soin:</span>
+                          <span className="stat-value heal">+{Math.abs(skill.damage)} PV</span>
+                        </div>
+                      ) : skill.type === 'buff' ? (
+                        <>
+                          <div className="tooltip-stat">
+                            <span className="stat-name">Bonus:</span>
+                            <span className="stat-value buff">+{skill.buffStats?.value} {skill.buffStats?.stat}</span>
+                          </div>
+                          <div className="tooltip-stat">
+                            <span className="stat-name">Durée:</span>
+                            <span className="stat-value">{skill.buffStats?.turns} tours</span>
+                          </div>
+                        </>
+                      ) : skill.damage > 0 ? (
+                        <>
+                          <div className="tooltip-stat">
+                            <span className="stat-name">Dégâts de base:</span>
+                            <span className="stat-value">{skill.damage}</span>
+                          </div>
+                          <div className="tooltip-stat bonus">
+                            <span className="stat-name">Bonus {isPhysical ? '⚔️ PHY' : '✨ MAG'}:</span>
+                            <span className="stat-value">+{baseBonus}</span>
+                          </div>
+                          <div className="tooltip-stat total">
+                            <span className="stat-name">Total:</span>
+                            <span className="stat-value">{totalDamage}</span>
+                          </div>
+                          <div className="tooltip-stat">
+                            <span className="stat-name">Type:</span>
+                            <span className="stat-value">{getDamageTypeLabel(skill.damageType)}</span>
+                          </div>
+                        </>
+                      ) : null}
+                      {skill.lifesteal && (
+                        <div className="tooltip-stat special">
+                          <span className="stat-name">🧛 Vol de vie:</span>
+                          <span className="stat-value">{skill.lifesteal}%</span>
+                        </div>
+                      )}
+                      {skill.bonusVsDemon && (
+                        <div className="tooltip-stat special">
+                          <span className="stat-name">👹 vs Démons:</span>
+                          <span className="stat-value">+{skill.bonusVsDemon}</span>
+                        </div>
+                      )}
+                      {skill.bonusVsUndead && (
+                        <div className="tooltip-stat special">
+                          <span className="stat-name">💀 vs Morts-vivants:</span>
+                          <span className="stat-value">+{skill.bonusVsUndead}</span>
+                        </div>
+                      )}
+                      {skill.cooldown && skill.cooldown > 0 && (
+                        <div className="tooltip-stat cooldown">
+                          <span className="stat-name">⏳ Cooldown:</span>
+                          <span className="stat-value">{skill.cooldown} tour(s)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {isAnimating && (
+      {isAnimating && !selectingTarget && (
         <div className="combat-waiting">
-          <p>{isEnemyTurn ? `${currentEnemy.name} prépare son attaque...` : 'Exécution...'}</p>
+          <p>{isEnemyTurn && currentTurn ? `${(currentTurn as Monster).name} prépare son attaque...` : 'Exécution...'}</p>
         </div>
       )}
 
-      {/* Log de combat */}
-      <div className="combat-log">
-        <h4>Journal de combat</h4>
-        <div className="log-entries">
-          {combatLog.slice(-5).map((entry, i) => (
-            <p key={i} className="log-entry">{entry}</p>
-          ))}
-        </div>
-      </div>
-
-      {/* Ordre des tours */}
       <div className="turn-order">
-        <h4>Ordre d'initiative</h4>
+        <h4>Initiative</h4>
         <div className="turn-list">
           {turnOrder.map((entity, i) => {
             const isDead = entity.hp <= 0;
@@ -172,6 +1912,7 @@ export function CombatPage() {
               <div 
                 key={i} 
                 className={`turn-item ${i === currentTurnIndex ? 'current' : ''} ${isDead ? 'dead' : ''}`}
+                title={'name' in entity ? entity.name : ''}
               >
                 {'portrait' in entity && entity.portrait}
               </div>
@@ -179,7 +1920,65 @@ export function CombatPage() {
           })}
         </div>
       </div>
+
+      {/* Modal de distribution des drops */}
+      {pendingDrops && pendingDrops.drops.length > 0 && (
+        <div className="drops-overlay">
+          <div className="drops-modal">
+            <h2>💎 Butin obtenu !</h2>
+            <p className="drops-info">Sélectionnez un objet puis choisissez le personnage qui le recevra.</p>
+            
+            <div className="drops-list">
+              {pendingDrops.drops.map((drop, i) => (
+                <div 
+                  key={i} 
+                  className={`drop-item ${selectingDropCharacter?.id === drop.id ? 'selected' : ''}`}
+                  style={{ borderColor: getRarityColor(drop.rarity) }}
+                  onClick={() => handleSelectDropCharacter(drop)}
+                >
+                  <span className="drop-icon">{drop.icon}</span>
+                  <div className="drop-info">
+                    <span className="drop-name" style={{ color: getRarityColor(drop.rarity) }}>
+                      {drop.name}
+                    </span>
+                    <span className="drop-rarity">{drop.rarity}</span>
+                    <span className="drop-desc">{drop.description}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {selectingDropCharacter && (
+              <div className="character-select-section">
+                <h3>Attribuer {selectingDropCharacter.icon} {selectingDropCharacter.name} à :</h3>
+                <div className="character-buttons">
+                  {team.filter(c => c.hp > 0).map(char => (
+                    <button 
+                      key={char.id}
+                      className="char-select-btn with-stats"
+                      onClick={() => handleAssignDrop(char.id)}
+                    >
+                      <span className="char-portrait">{char.portrait}</span>
+                      <div className="char-info">
+                        <span className="char-name">{char.name}</span>
+                        <span className="char-class">{char.class}</span>
+                        <div className="char-hp">❤️ {char.hp}/{char.maxHp}</div>
+                        <div className="char-stats-grid">
+                          <span title="Attaque">⚔️ {char.attack}</span>
+                          <span title="Attaque Magique">✨ {char.magicAttack || 0}</span>
+                          <span title="Défense">🛡️ {char.defense}</span>
+                          <span title="Défense Magique">🔮 {char.magicDefense}</span>
+                          <span title="Vitesse">💨 {char.speed}</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

@@ -1,0 +1,218 @@
+.menu-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: 
+    radial-gradient(ellipse at top, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.8) 0%, transparent 70%),
+    linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 50px,
+      rgba(138, 43, 226, 0.03) 50px,
+      rgba(138, 43, 226, 0.03) 51px
+    );
+  pointer-events: none;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+  max-width: 600px;
+}
+
+.title-section {
+  margin-bottom: 1.5rem;
+}
+
+.game-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 700;
+  color: #9b59b6;
+  text-shadow: 
+    0 0 20px rgba(155, 89, 182, 0.5),
+    0 0 40px rgba(155, 89, 182, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.1em;
+  margin: 0;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { 
+    text-shadow: 
+      0 0 20px rgba(155, 89, 182, 0.5),
+      0 0 40px rgba(155, 89, 182, 0.3),
+      0 4px 8px rgba(0, 0, 0, 0.8);
+  }
+  50% { 
+    text-shadow: 
+      0 0 30px rgba(155, 89, 182, 0.7),
+      0 0 60px rgba(155, 89, 182, 0.4),
+      0 4px 8px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.game-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: #8e8e8e;
+  margin-top: 0.5rem;
+  letter-spacing: 0.2em;
+}
+
+.menu-decoration {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.menu-decoration .rune {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.menu-decoration .line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #9b59b6, transparent);
+}
+
+.game-description {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #c0c0c0;
+  margin-bottom: 2.5rem;
+  max-width: 500px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.start-button {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1.2rem 4rem;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 50%, #a569bd 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  box-shadow: 
+    0 4px 20px rgba(155, 89, 182, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.start-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 8px 30px rgba(155, 89, 182, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.start-button:active {
+  transform: translateY(-1px);
+}
+
+.history-button {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  padding: 0.8rem 2rem;
+  background: rgba(100, 100, 100, 0.15);
+  color: #a0a0a0;
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.history-button:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.5);
+  color: #c0c0c0;
+  transform: translateY(-2px);
+}
+
+.button-icon {
+  font-size: 1.3rem;
+}
+
+.menu-info {
+  margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(155, 89, 182, 0.1);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 4px;
+}
+
+.menu-info p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  color: #9b59b6;
+  margin: 0;
+}
+
+.menu-footer {
+  position: absolute;
+  bottom: 1.5rem;
+  text-align: center;
+}
+
+.menu-footer p {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #666;
+  letter-spacing: 0.05em;
+  margin: 0.2rem 0;
+}
+
+.menu-footer .version-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: #444;
+  background: rgba(100, 100, 100, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 0.3rem;
+}
+

@@ -1,0 +1,623 @@
+.history-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.history-modal {
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 2px solid #9b59b6;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 95%;
+  max-width: 1000px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(155, 89, 182, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.history-header h2 {
+  font-family: 'Cinzel', serif;
+  color: #9b59b6;
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.history-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.history-header .close-btn:hover {
+  color: #e74c3c;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #888;
+}
+
+.history-empty .empty-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.history-empty p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.history-empty .hint {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.history-content {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.history-entry {
+  background: rgba(100, 100, 100, 0.1);
+  border: 1px solid rgba(100, 100, 100, 0.2);
+  border-radius: 8px;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: grid;
+  grid-template-columns: 100px 1fr auto auto;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.history-entry:hover {
+  background: rgba(155, 89, 182, 0.1);
+  border-color: rgba(155, 89, 182, 0.4);
+}
+
+.history-entry.selected {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: #9b59b6;
+}
+
+.entry-result {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: bold;
+}
+
+.result-icon {
+  font-size: 1.2rem;
+}
+
+.result-text {
+  font-size: 0.85rem;
+}
+
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.entry-date {
+  font-size: 0.8rem;
+  color: #a0a0a0;
+}
+
+.entry-version {
+  font-size: 0.7rem;
+  color: #9b59b6;
+  background: rgba(155, 89, 182, 0.2);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.entry-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.entry-team {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.team-portrait {
+  font-size: 1.2rem;
+}
+
+/* Détails de la partie */
+.game-details {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.game-details h3 {
+  font-family: 'Cinzel', serif;
+  color: #9b59b6;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.game-details h4 {
+  font-family: 'Cinzel', serif;
+  color: #c0c0c0;
+  margin: 1.5rem 0 0.8rem 0;
+  font-size: 1rem;
+  border-top: 1px dashed rgba(100, 100, 100, 0.3);
+  padding-top: 1rem;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.details-result {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.details-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.version-badge {
+  background: rgba(155, 89, 182, 0.3);
+  color: #9b59b6;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.details-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  background: rgba(100, 100, 100, 0.15);
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.stat-item.boss {
+  background: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: #fff;
+  margin: 0.3rem 0;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.team-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(100, 100, 100, 0.1);
+  border-radius: 6px;
+  padding: 0.6rem;
+}
+
+.team-member.dead {
+  opacity: 0.5;
+}
+
+.member-portrait {
+  font-size: 1.8rem;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-family: 'Cinzel', serif;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  display: block;
+}
+
+.member-class {
+  font-size: 0.75rem;
+  color: #9b59b6;
+}
+
+.member-hp {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.3rem;
+}
+
+.member-stats {
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+
+.history-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.history-count {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.clear-btn {
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  background: rgba(231, 76, 60, 0.3);
+  border-color: #e74c3c;
+}
+
+/* Badge de niveau */
+.entry-level {
+  font-size: 0.7rem;
+  color: #f1c40f;
+  background: rgba(241, 196, 15, 0.2);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.3rem;
+}
+
+/* Onglets de personnages */
+.character-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.char-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(100, 100, 100, 0.15);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.char-tab:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.5);
+}
+
+.char-tab.active {
+  background: rgba(155, 89, 182, 0.3);
+  border-color: #9b59b6;
+}
+
+.char-tab.dead {
+  opacity: 0.5;
+}
+
+.tab-portrait {
+  font-size: 1.2rem;
+}
+
+.tab-name {
+  font-size: 0.8rem;
+  color: #e0e0e0;
+}
+
+/* Carte détaillée du personnage */
+.character-detail-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(155, 89, 182, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.character-detail-card.dead {
+  border-color: rgba(231, 76, 60, 0.4);
+  background: rgba(231, 76, 60, 0.05);
+}
+
+.char-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(100, 100, 100, 0.3);
+}
+
+.char-portrait-large {
+  font-size: 3rem;
+}
+
+.char-identity {
+  flex: 1;
+}
+
+.char-name-large {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  color: #e0e0e0;
+  display: block;
+}
+
+.char-class-large {
+  font-size: 0.9rem;
+  color: #9b59b6;
+}
+
+.char-hp-bar {
+  position: relative;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.char-hp-bar .hp-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.char-hp-bar .hp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  color: #fff;
+  text-shadow: 0 0 3px #000;
+}
+
+/* Section des statistiques */
+.char-stats-section,
+.char-performance-section,
+.strongest-monster-section,
+.inventory-section {
+  margin-top: 1rem;
+}
+
+.char-stats-section h5,
+.char-performance-section h5,
+.strongest-monster-section h5,
+.inventory-section h5 {
+  font-family: 'Cinzel', serif;
+  color: #9b59b6;
+  font-size: 0.9rem;
+  margin: 0 0 0.6rem 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.stat-box {
+  background: rgba(100, 100, 100, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-box .stat-icon {
+  font-size: 1rem;
+}
+
+.stat-box .stat-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.stat-box .stat-lbl {
+  font-size: 0.6rem;
+  color: #888;
+}
+
+/* Performance en combat */
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #a0a0a0;
+}
+
+/* Monstre le plus puissant */
+.monster-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(241, 196, 15, 0.1);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem;
+}
+
+.monster-portrait {
+  font-size: 1.8rem;
+}
+
+.monster-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.monster-name {
+  font-family: 'Cinzel', serif;
+  color: #f1c40f;
+  font-size: 0.95rem;
+}
+
+.monster-stats {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Inventaire */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.4rem;
+}
+
+.inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(100, 100, 100, 0.1);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.item-icon {
+  font-size: 1.2rem;
+}
+
+.item-name {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-items {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .character-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .char-tab {
+    flex: 1;
+    min-width: 80px;
+    justify-content: center;
+  }
+}
+
+
