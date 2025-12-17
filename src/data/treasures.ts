@@ -1303,17 +1303,22 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
       
     case 'skill':
       const newSkill = {
-        id: treasure.id + '_skill',
+        id: treasure.id + '_skill_' + Date.now(),
         name: effect.skillName || 'Nouveau Sort',
         damage: effect.skillDamage || 20,
-        type: (effect.skillType || 'damage') as 'damage' | 'heal',
-        damageType: effect.skillDamageType,
+        type: (effect.skillType === 'heal' ? 'heal' : 'damage') as 'damage' | 'heal',
+        damageType: effect.skillDamageType || 'magical',
         targetType: effect.skillType === 'heal' ? 'ally' as const : 'enemy' as const,
-        description: `${effect.skillDamage} dégâts ${effect.skillDamageType || 'magiques'}`,
-        cooldown: effect.skillType === 'heal' ? 3 : 2
+        description: effect.skillType === 'heal' 
+          ? `Restaure ${effect.skillDamage} PV`
+          : `${effect.skillDamage} dégâts ${effect.skillDamageType || 'magiques'}`,
+        cooldown: effect.skillType === 'heal' ? 3 : 2,
+        currentCooldown: 0
       };
+      // S'assurer que skills existe
+      if (!character.skills) character.skills = [];
       character.skills.push(newSkill);
-      effects.push(`Nouveau sort: ${effect.skillName}`);
+      effects.push(`✨ Nouveau sort: ${effect.skillName}`);
       break;
       
     case 'passive':

@@ -153,7 +153,10 @@ export function CombatPage() {
   const processBuffsForCharacter = useCallback((characterId: string) => {
     const logs: string[] = [...state.combatLog];
     
-    const updatedTeam = state.team.map(char => {
+    // Récupérer l'équipe actuelle du state GLOBAL (pas de la closure)
+    const currentTeam = gameStore.getState().team;
+    
+    const updatedTeam = currentTeam.map(char => {
       if (char.id !== characterId) return char;
       
       let updatedChar = { ...char };
@@ -161,10 +164,14 @@ export function CombatPage() {
       // =============================================
       // DÉCRÉMENTER LES COOLDOWNS DES COMPÉTENCES
       // =============================================
-      if (updatedChar.skills) {
+      if (updatedChar.skills && updatedChar.skills.length > 0) {
         updatedChar.skills = updatedChar.skills.map(skill => {
           if (skill.currentCooldown && skill.currentCooldown > 0) {
-            return { ...skill, currentCooldown: skill.currentCooldown - 1 };
+            const newCooldown = skill.currentCooldown - 1;
+            if (newCooldown === 0) {
+              logs.push(`⏰ ${updatedChar.name}: ${skill.name} est prêt !`);
+            }
+            return { ...skill, currentCooldown: newCooldown };
           }
           return skill;
         });
@@ -470,7 +477,13 @@ export function CombatPage() {
             setScreenShake(true);
             setTimeout(() => setScreenShake(false), 2000);
             
-            // Marquer l'ultime comme utilisé
+            // IMPORTANT: Marquer l'ultime comme utilisé dans le STATE GLOBAL
+            const updatedEnemiesForUltimate = enemies.map(e => 
+              e.id === currentMonster.id ? { ...e, ultimateUsed: true } : e
+            );
+            gameStore.setState({ currentEnemies: updatedEnemiesForUltimate });
+            
+            // Garder la référence locale aussi pour la suite de cette fonction
             currentMonster.ultimateUsed = true;
             
             // Exécuter l'ultime sur tous les personnages
@@ -1056,9 +1069,10 @@ export function CombatPage() {
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
     
-    // Appliquer le cooldown à la compétence utilisée
+    // Appliquer le cooldown à la compétence utilisée - UTILISER L'ÉTAT GLOBAL
     if (skill.cooldown && skill.cooldown > 0) {
-      const updatedTeam = state.team.map(char => {
+      const currentTeam = gameStore.getState().team;
+      const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
             ...char,
@@ -1070,6 +1084,8 @@ export function CombatPage() {
         return char;
       });
       gameStore.setState({ team: updatedTeam });
+      // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
+      attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
     }
     
     if (skill.type === 'heal') {
@@ -1248,7 +1264,10 @@ export function CombatPage() {
         const actualDamage = calculateDamage(damage, attacker, target, damageType, skill);
         target.hp = Math.max(0, target.hp - actualDamage);
         trackDamageDealt(attacker.id, actualDamage);
-        triggerDamageEffect(target.id, damageType === 'magical' || damageType === 'holy' ? 'magical' : 'physical');
+        
+        // Déterminer si c'est un dégât physique ou magique pour l'effet visuel
+        const isPhysicalDmg = isPhysicalDamage(damageType);
+        triggerDamageEffect(target.id, isPhysicalDmg ? 'physical' : 'magical');
         
         // Mettre à jour les HP dans la liste locale des ennemis
         const updatedEnemies = enemies.map(e => 
