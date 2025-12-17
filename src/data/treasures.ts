@@ -19,11 +19,11 @@ export interface TreasureEffect {
   skillType?: 'damage' | 'heal';
   skillDamageType?: 'physical' | 'magical' | 'holy' | 'fire' | 'cold' | 'lightning' | 'thunder' | 'acid' | 'poison' | 'necrotic' | 'radiant' | 'force' | 'psychic' | 'bludgeoning' | 'piercing' | 'slashing';
   duration?: 'permanent' | 'combat';
-  // Effets passifs (bonus permanents non liés aux stats de base)
+  // Effets passifs
   passive?: {
     type: 'initiative' | 'stealth' | 'evasion' | 'critical' | 'lifesteal' | 'thorns' | 'regeneration' | 'resistance';
-    value: number; // % ou bonus fixe selon le type
-    damageType?: 'fire' | 'cold' | 'lightning' | 'acid' | 'poison' | 'necrotic' | 'radiant' | 'force' | 'psychic' | 'thunder'; // Pour resistance
+    value: number;
+    damageType?: 'fire' | 'cold' | 'lightning' | 'acid' | 'poison' | 'necrotic' | 'radiant' | 'force' | 'psychic' | 'thunder';
   };
 }
 
@@ -33,38 +33,59 @@ export interface ObtainedTreasure {
   timestamp: number;
 }
 
-// Trésors communs
+// ============================================
+// ÉQUILIBRAGE v2.2.0 - NORMES PAR RARETÉ
+// ============================================
+// COMMUN : Stats +2-3, Soins 15-20 PV, Pas de sorts
+// RARE : Stats +4-6, Soins 25-35 PV, Sorts 18-25 dégâts, Passifs 8-12%
+// ÉPIQUE : Stats +8-10, Soins 45-60 PV, Sorts 30-40 dégâts, Passifs 15-20%
+// LÉGENDAIRE : Stats +12-15, Soins 80-100 PV, Sorts 50-65 dégâts, Passifs 25-35%
+// ============================================
+
+// ============================================
+// TRÉSORS COMMUNS (+2-3 stats, 15-20 PV soins)
+// ============================================
 const commonTreasures: Treasure[] = [
+  // Soins
   {
     id: 'potion_sante',
     name: 'Potion de Santé',
     icon: '🧪',
     rarity: 'common',
-    description: 'Restaure 30 PV immédiatement',
-    effect: { type: 'heal', value: 30 }
+    description: 'Restaure 18 PV immédiatement',
+    effect: { type: 'heal', value: 18 }
   },
   {
     id: 'herbes_guerison',
     name: 'Herbes de Guérison',
     icon: '🌿',
     rarity: 'common',
+    description: 'Restaure 15 PV immédiatement',
+    effect: { type: 'heal', value: 15 }
+  },
+  {
+    id: 'fiole_energie',
+    name: 'Fiole d\'Énergie',
+    icon: '⚗️',
+    rarity: 'common',
     description: 'Restaure 20 PV immédiatement',
     effect: { type: 'heal', value: 20 }
   },
+  // Stats physiques
   {
     id: 'pierre_force',
     name: 'Pierre de Force',
     icon: '💎',
     rarity: 'common',
-    description: '+3 en Attaque de façon permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 3, duration: 'permanent' }
+    description: '+2 Attaque permanente',
+    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' }
   },
   {
     id: 'amulette_protection',
     name: 'Amulette de Protection',
     icon: '📿',
     rarity: 'common',
-    description: '+2 en Défense de façon permanente',
+    description: '+2 Défense permanente',
     effect: { type: 'stat_boost', stat: 'defense', value: 2, duration: 'permanent' }
   },
   {
@@ -72,15 +93,16 @@ const commonTreasures: Treasure[] = [
     name: 'Bottes de Rapidité',
     icon: '👢',
     rarity: 'common',
-    description: '+2 en Vitesse de façon permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 2, duration: 'permanent' }
+    description: '+3 Vitesse permanente',
+    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' }
   },
+  // Stats magiques
   {
     id: 'cristal_mana_petit',
     name: 'Petit Cristal de Mana',
     icon: '🔮',
     rarity: 'common',
-    description: '+2 en Attaque Magique de façon permanente',
+    description: '+2 Attaque Magique permanente',
     effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
   },
   {
@@ -88,35 +110,40 @@ const commonTreasures: Treasure[] = [
     name: 'Talisman Arcanique',
     icon: '✨',
     rarity: 'common',
-    description: '+2 en Résistance Magique de façon permanente',
+    description: '+2 Résistance Magique permanente',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' }
   },
+  // PV
   {
-    id: 'fiole_energie',
-    name: 'Fiole d\'Énergie',
-    icon: '⚗️',
+    id: 'baie_vitalite',
+    name: 'Baie de Vitalité',
+    icon: '🍒',
     rarity: 'common',
-    description: 'Restaure 25 PV immédiatement',
-    effect: { type: 'heal', value: 25 }
+    description: '+8 PV max permanents',
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 8, duration: 'permanent' }
   }
 ];
 
-// Trésors rares
+// ============================================
+// TRÉSORS RARES (+4-6 stats, 25-35 PV soins, 18-25 dégâts sorts)
+// ============================================
 const rareTreasures: Treasure[] = [
+  // Soins
   {
-    id: 'elixir_vitalite',
-    name: 'Élixir de Vitalité',
+    id: 'potion_guerison_grande',
+    name: 'Potion de Guérison Supérieure',
     icon: '⚗️',
     rarity: 'rare',
-    description: '+15 PV max et soigne complètement',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 15, duration: 'permanent' }
+    description: 'Restaure 30 PV immédiatement',
+    effect: { type: 'heal', value: 30 }
   },
+  // Stats physiques
   {
     id: 'gantelet_puissance',
     name: 'Gantelet de Puissance',
     icon: '🧤',
     rarity: 'rare',
-    description: '+5 en Attaque de façon permanente',
+    description: '+5 Attaque permanente',
     effect: { type: 'stat_boost', stat: 'attack', value: 5, duration: 'permanent' }
   },
   {
@@ -124,77 +151,143 @@ const rareTreasures: Treasure[] = [
     name: 'Bouclier Ancestral',
     icon: '🛡️',
     rarity: 'rare',
-    description: '+4 en Défense de façon permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 4, duration: 'permanent' }
+    description: '+5 Défense permanente',
+    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' }
   },
   {
     id: 'cape_vent',
     name: 'Cape du Vent',
     icon: '🧣',
     rarity: 'rare',
-    description: '+4 en Vitesse de façon permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 4, duration: 'permanent' }
+    description: '+5 Vitesse permanente',
+    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' }
   },
+  // Stats magiques
   {
     id: 'cristal_mana_moyen',
     name: 'Cristal de Mana',
     icon: '💠',
     rarity: 'rare',
-    description: '+5 en Attaque Magique de façon permanente',
+    description: '+5 Attaque Magique permanente',
     effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' }
   },
   {
-    id: 'robe_archimage',
-    name: 'Robe de l\'Archimage',
+    id: 'robe_archimage_mineure',
+    name: 'Robe de Mage',
     icon: '🧙',
     rarity: 'rare',
-    description: '+5 en Résistance Magique de façon permanente',
+    description: '+5 Résistance Magique permanente',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
   },
+  // PV
+  {
+    id: 'elixir_vitalite',
+    name: 'Élixir de Vitalité',
+    icon: '💊',
+    rarity: 'rare',
+    description: '+15 PV max permanents',
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 15, duration: 'permanent' }
+  },
+  // Compétences (18-25 dégâts)
   {
     id: 'grimoire_flammes',
     name: 'Grimoire des Flammes',
     icon: '📕',
     rarity: 'rare',
-    description: 'Apprend le sort "Boule de Feu" (25 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Boule de Feu', skillDamage: 25, skillType: 'damage', skillDamageType: 'fire' }
-  },
-  {
-    id: 'pendentif_guerison',
-    name: 'Pendentif de Guérison',
-    icon: '💚',
-    rarity: 'rare',
-    description: 'Apprend le sort "Soin Léger" (20 PV)',
-    effect: { type: 'skill', skillName: 'Soin Léger', skillDamage: 20, skillType: 'heal' }
+    description: 'Apprend "Boule de Feu" (20 dégâts de feu)',
+    effect: { type: 'skill', skillName: 'Boule de Feu', skillDamage: 20, skillType: 'damage', skillDamageType: 'fire' }
   },
   {
     id: 'anneau_givre',
     name: 'Anneau de Givre',
     icon: '❄️',
     rarity: 'rare',
-    description: 'Apprend "Souffle Glacé" (22 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Souffle Glacé', skillDamage: 22, skillType: 'damage', skillDamageType: 'cold' }
+    description: 'Apprend "Souffle Glacé" (18 dégâts de froid)',
+    effect: { type: 'skill', skillName: 'Souffle Glacé', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' }
   },
   {
-    id: 'amulette_lumiere',
-    name: 'Amulette de Lumière',
-    icon: '☀️',
+    id: 'pendentif_guerison',
+    name: 'Pendentif de Guérison',
+    icon: '💚',
     rarity: 'rare',
-    description: '+3 Attaque Magique et +3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 3, duration: 'permanent' }
+    description: 'Apprend "Soin Léger" (22 PV)',
+    effect: { type: 'skill', skillName: 'Soin Léger', skillDamage: 22, skillType: 'heal' }
+  },
+  {
+    id: 'perle_pouvoir',
+    name: 'Perle de Pouvoir',
+    icon: '🔮',
+    rarity: 'rare',
+    description: 'Apprend "Rayon de Givre" (18 dégâts de froid)',
+    effect: { type: 'skill', skillName: 'Rayon de Givre', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' }
   }
 ];
 
-// Trésors épiques
+// ============================================
+// TRÉSORS ÉPIQUES (+8-10 stats, 45-60 PV soins, 30-40 dégâts sorts)
+// ============================================
 const epicTreasures: Treasure[] = [
+  // Soins
+  {
+    id: 'potion_guerison_supreme',
+    name: 'Potion de Guérison Suprême',
+    icon: '💉',
+    rarity: 'epic',
+    description: 'Restaure 50 PV immédiatement',
+    effect: { type: 'heal', value: 50 }
+  },
+  // Stats physiques
+  {
+    id: 'epee_lumiere',
+    name: 'Épée de Lumière',
+    icon: '⚔️',
+    rarity: 'epic',
+    description: '+9 Attaque permanente',
+    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' }
+  },
+  {
+    id: 'armure_titan',
+    name: 'Armure du Titan',
+    icon: '🦾',
+    rarity: 'epic',
+    description: '+9 Défense permanente',
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
+  },
+  {
+    id: 'bottes_rapidite_epic',
+    name: 'Bottes de Célérité',
+    icon: '👟',
+    rarity: 'epic',
+    description: '+8 Vitesse permanente',
+    effect: { type: 'stat_boost', stat: 'speed', value: 8, duration: 'permanent' }
+  },
+  // Stats magiques
+  {
+    id: 'baton_archimage',
+    name: 'Bâton de l\'Archimage',
+    icon: '🪄',
+    rarity: 'epic',
+    description: '+10 Attaque Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' }
+  },
+  {
+    id: 'cape_ombre',
+    name: 'Cape des Ombres',
+    icon: '🌑',
+    rarity: 'epic',
+    description: '+9 Résistance Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' }
+  },
+  // PV + bonus
   {
     id: 'coeur_dragon',
     name: 'Cœur de Dragon',
     icon: '❤️‍🔥',
     rarity: 'epic',
-    description: '+30 PV max et +5 Attaque permanents',
-    effect: { type: 'buff', stat: 'maxHp', value: 30 }
+    description: '+25 PV max et +4 Attaque permanents',
+    effect: { type: 'buff', stat: 'maxHp', value: 25 }
   },
+  // Résurrection
   {
     id: 'anneau_immortel',
     name: 'Anneau de l\'Immortel',
@@ -203,144 +296,167 @@ const epicTreasures: Treasure[] = [
     description: 'Ressuscite un allié mort avec 50% PV',
     effect: { type: 'resurrect', percentage: 50 }
   },
-  {
-    id: 'epee_lumiere',
-    name: 'Épée de Lumière',
-    icon: '⚔️',
-    rarity: 'epic',
-    description: '+8 Attaque et +3 Vitesse permanents',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
-  },
-  {
-    id: 'armure_titan',
-    name: 'Armure du Titan',
-    icon: '🦾',
-    rarity: 'epic',
-    description: '+25 PV max et +6 Défense permanents',
-    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' }
-  },
+  // Compétences (30-40 dégâts)
   {
     id: 'orbe_foudre',
     name: 'Orbe de Foudre',
     icon: '⚡',
     rarity: 'epic',
-    description: 'Apprend "Éclair Dévastateur" (40 dégâts de foudre)',
-    effect: { type: 'skill', skillName: 'Éclair Dévastateur', skillDamage: 40, skillType: 'damage', skillDamageType: 'lightning' }
-  },
-  {
-    id: 'baton_archimage',
-    name: 'Bâton de l\'Archimage',
-    icon: '🪄',
-    rarity: 'epic',
-    description: '+10 Attaque Magique et +5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' }
-  },
-  {
-    id: 'cape_ombre',
-    name: 'Cape des Ombres',
-    icon: '🌑',
-    rarity: 'epic',
-    description: '+8 Résistance Magique et +4 Vitesse',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' }
-  },
-  {
-    id: 'essence_arcane',
-    name: 'Essence Arcanique Pure',
-    icon: '🌟',
-    rarity: 'epic',
-    description: '+12 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+    description: 'Apprend "Éclair Dévastateur" (35 dégâts de foudre)',
+    effect: { type: 'skill', skillName: 'Éclair Dévastateur', skillDamage: 35, skillType: 'damage', skillDamageType: 'lightning' }
   },
   {
     id: 'grimoire_necromancie',
     name: 'Grimoire de Nécromancie',
     icon: '📓',
     rarity: 'epic',
-    description: 'Apprend "Drain de Vie" (35 dégâts nécrotiques + vol de vie)',
-    effect: { type: 'skill', skillName: 'Drain de Vie', skillDamage: 35, skillType: 'damage', skillDamageType: 'necrotic' }
+    description: 'Apprend "Drain de Vie" (32 dégâts nécrotiques)',
+    effect: { type: 'skill', skillName: 'Drain de Vie', skillDamage: 32, skillType: 'damage', skillDamageType: 'necrotic' }
   },
   {
-    id: 'bouclier_spectral',
-    name: 'Bouclier Spectral',
-    icon: '👻',
+    id: 'baguette_boule_feu',
+    name: 'Baguette de Boule de Feu',
+    icon: '🔥',
     rarity: 'epic',
-    description: '+10 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' }
+    description: 'Apprend "Grande Boule de Feu" (38 dégâts de feu)',
+    effect: { type: 'skill', skillName: 'Grande Boule de Feu', skillDamage: 38, skillType: 'damage', skillDamageType: 'fire' }
+  },
+  {
+    id: 'baton_guerison',
+    name: 'Bâton de Guérison',
+    icon: '🏥',
+    rarity: 'epic',
+    description: 'Apprend "Guérison Majeure" (45 PV)',
+    effect: { type: 'skill', skillName: 'Guérison Majeure', skillDamage: 45, skillType: 'heal' }
   }
 ];
 
-// Trésors légendaires
+// ============================================
+// TRÉSORS LÉGENDAIRES (+12-15 stats, 80-100 PV soins, 50-65 dégâts sorts)
+// ============================================
 const legendaryTreasures: Treasure[] = [
+  // Soins
+  {
+    id: 'potion_guerison_legendaire',
+    name: 'Potion de Guérison Légendaire',
+    icon: '🧪',
+    rarity: 'legendary',
+    description: 'Restaure 100 PV immédiatement',
+    effect: { type: 'heal', value: 100 }
+  },
+  // Stats physiques
+  {
+    id: 'epee_vorpale',
+    name: 'Épée Vorpale',
+    icon: '⚔️',
+    rarity: 'legendary',
+    description: '+14 Attaque permanente',
+    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' }
+  },
+  {
+    id: 'armure_invincibilite',
+    name: 'Armure d\'Invincibilité',
+    icon: '🛡️',
+    rarity: 'legendary',
+    description: '+14 Défense permanente',
+    effect: { type: 'stat_boost', stat: 'defense', value: 14, duration: 'permanent' }
+  },
+  // Stats magiques
+  {
+    id: 'tome_arcane_supreme',
+    name: 'Tome Arcanique Suprême',
+    icon: '📖',
+    rarity: 'legendary',
+    description: '+15 Attaque Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' }
+  },
+  {
+    id: 'robe_archimage',
+    name: 'Robe de l\'Archimage',
+    icon: '🧙',
+    rarity: 'legendary',
+    description: '+14 Résistance Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 14, duration: 'permanent' }
+  },
+  // Multi-stats
   {
     id: 'couronne_roi',
     name: 'Couronne du Roi Déchu',
     icon: '👑',
     rarity: 'legendary',
-    description: '+50 PV max, +10 Attaque, +5 Défense permanents',
-    effect: { type: 'buff', stat: 'maxHp', value: 50 }
-  },
-  {
-    id: 'larme_phenix',
-    name: 'Larme du Phénix',
-    icon: '🔥',
-    rarity: 'legendary',
-    description: 'Ressuscite un allié avec 100% PV + bonus',
-    effect: { type: 'resurrect', percentage: 100 }
-  },
-  {
-    id: 'sceptre_eternel',
-    name: 'Sceptre Éternel',
-    icon: '🏆',
-    rarity: 'legendary',
-    description: 'Apprend "Jugement Divin" (60 dégâts radiants)',
-    effect: { type: 'skill', skillName: 'Jugement Divin', skillDamage: 60, skillType: 'damage', skillDamageType: 'radiant' }
-  },
-  {
-    id: 'orbe_cosmos',
-    name: 'Orbe du Cosmos',
-    icon: '🌌',
-    rarity: 'legendary',
-    description: '+15 Attaque Magique et +10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' }
+    description: '+35 PV max, +8 Attaque, +6 Défense permanents',
+    effect: { type: 'buff', stat: 'maxHp', value: 35 }
   },
   {
     id: 'armure_divine',
     name: 'Armure Divine',
     icon: '⚜️',
     rarity: 'legendary',
-    description: '+40 PV max, +8 Défense, +8 Rés. Magique',
-    effect: { type: 'buff', stat: 'defense', value: 8 }
+    description: '+30 PV max, +10 Défense, +8 Rés. Magique',
+    effect: { type: 'buff', stat: 'defense', value: 10 }
   },
   {
-    id: 'tome_arcane_supreme',
-    name: 'Tome Arcanique Suprême',
-    icon: '📖',
+    id: 'orbe_cosmos',
+    name: 'Orbe du Cosmos',
+    icon: '🌌',
     rarity: 'legendary',
-    description: '+20 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 20, duration: 'permanent' }
+    description: '+12 Attaque Magique et +10 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+  },
+  // Résurrection
+  {
+    id: 'larme_phenix',
+    name: 'Larme du Phénix',
+    icon: '🔥',
+    rarity: 'legendary',
+    description: 'Ressuscite un allié avec 100% PV',
+    effect: { type: 'resurrect', percentage: 100 }
+  },
+  // Compétences (50-65 dégâts)
+  {
+    id: 'sceptre_eternel',
+    name: 'Sceptre Éternel',
+    icon: '🏆',
+    rarity: 'legendary',
+    description: 'Apprend "Jugement Divin" (55 dégâts radiants)',
+    effect: { type: 'skill', skillName: 'Jugement Divin', skillDamage: 55, skillType: 'damage', skillDamageType: 'radiant' }
+  },
+  {
+    id: 'sphere_annihilation',
+    name: 'Sphère d\'Annihilation',
+    icon: '⚫',
+    rarity: 'legendary',
+    description: 'Apprend "Désintégration" (60 dégâts de force)',
+    effect: { type: 'skill', skillName: 'Désintégration', skillDamage: 60, skillType: 'damage', skillDamageType: 'force' }
+  },
+  {
+    id: 'baguette_rayon_mort',
+    name: 'Baguette du Rayon de la Mort',
+    icon: '💀',
+    rarity: 'legendary',
+    description: 'Apprend "Rayon de la Mort" (58 dégâts nécrotiques)',
+    effect: { type: 'skill', skillName: 'Rayon de la Mort', skillDamage: 58, skillType: 'damage', skillDamageType: 'necrotic' }
   }
 ];
 
 // ============================================
-// OBJETS MAGIQUES D&D - Adaptés à Ethernalys
+// OBJETS D&D - COMMUNS
 // ============================================
-
-// Objets D&D Communs
 const dndCommonItems: Treasure[] = [
   {
-    id: 'potion_guerison',
+    id: 'potion_guerison_dnd',
     name: 'Potion de Guérison',
     icon: '🧪',
     rarity: 'common',
-    description: 'Restaure 2d4+2 (7) PV immédiatement',
-    effect: { type: 'heal', value: 7 }
+    description: 'Restaure 2d4+2 (7) PV',
+    effect: { type: 'heal', value: 17 }
   },
   {
     id: 'dague_argent',
     name: 'Dague en Argent',
     icon: '🗡️',
     rarity: 'common',
-    description: '+2 Attaque, bonus contre les lycanthropes',
+    description: '+2 Attaque, efficace contre lycanthropes',
     effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' }
   },
   {
@@ -348,7 +464,7 @@ const dndCommonItems: Treasure[] = [
     name: 'Symbole Sacré',
     icon: '✝️',
     rarity: 'common',
-    description: '+2 Attaque Magique, bonus contre morts-vivants',
+    description: '+2 Attaque Magique',
     effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
   },
   {
@@ -356,36 +472,38 @@ const dndCommonItems: Treasure[] = [
     name: 'Torche Éternelle',
     icon: '🔦',
     rarity: 'common',
-    description: '+1 Attaque Magique, éclaire dans les ténèbres',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 1, duration: 'permanent' }
+    description: '+2 Attaque Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
   },
   {
     id: 'corde_escalade',
     name: 'Corde d\'Escalade',
     icon: '🪢',
     rarity: 'common',
-    description: '+2 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 2, duration: 'permanent' }
+    description: '+3 Vitesse permanente',
+    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' }
   }
 ];
 
-// Objets D&D Rares (Uncommon en D&D)
+// ============================================
+// OBJETS D&D - RARES (Uncommon D&D)
+// ============================================
 const dndRareItems: Treasure[] = [
   {
     id: 'cape_protection',
     name: 'Cape de Protection',
     icon: '🧥',
     rarity: 'rare',
-    description: '+3 Défense et +3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 3, duration: 'permanent' }
+    description: '+4 Défense et +4 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'defense', value: 4, duration: 'permanent' }
   },
   {
     id: 'bottes_elfiques',
     name: 'Bottes Elfiques',
     icon: '👢',
     rarity: 'rare',
-    description: '+5 Vitesse, déplacement silencieux',
-    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' }
+    description: '+6 Vitesse, déplacement silencieux',
+    effect: { type: 'stat_boost', stat: 'speed', value: 6, duration: 'permanent' }
   },
   {
     id: 'gants_ogre',
@@ -408,52 +526,38 @@ const dndRareItems: Treasure[] = [
     name: 'Amulette de Santé',
     icon: '💎',
     rarity: 'rare',
-    description: '+20 PV max (Constitution 19)',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 20, duration: 'permanent' }
-  },
-  {
-    id: 'perle_pouvoir',
-    name: 'Perle de Pouvoir',
-    icon: '🔮',
-    rarity: 'rare',
-    description: 'Apprend "Rayon de Givre" (15 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Rayon de Givre', skillDamage: 15, skillType: 'damage', skillDamageType: 'cold' }
+    description: '+18 PV max (Constitution 19)',
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 18, duration: 'permanent' }
   },
   {
     id: 'baguette_secrets',
     name: 'Baguette des Secrets',
     icon: '🪄',
     rarity: 'rare',
-    description: '+4 Attaque Magique et +2 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 4, duration: 'permanent' }
+    description: '+5 Attaque Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' }
   },
   {
     id: 'armure_mithral',
     name: 'Armure de Mithral',
     icon: '🛡️',
     rarity: 'rare',
-    description: '+5 Défense, légère comme l\'air',
-    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' }
+    description: '+6 Défense, légère comme l\'air',
+    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' }
   },
   {
     id: 'anneau_saut',
     name: 'Anneau de Saut',
     icon: '💍',
     rarity: 'rare',
-    description: '+4 Vitesse et +2 Défense',
-    effect: { type: 'stat_boost', stat: 'speed', value: 4, duration: 'permanent' }
-  },
-  {
-    id: 'potion_guerison_grande',
-    name: 'Potion de Guérison Supérieure',
-    icon: '⚗️',
-    rarity: 'rare',
-    description: 'Restaure 4d4+4 (14) PV immédiatement',
-    effect: { type: 'heal', value: 14 }
+    description: '+5 Vitesse permanente',
+    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' }
   }
 ];
 
-// Objets D&D Épiques (Rare en D&D)
+// ============================================
+// OBJETS D&D - ÉPIQUES (Rare D&D)
+// ============================================
 const dndEpicItems: Treasure[] = [
   {
     id: 'ceinture_geant',
@@ -468,23 +572,23 @@ const dndEpicItems: Treasure[] = [
     name: 'Cape de Déplacement',
     icon: '🧣',
     rarity: 'epic',
-    description: '+8 Défense (désavantage aux attaques)',
-    effect: { type: 'stat_boost', stat: 'defense', value: 8, duration: 'permanent' }
+    description: '+9 Défense (désavantage aux attaques ennemies)',
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
   },
   {
     id: 'epee_tranchante',
     name: 'Épée Tranchante +2',
     icon: '⚔️',
     rarity: 'epic',
-    description: '+8 Attaque, coups critiques améliorés',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
+    description: '+9 Attaque, coups critiques améliorés',
+    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' }
   },
   {
     id: 'baton_mage',
     name: 'Bâton du Mage',
     icon: '🪄',
     rarity: 'epic',
-    description: '+10 Attaque Magique, stocke des sorts',
+    description: '+10 Attaque Magique',
     effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' }
   },
   {
@@ -500,124 +604,70 @@ const dndEpicItems: Treasure[] = [
     name: 'Anneau de Protection +2',
     icon: '💍',
     rarity: 'epic',
-    description: '+5 Défense et +5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' }
-  },
-  {
-    id: 'bottes_rapidite',
-    name: 'Bottes de Rapidité',
-    icon: '👟',
-    rarity: 'epic',
-    description: '+10 Vitesse, clic pour doubler la vitesse',
-    effect: { type: 'stat_boost', stat: 'speed', value: 10, duration: 'permanent' }
-  },
-  {
-    id: 'baguette_boule_feu',
-    name: 'Baguette de Boule de Feu',
-    icon: '🔥',
-    rarity: 'epic',
-    description: 'Apprend "Boule de Feu" (35 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Boule de Feu', skillDamage: 35, skillType: 'damage', skillDamageType: 'fire' }
+    description: '+6 Défense et +6 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' }
   },
   {
     id: 'baguette_eclair',
     name: 'Baguette d\'Éclairs',
     icon: '⚡',
     rarity: 'epic',
-    description: 'Apprend "Éclair" (35 dégâts de foudre)',
-    effect: { type: 'skill', skillName: 'Éclair', skillDamage: 35, skillType: 'damage', skillDamageType: 'lightning' }
+    description: 'Apprend "Éclair" (36 dégâts de foudre)',
+    effect: { type: 'skill', skillName: 'Éclair', skillDamage: 36, skillType: 'damage', skillDamageType: 'lightning' }
   },
   {
     id: 'ioun_force',
     name: 'Pierre Ioun de Force',
     icon: '💠',
     rarity: 'epic',
-    description: '+6 Attaque, orbite autour de la tête',
-    effect: { type: 'stat_boost', stat: 'attack', value: 6, duration: 'permanent' }
+    description: '+8 Attaque',
+    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
   },
   {
     id: 'ioun_insight',
     name: 'Pierre Ioun d\'Intuition',
     icon: '🔷',
     rarity: 'epic',
-    description: '+6 Attaque Magique et +4 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 6, duration: 'permanent' }
-  },
-  {
-    id: 'potion_guerison_supreme',
-    name: 'Potion de Guérison Suprême',
-    icon: '💉',
-    rarity: 'epic',
-    description: 'Restaure 10d4+20 (45) PV immédiatement',
-    effect: { type: 'heal', value: 45 }
+    description: '+8 Attaque Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 8, duration: 'permanent' }
   }
 ];
 
-// Objets D&D Légendaires (Very Rare / Legendary en D&D)
+// ============================================
+// OBJETS D&D - LÉGENDAIRES (Very Rare / Legendary D&D)
+// ============================================
 const dndLegendaryItems: Treasure[] = [
   {
     id: 'ceinture_geant_feu',
     name: 'Ceinture de Force de Géant du Feu',
     icon: '🔥',
     rarity: 'legendary',
-    description: '+15 Attaque (Force 25)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 15, duration: 'permanent' }
+    description: '+14 Attaque (Force 25)',
+    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' }
   },
   {
     id: 'ceinture_geant_tempete',
     name: 'Ceinture de Force de Géant des Tempêtes',
     icon: '⛈️',
     rarity: 'legendary',
-    description: '+20 Attaque (Force 29)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 20, duration: 'permanent' }
-  },
-  {
-    id: 'epee_vorpale',
-    name: 'Épée Vorpale',
-    icon: '⚔️',
-    rarity: 'legendary',
-    description: '+15 Attaque, décapite sur 20 naturel',
+    description: '+15 Attaque (Force 29)',
     effect: { type: 'stat_boost', stat: 'attack', value: 15, duration: 'permanent' }
   },
   {
-    id: 'baton_archmage',
+    id: 'baton_archimage',
     name: 'Bâton de l\'Archimage',
     icon: '🪄',
     rarity: 'legendary',
-    description: '+15 Attaque Magique et +10 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' }
-  },
-  {
-    id: 'robe_archimage',
-    name: 'Robe de l\'Archimage',
-    icon: '🧙',
-    rarity: 'legendary',
-    description: '+12 Défense et +15 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' }
-  },
-  {
-    id: 'armure_invincibilite',
-    name: 'Armure d\'Invincibilité',
-    icon: '🛡️',
-    rarity: 'legendary',
-    description: '+15 Défense, résistance à tous les dégâts',
-    effect: { type: 'stat_boost', stat: 'defense', value: 15, duration: 'permanent' }
+    description: '+14 Attaque Magique et +8 Rés. Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' }
   },
   {
     id: 'anneau_trois_souhaits',
     name: 'Anneau des Trois Souhaits',
     icon: '💫',
     rarity: 'legendary',
-    description: '+50 PV max, +10 Attaque, +10 Att. Magique',
-    effect: { type: 'buff', stat: 'maxHp', value: 50 }
-  },
-  {
-    id: 'sphere_annihilation',
-    name: 'Sphère d\'Annihilation',
-    icon: '⚫',
-    rarity: 'legendary',
-    description: 'Apprend "Désintégration" (75 dégâts de force)',
-    effect: { type: 'skill', skillName: 'Désintégration', skillDamage: 75, skillType: 'damage', skillDamageType: 'force' }
+    description: '+35 PV max, +8 Attaque, +8 Att. Magique',
+    effect: { type: 'buff', stat: 'maxHp', value: 35 }
   },
   {
     id: 'main_vecna',
@@ -632,49 +682,40 @@ const dndLegendaryItems: Treasure[] = [
     name: 'Œil de Vecna',
     icon: '👁️',
     rarity: 'legendary',
-    description: '+8 Attaque Magique, vision des ténèbres',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 8, duration: 'permanent' }
-  },
-  {
-    id: 'potion_guerison_legendaire',
-    name: 'Potion de Guérison Légendaire',
-    icon: '🧪',
-    rarity: 'legendary',
-    description: 'Restaure tous les PV immédiatement',
-    effect: { type: 'heal', value: 200 }
+    description: '+12 Attaque Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
   },
   {
     id: 'manuel_exercice',
     name: 'Manuel d\'Exercices Physiques',
     icon: '📘',
     rarity: 'legendary',
-    description: '+10 PV max et +8 Attaque permanents',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
+    description: '+12 PV max et +10 Attaque permanents',
+    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' }
   },
   {
     id: 'tome_comprehension',
     name: 'Tome de Compréhension',
     icon: '📗',
     rarity: 'legendary',
-    description: '+8 Rés. Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' }
+    description: '+12 Résistance Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 12, duration: 'permanent' }
   },
   {
     id: 'tome_pensee',
     name: 'Tome de Pensée Claire',
     icon: '📙',
     rarity: 'legendary',
-    description: '+12 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+    description: '+13 Attaque Magique permanente',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 13, duration: 'permanent' }
   }
 ];
 
 // ============================================
 // OBJETS DE RÉSISTANCE MAGIQUE
 // ============================================
-
 const magicResistanceItems: Treasure[] = [
-  // Communs
+  // Communs (+2-3)
   {
     id: 'amulette_protection_mineure',
     name: 'Amulette de Protection Mineure',
@@ -688,7 +729,7 @@ const magicResistanceItems: Treasure[] = [
     name: 'Talisman du Gardien',
     icon: '🔷',
     rarity: 'common',
-    description: '+2 Résistance Magique et +1 Défense',
+    description: '+2 Résistance Magique',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' }
   },
   {
@@ -696,16 +737,16 @@ const magicResistanceItems: Treasure[] = [
     name: 'Pierre Anti-Magie',
     icon: '💎',
     rarity: 'common',
-    description: '+4 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 4, duration: 'permanent' }
+    description: '+3 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' }
   },
-  // Rares
+  // Rares (+4-6)
   {
     id: 'manteau_resistance',
     name: 'Manteau de Résistance',
     icon: '🧥',
     rarity: 'rare',
-    description: '+6 Résistance Magique, protection contre les sorts',
+    description: '+6 Résistance Magique',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' }
   },
   {
@@ -713,7 +754,7 @@ const magicResistanceItems: Treasure[] = [
     name: 'Broche de Bouclier Arcanique',
     icon: '💠',
     rarity: 'rare',
-    description: '+5 Résistance Magique et +3 Défense',
+    description: '+5 Résistance Magique',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
   },
   {
@@ -721,24 +762,24 @@ const magicResistanceItems: Treasure[] = [
     name: 'Anneau de Dissipation',
     icon: '💍',
     rarity: 'rare',
-    description: '+7 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 7, duration: 'permanent' }
+    description: '+6 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' }
   },
   {
     id: 'cape_mage_rebelle',
     name: 'Cape du Mage Rebelle',
     icon: '🧣',
     rarity: 'rare',
-    description: '+5 Résistance Magique et +3 Attaque Magique',
+    description: '+5 Résistance Magique',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
   },
-  // Épiques
+  // Épiques (+8-10)
   {
     id: 'armure_mage_tueur',
     name: 'Armure du Mage-Tueur',
     icon: '🦾',
     rarity: 'epic',
-    description: '+10 Résistance Magique, avantage contre les mages',
+    description: '+10 Résistance Magique',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' }
   },
   {
@@ -746,8 +787,8 @@ const magicResistanceItems: Treasure[] = [
     name: 'Collier d\'Absorption Magique',
     icon: '📿',
     rarity: 'epic',
-    description: '+12 Résistance Magique, absorbe les sorts',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 12, duration: 'permanent' }
+    description: '+10 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' }
   },
   {
     id: 'bouclier_miroir',
@@ -757,251 +798,211 @@ const magicResistanceItems: Treasure[] = [
     description: '+8 Résistance Magique et +5 Défense',
     effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' }
   },
-  // Légendaires
+  {
+    id: 'bouclier_spectral',
+    name: 'Bouclier Spectral',
+    icon: '👻',
+    rarity: 'epic',
+    description: '+9 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' }
+  },
+  // Légendaires (+12-15)
   {
     id: 'armure_antimagie',
     name: 'Armure d\'Antimagie',
     icon: '⚜️',
     rarity: 'legendary',
-    description: '+18 Résistance Magique, immunité partielle aux sorts',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 18, duration: 'permanent' }
+    description: '+15 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' }
   },
   {
     id: 'manteau_archimage_noir',
     name: 'Manteau de l\'Archimage Noir',
     icon: '🖤',
     rarity: 'legendary',
-    description: '+15 Résistance Magique et +10 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' }
+    description: '+13 Résistance Magique et +8 Att. Magique',
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 13, duration: 'permanent' }
   }
 ];
 
 // ============================================
-// OBJETS D&D AVEC EFFETS PASSIFS UTILES
+// OBJETS AVEC EFFETS PASSIFS
 // ============================================
-
 const passiveEffectItems: Treasure[] = [
-  // FURTIVITÉ / INITIATIVE
+  // INITIATIVE - Rares (8-12%)
   {
     id: 'bottes_elfiques_silence',
     name: 'Bottes Elfiques du Silence',
     icon: '👢',
     rarity: 'rare',
-    description: '+5 Vitesse, +10% Initiative (agit plus tôt)',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'initiative', value: 10 }
-    }
-  },
-  {
-    id: 'cape_ombre_furtive',
-    name: 'Cape de l\'Ombre Furtive',
-    icon: '🌑',
-    rarity: 'epic',
-    description: '+20% Initiative et +5 Résistance Magique',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'initiative', value: 20 }
-    }
+    description: '+10% Initiative (agit plus tôt)',
+    effect: { type: 'passive', passive: { type: 'initiative', value: 10 } }
   },
   {
     id: 'anneau_vent',
     name: 'Anneau du Vent',
     icon: '💨',
     rarity: 'rare',
-    description: '+15% Initiative, déplacement comme le vent',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'initiative', value: 15 }
-    }
+    description: '+12% Initiative',
+    effect: { type: 'passive', passive: { type: 'initiative', value: 12 } }
+  },
+  // INITIATIVE - Épiques (15-20%)
+  {
+    id: 'cape_ombre_furtive',
+    name: 'Cape de l\'Ombre Furtive',
+    icon: '🌑',
+    rarity: 'epic',
+    description: '+18% Initiative',
+    effect: { type: 'passive', passive: { type: 'initiative', value: 18 } }
   },
   
-  // ÉVASION
+  // ÉVASION - Rares (8-12%)
   {
     id: 'cape_evasion',
     name: 'Cape d\'Évasion',
     icon: '🧣',
     rarity: 'rare',
-    description: '10% de chance d\'esquiver les attaques',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'evasion', value: 10 }
-    }
+    description: '10% de chance d\'esquiver',
+    effect: { type: 'passive', passive: { type: 'evasion', value: 10 } }
   },
+  // ÉVASION - Épiques (15-20%)
   {
     id: 'bottes_dimension',
     name: 'Bottes de Dimension',
     icon: '👟',
     rarity: 'epic',
-    description: '15% de chance d\'esquiver, téléportation courte',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'evasion', value: 15 }
-    }
+    description: '15% de chance d\'esquiver',
+    effect: { type: 'passive', passive: { type: 'evasion', value: 15 } }
   },
   {
     id: 'anneau_flou',
     name: 'Anneau de Flou',
     icon: '💫',
     rarity: 'epic',
-    description: '20% de chance d\'esquiver les attaques',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'evasion', value: 20 }
-    }
+    description: '18% de chance d\'esquiver',
+    effect: { type: 'passive', passive: { type: 'evasion', value: 18 } }
   },
   
-  // COUPS CRITIQUES
+  // COUPS CRITIQUES - Rares (8-12%)
   {
     id: 'dague_chance',
     name: 'Dague de la Chance',
     icon: '🗡️',
     rarity: 'rare',
     description: '+10% de chance de coup critique',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'critical', value: 10 }
-    }
+    effect: { type: 'passive', passive: { type: 'critical', value: 10 } }
   },
+  // COUPS CRITIQUES - Épiques (15-20%)
   {
     id: 'anneau_precision',
     name: 'Anneau de Précision',
     icon: '🎯',
     rarity: 'epic',
     description: '+15% de chance de coup critique',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'critical', value: 15 }
-    }
+    effect: { type: 'passive', passive: { type: 'critical', value: 15 } }
   },
+  // COUPS CRITIQUES - Légendaires (25-35%)
   {
     id: 'epee_executeur',
     name: 'Épée de l\'Exécuteur',
     icon: '⚔️',
     rarity: 'legendary',
-    description: '+25% de chance de coup critique, +8 Attaque',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'critical', value: 25 }
-    }
+    description: '+25% de chance de coup critique',
+    effect: { type: 'passive', passive: { type: 'critical', value: 25 } }
   },
   
-  // VOL DE VIE
+  // VOL DE VIE - Rares (8-12%)
   {
     id: 'lame_vampire',
     name: 'Lame du Vampire',
     icon: '🩸',
     rarity: 'rare',
-    description: 'Récupère 10% des dégâts infligés en PV',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'lifesteal', value: 10 }
-    }
+    description: 'Récupère 10% des dégâts en PV',
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 10 } }
   },
+  // VOL DE VIE - Épiques (15-20%)
   {
     id: 'griffe_nosferatu',
     name: 'Griffe de Nosferatu',
     icon: '🧛',
     rarity: 'epic',
-    description: 'Récupère 20% des dégâts infligés en PV',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'lifesteal', value: 20 }
-    }
+    description: 'Récupère 18% des dégâts en PV',
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 18 } }
   },
+  // VOL DE VIE - Légendaires (25-35%)
   {
     id: 'faux_mort',
     name: 'Faux de la Mort',
     icon: '💀',
     rarity: 'legendary',
-    description: 'Récupère 30% des dégâts infligés en PV, +10 Attaque',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'lifesteal', value: 30 }
-    }
+    description: 'Récupère 28% des dégâts en PV',
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 28 } }
   },
   
-  // ÉPINES / RIPOSTE
+  // ÉPINES - Rares (8-12%)
   {
     id: 'armure_epines',
     name: 'Armure d\'Épines',
     icon: '🌵',
     rarity: 'rare',
-    description: 'Renvoie 10% des dégâts reçus à l\'attaquant',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'thorns', value: 10 }
-    }
+    description: 'Renvoie 10% des dégâts reçus',
+    effect: { type: 'passive', passive: { type: 'thorns', value: 10 } }
   },
+  // ÉPINES - Épiques (15-20%)
   {
     id: 'bouclier_vengeance',
     name: 'Bouclier de Vengeance',
     icon: '🛡️',
     rarity: 'epic',
-    description: 'Renvoie 20% des dégâts reçus, +5 Défense',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'thorns', value: 20 }
-    }
+    description: 'Renvoie 18% des dégâts reçus',
+    effect: { type: 'passive', passive: { type: 'thorns', value: 18 } }
   },
+  // ÉPINES - Légendaires (25-35%)
   {
     id: 'armure_malediction',
     name: 'Armure de Malédiction',
     icon: '☠️',
     rarity: 'legendary',
-    description: 'Renvoie 35% des dégâts reçus à l\'attaquant',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'thorns', value: 35 }
-    }
+    description: 'Renvoie 30% des dégâts reçus',
+    effect: { type: 'passive', passive: { type: 'thorns', value: 30 } }
   },
   
-  // RÉGÉNÉRATION
+  // RÉGÉNÉRATION - Rares (2-3 PV/tour)
   {
     id: 'anneau_regeneration',
     name: 'Anneau de Régénération',
     icon: '💚',
     rarity: 'rare',
-    description: 'Régénère 3 PV au début de chaque tour',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'regeneration', value: 3 }
-    }
+    description: 'Régénère 3 PV par tour',
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 3 } }
   },
+  // RÉGÉNÉRATION - Épiques (4-6 PV/tour)
   {
     id: 'amulette_troll',
     name: 'Amulette du Troll',
     icon: '🧟',
     rarity: 'epic',
-    description: 'Régénère 5 PV au début de chaque tour',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'regeneration', value: 5 }
-    }
+    description: 'Régénère 5 PV par tour',
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 5 } }
   },
+  // RÉGÉNÉRATION - Légendaires (8-12 PV/tour)
   {
     id: 'coeur_hydre',
     name: 'Cœur d\'Hydre',
     icon: '🐉',
     rarity: 'legendary',
-    description: 'Régénère 10 PV au début de chaque tour, +30 PV max',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'regeneration', value: 10 }
-    }
+    description: 'Régénère 10 PV par tour',
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 10 } }
   },
   
-  // RÉSISTANCES ÉLÉMENTAIRES
+  // RÉSISTANCES ÉLÉMENTAIRES - Toutes Rares (50% réduction)
   {
     id: 'anneau_feu',
     name: 'Anneau de Protection contre le Feu',
     icon: '🔥',
     rarity: 'rare',
     description: 'Résistance au feu (50% dégâts)',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'resistance', value: 50, damageType: 'fire' }
-    }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'fire' } }
   },
   {
     id: 'anneau_froid',
@@ -1009,10 +1010,7 @@ const passiveEffectItems: Treasure[] = [
     icon: '❄️',
     rarity: 'rare',
     description: 'Résistance au froid (50% dégâts)',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'resistance', value: 50, damageType: 'cold' }
-    }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'cold' } }
   },
   {
     id: 'anneau_foudre',
@@ -1020,79 +1018,81 @@ const passiveEffectItems: Treasure[] = [
     icon: '⚡',
     rarity: 'rare',
     description: 'Résistance à la foudre (50% dégâts)',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'resistance', value: 50, damageType: 'lightning' }
-    }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'lightning' } }
   },
+  // RÉSISTANCE MULTI-ÉLÉMENTS - Légendaire
   {
     id: 'cape_elements',
     name: 'Cape des Éléments',
     icon: '🌈',
     rarity: 'legendary',
-    description: 'Résistance à tous les éléments (30% dégâts)',
-    effect: { 
-      type: 'passive', 
-      passive: { type: 'resistance', value: 30, damageType: 'fire' } // Appliqué à tous
-    }
+    description: 'Résistance à tous les éléments (30%)',
+    effect: { type: 'passive', passive: { type: 'resistance', value: 30, damageType: 'fire' } }
   }
 ];
 
 // ============================================
-// NOUVEAUX OBJETS D&D ICONIQUES
+// ARMES ET OBJETS D&D ICONIQUES
 // ============================================
-
 const iconicDndItems: Treasure[] = [
-  // Armes légendaires
+  // Armes légendaires avec sorts (50-65 dégâts)
   {
     id: 'flammetongue',
     name: 'Épée Flammetongue',
     icon: '🗡️',
     rarity: 'legendary',
-    description: '+12 Attaque, apprend "Flamme Ardente" (45 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Flamme Ardente', skillDamage: 45, skillType: 'damage', skillDamageType: 'fire' }
+    description: 'Apprend "Flamme Ardente" (52 dégâts de feu)',
+    effect: { type: 'skill', skillName: 'Flamme Ardente', skillDamage: 52, skillType: 'damage', skillDamageType: 'fire' }
   },
   {
     id: 'frostbrand',
     name: 'Épée Frostbrand',
     icon: '❄️',
     rarity: 'legendary',
-    description: '+12 Attaque, apprend "Lame Glaciale" (45 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Lame Glaciale', skillDamage: 45, skillType: 'damage', skillDamageType: 'cold' }
+    description: 'Apprend "Lame Glaciale" (50 dégâts de froid)',
+    effect: { type: 'skill', skillName: 'Lame Glaciale', skillDamage: 50, skillType: 'damage', skillDamageType: 'cold' }
   },
   {
     id: 'lame_soleil',
     name: 'Lame du Soleil',
     icon: '☀️',
     rarity: 'legendary',
-    description: '+15 Attaque, apprend "Rayon Solaire" (55 dégâts radiants)',
-    effect: { type: 'skill', skillName: 'Rayon Solaire', skillDamage: 55, skillType: 'damage', skillDamageType: 'radiant' }
+    description: 'Apprend "Rayon Solaire" (58 dégâts radiants)',
+    effect: { type: 'skill', skillName: 'Rayon Solaire', skillDamage: 58, skillType: 'damage', skillDamageType: 'radiant' }
   },
   {
     id: 'lame_neuf_vies',
     name: 'Épée des Neuf Vies',
     icon: '⚔️',
     rarity: 'legendary',
-    description: '+10 Attaque, apprend "Frappe Fatale" (60 dégâts tranchants)',
-    effect: { type: 'skill', skillName: 'Frappe Fatale', skillDamage: 60, skillType: 'damage', skillDamageType: 'slashing' }
+    description: 'Apprend "Frappe Fatale" (55 dégâts tranchants)',
+    effect: { type: 'skill', skillName: 'Frappe Fatale', skillDamage: 55, skillType: 'damage', skillDamageType: 'slashing' }
+  },
+  {
+    id: 'orbe_destruction',
+    name: 'Orbe de Destruction',
+    icon: '🔴',
+    rarity: 'legendary',
+    description: 'Apprend "Rayon Destructeur" (62 dégâts de force)',
+    effect: { type: 'skill', skillName: 'Rayon Destructeur', skillDamage: 62, skillType: 'damage', skillDamageType: 'force' }
   },
   
-  // Objets protecteurs
+  // Objets protecteurs épiques
   {
     id: 'bouclier_foi',
     name: 'Bouclier de la Foi',
     icon: '🛡️',
     rarity: 'epic',
-    description: '+10 Défense et +8 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 10, duration: 'permanent' }
+    description: '+9 Défense et +6 Résistance Magique',
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
   },
   {
     id: 'heaume_salut',
     name: 'Heaume du Salut',
     icon: '⛑️',
     rarity: 'epic',
-    description: '+25 PV max et +5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 25, duration: 'permanent' }
+    description: '+22 PV max permanents',
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 22, duration: 'permanent' }
   },
   
   // Objets de soins
@@ -1101,50 +1101,26 @@ const iconicDndItems: Treasure[] = [
     name: 'Baguette de Soins',
     icon: '🪄',
     rarity: 'rare',
-    description: 'Apprend "Soin" (30 PV)',
-    effect: { type: 'skill', skillName: 'Soin', skillDamage: 30, skillType: 'heal' }
-  },
-  {
-    id: 'baton_guerison',
-    name: 'Bâton de Guérison',
-    icon: '🏥',
-    rarity: 'epic',
-    description: 'Apprend "Guérison Majeure" (50 PV)',
-    effect: { type: 'skill', skillName: 'Guérison Majeure', skillDamage: 50, skillType: 'heal' }
+    description: 'Apprend "Soin" (25 PV)',
+    effect: { type: 'skill', skillName: 'Soin', skillDamage: 25, skillType: 'heal' }
   },
   
-  // Artefacts destructeurs
-  {
-    id: 'baguette_rayon_mort',
-    name: 'Baguette du Rayon de la Mort',
-    icon: '💀',
-    rarity: 'legendary',
-    description: 'Apprend "Rayon de la Mort" (70 dégâts nécrotiques)',
-    effect: { type: 'skill', skillName: 'Rayon de la Mort', skillDamage: 70, skillType: 'damage', skillDamageType: 'necrotic' }
-  },
-  {
-    id: 'orbe_destruction',
-    name: 'Orbe de Destruction',
-    icon: '🔴',
-    rarity: 'legendary',
-    description: 'Apprend "Rayon Destructeur" (65 dégâts de force)',
-    effect: { type: 'skill', skillName: 'Rayon Destructeur', skillDamage: 65, skillType: 'damage', skillDamageType: 'force' }
-  },
+  // Sorts épiques (30-40 dégâts)
   {
     id: 'sceptre_tonnerre',
     name: 'Sceptre du Tonnerre',
     icon: '🌩️',
     rarity: 'epic',
-    description: 'Apprend "Vague de Tonnerre" (40 dégâts de tonnerre)',
-    effect: { type: 'skill', skillName: 'Vague de Tonnerre', skillDamage: 40, skillType: 'damage', skillDamageType: 'thunder' }
+    description: 'Apprend "Vague de Tonnerre" (35 dégâts de tonnerre)',
+    effect: { type: 'skill', skillName: 'Vague de Tonnerre', skillDamage: 35, skillType: 'damage', skillDamageType: 'thunder' }
   },
   {
     id: 'griffe_dragon_acide',
     name: 'Griffe de Dragon d\'Acide',
     icon: '🐲',
     rarity: 'epic',
-    description: 'Apprend "Souffle Acide" (38 dégâts d\'acide)',
-    effect: { type: 'skill', skillName: 'Souffle Acide', skillDamage: 38, skillType: 'damage', skillDamageType: 'acid' }
+    description: 'Apprend "Souffle Acide" (33 dégâts d\'acide)',
+    effect: { type: 'skill', skillName: 'Souffle Acide', skillDamage: 33, skillType: 'damage', skillDamageType: 'acid' }
   },
   
   // Bijoux de puissance
@@ -1153,42 +1129,45 @@ const iconicDndItems: Treasure[] = [
     name: 'Couronne du Magicien',
     icon: '👑',
     rarity: 'legendary',
-    description: '+18 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 18, duration: 'permanent' }
+    description: '+14 Attaque Magique',
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' }
   },
   {
     id: 'anneau_champion',
     name: 'Anneau du Champion',
     icon: '💍',
     rarity: 'epic',
-    description: '+8 Attaque et +8 Défense',
+    description: '+8 Attaque et +6 Défense',
     effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
   }
 ];
 
+// ============================================
+// EXPORT DE TOUS LES TRÉSORS
+// ============================================
 export const allTreasures = [
   ...commonTreasures,
   ...rareTreasures,
   ...epicTreasures,
   ...legendaryTreasures,
-  // Objets D&D adaptés
   ...dndCommonItems,
   ...dndRareItems,
   ...dndEpicItems,
   ...dndLegendaryItems,
-  // Objets de résistance magique
   ...magicResistanceItems,
-  // Objets avec effets passifs
   ...passiveEffectItems,
-  // Objets D&D iconiques
   ...iconicDndItems
 ];
 
-// Obtenir un trésor aléatoire avec probabilités
+// ============================================
+// FONCTIONS UTILITAIRES
+// ============================================
+
+// Obtenir un trésor aléatoire avec probabilités équilibrées
 export function getRandomTreasure(): Treasure {
   const roll = Math.random() * 100;
   
-  // Combiner les trésors de base avec les objets D&D et les nouveaux objets
+  // Combiner les trésors par rareté
   const allCommon = [
     ...commonTreasures, 
     ...dndCommonItems,
@@ -1217,14 +1196,15 @@ export function getRandomTreasure(): Treasure {
   ];
   
   let pool: Treasure[];
+  // Probabilités : 50% commun, 30% rare, 15% épique, 5% légendaire
   if (roll < 50) {
-    pool = allCommon; // 50% commun
+    pool = allCommon;
   } else if (roll < 80) {
-    pool = allRare; // 30% rare
+    pool = allRare;
   } else if (roll < 95) {
-    pool = allEpic; // 15% épique
+    pool = allEpic;
   } else {
-    pool = allLegendary; // 5% légendaire
+    pool = allLegendary;
   }
   
   return pool[Math.floor(Math.random() * pool.length)];
@@ -1249,7 +1229,6 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         effects.push(`+${effect.value} PV max`);
       } else if (effect.stat === 'attack') {
         character.attack += effect.value || 0;
-        // Mettre à jour baseAttack aussi
         if (character.baseAttack !== undefined) {
           character.baseAttack += effect.value || 0;
         }
@@ -1259,7 +1238,7 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         if (character.baseMagicAttack !== undefined) {
           character.baseMagicAttack += effect.value || 0;
         }
-        effects.push(`+${effect.value} ✨ Attaque Magique`);
+        effects.push(`+${effect.value} ✨ Att. Magique`);
       } else if (effect.stat === 'defense') {
         character.defense += effect.value || 0;
         if (character.baseDefense !== undefined) {
@@ -1284,41 +1263,41 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
     case 'buff':
       // Buff multiple selon le trésor
       if (treasure.id === 'coeur_dragon') {
+        character.maxHp += 25;
+        character.hp += 25;
+        character.attack += 4;
+        if (character.baseAttack !== undefined) character.baseAttack += 4;
+        effects.push('+25 PV max', '+4 ⚔️ Attaque');
+      } else if (treasure.id === 'couronne_roi') {
+        character.maxHp += 35;
+        character.hp += 35;
+        character.attack += 8;
+        character.defense += 6;
+        if (character.baseAttack !== undefined) character.baseAttack += 8;
+        if (character.baseDefense !== undefined) character.baseDefense += 6;
+        effects.push('+35 PV max', '+8 ⚔️ Attaque', '+6 🛡️ Défense');
+      } else if (treasure.id === 'armure_divine') {
         character.maxHp += 30;
         character.hp += 30;
-        character.attack += 5;
-        if (character.baseAttack !== undefined) character.baseAttack += 5;
-        effects.push('+30 PV max', '+5 ⚔️ Attaque');
-      } else if (treasure.id === 'couronne_roi') {
-        character.maxHp += 50;
-        character.hp += 50;
-        character.attack += 10;
-        character.defense += 5;
-        if (character.baseAttack !== undefined) character.baseAttack += 10;
-        if (character.baseDefense !== undefined) character.baseDefense += 5;
-        effects.push('+50 PV max', '+10 ⚔️ Attaque', '+5 🛡️ Défense');
-      } else if (treasure.id === 'armure_divine') {
-        character.maxHp += 40;
-        character.hp += 40;
-        character.defense += 8;
+        character.defense += 10;
         character.magicDefense = (character.magicDefense || 0) + 8;
-        if (character.baseDefense !== undefined) character.baseDefense += 8;
+        if (character.baseDefense !== undefined) character.baseDefense += 10;
         if (character.baseMagicDefense !== undefined) character.baseMagicDefense += 8;
-        effects.push('+40 PV max', '+8 🛡️ Défense', '+8 🔮 Rés. Magique');
+        effects.push('+30 PV max', '+10 🛡️ Défense', '+8 🔮 Rés. Magique');
       } else if (treasure.id === 'orbe_cosmos') {
-        character.magicAttack = (character.magicAttack || 0) + 15;
+        character.magicAttack = (character.magicAttack || 0) + 12;
         character.magicDefense = (character.magicDefense || 0) + 10;
-        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 15;
+        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 12;
         if (character.baseMagicDefense !== undefined) character.baseMagicDefense += 10;
-        effects.push('+15 ✨ Att. Magique', '+10 🔮 Rés. Magique');
+        effects.push('+12 ✨ Att. Magique', '+10 🔮 Rés. Magique');
       } else if (treasure.id === 'anneau_trois_souhaits') {
-        character.maxHp += 50;
-        character.hp += 50;
-        character.attack += 10;
-        character.magicAttack = (character.magicAttack || 0) + 10;
-        if (character.baseAttack !== undefined) character.baseAttack += 10;
-        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 10;
-        effects.push('+50 PV max', '+10 ⚔️ Attaque', '+10 ✨ Att. Magique');
+        character.maxHp += 35;
+        character.hp += 35;
+        character.attack += 8;
+        character.magicAttack = (character.magicAttack || 0) + 8;
+        if (character.baseAttack !== undefined) character.baseAttack += 8;
+        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 8;
+        effects.push('+35 PV max', '+8 ⚔️ Attaque', '+8 ✨ Att. Magique');
       }
       break;
       
@@ -1330,30 +1309,29 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         type: (effect.skillType || 'damage') as 'damage' | 'heal',
         damageType: effect.skillDamageType,
         targetType: effect.skillType === 'heal' ? 'ally' as const : 'enemy' as const,
-        description: `${effect.skillDamage} dégâts ${effect.skillDamageType || 'magiques'}`
+        description: `${effect.skillDamage} dégâts ${effect.skillDamageType || 'magiques'}`,
+        cooldown: effect.skillType === 'heal' ? 3 : 2
       };
       character.skills.push(newSkill);
       effects.push(`Nouveau sort: ${effect.skillName}`);
       break;
       
     case 'passive':
-      // Effets passifs - stockés sur le personnage pour être appliqués en combat
       if (effect.passive) {
-        // Ajouter l'effet passif à l'inventaire (il sera utilisé en combat)
         const passiveType = effect.passive.type;
         const passiveValue = effect.passive.value;
         
         switch (passiveType) {
           case 'initiative':
-            // Bonus d'initiative = bonus de vitesse
-            character.speed += Math.floor(character.speed * passiveValue / 100);
+            // Bonus d'initiative = bonus de vitesse proportionnel
+            const speedBonus = Math.floor(character.speed * passiveValue / 100);
+            character.speed += speedBonus;
             if (character.baseSpeed !== undefined) {
-              character.baseSpeed += Math.floor(character.baseSpeed * passiveValue / 100);
+              character.baseSpeed += speedBonus;
             }
             effects.push(`+${passiveValue}% 💨 Initiative`);
             break;
           case 'regeneration':
-            // Ajouter un buff permanent de régénération
             effects.push(`Régénère ${passiveValue} PV/tour`);
             break;
           case 'lifesteal':
