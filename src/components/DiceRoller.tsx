@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './DiceRoller.css';
 
 // Types de dés D&D
 export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
 
-interface DiceRoll {
+export interface DiceRoll {
   dieType: DieType;
   count: number;
   modifier: number;
@@ -12,11 +12,13 @@ interface DiceRoll {
   label?: string;
 }
 
-interface DiceResult {
+export interface DiceResult {
   rolls: number[];
   total: number;
   modifier: number;
   isCritical?: boolean;
+  isNatural1?: boolean;
+  isNatural20?: boolean;
   dieType: DieType;
 }
 
@@ -26,17 +28,6 @@ interface DiceRollerProps {
   showAnimation?: boolean;
   damageType?: string;
 }
-
-// Icônes des faces de dés
-const DIE_ICONS: Record<DieType, string> = {
-  'd4': '🔺',
-  'd6': '🎲',
-  'd8': '💎',
-  'd10': '🔷',
-  'd12': '⭐',
-  'd20': '🌟',
-  'd100': '💯'
-};
 
 // Maximum pour chaque type de dé
 const DIE_MAX: Record<DieType, number> = {
@@ -49,42 +40,50 @@ const DIE_MAX: Record<DieType, number> = {
   'd100': 100
 };
 
-// Couleurs selon le type de dégâts
-const DAMAGE_TYPE_COLORS: Record<string, string> = {
-  physical: '#c0c0c0',
-  slashing: '#c0c0c0',
-  piercing: '#a0a0a0',
-  bludgeoning: '#808080',
-  fire: '#ff6b35',
-  cold: '#4fc3f7',
-  lightning: '#ffd93d',
-  acid: '#76ff03',
-  poison: '#9c27b0',
-  necrotic: '#4a148c',
-  radiant: '#fff176',
-  force: '#64b5f6',
-  psychic: '#e040fb',
-  thunder: '#90caf9',
-  magical: '#9b59b6',
-  holy: '#ffd700',
-  heal: '#4caf50'
-};
-
 // Fonction utilitaire pour lancer un dé
 export function rollDie(dieType: DieType): number {
   return Math.floor(Math.random() * DIE_MAX[dieType]) + 1;
 }
 
-// Fonction pour lancer plusieurs dés
-export function rollDice(dieType: DieType, count: number, modifier: number = 0): DiceResult {
+// Fonction pour lancer plusieurs dés avec support avantage/désavantage
+export function rollDice(
+  dieType: DieType, 
+  count: number, 
+  modifier: number = 0,
+  hasAdvantage: boolean = false,
+  hasDisadvantage: boolean = false
+): DiceResult {
   const rolls: number[] = [];
-  for (let i = 0; i < count; i++) {
-    rolls.push(rollDie(dieType));
-  }
-  const total = rolls.reduce((sum, r) => sum + r, 0) + modifier;
-  const isCritical = dieType === 'd20' && rolls.some(r => r === 20);
   
-  return { rolls, total, modifier, isCritical, dieType };
+  // Pour le d20 avec avantage/désavantage, lancer 2 dés
+  if (dieType === 'd20' && count === 1 && (hasAdvantage || hasDisadvantage)) {
+    const roll1 = rollDie(dieType);
+    const roll2 = rollDie(dieType);
+    const chosenRoll = hasAdvantage 
+      ? Math.max(roll1, roll2) 
+      : Math.min(roll1, roll2);
+    rolls.push(chosenRoll);
+    // On pourrait stocker les deux pour affichage mais on garde le choisi
+  } else {
+    for (let i = 0; i < count; i++) {
+      rolls.push(rollDie(dieType));
+    }
+  }
+  
+  const total = rolls.reduce((sum, r) => sum + r, 0) + modifier;
+  const isNatural20 = dieType === 'd20' && rolls.some(r => r === 20);
+  const isNatural1 = dieType === 'd20' && rolls.some(r => r === 1);
+  const isCritical = isNatural20;
+  
+  return { 
+    rolls, 
+    total, 
+    modifier, 
+    isCritical, 
+    isNatural1,
+    isNatural20,
+    dieType 
+  };
 }
 
 // Parser une chaîne de dés D&D (ex: "2d6+3", "1d20", "3d8-2")
@@ -109,8 +108,10 @@ export function parseDiceString(diceString: string): DiceRoll | null {
   return { dieType, count, modifier };
 }
 
-// Composant d'un dé animé
-function AnimatedDie({ 
+// ============================================
+// COMPOSANT DÉ 3D ANIMÉ STYLE BALDUR'S GATE 3
+// ============================================
+function Animated3DDie({ 
   dieType, 
   finalValue, 
   delay, 
@@ -121,28 +122,25 @@ function AnimatedDie({
   delay: number;
   damageType?: string;
 }) {
-  const [isRolling, setIsRolling] = useState(true);
+  const [phase, setPhase] = useState<'rolling' | 'result'>('rolling');
   const [displayValue, setDisplayValue] = useState(1);
-  const [showResult, setShowResult] = useState(false);
   
-  const color = damageType ? DAMAGE_TYPE_COLORS[damageType] || '#9b59b6' : '#9b59b6';
   const max = DIE_MAX[dieType];
   const isCrit = dieType === 'd20' && finalValue === 20;
   const isFail = dieType === 'd20' && finalValue === 1;
   
   useEffect(() => {
-    // Animation de roulement
+    // Animation de roulement aléatoire
     const rollInterval = setInterval(() => {
       setDisplayValue(Math.floor(Math.random() * max) + 1);
-    }, 50);
+    }, 60);
     
     // Arrêter après un délai
     const stopTimeout = setTimeout(() => {
       clearInterval(rollInterval);
-      setIsRolling(false);
       setDisplayValue(finalValue);
-      setTimeout(() => setShowResult(true), 100);
-    }, 600 + delay);
+      setPhase('result');
+    }, 800 + delay);
     
     return () => {
       clearInterval(rollInterval);
@@ -150,45 +148,72 @@ function AnimatedDie({
     };
   }, [finalValue, max, delay]);
   
+  // Classes CSS dynamiques
+  const dieClasses = [
+    'animated-die-3d',
+    dieType,
+    phase,
+    damageType || '',
+    isCrit ? 'critical' : '',
+    isFail ? 'fail' : ''
+  ].filter(Boolean).join(' ');
+  
   return (
-    <div 
-      className={`animated-die ${dieType} ${isRolling ? 'rolling' : ''} ${showResult ? 'result' : ''} ${isCrit ? 'critical' : ''} ${isFail ? 'fail' : ''}`}
-      style={{ '--die-color': color } as React.CSSProperties}
-    >
-      <div className="die-face">
-        <span className="die-icon">{DIE_ICONS[dieType]}</span>
-        <span className="die-value">{displayValue}</span>
+    <div className={dieClasses}>
+      <div className="die-cube">
+        {/* Face principale visible */}
+        <div className="die-face-3d front">
+          {displayValue}
+        </div>
+        {/* Faces secondaires pour l'effet 3D */}
+        <div className="die-face-3d back">{Math.ceil(max / 2)}</div>
+        <div className="die-face-3d right">{Math.ceil(max / 3)}</div>
+        <div className="die-face-3d left">{Math.ceil(max / 4)}</div>
+        <div className="die-face-3d top">{Math.ceil(max / 5) || 1}</div>
+        <div className="die-face-3d bottom">{max}</div>
       </div>
-      <div className="die-label">{dieType}</div>
+      <div className="die-type-indicator">{dieType}</div>
     </div>
   );
 }
 
-// Composant principal de lancer de dés
+// ============================================
+// COMPOSANT PRINCIPAL DE LANCER DE DÉS
+// ============================================
 export function DiceRoller({ roll, onComplete, showAnimation = true, damageType }: DiceRollerProps) {
   const [result, setResult] = useState<DiceResult | null>(null);
   const [phase, setPhase] = useState<'rolling' | 'result'>('rolling');
   
+  const handleComplete = useCallback((diceResult: DiceResult) => {
+    onComplete(diceResult);
+  }, [onComplete]);
+  
   useEffect(() => {
-    // Effectuer le lancer
+    // Effectuer le lancer immédiatement
     const diceResult = rollDice(roll.dieType, roll.count, roll.modifier);
     setResult(diceResult);
     
     // Timer pour la phase de résultat
     const resultTimer = setTimeout(() => {
       setPhase('result');
-      // Délai supplémentaire avant de callback
-      setTimeout(() => {
-        onComplete(diceResult);
-      }, 800);
-    }, 800 + (roll.count * 100));
+    }, 900 + (roll.count * 150));
     
-    return () => clearTimeout(resultTimer);
-  }, [roll, onComplete]);
+    // Timer pour callback final
+    const completeTimer = setTimeout(() => {
+      handleComplete(diceResult);
+    }, 1800 + (roll.count * 150));
+    
+    return () => {
+      clearTimeout(resultTimer);
+      clearTimeout(completeTimer);
+    };
+  }, [roll, handleComplete]);
   
   if (!showAnimation || !result) {
     return null;
   }
+  
+  const effectiveDamageType = damageType || roll.damageType;
   
   return (
     <div className={`dice-roller-overlay ${phase}`}>
@@ -199,21 +224,27 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
         
         <div className="dice-group">
           {result.rolls.map((value, index) => (
-            <AnimatedDie 
+            <Animated3DDie 
               key={index}
               dieType={roll.dieType}
               finalValue={value}
-              delay={index * 100}
-              damageType={damageType || roll.damageType}
+              delay={index * 150}
+              damageType={effectiveDamageType}
             />
           ))}
         </div>
         
         {phase === 'result' && (
-          <div className={`dice-total ${result.isCritical ? 'critical' : ''}`}>
-            <span className="total-label">Total:</span>
+          <div className={`dice-total ${result.isCritical ? 'critical' : ''} ${result.isNatural1 ? 'fail' : ''}`}>
+            <span className="total-label">Résultat</span>
             <span className="total-value">
-              {result.rolls.reduce((s, r) => s + r, 0)}
+              {result.rolls.length > 1 && (
+                <>
+                  <span className="rolls-breakdown">
+                    ({result.rolls.join(' + ')})
+                  </span>
+                </>
+              )}
               {roll.modifier !== 0 && (
                 <span className="modifier">
                   {roll.modifier > 0 ? '+' : ''}{roll.modifier}
@@ -222,8 +253,12 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
               <span className="equals">=</span>
               <span className="final">{result.total}</span>
             </span>
+            
             {result.isCritical && (
-              <div className="critical-banner">💥 CRITIQUE !</div>
+              <div className="critical-banner">💥 COUP CRITIQUE !</div>
+            )}
+            {result.isNatural1 && !result.isCritical && (
+              <div className="fail-banner">💨 ÉCHEC CRITIQUE !</div>
             )}
           </div>
         )}
@@ -232,18 +267,45 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
   );
 }
 
-// Composant simplifié pour afficher le résultat d'un jet
+// ============================================
+// COMPOSANT D'AFFICHAGE DE RÉSULTAT EN LIGNE
+// ============================================
 export function DiceResultDisplay({ result, damageType }: { result: DiceResult; damageType?: string }) {
-  const color = damageType ? DAMAGE_TYPE_COLORS[damageType] || '#9b59b6' : '#9b59b6';
+  const color = getDamageTypeColor(damageType);
   
   return (
     <span className="dice-result-inline" style={{ color }}>
-      {DIE_ICONS[result.dieType]} ({result.rolls.join('+')})
+      🎲 ({result.rolls.join('+')})
       {result.modifier !== 0 && (
         <span className="modifier">{result.modifier > 0 ? '+' : ''}{result.modifier}</span>
       )}
       = <strong>{result.total}</strong>
+      {result.isCritical && <span className="crit-indicator">💥</span>}
     </span>
   );
 }
 
+// Couleur selon type de dégâts
+function getDamageTypeColor(damageType?: string): string {
+  const colors: Record<string, string> = {
+    physical: '#c0c0c0',
+    slashing: '#c0c0c0',
+    piercing: '#a0a0a0',
+    bludgeoning: '#808080',
+    fire: '#ff6b35',
+    cold: '#4fc3f7',
+    lightning: '#ffd93d',
+    acid: '#84cc16',
+    poison: '#22c55e',
+    necrotic: '#a855f7',
+    radiant: '#ffd700',
+    force: '#a855f7',
+    psychic: '#e040fb',
+    thunder: '#90caf9',
+    magical: '#9b59b6',
+    holy: '#ffd700',
+    heal: '#4ade80'
+  };
+  
+  return damageType ? colors[damageType] || '#9b59b6' : '#9b59b6';
+}

@@ -1803,21 +1803,25 @@ export function CombatPage() {
       let damage = skill.damage;
       
       if (damage > 0) {
-        // Déterminer si la compétence nécessite un jet de touche (spell attack)
-        // Pas de jet pour: effets de zone, jets de sauvegarde, ou explicitement désactivé
-        const needsAttackRoll = skill.requiresAttackRoll !== false && 
+        // Déterminer si la compétence nécessite un jet de touche
+        // Pas de jet pour: effets de zone, jets de sauvegarde, ou explicitement désactivé (requiresAttackRoll: false)
+        const needsAttackRoll = skill.requiresAttackRoll === true && 
                                 !skill.areaOfEffect && 
-                                !skill.savingThrow &&
-                                skill.isSpellAttack === true;
+                                !skill.savingThrow;
         
         let hit = true;
         let isCritical = false;
         
         if (needsAttackRoll) {
-          // === JET DE TOUCHE D&D 5e POUR COMPÉTENCE DE JOUEUR (Spell Attack) ===
-          const hasAdvantage = hasAdvantageOnAttack(attacker, target);
+          // === JET DE TOUCHE D&D 5e POUR COMPÉTENCE DE JOUEUR ===
+          // Vérifier si la compétence donne l'avantage (ex: Attaque téméraire)
+          const skillGrantsAdvantage = skill.grantAdvantage === true;
+          const hasAdvantage = skillGrantsAdvantage || hasAdvantageOnAttack(attacker, target);
           const hasDisadvantage = hasDisadvantageOnAttack(attacker, target);
-          const skillAttackResult = makeAttackRoll(attacker, target, true, hasAdvantage, hasDisadvantage);
+          
+          // Déterminer si c'est une attaque de sort ou physique
+          const isSpell = skill.isSpellAttack === true;
+          const skillAttackResult = makeAttackRoll(attacker, target, isSpell, hasAdvantage, hasDisadvantage);
           
           // Afficher le résultat du jet
           setLastAttackResult({
@@ -1831,9 +1835,11 @@ export function CombatPage() {
             target: target.name
           });
           
-          // Log du jet de touche
-          const rollText = hasAdvantage ? '🎲🎲 (Avantage)' : hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
-          logs.push(`${rollText} ${attacker.name} (${skill.name}): ${skillAttackResult.attackRoll.rolls[0]} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
+          // Log du jet de touche avec indication d'avantage si applicable
+          const advantageText = skillGrantsAdvantage ? '🎲🎲 (Avantage - Téméraire)' : 
+                               hasAdvantage ? '🎲🎲 (Avantage)' : 
+                               hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
+          logs.push(`${advantageText} ${attacker.name} (${skill.name}): ${skillAttackResult.attackRoll.rolls[0]} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
           
           hit = skillAttackResult.hit;
           isCritical = skillAttackResult.isCriticalHit;
@@ -1854,7 +1860,8 @@ export function CombatPage() {
             setIsAnimating(false);
             return;
           } else if (!hit) {
-            logs.push(`✨ ${skill.name} rate ${target.name} !`);
+            const missIcon = skill.isSpellAttack ? '✨' : '⚔️';
+            logs.push(`${missIcon} ${skill.name} rate ${target.name} !`);
             addCombatHistoryEntry({
               turn: combatTurn,
               actor: attacker.name,
@@ -2235,34 +2242,60 @@ export function CombatPage() {
           </div>
           <div className="combat-history-list">
             {combatHistory.length === 0 ? (
-              <p className="history-empty">Le combat commence...</p>
+              <p className="history-empty">⏳ En attente de la première action...</p>
             ) : (
-              [...combatHistory].reverse().slice(0, isHistoryExpanded ? 50 : 6).map(entry => (
-                <div 
-                  key={entry.id} 
-                  className={`combat-history-entry ${entry.isPlayerAction ? 'player' : 'enemy'}`}
-                >
-                  <div className="history-actor">
-                    <span className="history-portrait">{entry.actorPortrait}</span>
-                    <span className="history-turn">T{entry.turn}</span>
-                  </div>
-                  <div className="history-details">
-                    <span className="history-action">{entry.action}</span>
-                    {entry.target && <span className="history-target">→ {entry.target}</span>}
-                    {entry.damage !== undefined && (
-                      <span className={`history-damage ${entry.damageType || 'physical'}`}>
-                        -{entry.damage} {entry.damageType === 'magical' ? '🔮' : entry.damageType === 'holy' ? '✝️' : '⚔️'}
+              [...combatHistory].reverse().slice(0, isHistoryExpanded ? 100 : 8).map(entry => {
+                // Icône de type de dégâts selon D&D
+                const getDamageIcon = (type: string | undefined) => {
+                  switch (type) {
+                    case 'fire': return '🔥';
+                    case 'cold': return '❄️';
+                    case 'lightning': return '⚡';
+                    case 'poison': return '☠️';
+                    case 'necrotic': return '💀';
+                    case 'radiant': case 'holy': return '✨';
+                    case 'force': return '💫';
+                    case 'magical': return '🔮';
+                    case 'slashing': return '🗡️';
+                    case 'piercing': return '🏹';
+                    case 'bludgeoning': return '🔨';
+                    default: return '⚔️';
+                  }
+                };
+                
+                return (
+                  <div 
+                    key={entry.id} 
+                    className={`combat-history-entry ${entry.isPlayerAction ? 'player' : 'enemy'}`}
+                  >
+                    <div className="history-actor">
+                      <span className="history-portrait">{entry.actorPortrait}</span>
+                      <span className="history-turn">Tour {entry.turn}</span>
+                    </div>
+                    <div className="history-details">
+                      <span className="history-action">
+                        {entry.isPlayerAction ? '🎯' : '👹'} {entry.action}
                       </span>
-                    )}
-                    {entry.heal !== undefined && (
-                      <span className="history-heal">+{entry.heal} 💚</span>
-                    )}
-                    {entry.effect && (
-                      <span className="history-effect">{entry.effect}</span>
-                    )}
+                      {entry.target && (
+                        <span className="history-target">
+                          ➜ <strong>{entry.target}</strong>
+                        </span>
+                      )}
+                      {entry.damage !== undefined && entry.damage > 0 && (
+                        <span className={`history-damage ${entry.damageType || 'physical'}`}>
+                          {getDamageIcon(entry.damageType)} -{entry.damage} dégâts
+                        </span>
+                      )}
+                      {entry.heal !== undefined && entry.heal > 0 && (
+                        <span className="history-heal">💚 +{entry.heal} PV restaurés</span>
+                      )}
+                      {entry.effect && (
+                        <span className="history-effect">✦ {entry.effect}</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

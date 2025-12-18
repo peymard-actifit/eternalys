@@ -307,8 +307,9 @@ export interface Skill {
   savingThrow?: { ability: keyof AbilityScores; dc: number };
   areaOfEffect?: { type: 'cone' | 'sphere' | 'line' | 'cube'; size: number };
   // Jet de touche
-  requiresAttackRoll?: boolean; // true pour les spell attacks, false pour saves/auto-hit
+  requiresAttackRoll?: boolean; // true pour les spell attacks ou attaques physiques
   isSpellAttack?: boolean; // true si utilise INT/WIS/CHA au lieu de FOR/DEX
+  grantAdvantage?: boolean; // true si la compétence donne l'avantage (ex: Attaque téméraire)
 }
 
 export interface SkillEffect {

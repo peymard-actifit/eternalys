@@ -93,7 +93,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'slashing',
         targetType: 'enemy',
         cooldown: 1,
-        description: 'Grande hache avec avantage. 1d12+5 tranchant.'
+        description: 'Grande hache avec avantage. 1d12+5 tranchant.',
+        requiresAttackRoll: true,
+        grantAdvantage: true  // Attaque téméraire donne l'avantage
       },
       { 
         id: 'rage', 
