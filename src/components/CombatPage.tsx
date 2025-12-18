@@ -1014,9 +1014,10 @@ export function CombatPage() {
         attempts++;
       }
       
-      // Décrémenter les buffs et incrémenter les tours complets quand on revient au premier
+      // Incrémenter les tours complets quand on revient au premier
+      // NOTE: Les buffs sont décrémentés dans processBuffsForCharacter au début du tour de chaque personnage
+      // NE PAS appeler gameStore.decrementBuffs() ici car cela causerait une double décrémentation !
       if (nextIndex === 0) {
-        gameStore.decrementBuffs();
         setFullRounds(prev => prev + 1); // Un tour complet est terminé !
         // Réinitialiser les actions légendaires pour le prochain round
         gameStore.resetLegendaryActionsForAll();
@@ -1125,7 +1126,12 @@ export function CombatPage() {
     if (aliveEnemies.length === 0) return;
     
     setIsAnimating(true);
-    const attacker = currentTurn as Character;
+    
+    // IMPORTANT: Récupérer le personnage depuis le STATE GLOBAL pour avoir les passiveEffects à jour
+    const currentCharId = (currentTurn as Character).id;
+    const globalTeam = gameStore.getState().team;
+    const attacker = globalTeam.find(c => c.id === currentCharId) || (currentTurn as Character);
+    
     // Cibler l'ennemi sélectionné
     const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
     const logs = [...combatLog];
@@ -1149,11 +1155,12 @@ export function CombatPage() {
     trackDamageDealt(attacker.id, damage);
     triggerDamageEffect(target.id, 'physical');
     
-    // Appliquer le vol de vie passif
+    // Appliquer le vol de vie passif (depuis les objets/trésors)
+    let attackerHp = attacker.hp;
     if (attacker.passiveEffects?.lifesteal && attacker.passiveEffects.lifesteal > 0) {
       const stolen = Math.floor(damage * attacker.passiveEffects.lifesteal / 100);
       if (stolen > 0) {
-        attacker.hp = Math.min(attacker.maxHp, attacker.hp + stolen);
+        attackerHp = Math.min(attacker.maxHp, attacker.hp + stolen);
         trackHealing(attacker.id, stolen);
         logs.push(`🧛 ${attacker.name} vole ${stolen} PV !`);
       }
@@ -1167,14 +1174,12 @@ export function CombatPage() {
     // Mettre à jour le state avec les HP modifiés des ennemis
     gameStore.setState({ currentEnemies: updatedEnemies });
     
-    // Mettre à jour l'équipe si le personnage a volé de la vie
-    if (attacker.passiveEffects?.lifesteal) {
-      const currentTeam = gameStore.getState().team;
-      const updatedTeam = currentTeam.map(c => 
-        c.id === attacker.id ? { ...c, hp: attacker.hp } : c
-      );
-      gameStore.setState({ team: updatedTeam });
-    }
+    // Mettre à jour l'équipe avec les HP (vol de vie ou non)
+    const currentTeam = gameStore.getState().team;
+    const updatedTeam = currentTeam.map(c => 
+      c.id === attacker.id ? { ...c, hp: attackerHp } : c
+    );
+    gameStore.setState({ team: updatedTeam });
     
     addCombatHistoryEntry({
       turn: combatTurn,
@@ -1244,14 +1249,17 @@ export function CombatPage() {
     setPendingSkill(null);
   };
 
-  const executeSkill = (skill: Skill, attacker: Character, target: Character | Monster | null) => {
+  const executeSkill = (skill: Skill, attackerParam: Character, target: Character | Monster | null) => {
     setIsAnimating(true);
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
     
-    // Appliquer le cooldown à la compétence utilisée - UTILISER L'ÉTAT GLOBAL
+    // IMPORTANT: Récupérer l'attacker depuis le STATE GLOBAL pour avoir les passiveEffects à jour
+    let currentTeam = gameStore.getState().team;
+    let attacker = currentTeam.find(c => c.id === attackerParam.id) || attackerParam;
+    
+    // Appliquer le cooldown à la compétence utilisée
     if (skill.cooldown && skill.cooldown > 0) {
-      const currentTeam = gameStore.getState().team;
       const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
@@ -1266,6 +1274,7 @@ export function CombatPage() {
       gameStore.setState({ team: updatedTeam });
       // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
       attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
+      currentTeam = updatedTeam;
     }
     
     if (skill.type === 'heal') {
