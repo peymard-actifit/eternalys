@@ -151,18 +151,20 @@ export function CombatPage() {
 
   // Décrémenter les buffs et cooldowns du personnage actuel à chaque nouveau tour
   const processBuffsForCharacter = useCallback((characterId: string) => {
-    // Récupérer l'équipe actuelle du state GLOBAL (pas de la closure)
-    const currentTeam = gameStore.getState().team;
-    const currentLogs = gameStore.getState().combatLog;
-    const logs: string[] = [...currentLogs];
+    // IMPORTANT: Récupérer l'équipe actuelle du state GLOBAL (pas de la closure)
+    const currentState = gameStore.getState();
+    const currentTeam = currentState.team;
+    const logs: string[] = [...currentState.combatLog];
+    
+    console.log(`[COOLDOWN DEBUG] Processing turn for ${characterId}`);
     
     const updatedTeam = currentTeam.map(char => {
       if (char.id !== characterId) return char;
       
-      // Copie profonde du personnage
+      // Copie profonde du personnage avec ses skills
       let updatedChar = { 
         ...char,
-        skills: char.skills ? [...char.skills] : [],
+        skills: char.skills ? char.skills.map(s => ({ ...s })) : [],
         buffs: char.buffs ? [...char.buffs] : []
       };
       
@@ -186,8 +188,14 @@ export function CombatPage() {
       // =============================================
       if (updatedChar.skills && updatedChar.skills.length > 0) {
         updatedChar.skills = updatedChar.skills.map(skill => {
+          // Debug : log le cooldown actuel
+          if (skill.cooldown && skill.cooldown > 0) {
+            console.log(`[COOLDOWN DEBUG] ${skill.name}: current=${skill.currentCooldown || 0}, max=${skill.cooldown}`);
+          }
+          
           if (skill.currentCooldown && skill.currentCooldown > 0) {
             const newCooldown = skill.currentCooldown - 1;
+            console.log(`[COOLDOWN DEBUG] Decrementing ${skill.name} from ${skill.currentCooldown} to ${newCooldown}`);
             if (newCooldown === 0) {
               logs.push(`⏰ ${updatedChar.name}: ${skill.name} est prêt !`);
             }
@@ -1242,14 +1250,19 @@ export function CombatPage() {
     
     // Appliquer le cooldown à la compétence utilisée - UTILISER L'ÉTAT GLOBAL
     if (skill.cooldown && skill.cooldown > 0) {
+      console.log(`[COOLDOWN DEBUG] Setting cooldown for ${skill.name} to ${skill.cooldown}`);
       const currentTeam = gameStore.getState().team;
       const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
             ...char,
-            skills: char.skills.map(s => 
-              s.id === skill.id ? { ...s, currentCooldown: skill.cooldown } : s
-            )
+            skills: char.skills.map(s => {
+              if (s.id === skill.id) {
+                console.log(`[COOLDOWN DEBUG] Found skill ${s.name}, setting currentCooldown = ${skill.cooldown}`);
+                return { ...s, currentCooldown: skill.cooldown };
+              }
+              return s;
+            })
           };
         }
         return char;
@@ -1257,6 +1270,7 @@ export function CombatPage() {
       gameStore.setState({ team: updatedTeam });
       // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
       attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
+      console.log(`[COOLDOWN DEBUG] After setState, skill cooldown = ${attacker.skills.find(s => s.id === skill.id)?.currentCooldown}`);
     }
     
     if (skill.type === 'heal') {
