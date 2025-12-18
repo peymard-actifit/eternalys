@@ -373,46 +373,140 @@
 }
 
 .roll-header {
-  font-size: 0.9rem;
-  color: #a09080;
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  color: #c0b0a0;
+  margin-bottom: 1rem;
+  font-family: 'Cinzel', serif;
+}
+
+.roll-attacker {
+  color: #9b59b6;
+}
+
+.roll-arrow {
+  font-size: 1.3rem;
+}
+
+.roll-target {
+  color: #e74c3c;
+}
+
+.roll-dice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.advantage-label {
+  background: linear-gradient(90deg, rgba(46, 204, 113, 0.3), rgba(46, 204, 113, 0.1));
+  color: #2ecc71;
+  padding: 0.3rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.disadvantage-label {
+  background: linear-gradient(90deg, rgba(231, 76, 60, 0.3), rgba(231, 76, 60, 0.1));
+  color: #e74c3c;
+  padding: 0.3rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .roll-dice {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
   margin-bottom: 0.5rem;
 }
 
-.roll-d20 {
-  font-size: 2.5rem;
+/* Dé 3D dans l'indicateur */
+.die-3d {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #3a2a5a, #1a1025);
+  border: 3px solid #9b59b6;
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.die-3d.d20 {
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  border-radius: 0;
+}
+
+.die-3d .die-value {
+  font-size: 2rem;
   font-family: 'Cinzel', serif;
   font-weight: bold;
   color: #fff;
   text-shadow: 0 0 15px rgba(155, 89, 182, 0.8);
 }
 
-.roll-d20.nat20 {
+.die-3d.chosen {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(155, 89, 182, 0.6);
+}
+
+.die-3d.discarded {
+  opacity: 0.4;
+  transform: scale(0.85);
+  filter: grayscale(0.5);
+}
+
+.die-3d.nat20 {
+  border-color: #ffd700;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+}
+
+.die-3d.nat20 .die-value {
   color: #ffd700;
-  text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
   animation: nat20Pulse 0.3s ease infinite alternate;
 }
 
-@keyframes nat20Pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.1); }
+.die-3d.nat1 {
+  border-color: #e74c3c;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
 }
 
-.roll-d20.nat1 {
+.die-3d.nat1 .die-value {
   color: #e74c3c;
-  text-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+}
+
+@keyframes nat20Pulse {
+  from { transform: scale(1); text-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+  to { transform: scale(1.15); text-shadow: 0 0 30px rgba(255, 215, 0, 1); }
 }
 
 .roll-modifier {
-  font-size: 1.2rem;
-  color: #6a9ac9;
+  font-size: 1.5rem;
+  color: #7eb3e0;
+  font-weight: bold;
+}
+
+.attack-roll-indicator.critical-miss {
+  border-color: #c0392b;
+  box-shadow: 0 0 50px rgba(192, 57, 43, 0.6);
+}
+
+.roll-result.critical-miss {
+  background: rgba(192, 57, 43, 0.4);
+  color: #e74c3c;
 }
 
 .roll-total {
@@ -1045,15 +1139,16 @@
 }
 
 .combat-history-panel.compact {
-  max-height: 200px;
+  max-height: 250px;
 }
 
 .combat-history-panel.expanded {
-  max-height: 65vh;
-  min-height: 400px;
+  max-height: 80vh;
+  min-height: 500px;
   z-index: 100;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(155, 89, 182, 0.2);
-  border-color: rgba(155, 89, 182, 0.6);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7), 0 0 30px rgba(155, 89, 182, 0.25);
+  border-color: rgba(155, 89, 182, 0.7);
+  border-width: 2px;
 }
 
 .history-header {
@@ -1155,8 +1250,8 @@
 }
 
 .history-portrait {
-  font-size: 1.6rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  font-size: 2rem;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
 }
 
 .history-turn {
@@ -1177,23 +1272,31 @@
 }
 
 .history-action {
-  font-size: 1rem;
-  color: #e0e0e0;
+  font-size: 1.15rem;
+  color: #f0f0f0;
   font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.3px;
 }
 
 .history-target {
-  font-size: 0.9rem;
-  color: #a0a0a0;
+  font-size: 1.05rem;
+  color: #b0b0b0;
+}
+
+.history-target strong {
+  color: #e0d0c0;
 }
 
 .history-damage {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: bold;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
 }
 
 .history-damage.physical {
@@ -1247,24 +1350,28 @@
 }
 
 .history-heal {
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #58d68d;
   font-weight: bold;
-  text-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(46, 204, 113, 0.15);
+  border-radius: 6px;
 }
 
 .history-effect {
-  font-size: 0.85rem;
-  color: #bb8fce;
+  font-size: 1rem;
+  color: #d4a6ff;
   font-style: italic;
-  padding: 2px 6px;
-  background: rgba(155, 89, 182, 0.15);
-  border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(155, 89, 182, 0.2);
+  border-radius: 6px;
   display: inline-block;
-  margin-top: 2px;
+  margin-top: 4px;
+  border-left: 3px solid rgba(155, 89, 182, 0.5);
 }
 
 /* Compétences des monstres */

@@ -12,8 +12,11 @@ import {
   applyDamageWithTempHp,
   hasAdvantageOnAttack,
   hasDisadvantageOnAttack,
+  makeSavingThrow,
+  ABILITY_LABELS,
   AttackRollResult,
-  DamageRollResult
+  DamageRollResult,
+  SavingThrowResult
 } from '../utils/dndMechanics';
 import './CombatPage.css';
 
@@ -43,24 +46,29 @@ export function CombatPage() {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; entity: Character | Monster } | null>(null);
   // Fiche de personnage/monstre
   const [showCharacterSheet, setShowCharacterSheet] = useState<Character | Monster | null>(null);
-  // Animation de jet de dés
-  const [showDiceRoll, setShowDiceRoll] = useState<{
-    type: 'attack' | 'damage' | 'heal' | 'save';
+  // Animation de jet de dés 3D
+  const [activeDiceRoll, setActiveDiceRoll] = useState<{
     dieType: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
     count: number;
     modifier: number;
     damageType?: string;
     label?: string;
-    onComplete: (result: any) => void;
+    rolls?: number[]; // Pour afficher les résultats (avantage = 2 dés)
+    hasAdvantage?: boolean;
+    hasDisadvantage?: boolean;
   } | null>(null);
   // Résultat du dernier jet d'attaque (pour affichage)
   const [lastAttackResult, setLastAttackResult] = useState<{
     roll: number;
+    roll2?: number; // Second jet pour avantage/désavantage
     modifier: number;
     total: number;
     targetAC: number;
     hit: boolean;
     isCritical: boolean;
+    isCriticalMiss?: boolean;
+    hasAdvantage?: boolean;
+    hasDisadvantage?: boolean;
     attacker: string;
     target: string;
   } | null>(null);
@@ -841,6 +849,15 @@ export function CombatPage() {
             // === JET DE TOUCHE D&D 5e POUR MONSTRE ===
             const monsterAttackResult = makeAttackRoll(currentMonster, target, false, false, false);
             
+            // Afficher l'animation de dés 3D pour le monstre
+            setActiveDiceRoll({
+              dieType: 'd20',
+              count: 1,
+              modifier: monsterAttackResult.totalAttackBonus,
+              damageType: 'physical',
+              label: `${currentMonster.name} attaque !`
+            });
+            
             // Afficher le résultat du jet pour le monstre
             setLastAttackResult({
               roll: monsterAttackResult.attackRoll.rolls[0],
@@ -849,6 +866,7 @@ export function CombatPage() {
               targetAC: monsterAttackResult.targetAC,
               hit: monsterAttackResult.hit,
               isCritical: monsterAttackResult.isCriticalHit,
+              isCriticalMiss: monsterAttackResult.isCriticalMiss,
               attacker: currentMonster.name,
               target: target.name
             });
@@ -949,6 +967,14 @@ export function CombatPage() {
             // Jet de touche même en fallback
             const fallbackAttackResult = makeAttackRoll(currentMonster, target, false, false, false);
             
+            setActiveDiceRoll({
+              dieType: 'd20',
+              count: 1,
+              modifier: fallbackAttackResult.totalAttackBonus,
+              damageType: 'physical',
+              label: `${currentMonster.name} attaque !`
+            });
+            
             setLastAttackResult({
               roll: fallbackAttackResult.attackRoll.rolls[0],
               modifier: fallbackAttackResult.totalAttackBonus,
@@ -956,6 +982,7 @@ export function CombatPage() {
               targetAC: fallbackAttackResult.targetAC,
               hit: fallbackAttackResult.hit,
               isCritical: fallbackAttackResult.isCriticalHit,
+              isCriticalMiss: fallbackAttackResult.isCriticalMiss,
               attacker: currentMonster.name,
               target: target.name
             });
@@ -1038,6 +1065,15 @@ export function CombatPage() {
             const isSpell = skill.isSpellAttack || skill.damageType === 'magical';
             const skillAttackResult = makeAttackRoll(monster, target, isSpell, false, false);
             
+            // Afficher l'animation de dés 3D
+            setActiveDiceRoll({
+              dieType: 'd20',
+              count: 1,
+              modifier: skillAttackResult.totalAttackBonus,
+              damageType: isSpell ? 'magical' : 'physical',
+              label: `${monster.name}: ${skill.name}`
+            });
+            
             // Afficher le résultat du jet
             setLastAttackResult({
               roll: skillAttackResult.attackRoll.rolls[0],
@@ -1046,6 +1082,7 @@ export function CombatPage() {
               targetAC: skillAttackResult.targetAC,
               hit: skillAttackResult.hit,
               isCritical: skillAttackResult.isCriticalHit,
+              isCriticalMiss: skillAttackResult.isCriticalMiss,
               attacker: monster.name,
               target: target.name
             });
@@ -1093,8 +1130,52 @@ export function CombatPage() {
                 logs.push(`🧛 ${monster.name} récupère ${healed} PV !`);
               }
             }
+          } else if (skill.savingThrow) {
+            // === JET DE SAUVEGARDE D&D 5e ===
+            const saveResult = makeSavingThrow(target, skill.savingThrow.ability, skill.savingThrow.dc);
+            const abilityLabel = ABILITY_LABELS[skill.savingThrow.ability];
+            
+            // Afficher l'animation de dés 3D pour le jet de sauvegarde
+            setActiveDiceRoll({
+              dieType: 'd20',
+              count: 1,
+              modifier: saveResult.totalBonus,
+              damageType: skill.damageType === 'magical' ? 'magical' : 'physical',
+              label: `${target.name}: Jet de ${abilityLabel}`
+            });
+            
+            const chosenSaveRoll = saveResult.roll.chosenRoll || saveResult.roll.rolls[0];
+            logs.push(`🎲 ${target.name} jet de ${abilityLabel}: ${chosenSaveRoll} + ${saveResult.totalBonus} = ${saveResult.roll.total} vs DD ${skill.savingThrow.dc}`);
+            
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            if (saveResult.success) {
+              // Sauvegarde réussie - dégâts réduits de moitié généralement
+              const halfDamage = Math.floor(calculateDamage(skill.damage, monster, target, skill.damageType) / 2);
+              if (halfDamage > 0) {
+                totalDamage += halfDamage;
+                hitCount++;
+                target.hp = Math.max(0, target.hp - halfDamage);
+                trackDamageTaken(target.id, halfDamage);
+                triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+                logs.push(`✓ Sauvegarde réussie ! ${target.name} ne subit que ${halfDamage} dégâts !`);
+              } else {
+                logs.push(`✓ ${target.name} esquive complètement ${skill.name} !`);
+              }
+            } else {
+              // Sauvegarde ratée - dégâts complets
+              const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
+              totalDamage += damage;
+              hitCount++;
+              target.hp = Math.max(0, target.hp - damage);
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+              logs.push(`✗ Sauvegarde ratée ! ${target.name} subit ${damage} dégâts de ${skill.name} !`);
+              
+              applyDamageReflect(target, damage, monster, logs);
+            }
           } else {
-            // Pas de jet de touche (zone, save, etc.) - ancienne logique
+            // Pas de jet de touche ni save - effet automatique
             if (checkEvasion(target)) {
               logs.push(`💨 ${target.name} esquive ${skill.name} de ${monster.name} !`);
             } else {
@@ -1422,21 +1503,39 @@ export function CombatPage() {
     const hasDisadvantage = hasDisadvantageOnAttack(attacker, target);
     const attackResult = makeAttackRoll(attacker, target, false, hasAdvantage, hasDisadvantage);
     
-    // Afficher le résultat du jet
+    // Afficher l'animation de dés 3D
+    setActiveDiceRoll({
+      dieType: 'd20',
+      count: 1,
+      modifier: attackResult.totalAttackBonus,
+      damageType: 'physical',
+      label: `${attacker.name} attaque !`,
+      hasAdvantage,
+      hasDisadvantage
+    });
+    
+    // Afficher le résultat du jet avec les 2 dés si avantage/désavantage
+    const rolls = attackResult.attackRoll.rolls;
     setLastAttackResult({
-      roll: attackResult.attackRoll.rolls[0],
+      roll: rolls[0],
+      roll2: rolls.length > 1 ? rolls[1] : undefined,
       modifier: attackResult.totalAttackBonus,
       total: attackResult.attackRoll.total,
       targetAC: attackResult.targetAC,
       hit: attackResult.hit,
       isCritical: attackResult.isCriticalHit,
+      isCriticalMiss: attackResult.isCriticalMiss,
+      hasAdvantage,
+      hasDisadvantage,
       attacker: attacker.name,
       target: target.name
     });
     
-    // Log du jet de touche
-    const rollText = hasAdvantage ? '🎲🎲 (Avantage)' : hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
-    logs.push(`${rollText} Jet d'attaque: ${attackResult.attackRoll.rolls[0]} + ${attackResult.totalAttackBonus} = ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`);
+    // Log du jet de touche avec les 2 dés affichés
+    const rollText = hasAdvantage ? `🎲🎲 (Avantage: ${rolls[0]}/${rolls[1]})` : 
+                     hasDisadvantage ? `🎲🎲 (Désavantage: ${rolls[0]}/${rolls[1]})` : '🎲';
+    const chosenRoll = attackResult.attackRoll.chosenRoll || rolls[0];
+    logs.push(`${rollText} Jet d'attaque: ${chosenRoll} + ${attackResult.totalAttackBonus} = ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`);
     
     // Si l'attaque rate
     if (!attackResult.hit) {
@@ -1823,23 +1922,40 @@ export function CombatPage() {
           const isSpell = skill.isSpellAttack === true;
           const skillAttackResult = makeAttackRoll(attacker, target, isSpell, hasAdvantage, hasDisadvantage);
           
-          // Afficher le résultat du jet
+          // Afficher l'animation de dés 3D
+          setActiveDiceRoll({
+            dieType: 'd20',
+            count: 1,
+            modifier: skillAttackResult.totalAttackBonus,
+            damageType: isSpell ? 'magical' : 'physical',
+            label: `${attacker.name}: ${skill.name}`,
+            hasAdvantage,
+            hasDisadvantage
+          });
+          
+          // Afficher le résultat du jet avec les 2 dés si avantage/désavantage
+          const skillRolls = skillAttackResult.attackRoll.rolls;
           setLastAttackResult({
-            roll: skillAttackResult.attackRoll.rolls[0],
+            roll: skillRolls[0],
+            roll2: skillRolls.length > 1 ? skillRolls[1] : undefined,
             modifier: skillAttackResult.totalAttackBonus,
             total: skillAttackResult.attackRoll.total,
             targetAC: skillAttackResult.targetAC,
             hit: skillAttackResult.hit,
             isCritical: skillAttackResult.isCriticalHit,
+            isCriticalMiss: skillAttackResult.isCriticalMiss,
+            hasAdvantage,
+            hasDisadvantage,
             attacker: attacker.name,
             target: target.name
           });
           
           // Log du jet de touche avec indication d'avantage si applicable
-          const advantageText = skillGrantsAdvantage ? '🎲🎲 (Avantage - Téméraire)' : 
-                               hasAdvantage ? '🎲🎲 (Avantage)' : 
-                               hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
-          logs.push(`${advantageText} ${attacker.name} (${skill.name}): ${skillAttackResult.attackRoll.rolls[0]} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
+          const chosenSkillRoll = skillAttackResult.attackRoll.chosenRoll || skillRolls[0];
+          const advantageText = skillGrantsAdvantage ? `🎲🎲 (Téméraire: ${skillRolls.join('/')})` : 
+                               hasAdvantage ? `🎲🎲 (Avantage: ${skillRolls.join('/')})` : 
+                               hasDisadvantage ? `🎲🎲 (Désavantage: ${skillRolls.join('/')})` : '🎲';
+          logs.push(`${advantageText} ${attacker.name} (${skill.name}): ${chosenSkillRoll} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
           
           hit = skillAttackResult.hit;
           isCritical = skillAttackResult.isCriticalHit;
@@ -2740,32 +2856,82 @@ export function CombatPage() {
         />
       )}
       
-      {/* Indicateur de jet d'attaque D&D */}
+      {/* Animation de dés 3D */}
+      {activeDiceRoll && (
+        <DiceRoller
+          roll={{
+            dieType: activeDiceRoll.dieType,
+            count: activeDiceRoll.hasAdvantage || activeDiceRoll.hasDisadvantage ? 2 : activeDiceRoll.count,
+            modifier: activeDiceRoll.modifier,
+            damageType: activeDiceRoll.damageType,
+            label: activeDiceRoll.label
+          }}
+          onComplete={() => setActiveDiceRoll(null)}
+          showAnimation={true}
+          damageType={activeDiceRoll.damageType}
+        />
+      )}
+      
+      {/* Indicateur de jet d'attaque D&D amélioré */}
       {lastAttackResult && (
         <div 
-          className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''}`}
+          className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''} ${lastAttackResult.isCriticalMiss ? 'critical-miss' : ''}`}
           onClick={() => setLastAttackResult(null)}
         >
           <div className="roll-header">
-            {lastAttackResult.attacker} → {lastAttackResult.target}
+            <span className="roll-attacker">{lastAttackResult.attacker}</span>
+            <span className="roll-arrow">⚔️</span>
+            <span className="roll-target">{lastAttackResult.target}</span>
           </div>
-          <div className="roll-dice">
-            <span className="roll-emoji">🎲</span>
-            <span className={`roll-d20 ${lastAttackResult.roll === 20 ? 'nat20' : lastAttackResult.roll === 1 ? 'nat1' : ''}`}>
-              {lastAttackResult.roll}
-            </span>
-            <span className="roll-modifier">
-              +{lastAttackResult.modifier}
-            </span>
+          
+          {/* Affichage des dés - 2 si avantage/désavantage */}
+          <div className="roll-dice-container">
+            {lastAttackResult.hasAdvantage && (
+              <div className="advantage-label">🎲🎲 AVANTAGE</div>
+            )}
+            {lastAttackResult.hasDisadvantage && (
+              <div className="disadvantage-label">🎲🎲 DÉSAVANTAGE</div>
+            )}
+            
+            <div className="roll-dice">
+              {/* Premier dé */}
+              <div className={`die-3d d20 ${lastAttackResult.roll === 20 ? 'nat20' : lastAttackResult.roll === 1 ? 'nat1' : ''} ${
+                lastAttackResult.hasAdvantage && lastAttackResult.roll2 !== undefined 
+                  ? (lastAttackResult.roll > lastAttackResult.roll2 ? 'chosen' : 'discarded')
+                  : lastAttackResult.hasDisadvantage && lastAttackResult.roll2 !== undefined
+                    ? (lastAttackResult.roll < lastAttackResult.roll2 ? 'chosen' : 'discarded')
+                    : 'chosen'
+              }`}>
+                <span className="die-value">{lastAttackResult.roll}</span>
+              </div>
+              
+              {/* Second dé si avantage/désavantage */}
+              {lastAttackResult.roll2 !== undefined && (
+                <div className={`die-3d d20 ${lastAttackResult.roll2 === 20 ? 'nat20' : lastAttackResult.roll2 === 1 ? 'nat1' : ''} ${
+                  lastAttackResult.hasAdvantage 
+                    ? (lastAttackResult.roll2 > lastAttackResult.roll ? 'chosen' : 'discarded')
+                    : (lastAttackResult.roll2 < lastAttackResult.roll ? 'chosen' : 'discarded')
+                }`}>
+                  <span className="die-value">{lastAttackResult.roll2}</span>
+                </div>
+              )}
+              
+              <span className="roll-modifier">
+                +{lastAttackResult.modifier}
+              </span>
+            </div>
           </div>
+          
           <div className={`roll-total ${lastAttackResult.hit ? 'hit' : 'miss'}`}>
-            = {lastAttackResult.total}
+            = <span className="total-value">{lastAttackResult.total}</span>
           </div>
           <div className="roll-vs-ac">
-            vs CA {lastAttackResult.targetAC}
+            vs CA <span className="ac-value">{lastAttackResult.targetAC}</span>
           </div>
-          <div className={`roll-result ${lastAttackResult.isCritical ? 'critical' : lastAttackResult.hit ? 'hit' : 'miss'}`}>
-            {lastAttackResult.isCritical ? '💥 CRITIQUE !' : lastAttackResult.hit ? '✓ TOUCHÉ' : '✗ RATÉ'}
+          <div className={`roll-result ${lastAttackResult.isCritical ? 'critical' : lastAttackResult.isCriticalMiss ? 'critical-miss' : lastAttackResult.hit ? 'hit' : 'miss'}`}>
+            {lastAttackResult.isCritical ? '💥 COUP CRITIQUE !' : 
+             lastAttackResult.isCriticalMiss ? '💨 ÉCHEC CRITIQUE !' :
+             lastAttackResult.hit ? '✓ TOUCHÉ !' : '✗ RATÉ !'}
           </div>
         </div>
       )}

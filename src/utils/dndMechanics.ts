@@ -17,6 +17,7 @@ export interface DiceRollResult {
   isNatural1?: boolean;
   hasAdvantage?: boolean;
   hasDisadvantage?: boolean;
+  chosenRoll?: number; // Le dé sélectionné (pour avantage/désavantage)
 }
 
 // Résultat d'un jet d'attaque
@@ -62,40 +63,50 @@ export function rollDice(
   disadvantage: boolean = false
 ): DiceRollResult {
   const rolls: number[] = [];
+  let allRolls: number[] = []; // Stocke tous les jets (pour avantage/désavantage)
+  let chosenRoll: number | undefined;
   
   // Pour les jets d20 avec avantage/désavantage
   if (dieType === 'd20' && (advantage || disadvantage) && count === 1) {
     const roll1 = rollDie('d20');
     const roll2 = rollDie('d20');
+    allRolls = [roll1, roll2];
     
     if (advantage && !disadvantage) {
-      rolls.push(Math.max(roll1, roll2));
+      chosenRoll = Math.max(roll1, roll2);
+      rolls.push(chosenRoll);
     } else if (disadvantage && !advantage) {
-      rolls.push(Math.min(roll1, roll2));
+      chosenRoll = Math.min(roll1, roll2);
+      rolls.push(chosenRoll);
     } else {
       // Les deux s'annulent
       rolls.push(roll1);
+      allRolls = [roll1]; // Pas de second dé si annulation
     }
   } else {
     for (let i = 0; i < count; i++) {
-      rolls.push(rollDie(dieType));
+      const r = rollDie(dieType);
+      rolls.push(r);
+      allRolls.push(r);
     }
   }
   
   const sum = rolls.reduce((a, b) => a + b, 0);
   const total = sum + modifier;
-  const isNatural20 = dieType === 'd20' && rolls.some(r => r === 20);
-  const isNatural1 = dieType === 'd20' && rolls.every(r => r === 1);
+  // Pour critique: vérifie le dé CHOISI (pas tous les dés)
+  const isNatural20 = dieType === 'd20' && rolls[0] === 20;
+  const isNatural1 = dieType === 'd20' && rolls[0] === 1;
   
   return {
-    rolls,
+    rolls: allRolls, // Retourne TOUS les jets pour affichage
     total,
     modifier,
     dieType,
     isNatural20,
     isNatural1,
     hasAdvantage: advantage,
-    hasDisadvantage: disadvantage
+    hasDisadvantage: disadvantage,
+    chosenRoll // Le dé sélectionné (pour avantage/désavantage)
   };
 }
 
@@ -299,4 +310,75 @@ export function hasDisadvantageOnAttack(attacker: Character, target: Character |
   
   return false;
 }
+
+// ============================================
+// JETS DE SAUVEGARDE D&D 5e
+// ============================================
+
+export interface SavingThrowResult {
+  roll: DiceRollResult;
+  success: boolean;
+  dc: number;
+  ability: keyof AbilityScores;
+  totalBonus: number;
+}
+
+// Calculer le bonus de jet de sauvegarde
+export function getSavingThrowBonus(
+  entity: Character | Monster, 
+  ability: keyof AbilityScores
+): number {
+  const abilityScore = entity.abilities[ability];
+  const modifier = getAbilityModifier(abilityScore);
+  
+  // Les personnages ont des maîtrises de jets de sauvegarde
+  if ('savingThrowProficiencies' in entity && entity.savingThrowProficiencies) {
+    if (entity.savingThrowProficiencies.includes(ability)) {
+      const proficiency = entity.proficiencyBonus || getProficiencyBonus(entity.level || 1);
+      return modifier + proficiency;
+    }
+  }
+  
+  // Les monstres utilisent leur CR pour le bonus
+  if ('challengeRating' in entity) {
+    // Certains monstres ont des sauvegardes fortes dans certaines stats
+    // Pour simplifier, on utilise juste le modificateur
+    return modifier;
+  }
+  
+  return modifier;
+}
+
+// Effectuer un jet de sauvegarde
+export function makeSavingThrow(
+  target: Character | Monster,
+  ability: keyof AbilityScores,
+  dc: number,
+  hasAdvantage: boolean = false,
+  hasDisadvantage: boolean = false
+): SavingThrowResult {
+  const bonus = getSavingThrowBonus(target, ability);
+  const roll = rollDice('d20', 1, bonus, hasAdvantage, hasDisadvantage);
+  
+  // 20 naturel = réussite automatique, 1 naturel = échec automatique
+  const success = roll.isNatural20 || (!roll.isNatural1 && roll.total >= dc);
+  
+  return {
+    roll,
+    success,
+    dc,
+    ability,
+    totalBonus: bonus
+  };
+}
+
+// Labels pour les caractéristiques
+export const ABILITY_LABELS: Record<keyof AbilityScores, string> = {
+  strength: 'Force',
+  dexterity: 'Dextérité',
+  constitution: 'Constitution',
+  intelligence: 'Intelligence',
+  wisdom: 'Sagesse',
+  charisma: 'Charisme'
+};
 
