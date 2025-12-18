@@ -1254,12 +1254,23 @@ export function CombatPage() {
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
     
+    // DEBUG: Log skill cooldown info
+    console.log(`[SKILL DEBUG] Executing ${skill.name}:`);
+    console.log(`  - skill.id: ${skill.id}`);
+    console.log(`  - skill.cooldown: ${skill.cooldown}`);
+    console.log(`  - skill.currentCooldown: ${skill.currentCooldown}`);
+    
     // IMPORTANT: Récupérer l'attacker depuis le STATE GLOBAL pour avoir les passiveEffects à jour
     let currentTeam = gameStore.getState().team;
     let attacker = currentTeam.find(c => c.id === attackerParam.id) || attackerParam;
     
+    // DEBUG: Log attacker skills
+    const attackerSkill = attacker.skills.find(s => s.id === skill.id);
+    console.log(`  - Attacker skill in state: cooldown=${attackerSkill?.cooldown}, currentCooldown=${attackerSkill?.currentCooldown}`);
+    
     // Appliquer le cooldown à la compétence utilisée
     if (skill.cooldown && skill.cooldown > 0) {
+      console.log(`  - Applying cooldown: ${skill.cooldown}`);
       const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
@@ -1272,9 +1283,18 @@ export function CombatPage() {
         return char;
       });
       gameStore.setState({ team: updatedTeam });
+      
+      // DEBUG: Verify cooldown was applied
+      const verifyTeam = gameStore.getState().team;
+      const verifyChar = verifyTeam.find(c => c.id === attacker.id);
+      const verifySkill = verifyChar?.skills.find(s => s.id === skill.id);
+      console.log(`  - After setState: currentCooldown=${verifySkill?.currentCooldown}`);
+      
       // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
       attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
       currentTeam = updatedTeam;
+    } else {
+      console.log(`  - NO cooldown to apply (cooldown=${skill.cooldown})`);
     }
     
     if (skill.type === 'heal') {
