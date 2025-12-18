@@ -1547,27 +1547,9 @@ export function CombatPage() {
   return (
     <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
       <div className="combat-header">
-        <div className="header-buttons left">
-          <button 
-            className="header-btn inventory"
-            onClick={() => gameStore.setState({ showInventory: true })}
-          >
-            🎒 (I)
-          </button>
-        </div>
-        <div className="header-title">
-          <h2>⚔️ COMBAT ⚔️</h2>
-          {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
-          {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
-        </div>
-        <div className="header-buttons right">
-          <button 
-            className="header-btn menu"
-            onClick={() => gameStore.setState({ showPauseMenu: true })}
-          >
-            ⏸️ (Échap)
-          </button>
-        </div>
+        <h2>⚔️ COMBAT ⚔️</h2>
+        {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
+        {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
       </div>
 
       {selectingTarget && (
@@ -1756,7 +1738,22 @@ export function CombatPage() {
 
           <div className="versus">VS</div>
 
-          <div className="team-section">
+          <div className="team-panel">
+            <div className="team-actions">
+              <button 
+                className="team-action-btn inventory"
+                onClick={() => gameStore.setState({ showInventory: true })}
+              >
+                🎒 Inventaire
+              </button>
+              <button 
+                className="team-action-btn menu"
+                onClick={() => gameStore.setState({ showPauseMenu: true })}
+              >
+                ⏸️ Menu
+              </button>
+            </div>
+            <div className="team-section">
             {team.map(character => {
               const isCurrent = currentTurn && 'id' in currentTurn && currentTurn.id === character.id;
               const isDead = character.hp <= 0;
@@ -1812,6 +1809,7 @@ export function CombatPage() {
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>

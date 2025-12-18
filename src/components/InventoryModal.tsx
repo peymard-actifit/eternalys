@@ -412,50 +412,38 @@ export function InventoryModal() {
                 </div>
               </div>
 
-              {/* Zone centrale: Équipements style Pathfinder/BG3 */}
+              {/* Zone centrale: Équipements style Paperdoll */}
               <div className="character-model-zone">
                 <div className="equipment-paperdoll">
-                  {/* Silhouette de personnage avec emplacements */}
-                  <div className="paperdoll-body">
-                    {/* Rangée haute: Tête + accessoires */}
-                    <div className="paperdoll-row head-row">
-                      <div className="slot-spacer"></div>
-                      {renderEquipmentSlot('head')}
-                      <div className="slot-spacer"></div>
-                    </div>
-                    
-                    {/* Rangée cou/épaules */}
-                    <div className="paperdoll-row shoulders-row">
-                      {renderEquipmentSlot('necklace')}
-                      {renderEquipmentSlot('cloak')}
-                    </div>
-                    
-                    {/* Rangée torse: Armes + Armure */}
-                    <div className="paperdoll-row torso-row">
+                  {/* Disposition autour du personnage invisible */}
+                  <div className="paperdoll-container">
+                    {/* Colonne gauche - Armes et accessoires gauche */}
+                    <div className="paperdoll-column left">
                       {renderEquipmentSlot('mainHand')}
-                      {renderEquipmentSlot('armor')}
-                      {renderEquipmentSlot('offHand')}
-                    </div>
-                    
-                    {/* Rangée bras: Avant-bras + Gants + Arc */}
-                    <div className="paperdoll-row arms-row">
                       {renderEquipmentSlot('bracers')}
-                      {renderEquipmentSlot('gloves')}
-                      {renderEquipmentSlot('ranged')}
-                    </div>
-                    
-                    {/* Rangée ceinture: Anneaux + Ceinture */}
-                    <div className="paperdoll-row belt-row">
                       {renderEquipmentSlot('ring1')}
-                      {renderEquipmentSlot('belt')}
-                      {renderEquipmentSlot('ring2')}
                     </div>
                     
-                    {/* Rangée pieds */}
-                    <div className="paperdoll-row feet-row">
-                      <div className="slot-spacer"></div>
+                    {/* Colonne centrale - Corps */}
+                    <div className="paperdoll-column center">
+                      {renderEquipmentSlot('head')}
+                      <div className="neck-row">
+                        {renderEquipmentSlot('necklace')}
+                        {renderEquipmentSlot('cloak')}
+                      </div>
+                      {renderEquipmentSlot('armor')}
+                      <div className="waist-row">
+                        {renderEquipmentSlot('gloves')}
+                        {renderEquipmentSlot('belt')}
+                      </div>
                       {renderEquipmentSlot('boots')}
-                      <div className="slot-spacer"></div>
+                    </div>
+                    
+                    {/* Colonne droite - Armes et accessoires droite */}
+                    <div className="paperdoll-column right">
+                      {renderEquipmentSlot('offHand')}
+                      {renderEquipmentSlot('ranged')}
+                      {renderEquipmentSlot('ring2')}
                     </div>
                   </div>
                   

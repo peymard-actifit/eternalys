@@ -334,117 +334,117 @@
   padding: 0.5rem;
 }
 
-.paperdoll-body {
-  position: relative;
+/* Container principal - 3 colonnes autour du personnage invisible */
+.paperdoll-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  align-items: stretch;
   gap: 0.3rem;
-  padding: 1rem 0.5rem;
+  padding: 0.8rem;
   background: 
-    radial-gradient(ellipse 60% 100% at center, rgba(139, 115, 85, 0.08) 0%, transparent 70%);
+    radial-gradient(ellipse 50% 60% at center, rgba(139, 115, 85, 0.1) 0%, transparent 70%);
   border-radius: 8px;
+  position: relative;
 }
 
-/* Silhouette de corps en arrière-plan */
-.paperdoll-body::before {
+/* Silhouette de personnage en arrière-plan */
+.paperdoll-container::before {
   content: '';
   position: absolute;
-  top: 10%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 85%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 140px;
   background: 
-    radial-gradient(ellipse 35px 25px at 50% 8%, rgba(139, 115, 85, 0.15) 0%, transparent 100%),
-    radial-gradient(ellipse 60px 70px at 50% 45%, rgba(139, 115, 85, 0.1) 0%, transparent 100%),
-    radial-gradient(ellipse 25px 40px at 30% 50%, rgba(139, 115, 85, 0.08) 0%, transparent 100%),
-    radial-gradient(ellipse 25px 40px at 70% 50%, rgba(139, 115, 85, 0.08) 0%, transparent 100%);
+    radial-gradient(ellipse 30px 30px at 50% 12%, rgba(139, 115, 85, 0.12) 0%, transparent 100%),
+    radial-gradient(ellipse 40px 50px at 50% 45%, rgba(139, 115, 85, 0.08) 0%, transparent 100%),
+    radial-gradient(ellipse 30px 35px at 50% 85%, rgba(139, 115, 85, 0.06) 0%, transparent 100%);
   pointer-events: none;
   z-index: 0;
 }
 
-.paperdoll-row {
+/* Colonnes */
+.paperdoll-column {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   gap: 0.4rem;
   position: relative;
   z-index: 1;
 }
 
-.slot-spacer {
+.paperdoll-column.left,
+.paperdoll-column.right {
+  padding: 0.5rem 0;
+}
+
+.paperdoll-column.center {
+  align-items: center;
+}
+
+/* Slots armes (gauche/droite) - plus grands */
+.paperdoll-column.left .equipment-slot:first-child,
+.paperdoll-column.right .equipment-slot:first-child {
   width: 48px;
-  height: 48px;
+  height: 56px;
 }
 
-/* Rangée tête - légèrement plus grande */
-.paperdoll-row.head-row .equipment-slot {
-  width: 54px;
-  height: 54px;
+/* Slots secondaires */
+.paperdoll-column.left .equipment-slot:nth-child(2),
+.paperdoll-column.right .equipment-slot:nth-child(2) {
+  width: 44px;
+  height: 44px;
 }
 
-/* Rangée épaules - espacée */
-.paperdoll-row.shoulders-row {
-  gap: 0.8rem;
-  margin-top: -0.2rem;
+/* Anneaux - plus petits */
+.paperdoll-column.left .equipment-slot:last-child,
+.paperdoll-column.right .equipment-slot:last-child {
+  width: 38px;
+  height: 38px;
 }
 
-.paperdoll-row.shoulders-row .equipment-slot {
-  width: 46px;
-  height: 46px;
-}
-
-/* Rangée torse - armes plus grandes */
-.paperdoll-row.torso-row {
-  gap: 0.3rem;
-}
-
-.paperdoll-row.torso-row .equipment-slot:first-child,
-.paperdoll-row.torso-row .equipment-slot:last-child {
+/* Colonne centrale */
+.paperdoll-column.center .equipment-slot {
   width: 50px;
-  height: 58px;
+  height: 50px;
 }
 
-.paperdoll-row.torso-row .equipment-slot:nth-child(2) {
+/* Tête - légèrement plus grande */
+.paperdoll-column.center > .equipment-slot:first-child {
+  width: 52px;
+  height: 52px;
+}
+
+/* Armure - plus grande */
+.paperdoll-column.center > .equipment-slot:nth-child(3) {
   width: 56px;
   height: 56px;
 }
 
-/* Rangée bras */
-.paperdoll-row.arms-row {
-  gap: 0.5rem;
+/* Rangées dans la colonne centrale */
+.neck-row,
+.waist-row {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
 }
 
-.paperdoll-row.arms-row .equipment-slot {
-  width: 46px;
-  height: 46px;
+.neck-row .equipment-slot {
+  width: 42px;
+  height: 42px;
 }
 
-/* Rangée ceinture */
-.paperdoll-row.belt-row {
-  gap: 0.4rem;
-}
-
-.paperdoll-row.belt-row .equipment-slot:first-child,
-.paperdoll-row.belt-row .equipment-slot:last-child {
-  width: 40px;
-  height: 40px;
-}
-
-.paperdoll-row.belt-row .equipment-slot:nth-child(2) {
-  width: 52px;
+.waist-row .equipment-slot {
+  width: 44px;
   height: 44px;
 }
 
-/* Rangée pieds */
-.paperdoll-row.feet-row {
-  margin-top: 0.2rem;
-}
-
-.paperdoll-row.feet-row .equipment-slot {
-  width: 52px;
-  height: 48px;
+/* Bottes */
+.paperdoll-column.center > .equipment-slot:last-child {
+  width: 50px;
+  height: 46px;
 }
 
 /* Section accessoires */
@@ -471,13 +471,13 @@
 }
 
 .accessory-slots.trinkets-row .equipment-slot {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
 }
 
 .accessory-slots.consumables-row .equipment-slot {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
 }
 
 /* Equipment Slot - Style BG3/Pathfinder */

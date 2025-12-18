@@ -55,7 +55,8 @@ const commonTreasures: Treasure[] = [
     icon: '🧪',
     rarity: 'common',
     description: 'Restaure 18 PV immédiatement',
-    effect: { type: 'heal', value: 18 }
+    effect: { type: 'heal', value: 18 },
+    equipmentSlot: 'consumable1'
   },
   {
     id: 'herbes_guerison',
@@ -63,7 +64,8 @@ const commonTreasures: Treasure[] = [
     icon: '🌿',
     rarity: 'common',
     description: 'Restaure 15 PV immédiatement',
-    effect: { type: 'heal', value: 15 }
+    effect: { type: 'heal', value: 15 },
+    equipmentSlot: 'consumable2'
   },
   {
     id: 'fiole_energie',
@@ -71,7 +73,8 @@ const commonTreasures: Treasure[] = [
     icon: '⚗️',
     rarity: 'common',
     description: 'Restaure 20 PV immédiatement',
-    effect: { type: 'heal', value: 20 }
+    effect: { type: 'heal', value: 20 },
+    equipmentSlot: 'consumable3'
   },
   // Stats physiques
   {
@@ -80,7 +83,8 @@ const commonTreasures: Treasure[] = [
     icon: '💎',
     rarity: 'common',
     description: '+2 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'amulette_protection',
@@ -88,7 +92,8 @@ const commonTreasures: Treasure[] = [
     icon: '📿',
     rarity: 'common',
     description: '+2 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 2, duration: 'permanent' },
+    equipmentSlot: 'necklace'
   },
   {
     id: 'bottes_rapidite',
@@ -96,7 +101,8 @@ const commonTreasures: Treasure[] = [
     icon: '👢',
     rarity: 'common',
     description: '+3 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' },
+    equipmentSlot: 'boots'
   },
   // Stats magiques
   {
@@ -105,7 +111,8 @@ const commonTreasures: Treasure[] = [
     icon: '🔮',
     rarity: 'common',
     description: '+2 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    equipmentSlot: 'trinket2'
   },
   {
     id: 'talisman_arcane',
@@ -113,7 +120,8 @@ const commonTreasures: Treasure[] = [
     icon: '✨',
     rarity: 'common',
     description: '+2 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' },
+    equipmentSlot: 'trinket3'
   },
   // PV
   {
@@ -122,7 +130,8 @@ const commonTreasures: Treasure[] = [
     icon: '🍒',
     rarity: 'common',
     description: '+8 PV max permanents',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 8, duration: 'permanent' },
+    equipmentSlot: 'consumable1'
   }
 ];
 
@@ -137,7 +146,8 @@ const rareTreasures: Treasure[] = [
     icon: '⚗️',
     rarity: 'rare',
     description: 'Restaure 30 PV immédiatement',
-    effect: { type: 'heal', value: 30 }
+    effect: { type: 'heal', value: 30 },
+    equipmentSlot: 'consumable1'
   },
   // Stats physiques
   {
@@ -146,7 +156,8 @@ const rareTreasures: Treasure[] = [
     icon: '🧤',
     rarity: 'rare',
     description: '+5 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 5, duration: 'permanent' },
+    equipmentSlot: 'gloves'
   },
   {
     id: 'bouclier_ancestral',
@@ -154,7 +165,8 @@ const rareTreasures: Treasure[] = [
     icon: '🛡️',
     rarity: 'rare',
     description: '+5 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'cape_vent',
@@ -162,7 +174,8 @@ const rareTreasures: Treasure[] = [
     icon: '🧣',
     rarity: 'rare',
     description: '+5 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   // Stats magiques
   {
@@ -171,7 +184,8 @@ const rareTreasures: Treasure[] = [
     icon: '💠',
     rarity: 'rare',
     description: '+5 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'robe_archimage_mineure',
@@ -179,7 +193,8 @@ const rareTreasures: Treasure[] = [
     icon: '🧙',
     rarity: 'rare',
     description: '+5 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   // PV
   {
@@ -188,7 +203,8 @@ const rareTreasures: Treasure[] = [
     icon: '💊',
     rarity: 'rare',
     description: '+15 PV max permanents',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 15, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 15, duration: 'permanent' },
+    equipmentSlot: 'consumable2'
   },
   // Compétences (18-25 dégâts)
   {
@@ -197,7 +213,8 @@ const rareTreasures: Treasure[] = [
     icon: '📕',
     rarity: 'rare',
     description: 'Apprend "Boule de Feu" (20 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Boule de Feu', skillDamage: 20, skillType: 'damage', skillDamageType: 'fire' }
+    effect: { type: 'skill', skillName: 'Boule de Feu', skillDamage: 20, skillType: 'damage', skillDamageType: 'fire' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'anneau_givre',
@@ -205,7 +222,8 @@ const rareTreasures: Treasure[] = [
     icon: '❄️',
     rarity: 'rare',
     description: 'Apprend "Souffle Glacé" (18 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Souffle Glacé', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' }
+    effect: { type: 'skill', skillName: 'Souffle Glacé', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' },
+    equipmentSlot: 'ring1'
   },
   {
     id: 'pendentif_guerison',
@@ -213,7 +231,8 @@ const rareTreasures: Treasure[] = [
     icon: '💚',
     rarity: 'rare',
     description: 'Apprend "Soin Léger" (22 PV)',
-    effect: { type: 'skill', skillName: 'Soin Léger', skillDamage: 22, skillType: 'heal' }
+    effect: { type: 'skill', skillName: 'Soin Léger', skillDamage: 22, skillType: 'heal' },
+    equipmentSlot: 'necklace'
   },
   {
     id: 'perle_pouvoir',
@@ -221,7 +240,8 @@ const rareTreasures: Treasure[] = [
     icon: '🔮',
     rarity: 'rare',
     description: 'Apprend "Rayon de Givre" (18 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Rayon de Givre', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' }
+    effect: { type: 'skill', skillName: 'Rayon de Givre', skillDamage: 18, skillType: 'damage', skillDamageType: 'cold' },
+    equipmentSlot: 'trinket2'
   }
 ];
 
@@ -236,7 +256,8 @@ const epicTreasures: Treasure[] = [
     icon: '💉',
     rarity: 'epic',
     description: 'Restaure 50 PV immédiatement',
-    effect: { type: 'heal', value: 50 }
+    effect: { type: 'heal', value: 50 },
+    equipmentSlot: 'consumable1'
   },
   // Stats physiques
   {
@@ -245,7 +266,8 @@ const epicTreasures: Treasure[] = [
     icon: '⚔️',
     rarity: 'epic',
     description: '+9 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'armure_titan',
@@ -253,7 +275,8 @@ const epicTreasures: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+9 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   {
     id: 'bottes_rapidite_epic',
@@ -261,7 +284,8 @@ const epicTreasures: Treasure[] = [
     icon: '👟',
     rarity: 'epic',
     description: '+8 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 8, duration: 'permanent' },
+    equipmentSlot: 'boots'
   },
   // Stats magiques
   {
@@ -270,7 +294,8 @@ const epicTreasures: Treasure[] = [
     icon: '🪄',
     rarity: 'epic',
     description: '+10 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'cape_ombre',
@@ -278,7 +303,8 @@ const epicTreasures: Treasure[] = [
     icon: '🌑',
     rarity: 'epic',
     description: '+9 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   // PV + bonus
   {
@@ -287,7 +313,8 @@ const epicTreasures: Treasure[] = [
     icon: '❤️‍🔥',
     rarity: 'epic',
     description: '+25 PV max et +4 Attaque permanents',
-    effect: { type: 'buff', stat: 'maxHp', value: 25 }
+    effect: { type: 'buff', stat: 'maxHp', value: 25 },
+    equipmentSlot: 'trinket1'
   },
   // Résurrection
   {
@@ -296,7 +323,8 @@ const epicTreasures: Treasure[] = [
     icon: '💍',
     rarity: 'epic',
     description: 'Ressuscite un allié mort avec 50% PV',
-    effect: { type: 'resurrect', percentage: 50 }
+    effect: { type: 'resurrect', percentage: 50 },
+    equipmentSlot: 'ring1'
   },
   // Compétences (30-40 dégâts)
   {
@@ -305,7 +333,8 @@ const epicTreasures: Treasure[] = [
     icon: '⚡',
     rarity: 'epic',
     description: 'Apprend "Éclair Dévastateur" (35 dégâts de foudre)',
-    effect: { type: 'skill', skillName: 'Éclair Dévastateur', skillDamage: 35, skillType: 'damage', skillDamageType: 'lightning' }
+    effect: { type: 'skill', skillName: 'Éclair Dévastateur', skillDamage: 35, skillType: 'damage', skillDamageType: 'lightning' },
+    equipmentSlot: 'trinket2'
   },
   {
     id: 'grimoire_necromancie',
@@ -313,7 +342,8 @@ const epicTreasures: Treasure[] = [
     icon: '📓',
     rarity: 'epic',
     description: 'Apprend "Drain de Vie" (32 dégâts nécrotiques)',
-    effect: { type: 'skill', skillName: 'Drain de Vie', skillDamage: 32, skillType: 'damage', skillDamageType: 'necrotic' }
+    effect: { type: 'skill', skillName: 'Drain de Vie', skillDamage: 32, skillType: 'damage', skillDamageType: 'necrotic' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'baguette_boule_feu',
@@ -321,7 +351,8 @@ const epicTreasures: Treasure[] = [
     icon: '🔥',
     rarity: 'epic',
     description: 'Apprend "Grande Boule de Feu" (38 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Grande Boule de Feu', skillDamage: 38, skillType: 'damage', skillDamageType: 'fire' }
+    effect: { type: 'skill', skillName: 'Grande Boule de Feu', skillDamage: 38, skillType: 'damage', skillDamageType: 'fire' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'baton_guerison',
@@ -329,7 +360,8 @@ const epicTreasures: Treasure[] = [
     icon: '🏥',
     rarity: 'epic',
     description: 'Apprend "Guérison Majeure" (45 PV)',
-    effect: { type: 'skill', skillName: 'Guérison Majeure', skillDamage: 45, skillType: 'heal' }
+    effect: { type: 'skill', skillName: 'Guérison Majeure', skillDamage: 45, skillType: 'heal' },
+    equipmentSlot: 'mainHand'
   }
 ];
 
@@ -344,7 +376,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🧪',
     rarity: 'legendary',
     description: 'Restaure 100 PV immédiatement',
-    effect: { type: 'heal', value: 100 }
+    effect: { type: 'heal', value: 100 },
+    equipmentSlot: 'consumable1'
   },
   // Stats physiques
   {
@@ -353,7 +386,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '⚔️',
     rarity: 'legendary',
     description: '+14 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'armure_invincibilite',
@@ -361,7 +395,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🛡️',
     rarity: 'legendary',
     description: '+14 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 14, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   // Stats magiques
   {
@@ -370,7 +405,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '📖',
     rarity: 'legendary',
     description: '+15 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'robe_archimage',
@@ -378,7 +414,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🧙',
     rarity: 'legendary',
     description: '+14 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 14, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   // Multi-stats
   {
@@ -387,7 +424,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '👑',
     rarity: 'legendary',
     description: '+35 PV max, +8 Attaque, +6 Défense permanents',
-    effect: { type: 'buff', stat: 'maxHp', value: 35 }
+    effect: { type: 'buff', stat: 'maxHp', value: 35 },
+    equipmentSlot: 'head'
   },
   {
     id: 'armure_divine',
@@ -395,7 +433,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '⚜️',
     rarity: 'legendary',
     description: '+30 PV max, +10 Défense, +8 Rés. Magique',
-    effect: { type: 'buff', stat: 'defense', value: 10 }
+    effect: { type: 'buff', stat: 'defense', value: 10 },
+    equipmentSlot: 'armor'
   },
   {
     id: 'orbe_cosmos',
@@ -403,7 +442,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🌌',
     rarity: 'legendary',
     description: '+12 Attaque Magique et +10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   // Résurrection
   {
@@ -412,7 +452,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🔥',
     rarity: 'legendary',
     description: 'Ressuscite un allié avec 100% PV',
-    effect: { type: 'resurrect', percentage: 100 }
+    effect: { type: 'resurrect', percentage: 100 },
+    equipmentSlot: 'trinket2'
   },
   // Compétences (50-65 dégâts)
   {
@@ -421,7 +462,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '🏆',
     rarity: 'legendary',
     description: 'Apprend "Jugement Divin" (55 dégâts radiants)',
-    effect: { type: 'skill', skillName: 'Jugement Divin', skillDamage: 55, skillType: 'damage', skillDamageType: 'radiant' }
+    effect: { type: 'skill', skillName: 'Jugement Divin', skillDamage: 55, skillType: 'damage', skillDamageType: 'radiant' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'sphere_annihilation',
@@ -429,7 +471,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '⚫',
     rarity: 'legendary',
     description: 'Apprend "Désintégration" (60 dégâts de force)',
-    effect: { type: 'skill', skillName: 'Désintégration', skillDamage: 60, skillType: 'damage', skillDamageType: 'force' }
+    effect: { type: 'skill', skillName: 'Désintégration', skillDamage: 60, skillType: 'damage', skillDamageType: 'force' },
+    equipmentSlot: 'trinket3'
   },
   {
     id: 'baguette_rayon_mort',
@@ -437,7 +480,8 @@ const legendaryTreasures: Treasure[] = [
     icon: '💀',
     rarity: 'legendary',
     description: 'Apprend "Rayon de la Mort" (58 dégâts nécrotiques)',
-    effect: { type: 'skill', skillName: 'Rayon de la Mort', skillDamage: 58, skillType: 'damage', skillDamageType: 'necrotic' }
+    effect: { type: 'skill', skillName: 'Rayon de la Mort', skillDamage: 58, skillType: 'damage', skillDamageType: 'necrotic' },
+    equipmentSlot: 'mainHand'
   }
 ];
 
@@ -451,7 +495,8 @@ const dndCommonItems: Treasure[] = [
     icon: '🧪',
     rarity: 'common',
     description: 'Restaure 2d4+2 (7) PV',
-    effect: { type: 'heal', value: 17 }
+    effect: { type: 'heal', value: 17 },
+    equipmentSlot: 'consumable1'
   },
   {
     id: 'dague_argent',
@@ -459,7 +504,8 @@ const dndCommonItems: Treasure[] = [
     icon: '🗡️',
     rarity: 'common',
     description: '+2 Attaque, efficace contre lycanthropes',
-    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'symbole_sacre',
@@ -467,7 +513,8 @@ const dndCommonItems: Treasure[] = [
     icon: '✝️',
     rarity: 'common',
     description: '+2 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'torche_eternelle',
@@ -475,7 +522,8 @@ const dndCommonItems: Treasure[] = [
     icon: '🔦',
     rarity: 'common',
     description: '+2 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'corde_escalade',
@@ -483,7 +531,8 @@ const dndCommonItems: Treasure[] = [
     icon: '🪢',
     rarity: 'common',
     description: '+3 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 3, duration: 'permanent' },
+    equipmentSlot: 'belt'
   }
 ];
 
@@ -497,7 +546,8 @@ const dndRareItems: Treasure[] = [
     icon: '🧥',
     rarity: 'rare',
     description: '+4 Défense et +4 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 4, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 4, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   {
     id: 'bottes_elfiques',
@@ -505,7 +555,8 @@ const dndRareItems: Treasure[] = [
     icon: '👢',
     rarity: 'rare',
     description: '+6 Vitesse, déplacement silencieux',
-    effect: { type: 'stat_boost', stat: 'speed', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 6, duration: 'permanent' },
+    equipmentSlot: 'boots'
   },
   {
     id: 'gants_ogre',
@@ -513,7 +564,8 @@ const dndRareItems: Treasure[] = [
     icon: '🧤',
     rarity: 'rare',
     description: '+6 Attaque (Force 19)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 6, duration: 'permanent' },
+    equipmentSlot: 'gloves'
   },
   {
     id: 'bandeau_intellect',
@@ -521,7 +573,8 @@ const dndRareItems: Treasure[] = [
     icon: '👑',
     rarity: 'rare',
     description: '+6 Attaque Magique (Intelligence 19)',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 6, duration: 'permanent' },
+    equipmentSlot: 'head'
   },
   {
     id: 'amulette_sante',
@@ -529,7 +582,8 @@ const dndRareItems: Treasure[] = [
     icon: '💎',
     rarity: 'rare',
     description: '+18 PV max (Constitution 19)',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 18, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 18, duration: 'permanent' },
+    equipmentSlot: 'necklace'
   },
   {
     id: 'baguette_secrets',
@@ -537,7 +591,8 @@ const dndRareItems: Treasure[] = [
     icon: '🪄',
     rarity: 'rare',
     description: '+5 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'armure_mithral',
@@ -545,7 +600,8 @@ const dndRareItems: Treasure[] = [
     icon: '🛡️',
     rarity: 'rare',
     description: '+6 Défense, légère comme l\'air',
-    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   {
     id: 'anneau_saut',
@@ -553,7 +609,8 @@ const dndRareItems: Treasure[] = [
     icon: '💍',
     rarity: 'rare',
     description: '+5 Vitesse permanente',
-    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'speed', value: 5, duration: 'permanent' },
+    equipmentSlot: 'ring1'
   }
 ];
 
@@ -567,7 +624,8 @@ const dndEpicItems: Treasure[] = [
     icon: '🥋',
     rarity: 'epic',
     description: '+10 Attaque (Force 21)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' },
+    equipmentSlot: 'belt'
   },
   {
     id: 'cape_deplacement',
@@ -575,7 +633,8 @@ const dndEpicItems: Treasure[] = [
     icon: '🧣',
     rarity: 'epic',
     description: '+9 Défense (désavantage aux attaques ennemies)',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   {
     id: 'epee_tranchante',
@@ -583,7 +642,8 @@ const dndEpicItems: Treasure[] = [
     icon: '⚔️',
     rarity: 'epic',
     description: '+9 Attaque, coups critiques améliorés',
-    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'baton_mage',
@@ -591,7 +651,8 @@ const dndEpicItems: Treasure[] = [
     icon: '🪄',
     rarity: 'epic',
     description: '+10 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'armure_nain',
@@ -599,7 +660,8 @@ const dndEpicItems: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+10 Défense, résistance au poison',
-    effect: { type: 'stat_boost', stat: 'defense', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 10, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   {
     id: 'anneau_protection',
@@ -607,7 +669,8 @@ const dndEpicItems: Treasure[] = [
     icon: '💍',
     rarity: 'epic',
     description: '+6 Défense et +6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' },
+    equipmentSlot: 'ring1'
   },
   {
     id: 'baguette_eclair',
@@ -615,7 +678,8 @@ const dndEpicItems: Treasure[] = [
     icon: '⚡',
     rarity: 'epic',
     description: 'Apprend "Éclair" (36 dégâts de foudre)',
-    effect: { type: 'skill', skillName: 'Éclair', skillDamage: 36, skillType: 'damage', skillDamageType: 'lightning' }
+    effect: { type: 'skill', skillName: 'Éclair', skillDamage: 36, skillType: 'damage', skillDamageType: 'lightning' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'ioun_force',
@@ -623,7 +687,8 @@ const dndEpicItems: Treasure[] = [
     icon: '💠',
     rarity: 'epic',
     description: '+8 Attaque',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'ioun_insight',
@@ -631,7 +696,8 @@ const dndEpicItems: Treasure[] = [
     icon: '🔷',
     rarity: 'epic',
     description: '+8 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 8, duration: 'permanent' },
+    equipmentSlot: 'trinket2'
   }
 ];
 
@@ -645,7 +711,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '🔥',
     rarity: 'legendary',
     description: '+14 Attaque (Force 25)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' },
+    equipmentSlot: 'belt'
   },
   {
     id: 'ceinture_geant_tempete',
@@ -653,7 +720,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '⛈️',
     rarity: 'legendary',
     description: '+15 Attaque (Force 29)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 15, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 15, duration: 'permanent' },
+    equipmentSlot: 'belt'
   },
   {
     id: 'baton_archimage',
@@ -661,7 +729,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '🪄',
     rarity: 'legendary',
     description: '+14 Attaque Magique et +8 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'anneau_trois_souhaits',
@@ -669,7 +738,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '💫',
     rarity: 'legendary',
     description: '+35 PV max, +8 Attaque, +8 Att. Magique',
-    effect: { type: 'buff', stat: 'maxHp', value: 35 }
+    effect: { type: 'buff', stat: 'maxHp', value: 35 },
+    equipmentSlot: 'ring1'
   },
   {
     id: 'main_vecna',
@@ -677,7 +747,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '✋',
     rarity: 'legendary',
     description: '+12 Attaque Magique, drain de vie',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    equipmentSlot: 'gloves'
   },
   {
     id: 'oeil_vecna',
@@ -685,7 +756,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '👁️',
     rarity: 'legendary',
     description: '+12 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'manuel_exercice',
@@ -693,7 +765,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📘',
     rarity: 'legendary',
     description: '+12 PV max et +10 Attaque permanents',
-    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'tome_comprehension',
@@ -701,7 +774,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📗',
     rarity: 'legendary',
     description: '+12 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 12, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 12, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'tome_pensee',
@@ -709,7 +783,8 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📙',
     rarity: 'legendary',
     description: '+13 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 13, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 13, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   }
 ];
 
@@ -724,7 +799,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '📿',
     rarity: 'common',
     description: '+3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' },
+    equipmentSlot: 'necklace'
   },
   {
     id: 'talisman_gardien',
@@ -732,7 +808,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🔷',
     rarity: 'common',
     description: '+2 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' },
+    equipmentSlot: 'trinket1'
   },
   {
     id: 'pierre_anti_magie',
@@ -740,7 +817,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '💎',
     rarity: 'common',
     description: '+3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' },
+    equipmentSlot: 'trinket2'
   },
   // Rares (+4-6)
   {
@@ -749,7 +827,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🧥',
     rarity: 'rare',
     description: '+6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   {
     id: 'broche_bouclier',
@@ -757,7 +836,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '💠',
     rarity: 'rare',
     description: '+5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    equipmentSlot: 'trinket3'
   },
   {
     id: 'anneau_dissipation',
@@ -765,7 +845,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '💍',
     rarity: 'rare',
     description: '+6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' },
+    equipmentSlot: 'ring2'
   },
   {
     id: 'cape_mage_rebelle',
@@ -773,7 +854,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🧣',
     rarity: 'rare',
     description: '+5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   },
   // Épiques (+8-10)
   {
@@ -782,7 +864,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   {
     id: 'collier_absorption',
@@ -790,7 +873,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '📿',
     rarity: 'epic',
     description: '+10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' },
+    equipmentSlot: 'necklace'
   },
   {
     id: 'bouclier_miroir',
@@ -798,7 +882,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🪞',
     rarity: 'epic',
     description: '+8 Résistance Magique et +5 Défense',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'bouclier_spectral',
@@ -806,7 +891,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '👻',
     rarity: 'epic',
     description: '+9 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   // Légendaires (+12-15)
   {
@@ -815,7 +901,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '⚜️',
     rarity: 'legendary',
     description: '+15 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' },
+    equipmentSlot: 'armor'
   },
   {
     id: 'manteau_archimage_noir',
@@ -823,7 +910,8 @@ const magicResistanceItems: Treasure[] = [
     icon: '🖤',
     rarity: 'legendary',
     description: '+13 Résistance Magique et +8 Att. Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 13, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicDefense', value: 13, duration: 'permanent' },
+    equipmentSlot: 'cloak'
   }
 ];
 
@@ -838,7 +926,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '👢',
     rarity: 'rare',
     description: '+10% Initiative (agit plus tôt)',
-    effect: { type: 'passive', passive: { type: 'initiative', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'initiative', value: 10 } },
+    equipmentSlot: 'boots'
   },
   {
     id: 'anneau_vent',
@@ -846,7 +935,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '💨',
     rarity: 'rare',
     description: '+12% Initiative',
-    effect: { type: 'passive', passive: { type: 'initiative', value: 12 } }
+    effect: { type: 'passive', passive: { type: 'initiative', value: 12 } },
+    equipmentSlot: 'ring1'
   },
   // INITIATIVE - Épiques (15-20%)
   {
@@ -855,7 +945,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🌑',
     rarity: 'epic',
     description: '+18% Initiative',
-    effect: { type: 'passive', passive: { type: 'initiative', value: 18 } }
+    effect: { type: 'passive', passive: { type: 'initiative', value: 18 } },
+    equipmentSlot: 'cloak'
   },
   
   // ÉVASION - Rares (8-12%)
@@ -865,7 +956,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🧣',
     rarity: 'rare',
     description: '10% de chance d\'esquiver',
-    effect: { type: 'passive', passive: { type: 'evasion', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'evasion', value: 10 } },
+    equipmentSlot: 'cloak'
   },
   // ÉVASION - Épiques (15-20%)
   {
@@ -874,7 +966,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '👟',
     rarity: 'epic',
     description: '15% de chance d\'esquiver',
-    effect: { type: 'passive', passive: { type: 'evasion', value: 15 } }
+    effect: { type: 'passive', passive: { type: 'evasion', value: 15 } },
+    equipmentSlot: 'boots'
   },
   {
     id: 'anneau_flou',
@@ -882,7 +975,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '💫',
     rarity: 'epic',
     description: '18% de chance d\'esquiver',
-    effect: { type: 'passive', passive: { type: 'evasion', value: 18 } }
+    effect: { type: 'passive', passive: { type: 'evasion', value: 18 } },
+    equipmentSlot: 'ring2'
   },
   
   // COUPS CRITIQUES - Rares (8-12%)
@@ -892,7 +986,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🗡️',
     rarity: 'rare',
     description: '+10% de chance de coup critique',
-    effect: { type: 'passive', passive: { type: 'critical', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'critical', value: 10 } },
+    equipmentSlot: 'mainHand'
   },
   // COUPS CRITIQUES - Épiques (15-20%)
   {
@@ -901,7 +996,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🎯',
     rarity: 'epic',
     description: '+15% de chance de coup critique',
-    effect: { type: 'passive', passive: { type: 'critical', value: 15 } }
+    effect: { type: 'passive', passive: { type: 'critical', value: 15 } },
+    equipmentSlot: 'ring1'
   },
   // COUPS CRITIQUES - Légendaires (25-35%)
   {
@@ -910,7 +1006,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '⚔️',
     rarity: 'legendary',
     description: '+25% de chance de coup critique',
-    effect: { type: 'passive', passive: { type: 'critical', value: 25 } }
+    effect: { type: 'passive', passive: { type: 'critical', value: 25 } },
+    equipmentSlot: 'mainHand'
   },
   
   // VOL DE VIE - Rares (8-12%)
@@ -920,7 +1017,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🩸',
     rarity: 'rare',
     description: 'Récupère 10% des dégâts en PV',
-    effect: { type: 'passive', passive: { type: 'lifesteal', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 10 } },
+    equipmentSlot: 'mainHand'
   },
   // VOL DE VIE - Épiques (15-20%)
   {
@@ -929,7 +1027,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🧛',
     rarity: 'epic',
     description: 'Récupère 18% des dégâts en PV',
-    effect: { type: 'passive', passive: { type: 'lifesteal', value: 18 } }
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 18 } },
+    equipmentSlot: 'gloves'
   },
   // VOL DE VIE - Légendaires (25-35%)
   {
@@ -938,7 +1037,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '💀',
     rarity: 'legendary',
     description: 'Récupère 28% des dégâts en PV',
-    effect: { type: 'passive', passive: { type: 'lifesteal', value: 28 } }
+    effect: { type: 'passive', passive: { type: 'lifesteal', value: 28 } },
+    equipmentSlot: 'mainHand'
   },
   
   // ÉPINES - Rares (8-12%)
@@ -948,7 +1048,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🌵',
     rarity: 'rare',
     description: 'Renvoie 10% des dégâts reçus',
-    effect: { type: 'passive', passive: { type: 'thorns', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'thorns', value: 10 } },
+    equipmentSlot: 'armor'
   },
   // ÉPINES - Épiques (15-20%)
   {
@@ -957,7 +1058,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🛡️',
     rarity: 'epic',
     description: 'Renvoie 18% des dégâts reçus',
-    effect: { type: 'passive', passive: { type: 'thorns', value: 18 } }
+    effect: { type: 'passive', passive: { type: 'thorns', value: 18 } },
+    equipmentSlot: 'offHand'
   },
   // ÉPINES - Légendaires (25-35%)
   {
@@ -966,7 +1068,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '☠️',
     rarity: 'legendary',
     description: 'Renvoie 30% des dégâts reçus',
-    effect: { type: 'passive', passive: { type: 'thorns', value: 30 } }
+    effect: { type: 'passive', passive: { type: 'thorns', value: 30 } },
+    equipmentSlot: 'armor'
   },
   
   // RÉGÉNÉRATION - Rares (2-3 PV/tour)
@@ -976,7 +1079,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '💚',
     rarity: 'rare',
     description: 'Régénère 3 PV par tour',
-    effect: { type: 'passive', passive: { type: 'regeneration', value: 3 } }
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 3 } },
+    equipmentSlot: 'ring1'
   },
   // RÉGÉNÉRATION - Épiques (4-6 PV/tour)
   {
@@ -985,7 +1089,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🧟',
     rarity: 'epic',
     description: 'Régénère 5 PV par tour',
-    effect: { type: 'passive', passive: { type: 'regeneration', value: 5 } }
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 5 } },
+    equipmentSlot: 'necklace'
   },
   // RÉGÉNÉRATION - Légendaires (8-12 PV/tour)
   {
@@ -994,7 +1099,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🐉',
     rarity: 'legendary',
     description: 'Régénère 10 PV par tour',
-    effect: { type: 'passive', passive: { type: 'regeneration', value: 10 } }
+    effect: { type: 'passive', passive: { type: 'regeneration', value: 10 } },
+    equipmentSlot: 'trinket1'
   },
   
   // RÉSISTANCES ÉLÉMENTAIRES - Toutes Rares (50% réduction)
@@ -1004,7 +1110,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🔥',
     rarity: 'rare',
     description: 'Résistance au feu (50% dégâts)',
-    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'fire' } }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'fire' } },
+    equipmentSlot: 'ring1'
   },
   {
     id: 'anneau_froid',
@@ -1012,7 +1119,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '❄️',
     rarity: 'rare',
     description: 'Résistance au froid (50% dégâts)',
-    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'cold' } }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'cold' } },
+    equipmentSlot: 'ring2'
   },
   {
     id: 'anneau_foudre',
@@ -1020,7 +1128,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '⚡',
     rarity: 'rare',
     description: 'Résistance à la foudre (50% dégâts)',
-    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'lightning' } }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 50, damageType: 'lightning' } },
+    equipmentSlot: 'ring1'
   },
   // RÉSISTANCE MULTI-ÉLÉMENTS - Légendaire
   {
@@ -1029,7 +1138,8 @@ const passiveEffectItems: Treasure[] = [
     icon: '🌈',
     rarity: 'legendary',
     description: 'Résistance à tous les éléments (30%)',
-    effect: { type: 'passive', passive: { type: 'resistance', value: 30, damageType: 'fire' } }
+    effect: { type: 'passive', passive: { type: 'resistance', value: 30, damageType: 'fire' } },
+    equipmentSlot: 'cloak'
   }
 ];
 
@@ -1044,7 +1154,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🗡️',
     rarity: 'legendary',
     description: 'Apprend "Flamme Ardente" (52 dégâts de feu)',
-    effect: { type: 'skill', skillName: 'Flamme Ardente', skillDamage: 52, skillType: 'damage', skillDamageType: 'fire' }
+    effect: { type: 'skill', skillName: 'Flamme Ardente', skillDamage: 52, skillType: 'damage', skillDamageType: 'fire' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'frostbrand',
@@ -1052,7 +1163,8 @@ const iconicDndItems: Treasure[] = [
     icon: '❄️',
     rarity: 'legendary',
     description: 'Apprend "Lame Glaciale" (50 dégâts de froid)',
-    effect: { type: 'skill', skillName: 'Lame Glaciale', skillDamage: 50, skillType: 'damage', skillDamageType: 'cold' }
+    effect: { type: 'skill', skillName: 'Lame Glaciale', skillDamage: 50, skillType: 'damage', skillDamageType: 'cold' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'lame_soleil',
@@ -1060,7 +1172,8 @@ const iconicDndItems: Treasure[] = [
     icon: '☀️',
     rarity: 'legendary',
     description: 'Apprend "Rayon Solaire" (58 dégâts radiants)',
-    effect: { type: 'skill', skillName: 'Rayon Solaire', skillDamage: 58, skillType: 'damage', skillDamageType: 'radiant' }
+    effect: { type: 'skill', skillName: 'Rayon Solaire', skillDamage: 58, skillType: 'damage', skillDamageType: 'radiant' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'lame_neuf_vies',
@@ -1068,7 +1181,8 @@ const iconicDndItems: Treasure[] = [
     icon: '⚔️',
     rarity: 'legendary',
     description: 'Apprend "Frappe Fatale" (55 dégâts tranchants)',
-    effect: { type: 'skill', skillName: 'Frappe Fatale', skillDamage: 55, skillType: 'damage', skillDamageType: 'slashing' }
+    effect: { type: 'skill', skillName: 'Frappe Fatale', skillDamage: 55, skillType: 'damage', skillDamageType: 'slashing' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'orbe_destruction',
@@ -1076,7 +1190,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🔴',
     rarity: 'legendary',
     description: 'Apprend "Rayon Destructeur" (62 dégâts de force)',
-    effect: { type: 'skill', skillName: 'Rayon Destructeur', skillDamage: 62, skillType: 'damage', skillDamageType: 'force' }
+    effect: { type: 'skill', skillName: 'Rayon Destructeur', skillDamage: 62, skillType: 'damage', skillDamageType: 'force' },
+    equipmentSlot: 'trinket1'
   },
   
   // Objets protecteurs épiques
@@ -1086,7 +1201,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🛡️',
     rarity: 'epic',
     description: '+9 Défense et +6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    equipmentSlot: 'offHand'
   },
   {
     id: 'heaume_salut',
@@ -1094,7 +1210,8 @@ const iconicDndItems: Treasure[] = [
     icon: '⛑️',
     rarity: 'epic',
     description: '+22 PV max permanents',
-    effect: { type: 'stat_boost', stat: 'maxHp', value: 22, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'maxHp', value: 22, duration: 'permanent' },
+    equipmentSlot: 'head'
   },
   
   // Objets de soins
@@ -1104,7 +1221,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🪄',
     rarity: 'rare',
     description: 'Apprend "Soin" (25 PV)',
-    effect: { type: 'skill', skillName: 'Soin', skillDamage: 25, skillType: 'heal' }
+    effect: { type: 'skill', skillName: 'Soin', skillDamage: 25, skillType: 'heal' },
+    equipmentSlot: 'mainHand'
   },
   
   // Sorts épiques (30-40 dégâts)
@@ -1114,7 +1232,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🌩️',
     rarity: 'epic',
     description: 'Apprend "Vague de Tonnerre" (35 dégâts de tonnerre)',
-    effect: { type: 'skill', skillName: 'Vague de Tonnerre', skillDamage: 35, skillType: 'damage', skillDamageType: 'thunder' }
+    effect: { type: 'skill', skillName: 'Vague de Tonnerre', skillDamage: 35, skillType: 'damage', skillDamageType: 'thunder' },
+    equipmentSlot: 'mainHand'
   },
   {
     id: 'griffe_dragon_acide',
@@ -1122,7 +1241,8 @@ const iconicDndItems: Treasure[] = [
     icon: '🐲',
     rarity: 'epic',
     description: 'Apprend "Souffle Acide" (33 dégâts d\'acide)',
-    effect: { type: 'skill', skillName: 'Souffle Acide', skillDamage: 33, skillType: 'damage', skillDamageType: 'acid' }
+    effect: { type: 'skill', skillName: 'Souffle Acide', skillDamage: 33, skillType: 'damage', skillDamageType: 'acid' },
+    equipmentSlot: 'gloves'
   },
   
   // Bijoux de puissance
@@ -1132,7 +1252,8 @@ const iconicDndItems: Treasure[] = [
     icon: '👑',
     rarity: 'legendary',
     description: '+14 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' },
+    equipmentSlot: 'head'
   },
   {
     id: 'anneau_champion',
@@ -1140,7 +1261,8 @@ const iconicDndItems: Treasure[] = [
     icon: '💍',
     rarity: 'epic',
     description: '+8 Attaque et +6 Défense',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' }
+    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' },
+    equipmentSlot: 'ring1'
   }
 ];
 
