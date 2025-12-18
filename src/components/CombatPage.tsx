@@ -156,8 +156,6 @@ export function CombatPage() {
     const currentTeam = currentState.team;
     const logs: string[] = [...currentState.combatLog];
     
-    console.log(`[COOLDOWN DEBUG] Processing turn for ${characterId}`);
-    
     const updatedTeam = currentTeam.map(char => {
       if (char.id !== characterId) return char;
       
@@ -188,14 +186,8 @@ export function CombatPage() {
       // =============================================
       if (updatedChar.skills && updatedChar.skills.length > 0) {
         updatedChar.skills = updatedChar.skills.map(skill => {
-          // Debug : log le cooldown actuel
-          if (skill.cooldown && skill.cooldown > 0) {
-            console.log(`[COOLDOWN DEBUG] ${skill.name}: current=${skill.currentCooldown || 0}, max=${skill.cooldown}`);
-          }
-          
           if (skill.currentCooldown && skill.currentCooldown > 0) {
             const newCooldown = skill.currentCooldown - 1;
-            console.log(`[COOLDOWN DEBUG] Decrementing ${skill.name} from ${skill.currentCooldown} to ${newCooldown}`);
             if (newCooldown === 0) {
               logs.push(`⏰ ${updatedChar.name}: ${skill.name} est prêt !`);
             }
@@ -683,7 +675,16 @@ export function CombatPage() {
               damageType: ultimate.damageType || 'magical'
             });
             
-            gameStore.setState({ team: [...team] });
+            // IMPORTANT: Utiliser le state global pour préserver les cooldowns
+            const globalTeam = gameStore.getState().team;
+            const updatedTeamAfterUlt = globalTeam.map(c => {
+              const aliveChar = aliveTeam.find(a => a.id === c.id);
+              if (aliveChar) {
+                return { ...c, hp: aliveChar.hp, buffs: aliveChar.buffs };
+              }
+              return c;
+            });
+            gameStore.setState({ team: updatedTeamAfterUlt });
             checkCombatEnd(logs, null, undefined, enemies);
             setIsAnimating(false);
             return;
@@ -1250,19 +1251,14 @@ export function CombatPage() {
     
     // Appliquer le cooldown à la compétence utilisée - UTILISER L'ÉTAT GLOBAL
     if (skill.cooldown && skill.cooldown > 0) {
-      console.log(`[COOLDOWN DEBUG] Setting cooldown for ${skill.name} to ${skill.cooldown}`);
       const currentTeam = gameStore.getState().team;
       const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
             ...char,
-            skills: char.skills.map(s => {
-              if (s.id === skill.id) {
-                console.log(`[COOLDOWN DEBUG] Found skill ${s.name}, setting currentCooldown = ${skill.cooldown}`);
-                return { ...s, currentCooldown: skill.cooldown };
-              }
-              return s;
-            })
+            skills: char.skills.map(s => 
+              s.id === skill.id ? { ...s, currentCooldown: skill.cooldown } : s
+            )
           };
         }
         return char;
@@ -1270,11 +1266,12 @@ export function CombatPage() {
       gameStore.setState({ team: updatedTeam });
       // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
       attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
-      console.log(`[COOLDOWN DEBUG] After setState, skill cooldown = ${attacker.skills.find(s => s.id === skill.id)?.currentCooldown}`);
     }
     
     if (skill.type === 'heal') {
-      const updatedTeam = [...team];
+      // IMPORTANT: Récupérer le team depuis le STATE GLOBAL pour préserver les cooldowns
+      const currentTeamState = gameStore.getState().team;
+      const updatedTeam = currentTeamState.map(c => ({ ...c, skills: c.skills?.map(s => ({ ...s })) || [] }));
       const targetIndices: number[] = [];
       
       // Déterminer les cibles de soin
@@ -1340,8 +1337,9 @@ export function CombatPage() {
       // Mettre à jour l'équipe
       gameStore.setState({ team: updatedTeam });
     } else if (skill.type === 'buff') {
-      // Créer une copie modifiable de l'équipe
-      const updatedTeam = [...team];
+      // IMPORTANT: Récupérer le team depuis le STATE GLOBAL (pas la closure) pour préserver les cooldowns
+      const currentTeamState = gameStore.getState().team;
+      const updatedTeam = currentTeamState.map(c => ({ ...c, skills: c.skills?.map(s => ({ ...s })) || [] }));
       const targetIndices: number[] = [];
       
       // Déterminer les cibles
