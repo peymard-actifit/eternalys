@@ -3,6 +3,7 @@ import { gameStore } from '../store/gameStore';
 import { GameState, Character, Monster, Skill, MonsterSkill, CombatHistoryEntry, ActiveBuff, InventoryItem } from '../types/game.types';
 import { getMonsterAction, getMonsterTaunt } from '../lib/openai';
 import { getMonsterDrops, applyDropEffect } from '../data/monsterDrops';
+import { CharacterSheet } from './CharacterSheet';
 import './CombatPage.css';
 
 export function CombatPage() {
@@ -26,6 +27,10 @@ export function CombatPage() {
   const [fullRounds, setFullRounds] = useState(0);
   // Effet de dégâts visuels
   const [damageEffect, setDamageEffect] = useState<{ targetId: string; type: 'physical' | 'magical' } | null>(null);
+  // Menu contextuel (clic droit)
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; entity: Character | Monster } | null>(null);
+  // Fiche de personnage/monstre
+  const [showCharacterSheet, setShowCharacterSheet] = useState<Character | Monster | null>(null);
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
@@ -44,6 +49,52 @@ export function CombatPage() {
       setPendingDrops(null);
     }
   }, [state.currentEnemies?.length]);
+
+  // Fermer le menu contextuel quand on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Fermer la fiche avec Échap
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showCharacterSheet) {
+          setShowCharacterSheet(null);
+        } else if (contextMenu) {
+          setContextMenu(null);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showCharacterSheet, contextMenu]);
+
+  // Gérer le clic droit sur une entité
+  const handleContextMenu = (e: React.MouseEvent, entity: Character | Monster) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, entity });
+  };
+
+  // Ouvrir la fiche depuis le menu contextuel
+  const handleExamine = () => {
+    if (contextMenu) {
+      // Récupérer la version à jour de l'entité depuis le state global
+      let entityToShow: Character | Monster = contextMenu.entity;
+      if ('class' in contextMenu.entity) {
+        const updatedChar = gameStore.getState().team.find(c => c.id === contextMenu.entity.id);
+        if (updatedChar) entityToShow = updatedChar;
+      } else {
+        const updatedMonster = gameStore.getState().currentEnemies.find(e => e.id === contextMenu.entity.id);
+        if (updatedMonster) entityToShow = updatedMonster;
+      }
+      setShowCharacterSheet(entityToShow);
+      setContextMenu(null);
+    }
+  };
 
   const { team, currentEnemies, currentEnemy, turnOrder, currentTurnIndex, combatLog, selectedEnemyIndex, bossScaling } = state;
   
@@ -1880,6 +1931,7 @@ export function CombatPage() {
                     key={enemy.id}
                     className={`enemy-card ${isCurrentTurn ? 'active-turn' : ''} ${isSelected ? 'selected' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${dmgType}` : ''}`}
                     onClick={() => !isDead && gameStore.setState({ selectedEnemyIndex: idx })}
+                    onContextMenu={(e) => handleContextMenu(e, enemy)}
                   >
                     <div className="enemy-portrait-container">
                       <div className={`enemy-portrait ${isAnimating && isCurrentTurn ? 'attacking' : ''}`}>
@@ -1975,6 +2027,7 @@ export function CombatPage() {
                   key={character.id} 
                   className={`team-fighter ${isCurrent ? 'active-turn' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${damageType}` : ''}`}
                   title={getStatsTooltip(character)}
+                  onContextMenu={(e) => handleContextMenu(e, character)}
                 >
                   <span className="fighter-portrait">{character.portrait}</span>
                   <div className="fighter-info">
@@ -2246,6 +2299,32 @@ export function CombatPage() {
             )}
           </div>
         </div>
+      )}
+      
+      {/* Menu contextuel (clic droit) */}
+      {contextMenu && (
+        <div 
+          className="context-menu"
+          style={{ 
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            zIndex: 1000
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <button className="context-menu-item" onClick={handleExamine}>
+            🔍 Examiner
+          </button>
+        </div>
+      )}
+      
+      {/* Fiche de personnage/monstre */}
+      {showCharacterSheet && (
+        <CharacterSheet 
+          entity={showCharacterSheet}
+          onClose={() => setShowCharacterSheet(null)}
+        />
       )}
     </div>
   );
