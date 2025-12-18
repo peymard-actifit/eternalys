@@ -279,6 +279,186 @@
   background: linear-gradient(90deg, #c0392b, #e74c3c);
 }
 
+/* PV Temporaires - Effet visuel blanc/doré */
+.temp-hp-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.6) 0%, 
+    rgba(255, 215, 0, 0.4) 50%, 
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border-radius: inherit;
+  animation: tempHpGlow 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes tempHpGlow {
+  0%, 100% { 
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  50% { 
+    opacity: 1;
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.temp-hp-indicator {
+  position: absolute;
+  top: -18px;
+  right: 0;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 255, 255, 0.8));
+  color: #333;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  animation: tempHpPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tempHpPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* === INDICATEUR DE JET D'ATTAQUE === */
+.attack-roll-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, rgba(30, 20, 50, 0.98), rgba(10, 5, 20, 0.98));
+  border: 3px solid #9b59b6;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  z-index: 1500;
+  text-align: center;
+  animation: attackRollAppear 0.3s ease-out;
+  box-shadow: 0 0 50px rgba(155, 89, 182, 0.5);
+}
+
+@keyframes attackRollAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.attack-roll-indicator.hit {
+  border-color: #2ecc71;
+  box-shadow: 0 0 50px rgba(46, 204, 113, 0.5);
+}
+
+.attack-roll-indicator.miss {
+  border-color: #e74c3c;
+  box-shadow: 0 0 50px rgba(231, 76, 60, 0.5);
+}
+
+.attack-roll-indicator.critical {
+  border-color: #ffd700;
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.7);
+  animation: attackRollAppear 0.3s ease-out, criticalShine 0.5s ease infinite alternate;
+}
+
+@keyframes criticalShine {
+  from { box-shadow: 0 0 40px rgba(255, 215, 0, 0.5); }
+  to { box-shadow: 0 0 80px rgba(255, 215, 0, 0.9); }
+}
+
+.roll-header {
+  font-size: 0.9rem;
+  color: #a09080;
+  margin-bottom: 0.5rem;
+}
+
+.roll-dice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.roll-d20 {
+  font-size: 2.5rem;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(155, 89, 182, 0.8);
+}
+
+.roll-d20.nat20 {
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+  animation: nat20Pulse 0.3s ease infinite alternate;
+}
+
+@keyframes nat20Pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+.roll-d20.nat1 {
+  color: #e74c3c;
+  text-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+}
+
+.roll-modifier {
+  font-size: 1.2rem;
+  color: #6a9ac9;
+}
+
+.roll-total {
+  font-size: 1.8rem;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.roll-total.hit {
+  color: #2ecc71;
+}
+
+.roll-total.miss {
+  color: #e74c3c;
+}
+
+.roll-vs-ac {
+  font-size: 0.9rem;
+  color: #a09080;
+}
+
+.roll-result {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+}
+
+.roll-result.hit {
+  background: rgba(46, 204, 113, 0.3);
+  color: #2ecc71;
+}
+
+.roll-result.miss {
+  background: rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+}
+
+.roll-result.critical {
+  background: rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  font-size: 1.3rem;
+}
+
 .enemy-hp-bar .hp-text,
 .fighter-hp-bar .hp-text {
   position: absolute;
@@ -853,13 +1033,9 @@
 }
 
 .combat-history-panel.expanded {
-  max-height: 500px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 320px;
+  max-height: 400px;
   z-index: 100;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
 
 .history-header {

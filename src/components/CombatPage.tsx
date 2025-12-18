@@ -4,6 +4,17 @@ import { GameState, Character, Monster, Skill, MonsterSkill, CombatHistoryEntry,
 import { getMonsterAction, getMonsterTaunt } from '../lib/openai';
 import { getMonsterDrops, applyDropEffect } from '../data/monsterDrops';
 import { CharacterSheet } from './CharacterSheet';
+import { DiceRoller, rollDice } from './DiceRoller';
+import { 
+  makeAttackRoll, 
+  rollDamage, 
+  applyTemporaryHp, 
+  applyDamageWithTempHp,
+  hasAdvantageOnAttack,
+  hasDisadvantageOnAttack,
+  AttackRollResult,
+  DamageRollResult
+} from '../utils/dndMechanics';
 import './CombatPage.css';
 
 export function CombatPage() {
@@ -32,6 +43,27 @@ export function CombatPage() {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; entity: Character | Monster } | null>(null);
   // Fiche de personnage/monstre
   const [showCharacterSheet, setShowCharacterSheet] = useState<Character | Monster | null>(null);
+  // Animation de jet de dés
+  const [showDiceRoll, setShowDiceRoll] = useState<{
+    type: 'attack' | 'damage' | 'heal' | 'save';
+    dieType: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
+    count: number;
+    modifier: number;
+    damageType?: string;
+    label?: string;
+    onComplete: (result: any) => void;
+  } | null>(null);
+  // Résultat du dernier jet d'attaque (pour affichage)
+  const [lastAttackResult, setLastAttackResult] = useState<{
+    roll: number;
+    modifier: number;
+    total: number;
+    targetAC: number;
+    hit: boolean;
+    isCritical: boolean;
+    attacker: string;
+    target: string;
+  } | null>(null);
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
@@ -66,12 +98,22 @@ export function CombatPage() {
           setShowCharacterSheet(null);
         } else if (contextMenu) {
           setContextMenu(null);
+        } else if (lastAttackResult) {
+          setLastAttackResult(null);
         }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showCharacterSheet, contextMenu]);
+  }, [showCharacterSheet, contextMenu, lastAttackResult]);
+  
+  // Auto-fermer l'indicateur de jet d'attaque après 2 secondes
+  useEffect(() => {
+    if (lastAttackResult) {
+      const timer = setTimeout(() => setLastAttackResult(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAttackResult]);
 
   // Gérer le clic droit sur une entité
   const handleContextMenu = (e: React.MouseEvent, entity: Character | Monster) => {
@@ -1220,18 +1262,59 @@ export function CombatPage() {
     const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
     const logs = [...combatLog];
     
-    // Vérifier le coup critique
-    const critCheck = checkCritical(attacker);
+    // === JET DE TOUCHE D&D 5e ===
+    const hasAdvantage = hasAdvantageOnAttack(attacker, target);
+    const hasDisadvantage = hasDisadvantageOnAttack(attacker, target);
+    const attackResult = makeAttackRoll(attacker, target, false, hasAdvantage, hasDisadvantage);
     
-    // Attaque de base = valeur d'attaque du personnage (pas de bonus supplémentaire)
-    // Les dégâts suivent directement la stat d'attaque (avec buffs/debuffs appliqués)
-    const baseDamage = attacker.attack;
+    // Afficher le résultat du jet
+    setLastAttackResult({
+      roll: attackResult.attackRoll.rolls[0],
+      modifier: attackResult.totalAttackBonus,
+      total: attackResult.attackRoll.total,
+      targetAC: attackResult.targetAC,
+      hit: attackResult.hit,
+      isCritical: attackResult.isCriticalHit,
+      attacker: attacker.name,
+      target: target.name
+    });
+    
+    // Log du jet de touche
+    const rollText = hasAdvantage ? '🎲🎲 (Avantage)' : hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
+    logs.push(`${rollText} Jet d'attaque: ${attackResult.attackRoll.rolls[0]} + ${attackResult.totalAttackBonus} = ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`);
+    
+    // Si l'attaque rate
+    if (!attackResult.hit) {
+      logs.push(`❌ ${attacker.name} rate son attaque contre ${target.name} !`);
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: attacker.name,
+        actorPortrait: attacker.portrait,
+        action: attackResult.isCriticalMiss ? 'Échec critique!' : 'Raté',
+        target: target.name,
+        effect: `🎲 ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`,
+        isPlayerAction: true,
+        damageType: 'physical'
+      });
+      
+      checkCombatEnd(logs, attacker.id, undefined, enemies);
+      setIsAnimating(false);
+      return;
+    }
+    
+    // === CALCUL DES DÉGÂTS ===
+    const isCritical = attackResult.isCriticalHit;
+    
+    // Jet de dégâts avec les dés
+    const damageResult = rollDamage(attacker.attack, 'physical', isCritical, 0);
+    let damage = damageResult.totalDamage;
+    
+    // Appliquer la défense
     const defense = target.defense;
-    let damage = Math.max(1, baseDamage - defense);
+    damage = Math.max(1, damage - defense);
     
-    // Appliquer le critique
-    if (critCheck.isCritical) {
-      damage = Math.floor(damage * 2);
+    if (isCritical) {
       logs.push(`💥 COUP CRITIQUE ! ${attacker.name} frappe avec puissance !`);
     }
     
@@ -1269,14 +1352,15 @@ export function CombatPage() {
       turn: combatTurn,
       actor: attacker.name,
       actorPortrait: attacker.portrait,
-      action: critCheck.isCritical ? 'Attaque CRITIQUE!' : 'Attaque',
+      action: isCritical ? 'Attaque CRITIQUE!' : 'Attaque',
       target: target.name,
       damage,
+      effect: `🎲 ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`,
       isPlayerAction: true,
       damageType: 'physical'
     });
     
-    logs.push(`${attacker.name} inflige ${damage} dégâts à ${target.name} !`);
+    logs.push(`${attacker.name} inflige ${damage} dégâts (${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''}) à ${target.name} !`);
     
     // Vérifier si l'ennemi ciblé est mort
     const killedEnemy = target.hp <= 0 ? { ...target } : undefined;
@@ -1381,11 +1465,29 @@ export function CombatPage() {
       }
       
       let totalHealing = 0;
+      
+      // Vérifier si c'est une compétence de PV temporaires (Simulacre de vie)
+      const isTempHpSkill = skill.id === 'false_life' || skill.name.toLowerCase().includes('simulacre');
+      
       targetIndices.forEach(idx => {
         const t = updatedTeam[idx];
-        const healAmount = Math.min(Math.abs(skill.damage), t.maxHp - t.hp);
-        t.hp = Math.min(t.maxHp, t.hp + Math.abs(skill.damage));
-        totalHealing += healAmount;
+        
+        if (isTempHpSkill) {
+          // PV TEMPORAIRES - Jet de dés: 1d4+4
+          const tempHpRoll = rollDice('d4', 1, 4);
+          const tempHpAmount = tempHpRoll.total;
+          
+          // Les PV temporaires ne s'accumulent pas - on garde le max
+          const currentTempHp = t.temporaryHp || 0;
+          t.temporaryHp = Math.max(currentTempHp, tempHpAmount);
+          
+          logs.push(`✨ ${t.name} gagne ${tempHpAmount} PV temporaires (🎲 ${tempHpRoll.rolls[0]}+4) !`);
+        } else {
+          // Soin normal
+          const healAmount = Math.min(Math.abs(skill.damage), t.maxHp - t.hp);
+          t.hp = Math.min(t.maxHp, t.hp + Math.abs(skill.damage));
+          totalHealing += healAmount;
+        }
         
         if (skill.healOverTime) {
           const regen: ActiveBuff = {
@@ -1402,16 +1504,24 @@ export function CombatPage() {
         }
       });
       
-      trackHealing(attacker.id, totalHealing);
+      if (!isTempHpSkill) {
+        trackHealing(attacker.id, totalHealing);
+      }
       
       if (targetIndices.length > 1) {
-        logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe ! (+${Math.abs(skill.damage)} PV chacun)`);
+        if (isTempHpSkill) {
+          logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe !`);
+        } else {
+          logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe ! (+${Math.abs(skill.damage)} PV chacun)`);
+        }
         if (skill.healOverTime) {
           logs.push(`Toute l'équipe régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
         }
       } else if (targetIndices.length === 1) {
         const t = updatedTeam[targetIndices[0]];
-        logs.push(`${attacker.name} utilise ${skill.name} sur ${t.name} ! (+${Math.abs(skill.damage)} PV)`);
+        if (!isTempHpSkill) {
+          logs.push(`${attacker.name} utilise ${skill.name} sur ${t.name} ! (+${Math.abs(skill.damage)} PV)`);
+        }
         if (skill.healOverTime) {
           logs.push(`${t.name} régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
         }
@@ -2071,7 +2181,22 @@ export function CombatPage() {
                           background: getHpBarColor(character.hp, character.maxHp)
                         }}
                       ></div>
-                      <span className="hp-text">{Math.max(0, character.hp)}/{character.maxHp}</span>
+                      {/* PV Temporaires - Effet visuel */}
+                      {character.temporaryHp && character.temporaryHp > 0 && (
+                        <>
+                          <div 
+                            className="temp-hp-fill" 
+                            style={{ 
+                              width: `${Math.min(100, (character.temporaryHp / character.maxHp) * 100)}%`
+                            }}
+                          ></div>
+                          <span className="temp-hp-indicator">+{character.temporaryHp} temp</span>
+                        </>
+                      )}
+                      <span className="hp-text">
+                        {Math.max(0, character.hp)}/{character.maxHp}
+                        {character.temporaryHp && character.temporaryHp > 0 && ` (+${character.temporaryHp})`}
+                      </span>
                     </div>
                     <div className="fighter-all-stats stats-with-tooltip">
                       <span className={getStatModClass(character, 'attack')}>
@@ -2354,6 +2479,36 @@ export function CombatPage() {
           entity={showCharacterSheet}
           onClose={() => setShowCharacterSheet(null)}
         />
+      )}
+      
+      {/* Indicateur de jet d'attaque D&D */}
+      {lastAttackResult && (
+        <div 
+          className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''}`}
+          onClick={() => setLastAttackResult(null)}
+        >
+          <div className="roll-header">
+            {lastAttackResult.attacker} → {lastAttackResult.target}
+          </div>
+          <div className="roll-dice">
+            <span className="roll-emoji">🎲</span>
+            <span className={`roll-d20 ${lastAttackResult.roll === 20 ? 'nat20' : lastAttackResult.roll === 1 ? 'nat1' : ''}`}>
+              {lastAttackResult.roll}
+            </span>
+            <span className="roll-modifier">
+              +{lastAttackResult.modifier}
+            </span>
+          </div>
+          <div className={`roll-total ${lastAttackResult.hit ? 'hit' : 'miss'}`}>
+            = {lastAttackResult.total}
+          </div>
+          <div className="roll-vs-ac">
+            vs CA {lastAttackResult.targetAC}
+          </div>
+          <div className={`roll-result ${lastAttackResult.isCritical ? 'critical' : lastAttackResult.hit ? 'hit' : 'miss'}`}>
+            {lastAttackResult.isCritical ? '💥 CRITIQUE !' : lastAttackResult.hit ? '✓ TOUCHÉ' : '✗ RATÉ'}
+          </div>
+        </div>
       )}
     </div>
   );
