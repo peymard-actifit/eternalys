@@ -325,113 +325,250 @@
   align-items: center;
 }
 
-/* Equipment Grid - Nouvelle disposition en grille */
-.equipment-grid {
+/* Equipment Paperdoll - Style Pathfinder/BG3 */
+.equipment-paperdoll {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  align-items: center;
   width: 100%;
+  padding: 0.5rem;
 }
 
-.equipment-row {
+.paperdoll-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.5rem;
+  background: 
+    radial-gradient(ellipse 60% 100% at center, rgba(139, 115, 85, 0.08) 0%, transparent 70%);
+  border-radius: 8px;
+}
+
+/* Silhouette de corps en arrière-plan */
+.paperdoll-body::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 85%;
+  background: 
+    radial-gradient(ellipse 35px 25px at 50% 8%, rgba(139, 115, 85, 0.15) 0%, transparent 100%),
+    radial-gradient(ellipse 60px 70px at 50% 45%, rgba(139, 115, 85, 0.1) 0%, transparent 100%),
+    radial-gradient(ellipse 25px 40px at 30% 50%, rgba(139, 115, 85, 0.08) 0%, transparent 100%),
+    radial-gradient(ellipse 25px 40px at 70% 50%, rgba(139, 115, 85, 0.08) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.paperdoll-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
 }
 
-.equipment-row.single {
-  justify-content: center;
+.slot-spacer {
+  width: 48px;
+  height: 48px;
 }
 
-.equipment-row.trinkets {
+/* Rangée tête - légèrement plus grande */
+.paperdoll-row.head-row .equipment-slot {
+  width: 54px;
+  height: 54px;
+}
+
+/* Rangée épaules - espacée */
+.paperdoll-row.shoulders-row {
+  gap: 0.8rem;
+  margin-top: -0.2rem;
+}
+
+.paperdoll-row.shoulders-row .equipment-slot {
+  width: 46px;
+  height: 46px;
+}
+
+/* Rangée torse - armes plus grandes */
+.paperdoll-row.torso-row {
   gap: 0.3rem;
 }
 
-.equipment-row.consumables {
+.paperdoll-row.torso-row .equipment-slot:first-child,
+.paperdoll-row.torso-row .equipment-slot:last-child {
+  width: 50px;
+  height: 58px;
+}
+
+.paperdoll-row.torso-row .equipment-slot:nth-child(2) {
+  width: 56px;
+  height: 56px;
+}
+
+/* Rangée bras */
+.paperdoll-row.arms-row {
   gap: 0.5rem;
 }
 
-.section-title {
-  font-family: 'Cinzel', serif;
-  font-size: 0.8rem;
-  color: #8b7355;
-  text-align: center;
-  margin: 0.5rem 0 0.3rem 0;
+.paperdoll-row.arms-row .equipment-slot {
+  width: 46px;
+  height: 46px;
+}
+
+/* Rangée ceinture */
+.paperdoll-row.belt-row {
+  gap: 0.4rem;
+}
+
+.paperdoll-row.belt-row .equipment-slot:first-child,
+.paperdoll-row.belt-row .equipment-slot:last-child {
+  width: 40px;
+  height: 40px;
+}
+
+.paperdoll-row.belt-row .equipment-slot:nth-child(2) {
+  width: 52px;
+  height: 44px;
+}
+
+/* Rangée pieds */
+.paperdoll-row.feet-row {
+  margin-top: 0.2rem;
+}
+
+.paperdoll-row.feet-row .equipment-slot {
+  width: 52px;
+  height: 48px;
+}
+
+/* Section accessoires */
+.accessory-section {
+  width: 100%;
+  margin-top: 0.6rem;
   padding-top: 0.5rem;
   border-top: 1px solid #5c4a3a;
 }
 
-/* Equipment Slot */
-.equipment-slot {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
+.accessory-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  color: #8b7355;
+  text-align: center;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.5px;
 }
 
-.equipment-row.trinkets .equipment-slot {
-  width: 46px;
-  height: 46px;
+.accessory-slots {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.accessory-slots.trinkets-row .equipment-slot {
+  width: 42px;
+  height: 42px;
+}
+
+.accessory-slots.consumables-row .equipment-slot {
+  width: 44px;
+  height: 44px;
+}
+
+/* Equipment Slot - Style BG3/Pathfinder */
+.equipment-slot {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .equipment-slot .slot-background {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #2a2016, #1a1410);
-  border: 2px solid #5c4a3a;
-  border-radius: 6px;
+  background: 
+    linear-gradient(135deg, rgba(42, 32, 22, 0.95) 0%, rgba(26, 20, 16, 0.95) 100%);
+  border: 2px solid #4a3a2a;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
+  box-shadow: 
+    inset 0 1px 0 rgba(139, 115, 85, 0.1),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .equipment-slot:hover .slot-background {
-  border-color: #8b7355;
-  box-shadow: 0 0 15px rgba(201, 166, 107, 0.3);
-  transform: scale(1.08);
+  border-color: #c9a66b;
+  box-shadow: 
+    inset 0 1px 0 rgba(139, 115, 85, 0.2),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(201, 166, 107, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
 }
 
 .equipment-slot.equipped .slot-background {
-  background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+  background: 
+    linear-gradient(135deg, rgba(58, 42, 26, 0.98) 0%, rgba(42, 26, 10, 0.98) 100%);
+  border-color: #6a5a4a;
 }
 
 .equipment-slot.selected .slot-background {
-  border-color: #c9a66b;
-  box-shadow: 0 0 20px rgba(201, 166, 107, 0.5);
+  border-color: #ffd700;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 215, 0, 0.2),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .equipment-slot .empty-slot-icon {
-  font-size: 1.3rem;
-  opacity: 0.3;
-}
-
-.equipment-row.trinkets .equipment-slot .empty-slot-icon {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  opacity: 0.25;
+  filter: grayscale(0.5);
 }
 
 .equipment-slot .equipped-item-icon {
-  font-size: 1.6rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+  transition: transform 0.15s ease;
 }
 
-.equipment-row.trinkets .equipment-slot .equipped-item-icon {
-  font-size: 1.4rem;
+.equipment-slot:hover .equipped-item-icon {
+  transform: scale(1.1);
 }
 
+/* Slots plus petits */
+.accessory-slots .equipment-slot .empty-slot-icon {
+  font-size: 1rem;
+}
+
+.accessory-slots .equipment-slot .equipped-item-icon {
+  font-size: 1.3rem;
+}
+
+/* Labels cachés par défaut */
 .equipment-slot .slot-label {
   position: absolute;
-  bottom: -16px;
+  bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   color: #8b7355;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.15s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .equipment-slot:hover .slot-label {

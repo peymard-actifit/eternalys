@@ -412,61 +412,69 @@ export function InventoryModal() {
                 </div>
               </div>
 
-              {/* Zone centrale: Équipements en grille */}
+              {/* Zone centrale: Équipements style Pathfinder/BG3 */}
               <div className="character-model-zone">
-                <div className="character-model no-portrait">
-                  {/* Emplacements d'équipement en grille */}
-                  <div className="equipment-grid">
-                    {/* Ligne 1: Tête, Collier, Cape */}
-                    <div className="equipment-row">
+                <div className="equipment-paperdoll">
+                  {/* Silhouette de personnage avec emplacements */}
+                  <div className="paperdoll-body">
+                    {/* Rangée haute: Tête + accessoires */}
+                    <div className="paperdoll-row head-row">
+                      <div className="slot-spacer"></div>
                       {renderEquipmentSlot('head')}
+                      <div className="slot-spacer"></div>
+                    </div>
+                    
+                    {/* Rangée cou/épaules */}
+                    <div className="paperdoll-row shoulders-row">
                       {renderEquipmentSlot('necklace')}
                       {renderEquipmentSlot('cloak')}
                     </div>
                     
-                    {/* Ligne 2: Arme principale, Armure, Arme secondaire */}
-                    <div className="equipment-row">
+                    {/* Rangée torse: Armes + Armure */}
+                    <div className="paperdoll-row torso-row">
                       {renderEquipmentSlot('mainHand')}
                       {renderEquipmentSlot('armor')}
                       {renderEquipmentSlot('offHand')}
                     </div>
                     
-                    {/* Ligne 3: Avant-bras, Gants, Arme distance */}
-                    <div className="equipment-row">
+                    {/* Rangée bras: Avant-bras + Gants + Arc */}
+                    <div className="paperdoll-row arms-row">
                       {renderEquipmentSlot('bracers')}
                       {renderEquipmentSlot('gloves')}
                       {renderEquipmentSlot('ranged')}
                     </div>
                     
-                    {/* Ligne 4: Anneaux, Ceinture */}
-                    <div className="equipment-row">
+                    {/* Rangée ceinture: Anneaux + Ceinture */}
+                    <div className="paperdoll-row belt-row">
                       {renderEquipmentSlot('ring1')}
                       {renderEquipmentSlot('belt')}
                       {renderEquipmentSlot('ring2')}
                     </div>
                     
-                    {/* Ligne 5: Bottes */}
-                    <div className="equipment-row single">
+                    {/* Rangée pieds */}
+                    <div className="paperdoll-row feet-row">
+                      <div className="slot-spacer"></div>
                       {renderEquipmentSlot('boots')}
+                      <div className="slot-spacer"></div>
                     </div>
-                    
-                    {/* Séparateur Breloques */}
-                    <div className="section-title">🔮 Breloques</div>
-                    
-                    {/* Ligne 6: Breloques */}
-                    <div className="equipment-row trinkets">
+                  </div>
+                  
+                  {/* Section Breloques */}
+                  <div className="accessory-section">
+                    <div className="accessory-title">🔮 Breloques</div>
+                    <div className="accessory-slots trinkets-row">
                       {renderEquipmentSlot('trinket1')}
                       {renderEquipmentSlot('trinket2')}
                       {renderEquipmentSlot('trinket3')}
                       {renderEquipmentSlot('trinket4')}
                       {renderEquipmentSlot('trinket5')}
                     </div>
-                    
-                    {/* Séparateur Consommables */}
-                    <div className="section-title">🧪 Consommables</div>
-                    
-                    {/* Ligne 7: Consommables */}
-                    <div className="equipment-row consumables">
+                  </div>
+                  
+                  {/* Section Consommables */}
+                  <div className="accessory-section">
+                    <div className="accessory-title">🧪 Consommables</div>
+                    <div className="accessory-slots consumables-row">
                       {renderEquipmentSlot('consumable1')}
                       {renderEquipmentSlot('consumable2')}
                       {renderEquipmentSlot('consumable3')}
