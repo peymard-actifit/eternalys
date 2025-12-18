@@ -96,17 +96,6 @@ function App() {
       {showInventory && <InventoryModal />}
       {showPauseMenu && <PauseMenu />}
       
-      {/* Indicateurs de touches */}
-      {showHints && !showInventory && !showPauseMenu && (
-        <div className="keyboard-hints">
-          <span className="hint-item">
-            <kbd>I</kbd> Inventaire
-          </span>
-          <span className="hint-item">
-            <kbd>Échap</kbd> Menu
-          </span>
-        </div>
-      )}
     </div>
   );
 }

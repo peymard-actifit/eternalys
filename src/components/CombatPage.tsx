@@ -1738,22 +1738,7 @@ export function CombatPage() {
 
           <div className="versus">VS</div>
 
-          <div className="team-panel">
-            <div className="team-actions">
-              <button 
-                className="team-action-btn inventory"
-                onClick={() => gameStore.setState({ showInventory: true })}
-              >
-                🎒 Inventaire
-              </button>
-              <button 
-                className="team-action-btn menu"
-                onClick={() => gameStore.setState({ showPauseMenu: true })}
-              >
-                ⏸️ Menu
-              </button>
-            </div>
-            <div className="team-section">
+          <div className="team-section">
             {team.map(character => {
               const isCurrent = currentTurn && 'id' in currentTurn && currentTurn.id === character.id;
               const isDead = character.hp <= 0;
@@ -1809,14 +1794,29 @@ export function CombatPage() {
                 </div>
               );
             })}
-            </div>
           </div>
         </div>
       </div>
 
       {isPlayerTurn && !isAnimating && !selectingTarget && (currentTurn as Character).hp > 0 && (
         <div className="combat-actions">
-          <h4>Actions de {(currentTurn as Character).name}</h4>
+          <div className="actions-header">
+            <div className="action-panel-buttons">
+              <button 
+                className="action-panel-btn inventory"
+                onClick={() => gameStore.setState({ showInventory: true })}
+              >
+                🎒 Inventaire
+              </button>
+              <button 
+                className="action-panel-btn menu"
+                onClick={() => gameStore.setState({ showPauseMenu: true })}
+              >
+                ⏸️ Menu
+              </button>
+            </div>
+            <h4>📜 Actions de {(currentTurn as Character).name}</h4>
+          </div>
           <div className="action-buttons">
             <div className="skill-btn-wrapper">
               <button className="action-btn attack" onClick={handleAttack}>

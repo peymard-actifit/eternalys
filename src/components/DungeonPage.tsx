@@ -229,6 +229,20 @@ export function DungeonPage() {
       <div className="dungeon-layout">
         {/* Panel équipe */}
         <div className="team-panel">
+          <div className="panel-action-buttons">
+            <button 
+              className="panel-btn inventory"
+              onClick={() => gameStore.setState({ showInventory: true })}
+            >
+              🎒 Inventaire
+            </button>
+            <button 
+              className="panel-btn menu"
+              onClick={() => gameStore.setState({ showPauseMenu: true })}
+            >
+              ⏸️ Menu
+            </button>
+          </div>
           <h3>👥 Équipe - Niveau {state.dungeonLevel}</h3>
           {team.map(character => (
             <div key={character.id} className={`team-member ${character.hp <= 0 ? 'dead' : ''}`}>
@@ -266,20 +280,6 @@ export function DungeonPage() {
               </div>
             </div>
           ))}
-          <div className="action-buttons">
-            <button 
-              className="inventory-btn"
-              onClick={() => gameStore.setState({ showInventory: true })}
-            >
-              🎒 Inventaire (I)
-            </button>
-            <button 
-              className="menu-btn"
-              onClick={() => gameStore.setState({ showPauseMenu: true })}
-            >
-              ⏸️ Menu (Échap)
-            </button>
-          </div>
         </div>
 
         {/* Carte du donjon */}

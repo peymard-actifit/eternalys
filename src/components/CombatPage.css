@@ -120,53 +120,6 @@
   animation: combatPulse 1s ease-in-out infinite;
 }
 
-/* Team Panel avec boutons au-dessus */
-.team-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.team-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.team-action-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid;
-}
-
-.team-action-btn.inventory {
-  background: linear-gradient(135deg, #3a2a1a, #5c4a3a);
-  border-color: #8b7355;
-  color: #e8d5b5;
-}
-
-.team-action-btn.menu {
-  background: linear-gradient(135deg, #2a2a3a, #3a3a5c);
-  border-color: #5555aa;
-  color: #b8b8e8;
-}
-
-.team-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.team-action-btn.inventory:hover {
-  background: linear-gradient(135deg, #5c4a3a, #8b7355);
-}
-
-.team-action-btn.menu:hover {
-  background: linear-gradient(135deg, #3a3a5c, #5555aa);
-}
 
 @keyframes combatPulse {
   0%, 100% { text-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
@@ -434,10 +387,61 @@
   width: 100%;
 }
 
+.actions-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.action-panel-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-panel-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.action-panel-btn.inventory {
+  background: linear-gradient(135deg, #3a2a1a, #5c4a3a);
+  border-color: #8b7355;
+  color: #e8d5b5;
+}
+
+.action-panel-btn.menu {
+  background: linear-gradient(135deg, #2a2a3a, #3a3a5c);
+  border-color: #5555aa;
+  color: #b8b8e8;
+}
+
+.action-panel-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.action-panel-btn.inventory:hover {
+  background: linear-gradient(135deg, #5c4a3a, #8b7355);
+}
+
+.action-panel-btn.menu:hover {
+  background: linear-gradient(135deg, #3a3a5c, #5555aa);
+}
+
 .combat-actions h4 {
   font-family: 'Cinzel', serif;
   color: #9b59b6;
-  margin: 0 0 1rem 0;
+  margin: 0;
   text-align: center;
 }
 
