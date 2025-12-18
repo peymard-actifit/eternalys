@@ -360,40 +360,50 @@ export function CombatPage() {
   };
 
   // Tracker les stats de combat
+  // IMPORTANT: Utiliser gameStore.getState().team pour avoir les cooldowns à jour !
   const trackDamageDealt = (attackerId: string, damage: number) => {
-    const team = [...state.team];
-    const attacker = team.find(c => c.id === attackerId);
-    if (attacker) {
-      if (!attacker.stats) {
-        attacker.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+    const currentTeam = gameStore.getState().team;
+    const updatedTeam = currentTeam.map(c => {
+      if (c.id === attackerId) {
+        const stats = c.stats || { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+        return {
+          ...c,
+          stats: { ...stats, totalDamageDealt: stats.totalDamageDealt + damage }
+        };
       }
-      attacker.stats.totalDamageDealt += damage;
-      gameStore.setState({ team });
-    }
+      return c;
+    });
+    gameStore.setState({ team: updatedTeam });
   };
 
   const trackDamageTaken = (targetId: string, damage: number) => {
-    const team = [...state.team];
-    const target = team.find(c => c.id === targetId);
-    if (target) {
-      if (!target.stats) {
-        target.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+    const currentTeam = gameStore.getState().team;
+    const updatedTeam = currentTeam.map(c => {
+      if (c.id === targetId) {
+        const stats = c.stats || { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+        return {
+          ...c,
+          stats: { ...stats, totalDamageTaken: stats.totalDamageTaken + damage }
+        };
       }
-      target.stats.totalDamageTaken += damage;
-      gameStore.setState({ team });
-    }
+      return c;
+    });
+    gameStore.setState({ team: updatedTeam });
   };
 
   const trackHealing = (healerId: string, healing: number) => {
-    const team = [...state.team];
-    const healer = team.find(c => c.id === healerId);
-    if (healer) {
-      if (!healer.stats) {
-        healer.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+    const currentTeam = gameStore.getState().team;
+    const updatedTeam = currentTeam.map(c => {
+      if (c.id === healerId) {
+        const stats = c.stats || { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+        return {
+          ...c,
+          stats: { ...stats, totalHealingDone: stats.totalHealingDone + healing }
+        };
       }
-      healer.stats.totalHealingDone += healing;
-      gameStore.setState({ team });
-    }
+      return c;
+    });
+    gameStore.setState({ team: updatedTeam });
   };
 
   // Choisir la cible du monstre en tenant compte de la Provocation
@@ -463,20 +473,29 @@ export function CombatPage() {
   };
 
   const trackMonsterKill = (killerId: string, monster: Monster) => {
-    const team = [...state.team];
-    const killer = team.find(c => c.id === killerId);
-    if (killer) {
-      if (!killer.stats) {
-        killer.stats = { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+    // IMPORTANT: Utiliser gameStore.getState().team pour préserver les cooldowns !
+    const currentTeam = gameStore.getState().team;
+    const updatedTeam = currentTeam.map(c => {
+      if (c.id === killerId) {
+        const stats = c.stats || { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
+        const updatedMonstersKilled = [...stats.monstersKilled, { ...monster }];
+        // Mettre à jour le monstre le plus puissant
+        let strongestMonster = stats.strongestMonsterKilled;
+        if (!strongestMonster || (monster.attack + monster.defense) > (strongestMonster.attack + strongestMonster.defense)) {
+          strongestMonster = { ...monster };
+        }
+        return {
+          ...c,
+          stats: { 
+            ...stats, 
+            monstersKilled: updatedMonstersKilled,
+            strongestMonsterKilled: strongestMonster
+          }
+        };
       }
-      killer.stats.monstersKilled.push({ ...monster });
-      // Mettre à jour le monstre le plus puissant
-      if (!killer.stats.strongestMonsterKilled || 
-          (monster.attack + monster.defense) > (killer.stats.strongestMonsterKilled.attack + killer.stats.strongestMonsterKilled.defense)) {
-        killer.stats.strongestMonsterKilled = { ...monster };
-      }
-      gameStore.setState({ team });
-    }
+      return c;
+    });
+    gameStore.setState({ team: updatedTeam });
   };
 
   // Calculer les dégâts en tenant compte du type (physique/magique)
@@ -1305,23 +1324,12 @@ export function CombatPage() {
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
     
-    // DEBUG: Log skill cooldown info
-    console.log(`[SKILL DEBUG] Executing ${skill.name}:`);
-    console.log(`  - skill.id: ${skill.id}`);
-    console.log(`  - skill.cooldown: ${skill.cooldown}`);
-    console.log(`  - skill.currentCooldown: ${skill.currentCooldown}`);
-    
     // IMPORTANT: Récupérer l'attacker depuis le STATE GLOBAL pour avoir les passiveEffects à jour
     let currentTeam = gameStore.getState().team;
     let attacker = currentTeam.find(c => c.id === attackerParam.id) || attackerParam;
     
-    // DEBUG: Log attacker skills
-    const attackerSkill = attacker.skills.find(s => s.id === skill.id);
-    console.log(`  - Attacker skill in state: cooldown=${attackerSkill?.cooldown}, currentCooldown=${attackerSkill?.currentCooldown}`);
-    
     // Appliquer le cooldown à la compétence utilisée
     if (skill.cooldown && skill.cooldown > 0) {
-      console.log(`  - Applying cooldown: ${skill.cooldown}`);
       const updatedTeam = currentTeam.map(char => {
         if (char.id === attacker.id) {
           return {
@@ -1335,17 +1343,9 @@ export function CombatPage() {
       });
       gameStore.setState({ team: updatedTeam });
       
-      // DEBUG: Verify cooldown was applied
-      const verifyTeam = gameStore.getState().team;
-      const verifyChar = verifyTeam.find(c => c.id === attacker.id);
-      const verifySkill = verifyChar?.skills.find(s => s.id === skill.id);
-      console.log(`  - After setState: currentCooldown=${verifySkill?.currentCooldown}`);
-      
       // Mettre à jour aussi l'attacker local pour que les actions suivantes aient le bon state
       attacker = updatedTeam.find(c => c.id === attacker.id) || attacker;
       currentTeam = updatedTeam;
-    } else {
-      console.log(`  - NO cooldown to apply (cooldown=${skill.cooldown})`);
     }
     
     if (skill.type === 'heal') {
@@ -1760,19 +1760,29 @@ export function CombatPage() {
   const handleAssignDrop = (characterId: string) => {
     if (!selectingDropCharacter || !pendingDrops) return;
     
-    const team = [...state.team];
-    const character = team.find(c => c.id === characterId);
+    // IMPORTANT: Utiliser gameStore.getState().team pour préserver les cooldowns !
+    const currentTeam = gameStore.getState().team;
+    const character = currentTeam.find(c => c.id === characterId);
     if (!character) return;
     
+    // Créer une copie du personnage pour appliquer les effets
+    const characterCopy = { 
+      ...character, 
+      skills: character.skills?.map(s => ({ ...s })) || [],
+      inventory: [...(character.inventory || [])]
+    };
+    
     // Appliquer les effets de l'objet
-    const effects = applyDropEffect(selectingDropCharacter, character);
+    const effects = applyDropEffect(selectingDropCharacter, characterCopy);
     
     // Ajouter à l'inventaire
-    if (!character.inventory) character.inventory = [];
-    character.inventory.push(selectingDropCharacter);
+    characterCopy.inventory.push(selectingDropCharacter);
     
-    // Mettre à jour le state
-    gameStore.setState({ team });
+    // Mettre à jour le state en préservant les cooldowns des autres personnages
+    const updatedTeam = currentTeam.map(c => 
+      c.id === characterId ? characterCopy : c
+    );
+    gameStore.setState({ team: updatedTeam });
     
     // Retirer l'item des drops en attente
     const remainingDrops = pendingDrops.drops.filter(d => d.id !== selectingDropCharacter.id);
