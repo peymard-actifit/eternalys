@@ -38,7 +38,8 @@ const BAT: Monster = {
   challengeRating: 0, xpReward: 10,
   creatureType: 'beast', size: 'tiny',
   portrait: '🦇',
-  isBoss: false
+  isBoss: false,
+  description: 'Petit mammifère volant nocturne utilisant l\'écholocation pour naviguer dans l\'obscurité.'
 };
 
 const GIANT_RAT: Monster = {
@@ -737,6 +738,7 @@ const MIND_FLAYER: Monster = {
   portrait: '🦑',
   isBoss: false,
   resistances: ['psychic'],
+  description: 'Aussi appelé Illithide, cette horreur souterraine se nourrit de cerveaux. Sa tête ressemble à un poulpe, dotée de quatre tentacules qu\'il utilise pour extraire le cerveau de ses victimes. Les flagelleurs mentaux possèdent de formidables pouvoirs psioniques et vivent dans de vastes cités souterraines où ils réduisent d\'autres races en esclavage.',
   skills: [
     {
       id: 'mind_blast', name: 'Décharge mentale', damage: 22,
@@ -926,6 +928,7 @@ const BEHOLDER: Monster = {
   isLegendary: true,
   legendaryActionsPerTurn: 2,
   conditionImmunities: ['prone'],
+  description: 'Sphère flottante de chair avec une grande gueule pleine de dents et un œil central géant, surmonté de dix tentacules oculaires. Chaque œil projette un rayon magique différent : désintégration, pétrification, charme, mort... Le tyrannœil est paranoïaque, cruel et se considère comme la forme de vie parfaite. Son œil central génère un cône antimagie.',
   skills: [
     { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
     {
@@ -1008,6 +1011,7 @@ const VAMPIRE: Monster = {
   legendaryActionsPerTurn: 2,
   resistances: ['necrotic'],
   immunities: ['poison'],
+  description: 'Mort-vivant noble et séducteur, le vampire est un prédateur immortel qui se nourrit du sang des vivants. Doté d\'une intelligence redoutable et de pouvoirs surnaturels, il peut charmer ses victimes, se transformer en chauve-souris ou en brume, et régénérer ses blessures tant qu\'il a accès au sang frais.',
   skills: [
     {
       id: 'bite', name: 'Morsure', damage: 12,
@@ -1048,6 +1052,7 @@ const DEATH_KNIGHT: Monster = {
   isBoss: true,
   immunities: ['necrotic', 'poison'],
   conditionImmunities: ['frightened', 'poisoned'],
+  description: 'Ancien paladin déchu, maudit pour l\'éternité à servir les forces des ténèbres. Le chevalier de la mort conserve sa maîtrise martiale et ses pouvoirs magiques, désormais corrompus par une énergie nécromantique. Sa simple présence inspire la terreur et son épée maudite consume l\'âme de ses victimes.',
   skills: [
     {
       id: 'longsword', name: 'Épée maudite', damage: 18,
@@ -1134,6 +1139,7 @@ const LICH: Monster = {
   resistances: ['cold', 'lightning', 'necrotic'],
   immunities: ['poison'],
   conditionImmunities: ['charmed', 'frightened', 'paralyzed', 'poisoned'],
+  description: 'Un mage ayant choisi l\'immortalité en liant son âme à un phylactère. La liche est un cadavre ambulant dont les orbites brillent de points lumineux. C\'est l\'un des lanceurs de sorts les plus puissants, capable de sorts dévastateurs et de nécromancie. Tant que son phylactère existe, la liche se régénère après sa destruction.',
   skills: [
     {
       id: 'paralyzing_touch', name: 'Toucher paralysant', damage: 14,
