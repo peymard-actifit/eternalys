@@ -107,8 +107,16 @@
 }
 
 .combat-header {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.header-title {
+  text-align: center;
+  flex: 1;
 }
 
 .combat-header h2 {
@@ -118,6 +126,46 @@
   margin: 0;
   text-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
   animation: combatPulse 1s ease-in-out infinite;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.header-btn {
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.header-btn.inventory {
+  background: linear-gradient(135deg, #3a2a1a, #5c4a3a);
+  border-color: #8b7355;
+  color: #e8d5b5;
+}
+
+.header-btn.menu {
+  background: linear-gradient(135deg, #2a2a3a, #3a3a5c);
+  border-color: #5555aa;
+  color: #b8b8e8;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.header-btn.inventory:hover {
+  background: linear-gradient(135deg, #5c4a3a, #8b7355);
+}
+
+.header-btn.menu:hover {
+  background: linear-gradient(135deg, #3a3a5c, #5555aa);
 }
 
 @keyframes combatPulse {

@@ -1,4 +1,4 @@
-import { Character } from '../types/game.types';
+import { Character, EquipmentSlotType } from '../types/game.types';
 
 export interface Treasure {
   id: string;
@@ -7,6 +7,8 @@ export interface Treasure {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   description: string;
   effect: TreasureEffect;
+  // Type d'emplacement d'équipement pour ce trésor
+  equipmentSlot?: EquipmentSlotType;
 }
 
 export interface TreasureEffect {
@@ -1326,6 +1328,11 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         const passiveType = effect.passive.type;
         const passiveValue = effect.passive.value;
         
+        // Initialiser les effets passifs si nécessaire
+        if (!character.passiveEffects) {
+          character.passiveEffects = {};
+        }
+        
         switch (passiveType) {
           case 'initiative':
             // Bonus d'initiative = bonus de vitesse proportionnel
@@ -1337,18 +1344,23 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
             effects.push(`+${passiveValue}% 💨 Initiative`);
             break;
           case 'regeneration':
+            character.passiveEffects.regeneration = (character.passiveEffects.regeneration || 0) + passiveValue;
             effects.push(`Régénère ${passiveValue} PV/tour`);
             break;
           case 'lifesteal':
+            character.passiveEffects.lifesteal = (character.passiveEffects.lifesteal || 0) + passiveValue;
             effects.push(`Vol de vie ${passiveValue}%`);
             break;
           case 'thorns':
+            character.passiveEffects.thorns = (character.passiveEffects.thorns || 0) + passiveValue;
             effects.push(`Renvoie ${passiveValue}% dégâts`);
             break;
           case 'evasion':
+            character.passiveEffects.evasion = (character.passiveEffects.evasion || 0) + passiveValue;
             effects.push(`${passiveValue}% d'esquive`);
             break;
           case 'critical':
+            character.passiveEffects.critical = (character.passiveEffects.critical || 0) + passiveValue;
             effects.push(`+${passiveValue}% coup critique`);
             break;
           case 'resistance':

@@ -19,26 +19,36 @@ const SLOT_LABELS: Record<EquipmentSlotType, { label: string; icon: string }> = 
   mainHand: { label: 'Main principale', icon: '⚔️' },
   offHand: { label: 'Main secondaire', icon: '🛡️' },
   ranged: { label: 'Arme à distance', icon: '🏹' },
+  trinket1: { label: 'Breloque 1', icon: '🔮' },
+  trinket2: { label: 'Breloque 2', icon: '🔮' },
+  trinket3: { label: 'Breloque 3', icon: '🔮' },
+  trinket4: { label: 'Breloque 4', icon: '🔮' },
+  trinket5: { label: 'Breloque 5', icon: '🔮' },
   consumable1: { label: 'Consommable 1', icon: '🧪' },
   consumable2: { label: 'Consommable 2', icon: '🍖' },
   consumable3: { label: 'Consommable 3', icon: '🔦' },
 };
 
-// Position des emplacements sur le modèle de personnage
+// Position des emplacements - non utilisé directement car on utilise une grille
 const SLOT_POSITIONS: Record<EquipmentSlotType, { top: string; left: string; side?: 'left' | 'right' }> = {
-  head: { top: '5%', left: '50%' },
-  necklace: { top: '15%', left: '50%' },
-  cloak: { top: '25%', left: '15%', side: 'left' },
-  armor: { top: '30%', left: '50%' },
-  mainHand: { top: '35%', left: '10%', side: 'left' },
-  offHand: { top: '35%', left: '90%', side: 'right' },
-  bracers: { top: '45%', left: '15%', side: 'left' },
-  gloves: { top: '50%', left: '90%', side: 'right' },
-  belt: { top: '55%', left: '50%' },
-  ring1: { top: '60%', left: '15%', side: 'left' },
-  ring2: { top: '60%', left: '85%', side: 'right' },
-  boots: { top: '75%', left: '50%' },
-  ranged: { top: '25%', left: '85%', side: 'right' },
+  head: { top: '0%', left: '50%' },
+  necklace: { top: '10%', left: '50%' },
+  cloak: { top: '20%', left: '15%', side: 'left' },
+  armor: { top: '20%', left: '50%' },
+  mainHand: { top: '30%', left: '10%', side: 'left' },
+  offHand: { top: '30%', left: '90%', side: 'right' },
+  bracers: { top: '40%', left: '15%', side: 'left' },
+  gloves: { top: '40%', left: '90%', side: 'right' },
+  belt: { top: '50%', left: '50%' },
+  ring1: { top: '50%', left: '15%', side: 'left' },
+  ring2: { top: '50%', left: '85%', side: 'right' },
+  boots: { top: '60%', left: '50%' },
+  ranged: { top: '20%', left: '85%', side: 'right' },
+  trinket1: { top: '70%', left: '10%' },
+  trinket2: { top: '70%', left: '30%' },
+  trinket3: { top: '70%', left: '50%' },
+  trinket4: { top: '70%', left: '70%' },
+  trinket5: { top: '70%', left: '90%' },
   consumable1: { top: '85%', left: '30%' },
   consumable2: { top: '85%', left: '50%' },
   consumable3: { top: '85%', left: '70%' },
@@ -164,18 +174,11 @@ export function InventoryModal() {
   const renderEquipmentSlot = (slotType: EquipmentSlotType) => {
     const slotInfo = SLOT_LABELS[slotType];
     const equipped = getEquippedItem(slotType);
-    const position = SLOT_POSITIONS[slotType];
     
     return (
       <div
         key={slotType}
         className={`equipment-slot ${equipped ? 'equipped' : 'empty'} ${selectedSlot === slotType ? 'selected' : ''}`}
-        style={{
-          position: 'absolute',
-          top: position.top,
-          left: position.left,
-          transform: 'translate(-50%, -50%)'
-        }}
         onClick={() => setSelectedSlot(selectedSlot === slotType ? null : slotType)}
         onMouseEnter={() => equipped && setHoveredEquipment(equipped)}
         onMouseLeave={() => setHoveredEquipment(null)}
@@ -409,51 +412,61 @@ export function InventoryModal() {
                 </div>
               </div>
 
-              {/* Zone centrale: Modèle du personnage avec équipements */}
+              {/* Zone centrale: Équipements en grille */}
               <div className="character-model-zone">
-                <div className="character-model">
-                  <div className="model-portrait">{currentCharacter.portrait}</div>
-                  <div className="model-name">{currentCharacter.name}</div>
-                  
-                  {/* Emplacements d'équipement */}
-                  <div className="equipment-slots">
-                    {/* Ligne du haut - Tête */}
-                    <div className="slot-row top">
+                <div className="character-model no-portrait">
+                  {/* Emplacements d'équipement en grille */}
+                  <div className="equipment-grid">
+                    {/* Ligne 1: Tête, Collier, Cape */}
+                    <div className="equipment-row">
                       {renderEquipmentSlot('head')}
-                    </div>
-                    
-                    {/* Ligne du collier */}
-                    <div className="slot-row neck">
                       {renderEquipmentSlot('necklace')}
+                      {renderEquipmentSlot('cloak')}
                     </div>
                     
-                    {/* Ligne du corps avec armes */}
-                    <div className="slot-row body">
-                      <div className="left-side">
-                        {renderEquipmentSlot('mainHand')}
-                        {renderEquipmentSlot('bracers')}
-                        {renderEquipmentSlot('ring1')}
-                      </div>
-                      <div className="center">
-                        {renderEquipmentSlot('cloak')}
-                        {renderEquipmentSlot('armor')}
-                        {renderEquipmentSlot('belt')}
-                      </div>
-                      <div className="right-side">
-                        {renderEquipmentSlot('offHand')}
-                        {renderEquipmentSlot('gloves')}
-                        {renderEquipmentSlot('ring2')}
-                        {renderEquipmentSlot('ranged')}
-                      </div>
+                    {/* Ligne 2: Arme principale, Armure, Arme secondaire */}
+                    <div className="equipment-row">
+                      {renderEquipmentSlot('mainHand')}
+                      {renderEquipmentSlot('armor')}
+                      {renderEquipmentSlot('offHand')}
                     </div>
                     
-                    {/* Ligne des bottes */}
-                    <div className="slot-row feet">
+                    {/* Ligne 3: Avant-bras, Gants, Arme distance */}
+                    <div className="equipment-row">
+                      {renderEquipmentSlot('bracers')}
+                      {renderEquipmentSlot('gloves')}
+                      {renderEquipmentSlot('ranged')}
+                    </div>
+                    
+                    {/* Ligne 4: Anneaux, Ceinture */}
+                    <div className="equipment-row">
+                      {renderEquipmentSlot('ring1')}
+                      {renderEquipmentSlot('belt')}
+                      {renderEquipmentSlot('ring2')}
+                    </div>
+                    
+                    {/* Ligne 5: Bottes */}
+                    <div className="equipment-row single">
                       {renderEquipmentSlot('boots')}
                     </div>
                     
-                    {/* Ligne des consommables */}
-                    <div className="slot-row consumables">
+                    {/* Séparateur Breloques */}
+                    <div className="section-title">🔮 Breloques</div>
+                    
+                    {/* Ligne 6: Breloques */}
+                    <div className="equipment-row trinkets">
+                      {renderEquipmentSlot('trinket1')}
+                      {renderEquipmentSlot('trinket2')}
+                      {renderEquipmentSlot('trinket3')}
+                      {renderEquipmentSlot('trinket4')}
+                      {renderEquipmentSlot('trinket5')}
+                    </div>
+                    
+                    {/* Séparateur Consommables */}
+                    <div className="section-title">🧪 Consommables</div>
+                    
+                    {/* Ligne 7: Consommables */}
+                    <div className="equipment-row consumables">
                       {renderEquipmentSlot('consumable1')}
                       {renderEquipmentSlot('consumable2')}
                       {renderEquipmentSlot('consumable3')}

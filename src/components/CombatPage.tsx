@@ -1288,11 +1288,19 @@ export function CombatPage() {
           damageType
         });
         
-        if (skill.lifesteal && skill.lifesteal > 0) {
-          const stolen = Math.floor(actualDamage * skill.lifesteal / 100);
+        // Lifesteal de la compétence
+        let totalLifesteal = skill.lifesteal || 0;
+        
+        // Ajouter le lifesteal passif du personnage (des objets/trésors)
+        if (attacker.passiveEffects?.lifesteal) {
+          totalLifesteal += attacker.passiveEffects.lifesteal;
+        }
+        
+        if (totalLifesteal > 0) {
+          const stolen = Math.floor(actualDamage * totalLifesteal / 100);
           attacker.hp = Math.min(attacker.maxHp, attacker.hp + stolen);
           trackHealing(attacker.id, stolen);
-          logs.push(`${attacker.name} récupère ${stolen} PV !`);
+          logs.push(`🩸 ${attacker.name} récupère ${stolen} PV (vol de vie ${totalLifesteal}%) !`);
         }
         
         if (target.hp > 0) {
@@ -1539,9 +1547,27 @@ export function CombatPage() {
   return (
     <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
       <div className="combat-header">
-        <h2>⚔️ COMBAT ⚔️</h2>
-        {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
-        {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
+        <div className="header-buttons left">
+          <button 
+            className="header-btn inventory"
+            onClick={() => gameStore.setState({ showInventory: true })}
+          >
+            🎒 (I)
+          </button>
+        </div>
+        <div className="header-title">
+          <h2>⚔️ COMBAT ⚔️</h2>
+          {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
+          {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
+        </div>
+        <div className="header-buttons right">
+          <button 
+            className="header-btn menu"
+            onClick={() => gameStore.setState({ showPauseMenu: true })}
+          >
+            ⏸️ (Échap)
+          </button>
+        </div>
       </div>
 
       {selectingTarget && (

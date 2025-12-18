@@ -102,6 +102,15 @@ export interface Character {
   baseDefense?: number;
   baseMagicDefense?: number;
   baseSpeed?: number;
+  // Effets passifs (provenant des objets/trésors)
+  passiveEffects?: {
+    lifesteal?: number;      // % des dégâts récupérés en PV
+    critical?: number;       // % chance de coup critique
+    thorns?: number;         // % des dégâts renvoyés à l'attaquant
+    regeneration?: number;   // PV régénérés par tour
+    evasion?: number;        // % chance d'esquiver
+    damageReduction?: number; // % réduction des dégâts reçus
+  };
 }
 
 // Conditions D&D
@@ -161,6 +170,11 @@ export type EquipmentSlotType =
   | 'mainHand'       // Main principale (arme)
   | 'offHand'        // Main secondaire (bouclier/arme légère)
   | 'ranged'         // Arme à distance
+  | 'trinket1'       // Breloque 1
+  | 'trinket2'       // Breloque 2
+  | 'trinket3'       // Breloque 3
+  | 'trinket4'       // Breloque 4
+  | 'trinket5'       // Breloque 5
   | 'consumable1'    // Emplacement consommable 1
   | 'consumable2'    // Emplacement consommable 2
   | 'consumable3';   // Emplacement consommable 3
@@ -250,6 +264,11 @@ export interface CharacterEquipment {
   mainHand?: Equipment;
   offHand?: Equipment;
   ranged?: Equipment;
+  trinket1?: Equipment;
+  trinket2?: Equipment;
+  trinket3?: Equipment;
+  trinket4?: Equipment;
+  trinket5?: Equipment;
   consumable1?: Equipment;
   consumable2?: Equipment;
   consumable3?: Equipment;

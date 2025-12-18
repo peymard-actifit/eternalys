@@ -184,25 +184,42 @@
   cursor: help;
 }
 
-/* Bouton inventaire */
-.inventory-btn {
-  width: 100%;
+/* Boutons d'action */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
   margin-top: 1rem;
-  padding: 0.7rem 1rem;
+}
+
+.inventory-btn,
+.menu-btn {
+  flex: 1;
+  padding: 0.7rem 0.5rem;
   background: linear-gradient(135deg, #3a2a1a, #5c4a3a);
   border: 1px solid #8b7355;
   border-radius: 6px;
   color: #e8d5b5;
   font-family: 'Cinzel', serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.inventory-btn:hover {
+.inventory-btn:hover,
+.menu-btn:hover {
   background: linear-gradient(135deg, #5c4a3a, #8b7355);
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+}
+
+.menu-btn {
+  background: linear-gradient(135deg, #2a2a3a, #3a3a5c);
+  border-color: #5555aa;
+}
+
+.menu-btn:hover {
+  background: linear-gradient(135deg, #3a3a5c, #5555aa);
+  box-shadow: 0 4px 15px rgba(85, 85, 170, 0.3);
 }
 
 /* Dungeon Map Container */

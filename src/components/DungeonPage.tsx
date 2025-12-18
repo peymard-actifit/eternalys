@@ -266,12 +266,20 @@ export function DungeonPage() {
               </div>
             </div>
           ))}
-          <button 
-            className="inventory-btn"
-            onClick={() => gameStore.setState({ showInventory: true })}
-          >
-            🎒 Inventaire (I)
-          </button>
+          <div className="action-buttons">
+            <button 
+              className="inventory-btn"
+              onClick={() => gameStore.setState({ showInventory: true })}
+            >
+              🎒 Inventaire (I)
+            </button>
+            <button 
+              className="menu-btn"
+              onClick={() => gameStore.setState({ showPauseMenu: true })}
+            >
+              ⏸️ Menu (Échap)
+            </button>
+          </div>
         </div>
 
         {/* Carte du donjon */}

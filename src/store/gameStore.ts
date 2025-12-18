@@ -419,20 +419,23 @@ export const gameStore = {
     const pendingTreasure = state.pendingTreasures?.[0];
     
     if (pendingTreasure) {
-      // Ajouter l'objet à l'inventaire du personnage
+      // Ajouter l'objet à l'inventaire du personnage ET copier toutes les modifications de stats
       const charIndex = team.findIndex(c => c.id === selectedCharacter.id);
       if (charIndex !== -1) {
-        if (!team[charIndex].inventory) {
-          team[charIndex].inventory = [];
-        }
-        team[charIndex].inventory!.push({
-          id: pendingTreasure.treasureId,
-          name: pendingTreasure.treasureName,
-          icon: pendingTreasure.treasureIcon,
-          rarity: pendingTreasure.treasureRarity,
-          description: pendingTreasure.treasureDescription,
-          obtainedAt: state.encounterCount
-        });
+        // Copier TOUTES les modifications de selectedCharacter (stats, passiveEffects, skills, etc.)
+        team[charIndex] = {
+          ...team[charIndex],
+          ...selectedCharacter,
+          // S'assurer que l'inventaire est correctement mis à jour
+          inventory: [...(selectedCharacter.inventory || []), {
+            id: pendingTreasure.treasureId,
+            name: pendingTreasure.treasureName,
+            icon: pendingTreasure.treasureIcon,
+            rarity: pendingTreasure.treasureRarity,
+            description: pendingTreasure.treasureDescription,
+            obtainedAt: state.encounterCount
+          }]
+        };
       }
       
       // Mettre à jour l'historique avec le personnage choisi
