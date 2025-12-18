@@ -952,10 +952,12 @@ export function CombatPage() {
     }
     
     // Il reste des monstres en vie - le combat continue
-    const teamAlive = team.some(c => c.hp > 0);
+    // IMPORTANT: Utiliser le state global pour avoir les HP à jour
+    const currentGlobalTeamForCheck = gameStore.getState().team;
+    const teamAlive = currentGlobalTeamForCheck.some(c => c.hp > 0);
     if (!teamAlive) {
       // L'équipe est vaincue
-      const cleanTeam = state.team.map(c => {
+      const cleanTeam = currentGlobalTeamForCheck.map(c => {
         let cleanChar = { ...c };
         if (c.buffs) {
           c.buffs.forEach(buff => {
@@ -981,6 +983,9 @@ export function CombatPage() {
       accumulatedDropsRef.current = [];
     } else {
       // Le combat continue - passer au tour suivant
+      // IMPORTANT: Utiliser le state global pour avoir les données à jour (cooldowns, HP, etc.)
+      const currentGlobalTeam = gameStore.getState().team;
+      
       // On doit vérifier les HP à jour (pas ceux dans turnOrder qui peuvent être obsolètes)
       const getEntityHp = (entity: Character | Monster): number => {
         // Si c'est un monstre, récupérer son HP à jour depuis currentEnemiesList
@@ -988,8 +993,8 @@ export function CombatPage() {
           const updatedMonster = currentEnemiesList.find(e => e.id === entity.id);
           return updatedMonster ? updatedMonster.hp : entity.hp;
         }
-        // Si c'est un personnage, récupérer son HP à jour depuis team
-        const updatedChar = team.find(c => c.id === entity.id);
+        // Si c'est un personnage, récupérer son HP à jour depuis le state global
+        const updatedChar = currentGlobalTeam.find(c => c.id === entity.id);
         return updatedChar ? updatedChar.hp : entity.hp;
       };
       
@@ -1017,11 +1022,11 @@ export function CombatPage() {
       }
       
       setCombatTurn(prev => prev + 1);
+      // IMPORTANT: NE PAS écraser team - utiliser le state global qui contient les cooldowns à jour
       gameStore.setState({ 
         currentTurnIndex: nextIndex, 
         combatLog: finalLogs, 
-        currentEnemies: currentEnemiesList,
-        team: [...team]
+        currentEnemies: currentEnemiesList
       });
     }
   };
