@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { gameStore } from '../store/gameStore';
-import { GameState, HistoryEntry, Character, getModifier } from '../types/game.types';
+import { GameState, HistoryEntry, Character } from '../types/game.types';
 import { TreasureModal } from './TreasureModal';
 import { allTreasures, getRarityColor, Treasure } from '../data/treasures';
 import './DungeonPage.css';
@@ -24,12 +24,6 @@ export function DungeonPage() {
     if (percentage <= 33) return '#c0392b'; // Rouge
     if (percentage <= 66) return '#f39c12'; // Jaune/Orange
     return '#27ae60'; // Vert
-  };
-
-  // Fonction pour le modificateur en string
-  const getModifierString = (score: number): string => {
-    const mod = getModifier(score);
-    return mod >= 0 ? `+${mod}` : `${mod}`;
   };
 
   // Calcul des modifications de stats pour le tooltip

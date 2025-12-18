@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { gameStore } from '../store/gameStore';
 import { Character, InventoryItem, Equipment, EquipmentSlotType, CharacterEquipment, getModifier } from '../types/game.types';
-import { calculateEquipmentBonuses, ALL_EQUIPMENT } from '../data/equipment';
+import { calculateEquipmentBonuses } from '../data/equipment';
 import './InventoryModal.css';
 
 // Labels pour les emplacements d'équipement
