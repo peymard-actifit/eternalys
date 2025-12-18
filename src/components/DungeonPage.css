@@ -144,6 +144,30 @@
   font-weight: bold;
 }
 
+/* Caractéristiques D&D */
+.member-abilities {
+  display: flex;
+  gap: 0.2rem;
+  margin: 0.3rem 0;
+}
+
+.ability-tag {
+  font-size: 0.6rem;
+  font-weight: bold;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #a0a0a0;
+  cursor: help;
+}
+
+.ability-tag.str { border-bottom: 2px solid #e74c3c; color: #ff6b6b; }
+.ability-tag.dex { border-bottom: 2px solid #2ecc71; color: #5ed99a; }
+.ability-tag.con { border-bottom: 2px solid #e67e22; color: #f5a54a; }
+.ability-tag.int { border-bottom: 2px solid #3498db; color: #5dade2; }
+.ability-tag.wis { border-bottom: 2px solid #9b59b6; color: #bb8fce; }
+.ability-tag.cha { border-bottom: 2px solid #f39c12; color: #f7c56c; }
+
 .member-all-stats {
   display: flex;
   flex-wrap: wrap;
@@ -158,6 +182,27 @@
   padding: 0.15rem 0.3rem;
   border-radius: 4px;
   cursor: help;
+}
+
+/* Bouton inventaire */
+.inventory-btn {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, #3a2a1a, #5c4a3a);
+  border: 1px solid #8b7355;
+  border-radius: 6px;
+  color: #e8d5b5;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inventory-btn:hover {
+  background: linear-gradient(135deg, #5c4a3a, #8b7355);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
 }
 
 /* Dungeon Map Container */

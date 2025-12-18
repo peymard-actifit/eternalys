@@ -92,8 +92,9 @@ export interface Character {
   resistances?: DamageType[];
   immunities?: DamageType[];
   vulnerabilities?: DamageType[];
-  // Inventaire
+  // Inventaire et Équipement
   inventory?: InventoryItem[];
+  equipment?: CharacterEquipment;
   stats?: CharacterStats;
   // Stats de base pour tracking
   baseAttack?: number;
@@ -139,6 +140,119 @@ export interface InventoryItem {
   rarity: string;
   description: string;
   obtainedAt: number;
+}
+
+// ============================================
+// SYSTÈME D'ÉQUIPEMENT (Pathfinder/BG3 style)
+// ============================================
+
+// Types d'emplacements d'équipement
+export type EquipmentSlotType = 
+  | 'head'           // Casque
+  | 'armor'          // Armure/Torse
+  | 'cloak'          // Cape
+  | 'gloves'         // Gants
+  | 'bracers'        // Avant-bras/Bracelets
+  | 'belt'           // Ceinture
+  | 'boots'          // Bottes/Jambières
+  | 'necklace'       // Collier/Amulette
+  | 'ring1'          // Anneau 1
+  | 'ring2'          // Anneau 2
+  | 'mainHand'       // Main principale (arme)
+  | 'offHand'        // Main secondaire (bouclier/arme légère)
+  | 'ranged'         // Arme à distance
+  | 'consumable1'    // Emplacement consommable 1
+  | 'consumable2'    // Emplacement consommable 2
+  | 'consumable3';   // Emplacement consommable 3
+
+// Catégorie d'arme
+export type WeaponCategory = 
+  | 'simple_melee'   // Armes simples de mêlée
+  | 'martial_melee'  // Armes de guerre de mêlée
+  | 'simple_ranged'  // Armes simples à distance
+  | 'martial_ranged' // Armes de guerre à distance
+  | 'shield'         // Bouclier
+  | 'focus';         // Focus arcanique
+
+// Catégorie d'armure
+export type ArmorCategory = 'light' | 'medium' | 'heavy' | 'shield' | 'clothing';
+
+// Pièce d'équipement
+export interface Equipment {
+  id: string;
+  name: string;
+  icon: string;
+  slotType: EquipmentSlotType;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  description: string;
+  // Stats bonus
+  bonuses?: {
+    attack?: number;
+    magicAttack?: number;
+    defense?: number;
+    magicDefense?: number;
+    speed?: number;
+    maxHp?: number;
+    armorClass?: number;
+    // Bonus de caractéristiques
+    strength?: number;
+    dexterity?: number;
+    constitution?: number;
+    intelligence?: number;
+    wisdom?: number;
+    charisma?: number;
+  };
+  // Pour les armes
+  weaponCategory?: WeaponCategory;
+  damage?: string;        // Ex: "1d8", "2d6"
+  damageType?: DamageType;
+  twoHanded?: boolean;
+  finesse?: boolean;      // Utilise DEX ou FOR
+  // Pour les armures
+  armorCategory?: ArmorCategory;
+  baseAC?: number;
+  maxDexBonus?: number;   // Bonus DEX max pour armures moyennes/lourdes
+  stealthDisadvantage?: boolean;
+  // Effets spéciaux
+  effects?: EquipmentEffect[];
+  // Prérequis
+  requirements?: {
+    strength?: number;
+    classes?: string[];
+  };
+  // Prix en pièces d'or
+  value?: number;
+}
+
+// Effet d'équipement
+export interface EquipmentEffect {
+  type: 'resistance' | 'immunity' | 'skill' | 'passive' | 'onHit';
+  damageType?: DamageType;
+  skillGranted?: Skill;
+  passiveBonus?: {
+    type: 'critical' | 'lifesteal' | 'thorns' | 'regeneration' | 'evasion' | 'initiative';
+    value: number;
+  };
+}
+
+// Emplacements d'équipement du personnage
+export interface CharacterEquipment {
+  head?: Equipment;
+  armor?: Equipment;
+  cloak?: Equipment;
+  gloves?: Equipment;
+  bracers?: Equipment;
+  belt?: Equipment;
+  boots?: Equipment;
+  necklace?: Equipment;
+  ring1?: Equipment;
+  ring2?: Equipment;
+  mainHand?: Equipment;
+  offHand?: Equipment;
+  ranged?: Equipment;
+  consumable1?: Equipment;
+  consumable2?: Equipment;
+  consumable3?: Equipment;
 }
 
 export interface CharacterStats {

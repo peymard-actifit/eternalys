@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { gameStore } from '../store/gameStore';
-import { GameState, HistoryEntry, Character } from '../types/game.types';
+import { GameState, HistoryEntry, Character, getModifier } from '../types/game.types';
 import { TreasureModal } from './TreasureModal';
 import { allTreasures, getRarityColor, Treasure } from '../data/treasures';
 import './DungeonPage.css';
@@ -24,6 +24,12 @@ export function DungeonPage() {
     if (percentage <= 33) return '#c0392b'; // Rouge
     if (percentage <= 66) return '#f39c12'; // Jaune/Orange
     return '#27ae60'; // Vert
+  };
+
+  // Fonction pour le modificateur en string
+  const getModifierString = (score: number): string => {
+    const mod = getModifier(score);
+    return mod >= 0 ? `+${mod}` : `${mod}`;
   };
 
   // Calcul des modifications de stats pour le tooltip
@@ -229,13 +235,13 @@ export function DungeonPage() {
       <div className="dungeon-layout">
         {/* Panel équipe */}
         <div className="team-panel">
-          <h3>👥 Équipe</h3>
+          <h3>👥 Équipe - Niveau {state.dungeonLevel}</h3>
           {team.map(character => (
             <div key={character.id} className={`team-member ${character.hp <= 0 ? 'dead' : ''}`}>
               <span className="member-portrait">{character.portrait}</span>
               <div className="member-info">
                 <span className="member-name">{character.name}</span>
-                <span className="member-class">{character.class}</span>
+                <span className="member-class">{character.class} Niv. {character.level}</span>
                 <div className="hp-bar">
                   <div 
                     className="hp-fill" 
@@ -246,17 +252,32 @@ export function DungeonPage() {
                   ></div>
                   <span className="hp-text">{Math.max(0, character.hp)}/{character.maxHp}</span>
                 </div>
+                {/* Caractéristiques D&D */}
+                <div className="member-abilities">
+                  <span className="ability-tag str" title="Force">{character.abilities.strength}</span>
+                  <span className="ability-tag dex" title="Dextérité">{character.abilities.dexterity}</span>
+                  <span className="ability-tag con" title="Constitution">{character.abilities.constitution}</span>
+                  <span className="ability-tag int" title="Intelligence">{character.abilities.intelligence}</span>
+                  <span className="ability-tag wis" title="Sagesse">{character.abilities.wisdom}</span>
+                  <span className="ability-tag cha" title="Charisme">{character.abilities.charisma}</span>
+                </div>
                 <div className="member-all-stats stats-with-tooltip">
-                  <span>⚔️{character.attack}</span>
-                  <span>✨{character.magicAttack || 0}</span>
-                  <span>🛡️{character.defense}</span>
-                  <span>🔮{character.magicDefense}</span>
-                  <span>💨{character.speed}</span>
+                  <span title="Classe d'armure">🔰{character.armorClass}</span>
+                  <span title="Attaque">⚔️{character.attack}</span>
+                  <span title="Attaque magique">✨{character.magicAttack || 0}</span>
+                  <span title="Défense">🛡️{character.defense}</span>
+                  <span title="Défense magique">🔮{character.magicDefense}</span>
                   {renderStatsTooltip(character)}
                 </div>
               </div>
             </div>
           ))}
+          <button 
+            className="inventory-btn"
+            onClick={() => gameStore.setState({ showInventory: true })}
+          >
+            🎒 Inventaire (I)
+          </button>
         </div>
 
         {/* Carte du donjon */}
