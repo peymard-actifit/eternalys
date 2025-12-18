@@ -181,7 +181,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'fire',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d10 dégâts de feu.'
+        description: 'Sort mineur. 1d10 dégâts de feu.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       },
       { 
         id: 'magic_missile', 
@@ -222,7 +224,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'necrotic',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d8 nécrotique, empêche régénération.'
+        description: 'Sort mineur. 1d8 nécrotique, empêche régénération.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       },
       { 
         id: 'false_life', 
@@ -262,7 +266,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'lightning',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d8 foudre, avantage vs armure métal.'
+        description: 'Sort mineur. 1d8 foudre, avantage vs armure métal.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       },
       { 
         id: 'chromatic_orb', 
@@ -272,7 +278,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'lightning',
         targetType: 'enemy',
         cooldown: 2,
-        description: 'Sort niveau 1. 3d8 dégâts élémentaires.'
+        description: 'Sort niveau 1. 3d8 dégâts élémentaires.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       }
     ]
   },
@@ -304,7 +312,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'enemy',
         debuffStats: { stat: 'speed', value: 3, turns: 1 },
         cooldown: 0,
-        description: 'Sort mineur. 1d8 froid, -3m vitesse.'
+        description: 'Sort mineur. 1d8 froid, -3m vitesse.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       },
       { 
         id: 'chaos_bolt', 
@@ -314,7 +324,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'force',
         targetType: 'enemy',
         cooldown: 2,
-        description: 'Sort niveau 1. Dégâts aléatoires.'
+        description: 'Sort niveau 1. Dégâts aléatoires.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       }
     ]
   },
@@ -345,7 +357,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'force',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur signature. 1d10 force.'
+        description: 'Sort mineur signature. 1d10 force.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       },
       { 
         id: 'hex', 
@@ -401,7 +415,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'radiant',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d8 radiant, jet de DEX.'
+        description: 'Sort mineur. 1d8 radiant, jet de DEX.',
+        savingThrow: { ability: 'dexterity', dc: 13 },
+        requiresAttackRoll: false
       }
     ]
   },
@@ -441,7 +457,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'fire',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d8 feu.'
+        description: 'Sort mineur. 1d8 feu.',
+        isSpellAttack: true,
+        requiresAttackRoll: true
       }
     ]
   },
@@ -522,7 +540,9 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damageType: 'necrotic',
         targetType: 'enemy',
         cooldown: 0,
-        description: 'Sort mineur. 1d8 nécrotique (1d12 si cible blessée).'
+        description: 'Sort mineur. 1d8 nécrotique (1d12 si cible blessée).',
+        savingThrow: { ability: 'wisdom', dc: 13 },
+        requiresAttackRoll: false
       }
     ]
   },

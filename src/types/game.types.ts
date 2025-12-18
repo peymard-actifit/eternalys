@@ -306,6 +306,9 @@ export interface Skill {
   // D&D spécifique
   savingThrow?: { ability: keyof AbilityScores; dc: number };
   areaOfEffect?: { type: 'cone' | 'sphere' | 'line' | 'cube'; size: number };
+  // Jet de touche
+  requiresAttackRoll?: boolean; // true pour les spell attacks, false pour saves/auto-hit
+  isSpellAttack?: boolean; // true si utilise INT/WIS/CHA au lieu de FOR/DEX
 }
 
 export interface SkillEffect {
@@ -415,6 +418,10 @@ export interface MonsterSkill {
   savingThrow?: { ability: keyof AbilityScores; dc: number };
   // Zone d'effet
   areaOfEffect?: boolean;
+  // Jet de touche requis (par défaut: true pour attack/special/multiattack)
+  requiresAttackRoll?: boolean; // false pour les effets de zone ou saves uniquement
+  // Attaque de sort (utilise INT/WIS/CHA au lieu de FOR/DEX)
+  isSpellAttack?: boolean;
   cooldown?: number;
   currentCooldown?: number;
 }

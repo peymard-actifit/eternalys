@@ -838,14 +838,49 @@ export function CombatPage() {
             const target = getMonsterTarget(aliveTeam);
             const logs = [...combatLog];
             
-            // Vérifier l'évasion du personnage
-            if (checkEvasion(target)) {
-              logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} !`);
+            // === JET DE TOUCHE D&D 5e POUR MONSTRE ===
+            const monsterAttackResult = makeAttackRoll(currentMonster, target, false, false, false);
+            
+            // Afficher le résultat du jet pour le monstre
+            setLastAttackResult({
+              roll: monsterAttackResult.attackRoll.rolls[0],
+              modifier: monsterAttackResult.totalAttackBonus,
+              total: monsterAttackResult.attackRoll.total,
+              targetAC: monsterAttackResult.targetAC,
+              hit: monsterAttackResult.hit,
+              isCritical: monsterAttackResult.isCriticalHit,
+              attacker: currentMonster.name,
+              target: target.name
+            });
+            
+            // Log du jet de touche
+            logs.push(`🎲 ${currentMonster.name} : ${monsterAttackResult.attackRoll.rolls[0]} + ${monsterAttackResult.totalAttackBonus} = ${monsterAttackResult.attackRoll.total} vs CA ${monsterAttackResult.targetAC}`);
+            
+            // Attendre un peu pour que le joueur voit le jet
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            if (monsterAttackResult.isCriticalMiss) {
+              // Échec critique !
+              logs.push(`💨 Échec critique ! ${currentMonster.name} rate complètement son attaque !`);
               addCombatHistoryEntry({
                 turn: combatTurn,
                 actor: currentMonster.name,
                 actorPortrait: currentMonster.portrait,
-                action: 'Attaque (esquivée)',
+                action: 'Attaque (échec critique)',
+                target: target.name,
+                damage: 0,
+                isPlayerAction: false,
+                damageType: 'physical'
+              });
+              checkCombatEnd(logs, null, undefined, enemies);
+            } else if (!monsterAttackResult.hit) {
+              // Rate simplement
+              logs.push(`💨 ${currentMonster.name} rate ${target.name} !`);
+              addCombatHistoryEntry({
+                turn: combatTurn,
+                actor: currentMonster.name,
+                actorPortrait: currentMonster.portrait,
+                action: 'Attaque (raté)',
                 target: target.name,
                 damage: 0,
                 isPlayerAction: false,
@@ -853,28 +888,52 @@ export function CombatPage() {
               });
               checkCombatEnd(logs, null, undefined, enemies);
             } else {
-              const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
-              target.hp = Math.max(0, target.hp - damage);
-              trackDamageTaken(target.id, damage);
-              triggerDamageEffect(target.id, 'physical');
-              
-              logs.push(`${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
-              
-              // Appliquer le renvoi de dégâts et épines
-              applyDamageReflect(target, damage, currentMonster, logs);
-              
-              addCombatHistoryEntry({
-                turn: combatTurn,
-                actor: currentMonster.name,
-                actorPortrait: currentMonster.portrait,
-                action: 'Attaque',
-                target: target.name,
-                damage,
-                isPlayerAction: false,
-                damageType: 'physical'
-              });
-              
-              checkCombatEnd(logs, null, undefined, enemies);
+              // Vérifier l'évasion du personnage (compétences spéciales)
+              if (checkEvasion(target) && !monsterAttackResult.isCriticalHit) {
+                logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} grâce à sa compétence !`);
+                addCombatHistoryEntry({
+                  turn: combatTurn,
+                  actor: currentMonster.name,
+                  actorPortrait: currentMonster.portrait,
+                  action: 'Attaque (esquivée)',
+                  target: target.name,
+                  damage: 0,
+                  isPlayerAction: false,
+                  damageType: 'physical'
+                });
+                checkCombatEnd(logs, null, undefined, enemies);
+              } else {
+                // TOUCHÉ ! Calcul des dégâts
+                let damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+                
+                // Dégâts doublés sur critique
+                if (monsterAttackResult.isCriticalHit) {
+                  damage = Math.floor(damage * 2);
+                  logs.push(`💥 COUP CRITIQUE ! ${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
+                } else {
+                  logs.push(`⚔️ ${currentMonster.name} touche ${target.name} pour ${damage} dégâts !`);
+                }
+                
+                target.hp = Math.max(0, target.hp - damage);
+                trackDamageTaken(target.id, damage);
+                triggerDamageEffect(target.id, 'physical');
+                
+                // Appliquer le renvoi de dégâts et épines
+                applyDamageReflect(target, damage, currentMonster, logs);
+                
+                addCombatHistoryEntry({
+                  turn: combatTurn,
+                  actor: currentMonster.name,
+                  actorPortrait: currentMonster.portrait,
+                  action: monsterAttackResult.isCriticalHit ? 'Attaque (CRIT)' : 'Attaque',
+                  target: target.name,
+                  damage,
+                  isPlayerAction: false,
+                  damageType: 'physical'
+                });
+                
+                checkCombatEnd(logs, null, undefined, enemies);
+              }
             }
           }
         } catch (error) {
@@ -887,17 +946,40 @@ export function CombatPage() {
             await new Promise(resolve => setTimeout(resolve, 1000));
             const logs = [...combatLog];
             
-            // Vérifier l'évasion
-            if (checkEvasion(target)) {
+            // Jet de touche même en fallback
+            const fallbackAttackResult = makeAttackRoll(currentMonster, target, false, false, false);
+            
+            setLastAttackResult({
+              roll: fallbackAttackResult.attackRoll.rolls[0],
+              modifier: fallbackAttackResult.totalAttackBonus,
+              total: fallbackAttackResult.attackRoll.total,
+              targetAC: fallbackAttackResult.targetAC,
+              hit: fallbackAttackResult.hit,
+              isCritical: fallbackAttackResult.isCriticalHit,
+              attacker: currentMonster.name,
+              target: target.name
+            });
+            
+            logs.push(`🎲 ${currentMonster.name} : ${fallbackAttackResult.attackRoll.rolls[0]} + ${fallbackAttackResult.totalAttackBonus} = ${fallbackAttackResult.attackRoll.total} vs CA ${fallbackAttackResult.targetAC}`);
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            if (!fallbackAttackResult.hit) {
+              logs.push(`💨 ${currentMonster.name} rate son attaque !`);
+              checkCombatEnd(logs, null, undefined, enemies);
+            } else if (checkEvasion(target) && !fallbackAttackResult.isCriticalHit) {
               logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} !`);
               checkCombatEnd(logs, null, undefined, enemies);
             } else {
-              const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+              let damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+              if (fallbackAttackResult.isCriticalHit) {
+                damage = Math.floor(damage * 2);
+              }
               target.hp = Math.max(0, target.hp - damage);
               trackDamageTaken(target.id, damage);
               triggerDamageEffect(target.id, 'physical');
               
-              logs.push(`${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
+              logs.push(`${fallbackAttackResult.isCriticalHit ? '💥 CRIT ! ' : ''}${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
               
               // Appliquer le renvoi de dégâts et épines
               applyDamageReflect(target, damage, currentMonster, logs);
@@ -906,7 +988,7 @@ export function CombatPage() {
                 turn: combatTurn,
                 actor: currentMonster.name,
                 actorPortrait: currentMonster.portrait,
-                action: 'Attaque',
+                action: fallbackAttackResult.isCriticalHit ? 'Attaque (CRIT)' : 'Attaque',
                 target: target.name,
                 damage,
                 isPlayerAction: false,
@@ -932,52 +1014,125 @@ export function CombatPage() {
     const aliveTeam = team.filter(c => c.hp > 0);
     const logs: string[] = [...combatLog];
     
-    if (skill.type === 'attack' || skill.type === 'special') {
+    // Déterminer si la compétence nécessite un jet de touche
+    // Pas de jet de touche pour: effets de zone, jets de sauvegarde, ou si explicitement désactivé
+    const needsAttackRoll = skill.requiresAttackRoll !== false && 
+                            !skill.areaOfEffect && 
+                            !skill.savingThrow &&
+                            (skill.type === 'attack' || skill.type === 'special' || skill.type === 'multiattack');
+    
+    if (skill.type === 'attack' || skill.type === 'special' || skill.type === 'multiattack') {
       if (aliveTeam.length > 0) {
         // Utiliser getMonsterTarget pour la Provocation
         const target = getMonsterTarget(aliveTeam);
         
-        // Vérifier l'évasion du personnage
-        if (checkEvasion(target)) {
-          logs.push(`💨 ${target.name} esquive ${skill.name} de ${monster.name} !`);
-          addCombatHistoryEntry({
-            turn: combatTurn,
-            actor: monster.name,
-            actorPortrait: monster.portrait,
-            action: `${skill.name} (esquivé)`,
-            target: target.name,
-            damage: 0,
-            isPlayerAction: false,
-            damageType: skill.damageType
-          });
-        } else {
-          const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
-          target.hp = Math.max(0, target.hp - damage);
-          trackDamageTaken(target.id, damage);
-          triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
-          
-          logs.push(`${monster.name} utilise ${skill.name} ! (${damage} dégâts ${skill.damageType === 'magical' ? 'magiques' : 'physiques'} à ${target.name})`);
-          
-          // Appliquer le renvoi de dégâts et épines
-          applyDamageReflect(target, damage, monster, logs);
-          
-          addCombatHistoryEntry({
-            turn: combatTurn,
-            actor: monster.name,
-            actorPortrait: monster.portrait,
-            action: skill.name,
-            target: target.name,
-            damage,
-            isPlayerAction: false,
-            damageType: skill.damageType
-          });
-          
-          if (skill.effect?.type === 'lifesteal') {
-            const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
-            monster.hp = Math.min(monster.maxHp, monster.hp + healed);
-            logs.push(`🧛 ${monster.name} récupère ${healed} PV !`);
+        // Nombre d'attaques (pour multiattack)
+        const attackCount = skill.attackCount || 1;
+        let totalDamage = 0;
+        let hitCount = 0;
+        let critCount = 0;
+        
+        for (let i = 0; i < attackCount; i++) {
+          if (needsAttackRoll) {
+            // === JET DE TOUCHE D&D 5e POUR COMPÉTENCE DE MONSTRE ===
+            const isSpell = skill.isSpellAttack || skill.damageType === 'magical';
+            const skillAttackResult = makeAttackRoll(monster, target, isSpell, false, false);
+            
+            // Afficher le résultat du jet
+            setLastAttackResult({
+              roll: skillAttackResult.attackRoll.rolls[0],
+              modifier: skillAttackResult.totalAttackBonus,
+              total: skillAttackResult.attackRoll.total,
+              targetAC: skillAttackResult.targetAC,
+              hit: skillAttackResult.hit,
+              isCritical: skillAttackResult.isCriticalHit,
+              attacker: monster.name,
+              target: target.name
+            });
+            
+            // Log du jet de touche
+            const attackTypeIcon = isSpell ? '✨' : '⚔️';
+            logs.push(`🎲 ${monster.name} (${skill.name}${attackCount > 1 ? ` #${i+1}` : ''}) : ${skillAttackResult.attackRoll.rolls[0]} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
+            
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            if (skillAttackResult.isCriticalMiss) {
+              logs.push(`💨 Échec critique sur ${skill.name}${attackCount > 1 ? ` #${i+1}` : ''} !`);
+            } else if (!skillAttackResult.hit) {
+              logs.push(`${attackTypeIcon} ${skill.name}${attackCount > 1 ? ` #${i+1}` : ''} rate ${target.name} !`);
+            } else if (checkEvasion(target) && !skillAttackResult.isCriticalHit) {
+              logs.push(`💨 ${target.name} esquive ${skill.name}${attackCount > 1 ? ` #${i+1}` : ''} !`);
+            } else {
+              // TOUCHÉ !
+              hitCount++;
+              let damage = calculateDamage(skill.damage, monster, target, skill.damageType);
+              
+              if (skillAttackResult.isCriticalHit) {
+                damage = Math.floor(damage * 2);
+                critCount++;
+              }
+              
+              totalDamage += damage;
+              target.hp = Math.max(0, target.hp - damage);
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+              
+              if (skillAttackResult.isCriticalHit) {
+                logs.push(`💥 CRITIQUE ! ${skill.name}${attackCount > 1 ? ` #${i+1}` : ''} inflige ${damage} dégâts à ${target.name} !`);
+              } else {
+                logs.push(`${attackTypeIcon} ${skill.name}${attackCount > 1 ? ` #${i+1}` : ''} touche ${target.name} pour ${damage} dégâts !`);
+              }
+              
+              // Appliquer le renvoi de dégâts et épines
+              applyDamageReflect(target, damage, monster, logs);
+              
+              // Vol de vie sur cette attaque
+              if (skill.effect?.type === 'lifesteal') {
+                const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
+                monster.hp = Math.min(monster.maxHp, monster.hp + healed);
+                logs.push(`🧛 ${monster.name} récupère ${healed} PV !`);
+              }
+            }
+          } else {
+            // Pas de jet de touche (zone, save, etc.) - ancienne logique
+            if (checkEvasion(target)) {
+              logs.push(`💨 ${target.name} esquive ${skill.name} de ${monster.name} !`);
+            } else {
+              const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
+              totalDamage += damage;
+              hitCount++;
+              target.hp = Math.max(0, target.hp - damage);
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+              
+              logs.push(`${monster.name} utilise ${skill.name} ! (${damage} dégâts ${skill.damageType === 'magical' ? 'magiques' : 'physiques'} à ${target.name})`);
+              
+              applyDamageReflect(target, damage, monster, logs);
+              
+              if (skill.effect?.type === 'lifesteal') {
+                const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
+                monster.hp = Math.min(monster.maxHp, monster.hp + healed);
+                logs.push(`🧛 ${monster.name} récupère ${healed} PV !`);
+              }
+            }
           }
         }
+        
+        // Résumé pour multiattack
+        if (attackCount > 1) {
+          logs.push(`📊 Résumé: ${hitCount}/${attackCount} touches, ${totalDamage} dégâts totaux${critCount > 0 ? `, ${critCount} critiques` : ''}`);
+        }
+        
+        addCombatHistoryEntry({
+          turn: combatTurn,
+          actor: monster.name,
+          actorPortrait: monster.portrait,
+          action: `${skill.name}${critCount > 0 ? ' (CRIT)' : ''}`,
+          target: target.name,
+          damage: totalDamage,
+          isPlayerAction: false,
+          damageType: skill.damageType
+        });
       }
     } else if (skill.type === 'buff' && skill.effect) {
       if (skill.effect.type === 'heal') {
@@ -1648,9 +1803,80 @@ export function CombatPage() {
       let damage = skill.damage;
       
       if (damage > 0) {
-        // Vérifier le coup critique
-        const critCheck = checkCritical(attacker);
-        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill, critCheck.isCritical);
+        // Déterminer si la compétence nécessite un jet de touche (spell attack)
+        // Pas de jet pour: effets de zone, jets de sauvegarde, ou explicitement désactivé
+        const needsAttackRoll = skill.requiresAttackRoll !== false && 
+                                !skill.areaOfEffect && 
+                                !skill.savingThrow &&
+                                skill.isSpellAttack === true;
+        
+        let hit = true;
+        let isCritical = false;
+        
+        if (needsAttackRoll) {
+          // === JET DE TOUCHE D&D 5e POUR COMPÉTENCE DE JOUEUR (Spell Attack) ===
+          const hasAdvantage = hasAdvantageOnAttack(attacker, target);
+          const hasDisadvantage = hasDisadvantageOnAttack(attacker, target);
+          const skillAttackResult = makeAttackRoll(attacker, target, true, hasAdvantage, hasDisadvantage);
+          
+          // Afficher le résultat du jet
+          setLastAttackResult({
+            roll: skillAttackResult.attackRoll.rolls[0],
+            modifier: skillAttackResult.totalAttackBonus,
+            total: skillAttackResult.attackRoll.total,
+            targetAC: skillAttackResult.targetAC,
+            hit: skillAttackResult.hit,
+            isCritical: skillAttackResult.isCriticalHit,
+            attacker: attacker.name,
+            target: target.name
+          });
+          
+          // Log du jet de touche
+          const rollText = hasAdvantage ? '🎲🎲 (Avantage)' : hasDisadvantage ? '🎲 (Désavantage)' : '🎲';
+          logs.push(`${rollText} ${attacker.name} (${skill.name}): ${skillAttackResult.attackRoll.rolls[0]} + ${skillAttackResult.totalAttackBonus} = ${skillAttackResult.attackRoll.total} vs CA ${skillAttackResult.targetAC}`);
+          
+          hit = skillAttackResult.hit;
+          isCritical = skillAttackResult.isCriticalHit;
+          
+          if (skillAttackResult.isCriticalMiss) {
+            logs.push(`💨 Échec critique ! ${skill.name} rate complètement !`);
+            addCombatHistoryEntry({
+              turn: combatTurn,
+              actor: attacker.name,
+              actorPortrait: attacker.portrait,
+              action: `${skill.name} (échec crit.)`,
+              target: target.name,
+              damage: 0,
+              isPlayerAction: true,
+              damageType
+            });
+            checkCombatEnd(logs, attacker.id, undefined, enemies);
+            setIsAnimating(false);
+            return;
+          } else if (!hit) {
+            logs.push(`✨ ${skill.name} rate ${target.name} !`);
+            addCombatHistoryEntry({
+              turn: combatTurn,
+              actor: attacker.name,
+              actorPortrait: attacker.portrait,
+              action: `${skill.name} (raté)`,
+              target: target.name,
+              damage: 0,
+              isPlayerAction: true,
+              damageType
+            });
+            checkCombatEnd(logs, attacker.id, undefined, enemies);
+            setIsAnimating(false);
+            return;
+          }
+        } else {
+          // Pas de jet de touche - vérifier le coup critique normal
+          const critCheck = checkCritical(attacker);
+          isCritical = critCheck.isCritical;
+        }
+        
+        // TOUCHÉ ! Calcul des dégâts
+        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
         
         target.hp = Math.max(0, target.hp - actualDamage);
         trackDamageDealt(attacker.id, actualDamage);
@@ -1665,7 +1891,7 @@ export function CombatPage() {
         );
         gameStore.setState({ currentEnemies: updatedEnemies });
         
-        if (critCheck.isCritical) {
+        if (isCritical) {
           logs.push(`💥 COUP CRITIQUE ! ${attacker.name} utilise ${skill.name} !`);
         }
         logs.push(`${attacker.name} utilise ${skill.name} ! (${actualDamage} dégâts ${damageType === 'magical' ? 'magiques' : damageType === 'holy' ? 'sacrés' : 'physiques'} à ${target.name})`);
@@ -1674,7 +1900,7 @@ export function CombatPage() {
           turn: combatTurn,
           actor: attacker.name,
           actorPortrait: attacker.portrait,
-          action: critCheck.isCritical ? `${skill.name} (CRITIQUE!)` : skill.name,
+          action: isCritical ? `${skill.name} (CRITIQUE!)` : skill.name,
           target: target.name,
           damage: actualDamage,
           isPlayerAction: true,
