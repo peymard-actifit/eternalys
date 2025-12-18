@@ -365,6 +365,15 @@
   text-transform: capitalize;
 }
 
+.resistance-icon .resistance-percent {
+  color: #70a070;
+  font-size: 0.75rem;
+  margin-left: 0.3rem;
+  background: rgba(100, 180, 100, 0.2);
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+}
+
 .resistance-row.immunity .resistance-icon {
   background: linear-gradient(135deg, #3a3a2a, #2a2a1a);
   border-color: #5a5a4a;

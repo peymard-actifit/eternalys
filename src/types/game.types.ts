@@ -109,8 +109,10 @@ export interface Character {
     thorns?: number;         // % des dégâts renvoyés à l'attaquant
     regeneration?: number;   // PV régénérés par tour
     evasion?: number;        // % chance d'esquiver
-    damageReduction?: number; // % réduction des dégâts reçus
+    damageReduction?: Record<string, number>; // % réduction par type de dégâts (fire: 50, cold: 30, etc.)
   };
+  // PV temporaires (Simulacre de vie, etc.)
+  temporaryHp?: number;
 }
 
 // Conditions D&D

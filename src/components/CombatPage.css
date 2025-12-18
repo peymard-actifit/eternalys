@@ -839,22 +839,65 @@
 
 /* Historique de combat */
 .combat-history-panel {
-  background: rgba(20, 15, 30, 0.9);
+  background: rgba(20, 15, 30, 0.95);
   border: 1px solid rgba(155, 89, 182, 0.3);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem;
   overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.combat-history-panel.compact {
+  max-height: 180px;
+}
+
+.combat-history-panel.expanded {
+  max-height: 500px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 320px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+  margin-bottom: 0.5rem;
+}
+
+.history-header:hover {
+  background: rgba(155, 89, 182, 0.1);
+  border-radius: 4px;
 }
 
 .combat-history-panel h4 {
   font-family: 'Cinzel', serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #9b59b6;
-  margin: 0 0 0.8rem 0;
-  text-align: center;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+  margin: 0;
+}
+
+.history-toggle-btn {
+  background: rgba(155, 89, 182, 0.2);
+  border: 1px solid rgba(155, 89, 182, 0.4);
+  color: #9b59b6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-toggle-btn:hover {
+  background: rgba(155, 89, 182, 0.4);
+  color: #fff;
 }
 
 .combat-history-list {

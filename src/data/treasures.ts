@@ -1486,7 +1486,23 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
             effects.push(`+${passiveValue}% coup critique`);
             break;
           case 'resistance':
-            effects.push(`Résistance ${effect.passive.damageType}: ${passiveValue}%`);
+            // Ajouter la résistance au tableau de résistances du personnage
+            if (effect.passive.damageType) {
+              if (!character.resistances) {
+                character.resistances = [];
+              }
+              // Ne pas ajouter en double
+              if (!character.resistances.includes(effect.passive.damageType as any)) {
+                character.resistances.push(effect.passive.damageType as any);
+              }
+              // Stocker aussi le pourcentage de réduction dans passiveEffects
+              if (!character.passiveEffects.damageReduction) {
+                character.passiveEffects.damageReduction = {};
+              }
+              character.passiveEffects.damageReduction[effect.passive.damageType] = 
+                (character.passiveEffects.damageReduction[effect.passive.damageType] || 0) + passiveValue;
+              effects.push(`🛡️ Résistance ${effect.passive.damageType}: ${passiveValue}%`);
+            }
             break;
         }
       }

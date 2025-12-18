@@ -15,6 +15,7 @@ export function CombatPage() {
   const [pendingSkill, setPendingSkill] = useState<Skill | null>(null);
   const [combatHistory, setCombatHistory] = useState<CombatHistoryEntry[]>([]);
   const [combatTurn, setCombatTurn] = useState(1);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
   const lastTurnRef = useRef<string | null>(null);
   // Utiliser une ref pour accumuler les drops de manière SYNCHRONE
   // (useState est asynchrone et causerait des problèmes avec checkCombatEnd)
@@ -584,13 +585,26 @@ export function CombatPage() {
     
     // Vérifier les résistances/immunités/vulnérabilités (D&D)
     if ('resistances' in target && target.resistances?.includes(damageType as any)) {
-      totalDamage = Math.floor(totalDamage * 0.5); // Résistance = 50% de dégâts
+      // Pour les personnages, utiliser le pourcentage personnalisé si disponible
+      if ('class' in target && target.passiveEffects?.damageReduction?.[damageType]) {
+        const reductionPercent = target.passiveEffects.damageReduction[damageType];
+        totalDamage = Math.floor(totalDamage * (1 - reductionPercent / 100));
+      } else {
+        totalDamage = Math.floor(totalDamage * 0.5); // Résistance = 50% de dégâts par défaut
+      }
     }
     if ('immunities' in target && target.immunities?.includes(damageType as any)) {
       totalDamage = 0; // Immunité = 0 dégâts
     }
     if ('vulnerabilities' in target && target.vulnerabilities?.includes(damageType as any)) {
       totalDamage = Math.floor(totalDamage * 2); // Vulnérabilité = 200% de dégâts
+    }
+    
+    // Appliquer les PV temporaires en premier
+    if ('class' in target && target.temporaryHp && target.temporaryHp > 0) {
+      const absorbedByTempHp = Math.min(target.temporaryHp, totalDamage);
+      totalDamage -= absorbedByTempHp;
+      // Note: la réduction des PV temporaires sera gérée dans le code appelant
     }
     
     return Math.max(1, totalDamage - defense);
@@ -1876,13 +1890,18 @@ export function CombatPage() {
       )}
 
       <div className="combat-main-layout">
-        <div className="combat-history-panel">
-          <h4>📜 Actions</h4>
+        <div className={`combat-history-panel ${isHistoryExpanded ? 'expanded' : 'compact'}`}>
+          <div className="history-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}>
+            <h4>📜 Historique ({combatHistory.length})</h4>
+            <button className="history-toggle-btn">
+              {isHistoryExpanded ? '▼ Réduire' : '▲ Agrandir'}
+            </button>
+          </div>
           <div className="combat-history-list">
             {combatHistory.length === 0 ? (
               <p className="history-empty">Le combat commence...</p>
             ) : (
-              [...combatHistory].reverse().slice(0, 12).map(entry => (
+              [...combatHistory].reverse().slice(0, isHistoryExpanded ? 50 : 6).map(entry => (
                 <div 
                   key={entry.id} 
                   className={`combat-history-entry ${entry.isPlayerAction ? 'player' : 'enemy'}`}

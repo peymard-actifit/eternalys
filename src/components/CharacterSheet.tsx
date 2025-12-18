@@ -176,7 +176,7 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
           <div className="resistances-section">
             <h3>🛡️ Résistances & Immunités</h3>
             <div className="resistances-grid">
-              {/* Résistances */}
+              {/* Résistances - Monstres */}
               {isMonster && (entity as Monster).resistances && (entity as Monster).resistances!.length > 0 && (
                 <div className="resistance-row">
                   <span className="resistance-label">Résistances:</span>
@@ -190,7 +190,25 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
                 </div>
               )}
               
-              {/* Immunités */}
+              {/* Résistances - Personnages (obtenues via objets) */}
+              {isCharacter && (entity as Character).resistances && (entity as Character).resistances!.length > 0 && (
+                <div className="resistance-row">
+                  <span className="resistance-label">Résistances:</span>
+                  <div className="resistance-icons">
+                    {(entity as Character).resistances!.map(r => {
+                      const reductionPercent = (entity as Character).passiveEffects?.damageReduction?.[r] || 50;
+                      return (
+                        <span key={r} className="resistance-icon" title={`Résistance: ${r} (${reductionPercent}% réduction)`}>
+                          {DAMAGE_TYPE_ICONS[r] || '🔷'} <span className="resistance-name">{r}</span>
+                          <span className="resistance-percent">{reductionPercent}%</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Immunités - Monstres */}
               {isMonster && (entity as Monster).immunities && (entity as Monster).immunities!.length > 0 && (
                 <div className="resistance-row immunity">
                   <span className="resistance-label">Immunités:</span>
@@ -204,7 +222,7 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
                 </div>
               )}
               
-              {/* Vulnérabilités */}
+              {/* Vulnérabilités - Monstres */}
               {isMonster && (entity as Monster).vulnerabilities && (entity as Monster).vulnerabilities!.length > 0 && (
                 <div className="resistance-row vulnerability">
                   <span className="resistance-label">Vulnérabilités:</span>
