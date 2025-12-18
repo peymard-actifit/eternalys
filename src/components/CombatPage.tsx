@@ -151,15 +151,35 @@ export function CombatPage() {
 
   // Décrémenter les buffs et cooldowns du personnage actuel à chaque nouveau tour
   const processBuffsForCharacter = useCallback((characterId: string) => {
-    const logs: string[] = [...state.combatLog];
-    
     // Récupérer l'équipe actuelle du state GLOBAL (pas de la closure)
     const currentTeam = gameStore.getState().team;
+    const currentLogs = gameStore.getState().combatLog;
+    const logs: string[] = [...currentLogs];
     
     const updatedTeam = currentTeam.map(char => {
       if (char.id !== characterId) return char;
       
-      let updatedChar = { ...char };
+      // Copie profonde du personnage
+      let updatedChar = { 
+        ...char,
+        skills: char.skills ? [...char.skills] : [],
+        buffs: char.buffs ? [...char.buffs] : []
+      };
+      
+      // =============================================
+      // APPLIQUER LA RÉGÉNÉRATION PASSIVE (des objets)
+      // =============================================
+      if (updatedChar.passiveEffects?.regeneration && updatedChar.passiveEffects.regeneration > 0) {
+        const regenAmount = updatedChar.passiveEffects.regeneration;
+        const healAmount = Math.min(regenAmount, updatedChar.maxHp - updatedChar.hp);
+        if (healAmount > 0) {
+          updatedChar.hp = Math.min(updatedChar.maxHp, updatedChar.hp + regenAmount);
+          logs.push(`💚 ${updatedChar.name} régénère ${healAmount} PV (passif)`);
+          if (updatedChar.stats) {
+            updatedChar.stats.totalHealingDone += healAmount;
+          }
+        }
+      }
       
       // =============================================
       // DÉCRÉMENTER LES COOLDOWNS DES COMPÉTENCES
@@ -187,13 +207,15 @@ export function CombatPage() {
       const updatedBuffs: ActiveBuff[] = [];
       const expiredBuffNames: string[] = [];
       
-      char.buffs?.forEach(buff => {
+      // IMPORTANT: Itérer sur updatedChar.buffs (pas char.buffs)
+      updatedChar.buffs.forEach(buff => {
+        // Traiter TOUS les buffs dont ce personnage est propriétaire
         if (buff.ownerId === characterId) {
           // Appliquer les effets de début de tour (régén, poison)
           if (buff.type === 'regen') {
             const healAmount = Math.min(buff.value, updatedChar.maxHp - updatedChar.hp);
-            updatedChar.hp = Math.min(updatedChar.maxHp, updatedChar.hp + buff.value);
             if (healAmount > 0) {
+              updatedChar.hp = Math.min(updatedChar.maxHp, updatedChar.hp + buff.value);
               logs.push(`💚 ${updatedChar.name} régénère ${healAmount} PV`);
               if (updatedChar.stats) {
                 updatedChar.stats.totalHealingDone += healAmount;
@@ -224,15 +246,19 @@ export function CombatPage() {
             } else if (buff.type === 'speed') {
               expiredBuffNames.push('vitesse');
             } else if (buff.type === 'damage_reflect') {
-              logs.push(`${updatedChar.name} ne renvoie plus les dégâts`);
+              expiredBuffNames.push('renvoi de dégâts');
+            } else if (buff.type === 'regen') {
+              expiredBuffNames.push('régénération');
+            } else if (buff.type === 'poison') {
+              expiredBuffNames.push('poison');
             }
             // NE PAS ajouter aux buffs (supprimé de la liste)
           } else {
-            // Buff toujours actif, on le garde
+            // Buff toujours actif, on le garde avec la durée décrémentée
             updatedBuffs.push({ ...buff, turnsRemaining: newTurns });
           }
         } else {
-          // Buff d'un autre personnage, garder tel quel
+          // Buff d'un autre personnage (comme un buff de groupe), garder tel quel
           updatedBuffs.push(buff);
         }
       });
@@ -251,14 +277,14 @@ export function CombatPage() {
       
       // Logger les buffs expirés
       if (expiredBuffNames.length > 0) {
-        logs.push(`⏳ ${updatedChar.name} perd le(s) buff(s) de ${expiredBuffNames.join(', ')}`);
+        logs.push(`⏳ ${updatedChar.name} perd le(s) effet(s): ${expiredBuffNames.join(', ')}`);
       }
       
       return updatedChar;
     });
     
     gameStore.setState({ team: updatedTeam, combatLog: logs });
-  }, [state.team, state.combatLog]);
+  }, []);
 
   // Vérifier si c'est un nouveau tour pour un personnage
   useEffect(() => {
@@ -335,15 +361,18 @@ export function CombatPage() {
     return aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
   };
 
-  // Appliquer le renvoi de dégâts si le personnage a ce buff
+  // Appliquer le renvoi de dégâts (buff temporaire ET épines passives)
   const applyDamageReflect = (target: Character, damage: number, enemy: Monster, logs: string[]): number => {
+    let totalReflected = 0;
+    
+    // 1. Renvoi de dégâts via buff temporaire
     const reflectBuff = target.buffs?.find(b => b.type === 'damage_reflect');
     if (reflectBuff && damage > 0) {
-      // Minimum 1 dégât renvoyé si le personnage a reçu des dégâts
       const reflectedDamage = Math.max(1, Math.floor(damage * reflectBuff.value / 100));
       enemy.hp = Math.max(0, enemy.hp - reflectedDamage);
+      totalReflected += reflectedDamage;
       
-      logs.push(`🔄 ${target.name} renvoie ${reflectedDamage} dégâts à ${enemy.name} !`);
+      logs.push(`🔄 ${target.name} renvoie ${reflectedDamage} dégâts à ${enemy.name} (buff) !`);
       trackDamageDealt(target.id, reflectedDamage);
       
       addCombatHistoryEntry({
@@ -356,10 +385,30 @@ export function CombatPage() {
         isPlayerAction: true,
         damageType: 'physical'
       });
-      
-      return reflectedDamage;
     }
-    return 0;
+    
+    // 2. Épines passives (thorns) via objets/trésors
+    if (target.passiveEffects?.thorns && target.passiveEffects.thorns > 0 && damage > 0) {
+      const thornsDamage = Math.max(1, Math.floor(damage * target.passiveEffects.thorns / 100));
+      enemy.hp = Math.max(0, enemy.hp - thornsDamage);
+      totalReflected += thornsDamage;
+      
+      logs.push(`🌵 ${target.name} renvoie ${thornsDamage} dégâts à ${enemy.name} (épines) !`);
+      trackDamageDealt(target.id, thornsDamage);
+      
+      addCombatHistoryEntry({
+        turn: combatTurn,
+        actor: target.name,
+        actorPortrait: target.portrait,
+        action: 'Épines',
+        target: enemy.name,
+        damage: thornsDamage,
+        isPlayerAction: true,
+        damageType: 'physical'
+      });
+    }
+    
+    return totalReflected;
   };
 
   const trackMonsterKill = (killerId: string, monster: Monster) => {
@@ -388,12 +437,38 @@ export function CombatPage() {
   const isPhysicalDamage = (type: string): boolean => physicalDamageTypes.includes(type);
   const isMagicalDamage = (type: string): boolean => magicalDamageTypes.includes(type);
   
+  // Vérifier si l'attaque est un coup critique (retourne le multiplicateur)
+  const checkCritical = (attacker: Character | Monster): { isCritical: boolean; multiplier: number } => {
+    let critChance = 5; // 5% de base
+    
+    // Ajouter le bonus de critique passif du personnage
+    if ('class' in attacker && attacker.passiveEffects?.critical) {
+      critChance += attacker.passiveEffects.critical;
+    }
+    
+    const roll = Math.random() * 100;
+    return {
+      isCritical: roll < critChance,
+      multiplier: roll < critChance ? 2 : 1
+    };
+  };
+  
+  // Vérifier si la cible esquive l'attaque
+  const checkEvasion = (target: Character | Monster): boolean => {
+    if ('class' in target && target.passiveEffects?.evasion) {
+      const roll = Math.random() * 100;
+      return roll < target.passiveEffects.evasion;
+    }
+    return false;
+  };
+  
   const calculateDamage = (
     baseDamage: number, 
     attacker: Character | Monster, 
     target: Character | Monster,
     damageType: string = 'physical',
-    skill?: Skill
+    skill?: Skill,
+    isCritical: boolean = false
   ): number => {
     let totalDamage = baseDamage;
     
@@ -424,6 +499,11 @@ export function CombatPage() {
       }
     }
     
+    // Appliquer le multiplicateur de critique
+    if (isCritical) {
+      totalDamage = Math.floor(totalDamage * 2);
+    }
+    
     // Calculer la défense appropriée
     let defense = 0;
     if (isPhysical) {
@@ -444,6 +524,24 @@ export function CombatPage() {
     }
     
     return Math.max(1, totalDamage - defense);
+  };
+  
+  // Appliquer les épines (thorns) quand un personnage reçoit des dégâts
+  const applyThorns = (
+    defender: Character, 
+    attacker: Monster, 
+    damageReceived: number,
+    logs: string[]
+  ): number => {
+    if (defender.passiveEffects?.thorns && defender.passiveEffects.thorns > 0) {
+      const thornsDamage = Math.floor(damageReceived * defender.passiveEffects.thorns / 100);
+      if (thornsDamage > 0) {
+        attacker.hp = Math.max(0, attacker.hp - thornsDamage);
+        logs.push(`🌵 ${defender.name} renvoie ${thornsDamage} dégâts à ${attacker.name} (épines)`);
+        return thornsDamage;
+      }
+    }
+    return 0;
   };
 
   const displayMonsterDialogue = (dialogue: string) => {
@@ -603,29 +701,46 @@ export function CombatPage() {
           if (aliveTeam.length > 0) {
             // Vérifier la Provocation en priorité
             const target = getMonsterTarget(aliveTeam);
+            const logs = [...combatLog];
             
-            const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
-            target.hp = Math.max(0, target.hp - damage);
-            trackDamageTaken(target.id, damage);
-            triggerDamageEffect(target.id, 'physical');
-            
-            const logs = [...combatLog, `${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`];
-            
-            // Appliquer le renvoi de dégâts si le personnage provoque
-            applyDamageReflect(target, damage, currentMonster, logs);
-            
-            addCombatHistoryEntry({
-              turn: combatTurn,
-              actor: currentMonster.name,
-              actorPortrait: currentMonster.portrait,
-              action: 'Attaque',
-              target: target.name,
-              damage,
-              isPlayerAction: false,
-              damageType: 'physical'
-            });
-            
-            checkCombatEnd(logs, null, undefined, enemies);
+            // Vérifier l'évasion du personnage
+            if (checkEvasion(target)) {
+              logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} !`);
+              addCombatHistoryEntry({
+                turn: combatTurn,
+                actor: currentMonster.name,
+                actorPortrait: currentMonster.portrait,
+                action: 'Attaque (esquivée)',
+                target: target.name,
+                damage: 0,
+                isPlayerAction: false,
+                damageType: 'physical'
+              });
+              checkCombatEnd(logs, null, undefined, enemies);
+            } else {
+              const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+              target.hp = Math.max(0, target.hp - damage);
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, 'physical');
+              
+              logs.push(`${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
+              
+              // Appliquer le renvoi de dégâts et épines
+              applyDamageReflect(target, damage, currentMonster, logs);
+              
+              addCombatHistoryEntry({
+                turn: combatTurn,
+                actor: currentMonster.name,
+                actorPortrait: currentMonster.portrait,
+                action: 'Attaque',
+                target: target.name,
+                damage,
+                isPlayerAction: false,
+                damageType: 'physical'
+              });
+              
+              checkCombatEnd(logs, null, undefined, enemies);
+            }
           }
         } catch (error) {
           console.error('Error in monster turn:', error);
@@ -635,29 +750,36 @@ export function CombatPage() {
             const target = getMonsterTarget(aliveTeam);
             displayMonsterDialogue('GRAAAH!');
             await new Promise(resolve => setTimeout(resolve, 1000));
+            const logs = [...combatLog];
             
-            const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
-            target.hp = Math.max(0, target.hp - damage);
-            trackDamageTaken(target.id, damage);
-            triggerDamageEffect(target.id, 'physical');
-            
-            const logs = [...combatLog, `${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`];
-            
-            // Appliquer le renvoi de dégâts si le personnage provoque
-            applyDamageReflect(target, damage, currentMonster, logs);
-            
-            addCombatHistoryEntry({
-              turn: combatTurn,
-              actor: currentMonster.name,
-              actorPortrait: currentMonster.portrait,
-              action: 'Attaque',
-              target: target.name,
-              damage,
-              isPlayerAction: false,
-              damageType: 'physical'
-            });
-            
-            checkCombatEnd(logs, null, undefined, enemies);
+            // Vérifier l'évasion
+            if (checkEvasion(target)) {
+              logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} !`);
+              checkCombatEnd(logs, null, undefined, enemies);
+            } else {
+              const damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+              target.hp = Math.max(0, target.hp - damage);
+              trackDamageTaken(target.id, damage);
+              triggerDamageEffect(target.id, 'physical');
+              
+              logs.push(`${currentMonster.name} inflige ${damage} dégâts à ${target.name} !`);
+              
+              // Appliquer le renvoi de dégâts et épines
+              applyDamageReflect(target, damage, currentMonster, logs);
+              
+              addCombatHistoryEntry({
+                turn: combatTurn,
+                actor: currentMonster.name,
+                actorPortrait: currentMonster.portrait,
+                action: 'Attaque',
+                target: target.name,
+                damage,
+                isPlayerAction: false,
+                damageType: 'physical'
+              });
+              
+              checkCombatEnd(logs, null, undefined, enemies);
+            }
           }
         }
         
@@ -679,33 +801,47 @@ export function CombatPage() {
       if (aliveTeam.length > 0) {
         // Utiliser getMonsterTarget pour la Provocation
         const target = getMonsterTarget(aliveTeam);
-        const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
-        target.hp = Math.max(0, target.hp - damage);
-        trackDamageTaken(target.id, damage);
-        triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
         
-        logs.push(`${monster.name} utilise ${skill.name} ! (${damage} dégâts ${skill.damageType === 'magical' ? 'magiques' : 'physiques'} à ${target.name})`);
-        
-        // Appliquer le renvoi de dégâts si le personnage provoque (seulement pour dégâts physiques)
-        if (skill.damageType === 'physical') {
+        // Vérifier l'évasion du personnage
+        if (checkEvasion(target)) {
+          logs.push(`💨 ${target.name} esquive ${skill.name} de ${monster.name} !`);
+          addCombatHistoryEntry({
+            turn: combatTurn,
+            actor: monster.name,
+            actorPortrait: monster.portrait,
+            action: `${skill.name} (esquivé)`,
+            target: target.name,
+            damage: 0,
+            isPlayerAction: false,
+            damageType: skill.damageType
+          });
+        } else {
+          const damage = calculateDamage(skill.damage, monster, target, skill.damageType);
+          target.hp = Math.max(0, target.hp - damage);
+          trackDamageTaken(target.id, damage);
+          triggerDamageEffect(target.id, skill.damageType === 'magical' ? 'magical' : 'physical');
+          
+          logs.push(`${monster.name} utilise ${skill.name} ! (${damage} dégâts ${skill.damageType === 'magical' ? 'magiques' : 'physiques'} à ${target.name})`);
+          
+          // Appliquer le renvoi de dégâts et épines
           applyDamageReflect(target, damage, monster, logs);
-        }
-        
-        addCombatHistoryEntry({
-          turn: combatTurn,
-          actor: monster.name,
-          actorPortrait: monster.portrait,
-          action: skill.name,
-          target: target.name,
-          damage,
-          isPlayerAction: false,
-          damageType: skill.damageType
-        });
-        
-        if (skill.effect?.type === 'lifesteal') {
-          const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
-          monster.hp = Math.min(monster.maxHp, monster.hp + healed);
-          logs.push(`${monster.name} récupère ${healed} PV !`);
+          
+          addCombatHistoryEntry({
+            turn: combatTurn,
+            actor: monster.name,
+            actorPortrait: monster.portrait,
+            action: skill.name,
+            target: target.name,
+            damage,
+            isPlayerAction: false,
+            damageType: skill.damageType
+          });
+          
+          if (skill.effect?.type === 'lifesteal') {
+            const healed = Math.floor(damage * (skill.effect.value || 50) / 100);
+            monster.hp = Math.min(monster.maxHp, monster.hp + healed);
+            logs.push(`🧛 ${monster.name} récupère ${healed} PV !`);
+          }
         }
       }
     } else if (skill.type === 'buff' && skill.effect) {
@@ -978,15 +1114,36 @@ export function CombatPage() {
     const attacker = currentTurn as Character;
     // Cibler l'ennemi sélectionné
     const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
+    const logs = [...combatLog];
+    
+    // Vérifier le coup critique
+    const critCheck = checkCritical(attacker);
     
     // Attaque de base = valeur d'attaque du personnage (pas de bonus supplémentaire)
     // Les dégâts suivent directement la stat d'attaque (avec buffs/debuffs appliqués)
     const baseDamage = attacker.attack;
     const defense = target.defense;
-    const damage = Math.max(1, baseDamage - defense);
+    let damage = Math.max(1, baseDamage - defense);
+    
+    // Appliquer le critique
+    if (critCheck.isCritical) {
+      damage = Math.floor(damage * 2);
+      logs.push(`💥 COUP CRITIQUE ! ${attacker.name} frappe avec puissance !`);
+    }
+    
     target.hp = Math.max(0, target.hp - damage);
     trackDamageDealt(attacker.id, damage);
     triggerDamageEffect(target.id, 'physical');
+    
+    // Appliquer le vol de vie passif
+    if (attacker.passiveEffects?.lifesteal && attacker.passiveEffects.lifesteal > 0) {
+      const stolen = Math.floor(damage * attacker.passiveEffects.lifesteal / 100);
+      if (stolen > 0) {
+        attacker.hp = Math.min(attacker.maxHp, attacker.hp + stolen);
+        trackHealing(attacker.id, stolen);
+        logs.push(`🧛 ${attacker.name} vole ${stolen} PV !`);
+      }
+    }
     
     // Mettre à jour les HP dans la liste locale des ennemis
     const updatedEnemies = enemies.map(e => 
@@ -996,18 +1153,27 @@ export function CombatPage() {
     // Mettre à jour le state avec les HP modifiés des ennemis
     gameStore.setState({ currentEnemies: updatedEnemies });
     
+    // Mettre à jour l'équipe si le personnage a volé de la vie
+    if (attacker.passiveEffects?.lifesteal) {
+      const currentTeam = gameStore.getState().team;
+      const updatedTeam = currentTeam.map(c => 
+        c.id === attacker.id ? { ...c, hp: attacker.hp } : c
+      );
+      gameStore.setState({ team: updatedTeam });
+    }
+    
     addCombatHistoryEntry({
       turn: combatTurn,
       actor: attacker.name,
       actorPortrait: attacker.portrait,
-      action: 'Attaque',
+      action: critCheck.isCritical ? 'Attaque CRITIQUE!' : 'Attaque',
       target: target.name,
       damage,
       isPlayerAction: true,
       damageType: 'physical'
     });
     
-    const logs = [...combatLog, `${attacker.name} inflige ${damage} dégâts à ${target.name} !`];
+    logs.push(`${attacker.name} inflige ${damage} dégâts à ${target.name} !`);
     
     // Vérifier si l'ennemi ciblé est mort
     const killedEnemy = target.hp <= 0 ? { ...target } : undefined;
@@ -1261,7 +1427,10 @@ export function CombatPage() {
       let damage = skill.damage;
       
       if (damage > 0) {
-        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill);
+        // Vérifier le coup critique
+        const critCheck = checkCritical(attacker);
+        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill, critCheck.isCritical);
+        
         target.hp = Math.max(0, target.hp - actualDamage);
         trackDamageDealt(attacker.id, actualDamage);
         
@@ -1275,13 +1444,16 @@ export function CombatPage() {
         );
         gameStore.setState({ currentEnemies: updatedEnemies });
         
+        if (critCheck.isCritical) {
+          logs.push(`💥 COUP CRITIQUE ! ${attacker.name} utilise ${skill.name} !`);
+        }
         logs.push(`${attacker.name} utilise ${skill.name} ! (${actualDamage} dégâts ${damageType === 'magical' ? 'magiques' : damageType === 'holy' ? 'sacrés' : 'physiques'} à ${target.name})`);
         
         addCombatHistoryEntry({
           turn: combatTurn,
           actor: attacker.name,
           actorPortrait: attacker.portrait,
-          action: skill.name,
+          action: critCheck.isCritical ? `${skill.name} (CRITIQUE!)` : skill.name,
           target: target.name,
           damage: actualDamage,
           isPlayerAction: true,
@@ -1300,7 +1472,14 @@ export function CombatPage() {
           const stolen = Math.floor(actualDamage * totalLifesteal / 100);
           attacker.hp = Math.min(attacker.maxHp, attacker.hp + stolen);
           trackHealing(attacker.id, stolen);
-          logs.push(`🩸 ${attacker.name} récupère ${stolen} PV (vol de vie ${totalLifesteal}%) !`);
+          logs.push(`🧛 ${attacker.name} récupère ${stolen} PV (vol de vie ${totalLifesteal}%) !`);
+          
+          // Mettre à jour l'équipe pour persister le vol de vie
+          const currentTeam = gameStore.getState().team;
+          const updatedTeam = currentTeam.map(c => 
+            c.id === attacker.id ? { ...c, hp: attacker.hp } : c
+          );
+          gameStore.setState({ team: updatedTeam });
         }
         
         if (target.hp > 0) {
