@@ -877,3 +877,45 @@
   }
 }
 
+/* ============================================
+   ÉTAT D'ERREUR
+   ============================================ */
+.sheet-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  min-height: 200px;
+}
+
+.sheet-error .error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.sheet-error p {
+  color: #e0d0c0;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sheet-error .error-close-btn {
+  background: linear-gradient(135deg, #8b4545, #6b3535);
+  border: 2px solid #8b4545;
+  color: #e0d0c0;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sheet-error .error-close-btn:hover {
+  background: #8b4545;
+  transform: scale(1.05);
+}
+

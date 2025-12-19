@@ -2820,8 +2820,9 @@ export function CombatPage() {
               >
                 <span className="toggle-icon">{autoMode ? '🔓' : '🔒'}</span>
               </button>
+              {/* Bouton minimize visible UNIQUEMENT sur mobile/tablette */}
               <button 
-                className="minimize-actions-btn"
+                className="minimize-actions-btn mobile-only"
                 onClick={() => setIsActionsMinimized(!isActionsMinimized)}
               >
                 {isActionsMinimized ? '▼ Ouvrir' : '▲ Réduire'}

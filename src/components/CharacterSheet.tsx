@@ -55,22 +55,39 @@ const formatModifier = (mod: number): string => mod >= 0 ? `+${mod}` : `${mod}`;
 
 export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
   // Protection contre les entités null/undefined
-  if (!entity) {
+  if (!entity || typeof entity !== 'object') {
     return (
       <div className="character-sheet-overlay" onClick={onClose}>
         <div className="character-sheet" onClick={e => e.stopPropagation()}>
           <button className="close-btn" onClick={onClose}>✕</button>
           <div className="sheet-error">
-            <p>⚠️ Impossible de charger les informations</p>
-            <button onClick={onClose}>Fermer</button>
+            <span className="error-icon">⚠️</span>
+            <p>Impossible de charger les informations de cette entité</p>
+            <button className="error-close-btn" onClick={onClose}>Fermer</button>
           </div>
         </div>
       </div>
     );
   }
 
-  const isCharacter = entity && 'class' in entity;
-  const isMonster = entity && ('isBoss' in entity || 'creatureType' in entity);
+  // Valeurs par défaut pour éviter les erreurs
+  const safeEntity = {
+    name: entity.name || 'Inconnu',
+    portrait: entity.portrait || '❓',
+    hp: entity.hp ?? 0,
+    maxHp: entity.maxHp ?? 1,
+    attack: entity.attack ?? 0,
+    defense: entity.defense ?? 0,
+    speed: entity.speed ?? 0,
+    magicAttack: entity.magicAttack ?? 0,
+    magicDefense: entity.magicDefense ?? 0,
+    abilities: entity.abilities || null,
+    skills: entity.skills || [],
+    ...entity
+  };
+
+  const isCharacter = 'class' in safeEntity;
+  const isMonster = 'isMonster' in safeEntity || 'creatureType' in safeEntity || 'challengeRating' in safeEntity;
   
   // Gestion de la touche Échap
   const handleKeyDown = (e: React.KeyboardEvent) => {

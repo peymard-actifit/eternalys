@@ -1107,6 +1107,11 @@
   box-shadow: none;
 }
 
+/* Bouton minimize - CACHÉ sur PC par défaut */
+.minimize-actions-btn.mobile-only {
+  display: none;
+}
+
 .action-btn.on-cooldown::after {
   content: '';
   position: absolute;
@@ -2791,37 +2796,46 @@
     gap: 0.15rem;
   }
 
-  /* Boutons TRÈS compacts - même taille pour attaque et compétences */
+  /* Boutons TRÈS compacts - TAILLE UNIFORME pour attaque et compétences */
   .action-btn,
   .action-btn.attack,
   .action-btn.skill {
-    padding: 0.2rem 0.15rem !important;
-    font-size: 0.45rem !important;
+    padding: 0.25rem 0.2rem !important;
+    font-size: 0.5rem !important;
     border-radius: 4px;
-    min-height: 28px !important;
-    max-height: 32px !important;
+    min-height: 32px !important;
+    max-height: 36px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .action-btn .action-icon {
-    font-size: 0.7rem !important;
-    margin-bottom: 0.05rem;
+    font-size: 0.75rem !important;
+    margin-bottom: 0.1rem;
   }
 
-  .action-btn .action-name {
-    font-size: 0.4rem !important;
+  .action-btn .action-name,
+  .action-btn span:first-child {
+    font-size: 0.45rem !important;
     line-height: 1.1;
+    text-align: center;
   }
 
   .damage-preview {
     font-size: 0.35rem !important;
     margin-top: 0.05rem;
+    opacity: 0.8;
   }
 
+  /* Grille des actions - 3 colonnes sur mobile */
+  .action-buttons,
   .skills-grid,
   .actions-grid {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.1rem !important;
+    gap: 0.15rem !important;
   }
 
   .cooldown-text {
@@ -2830,6 +2844,11 @@
 
   .cooldown-overlay {
     font-size: 0.6rem !important;
+  }
+
+  /* Bouton minimize visible UNIQUEMENT sur mobile */
+  .minimize-actions-btn.mobile-only {
+    display: flex !important;
   }
 
   /* DiceRoller compact */
