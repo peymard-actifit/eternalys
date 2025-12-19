@@ -32,6 +32,7 @@ export function CombatPage() {
   const [combatHistory, setCombatHistory] = useState<CombatHistoryEntry[]>([]);
   const [combatTurn, setCombatTurn] = useState(1);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
+  const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false);
   const lastTurnRef = useRef<string | null>(null);
   // Utiliser une ref pour accumuler les drops de manière SYNCHRONE
   // (useState est asynchrone et causerait des problèmes avec checkCombatEnd)
@@ -2502,7 +2503,15 @@ export function CombatPage() {
       )}
 
       <div className="combat-main-layout">
-        <div className={`combat-history-panel ${isHistoryExpanded ? 'expanded' : 'compact'}`}>
+        {/* Bouton toggle historique mobile */}
+        <button 
+          className={`mobile-history-toggle ${isMobileHistoryOpen ? 'open' : ''}`}
+          onClick={() => setIsMobileHistoryOpen(!isMobileHistoryOpen)}
+        >
+          {isMobileHistoryOpen ? '▶' : '◀'}
+        </button>
+
+        <div className={`combat-history-panel ${isHistoryExpanded ? 'expanded' : 'compact'} ${isMobileHistoryOpen ? 'mobile-open' : ''}`}>
           <div className="history-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}>
             <h4>📜 Historique ({combatHistory.length})</h4>
             <button className="history-toggle-btn">

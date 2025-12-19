@@ -762,66 +762,76 @@
   .dungeon-page {
     padding: 0.3rem;
     min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .dungeon-header {
     margin-bottom: 0.3rem;
     padding-bottom: 0.3rem;
+    flex-shrink: 0;
   }
 
   .dungeon-header h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .encounter-counter {
-    font-size: 0.75rem;
-    gap: 0.4rem;
+    font-size: 0.7rem;
+    gap: 0.3rem;
   }
 
   .counter-value {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .boss-warning {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .dungeon-layout {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   /* Panel équipe compact */
   .team-panel {
-    padding: 0.5rem;
+    padding: 0.4rem;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.3rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+    flex-shrink: 0;
   }
 
   .team-panel h3 {
-    font-size: 0.8rem;
-    margin-bottom: 0.4rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
     grid-column: 1 / -1;
+    padding-bottom: 0.2rem;
   }
 
   .panel-action-buttons {
     grid-column: 1 / -1;
     gap: 0.2rem;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
   }
 
   .panel-btn {
-    padding: 0.35rem;
-    font-size: 0.65rem;
-    gap: 0.2rem;
+    padding: 0.3rem;
+    font-size: 0.6rem;
+    gap: 0.15rem;
   }
 
   .team-member {
-    padding: 0.4rem;
-    gap: 0.3rem;
+    padding: 0.25rem;
+    gap: 0.15rem;
     border-radius: 6px;
     flex-direction: column;
     align-items: center;
@@ -829,7 +839,7 @@
   }
 
   .member-portrait {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 
   .member-info {
@@ -837,24 +847,23 @@
   }
 
   .member-name {
-    font-size: 0.7rem;
+    font-size: 0.55rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .member-class {
-    font-size: 0.55rem;
-    margin-bottom: 0.2rem;
+    display: none;
   }
 
   .hp-bar {
-    height: 10px;
-    border-radius: 5px;
+    height: 6px;
+    border-radius: 3px;
   }
 
   .hp-text {
-    font-size: 0.5rem;
+    font-size: 0.4rem;
   }
 
   .member-abilities {
@@ -865,120 +874,105 @@
     display: none;
   }
 
-  /* Carte du donjon compacte */
+  /* Carte du donjon - FIXE et CENTREE */
   .dungeon-map-container {
     flex: 1;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .treasure-notification {
-    padding: 0.5rem;
-    gap: 0.5rem;
+    padding: 0.4rem;
+    gap: 0.4rem;
     border-radius: 6px;
+    flex-shrink: 0;
   }
 
   .treasure-icon {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .treasure-text {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 
   .dungeon-map {
-    min-height: 200px;
+    flex: 1;
+    min-height: 0;
     padding: 0.5rem;
     border-radius: 8px;
-    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
 
-  .map-cell {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-    border-radius: 4px;
-  }
-
-  .map-cell.current {
-    font-size: 1.1rem;
-  }
-
-  .map-cell.adjacent {
-    font-size: 0.9rem;
+  /* Grille de la carte - cases alignées */
+  .map-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    align-items: center;
   }
 
   .map-row {
-    gap: 2px;
+    display: flex;
+    gap: 1px;
+    justify-content: center;
   }
 
-  .map-grid {
-    gap: 2px;
+  .map-cell {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Actions compactes */
+  .map-cell.current {
+    font-size: 0.95rem;
+  }
+
+  .map-cell.adjacent {
+    font-size: 0.75rem;
+  }
+
+  .map-cell.unknown {
+    font-size: 0.5rem;
+  }
+
+  /* Actions compactes en bas */
   .map-actions {
-    padding: 0.5rem;
+    padding: 0.4rem;
     border-radius: 8px;
+    flex-shrink: 0;
   }
 
   .map-actions h4 {
-    font-size: 0.75rem;
-    margin-bottom: 0.5rem;
+    font-size: 0.65rem;
+    margin-bottom: 0.3rem;
   }
 
   .direction-buttons {
-    gap: 0.4rem;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .direction-btn {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.7rem;
-    border-radius: 6px;
-  }
-
-  /* Historique ultra compact */
-  .history-panel {
-    max-height: 100px;
-    padding: 0.4rem;
-    border-radius: 8px;
-  }
-
-  .history-panel h3 {
-    font-size: 0.75rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .history-list {
-    gap: 0.3rem;
-  }
-
-  .history-entry {
-    padding: 0.3rem 0.5rem;
-    min-width: 100px;
-    border-radius: 6px;
-  }
-
-  .entry-header {
-    gap: 0.3rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .entry-icon {
-    font-size: 0.9rem;
-  }
-
-  .entry-turn {
-    font-size: 0.55rem;
-  }
-
-  .entry-content {
+    padding: 0.35rem 0.5rem;
     font-size: 0.65rem;
+    border-radius: 5px;
   }
 
-  .entry-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* Historique CACHÉ sur mobile - dans fenêtre annexe */
+  .history-panel {
+    display: none;
   }
 
   /* Tooltips désactivés sur mobile */
