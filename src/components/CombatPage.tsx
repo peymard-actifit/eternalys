@@ -2764,7 +2764,7 @@ export function CombatPage() {
               <div key={skill.id} className="skill-btn-wrapper">
                 <button
                   className={`action-btn skill ${skill.type || ''}`}
-                  onClick={() => handleSkillSelect(skill)}
+                  onClick={() => requestSkillUse(skill)}
                 >
                   <span>{skill.name}</span>
                   <span className="damage-preview">
