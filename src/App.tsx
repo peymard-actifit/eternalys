@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { gameStore } from './store/gameStore';
+import { authStore } from './store/authStore';
 import { GameState } from './types/game.types';
+import { WelcomePage } from './components/WelcomePage';
 import { MenuPage } from './components/MenuPage';
 import { CharacterSelectPage } from './components/CharacterSelectPage';
 import { DungeonPage } from './components/DungeonPage';
@@ -21,6 +23,15 @@ import './styles/z-index.css';
 function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [showBestiary, setShowBestiary] = useState(false);
+  const [hasEnteredGame, setHasEnteredGame] = useState(false);
+  
+  // Vérifier si l'utilisateur est déjà connecté au chargement
+  useEffect(() => {
+    const authState = authStore.getState();
+    if (authState.isAuthenticated && authState.currentUser) {
+      setHasEnteredGame(true);
+    }
+  }, []);
   
   // Détection automatique du type d'appareil et ajout des classes CSS
   useDeviceClass();
@@ -82,6 +93,16 @@ function App() {
   }, [handleKeyDown]);
 
   const { phase, showInventory, showPauseMenu } = state;
+
+  // Callback pour entrer dans le jeu
+  const handleEnterGame = useCallback(() => {
+    setHasEnteredGame(true);
+  }, []);
+
+  // Si l'utilisateur n'a pas encore passé l'écran de bienvenue
+  if (!hasEnteredGame) {
+    return <WelcomePage onEnterGame={handleEnterGame} />;
+  }
 
   const renderPage = () => {
     switch (phase) {
