@@ -3,12 +3,14 @@ import { gameStore } from '../store/gameStore';
 import { GameState, HistoryEntry, Character } from '../types/game.types';
 import { TreasureModal } from './TreasureModal';
 import { allTreasures, getRarityColor, Treasure } from '../data/treasures';
+import { useAnimationPreferences } from '../hooks/useAnimationPreferences';
 import './DungeonPage.css';
 
 export function DungeonPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [hoveredEntry, setHoveredEntry] = useState<HistoryEntry | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const { animationsEnabled, toggleAnimations } = useAnimationPreferences();
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
@@ -241,6 +243,13 @@ export function DungeonPage() {
               onClick={() => gameStore.setState({ showPauseMenu: true })}
             >
               ⏸️ Menu
+            </button>
+            <button 
+              className={`animation-toggle-btn ${animationsEnabled ? 'active' : 'inactive'}`}
+              onClick={toggleAnimations}
+              title={animationsEnabled ? 'Désactiver les animations' : 'Activer les animations'}
+            >
+              <span className="toggle-icon">{animationsEnabled ? '✨' : '⏸️'}</span>
             </button>
           </div>
           <h3>👥 Équipe - Niveau {state.dungeonLevel}</h3>

@@ -12,6 +12,8 @@ import { SummaryScreen } from './components/SummaryScreen';
 import { PauseMenu } from './components/PauseMenu';
 import { Bestiary } from './components/Bestiary';
 import './App.css';
+import './styles/responsive.css';
+import './styles/animations-toggle.css';
 
 function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());

@@ -116,6 +116,13 @@
   background: linear-gradient(135deg, #3a3a5c, #5555aa);
 }
 
+/* Toggle animation dans le panel */
+.panel-action-buttons .animation-toggle-btn {
+  flex: 0 0 auto;
+  padding: 0.6rem;
+  min-width: auto;
+}
+
 .team-panel h3 {
   font-family: 'Cinzel', serif;
   font-size: 1rem;

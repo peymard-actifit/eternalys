@@ -5,6 +5,7 @@ import { getMonsterAction, getMonsterTaunt } from '../lib/openai';
 import { getMonsterDrops, applyDropEffect } from '../data/monsterDrops';
 import { CharacterSheet } from './CharacterSheet';
 import { DiceRoller, rollDice } from './DiceRoller';
+import { useAnimationPreferences } from '../hooks/useAnimationPreferences';
 import { 
   makeAttackRoll, 
   rollDamage, 
@@ -23,6 +24,7 @@ import './CombatPage.css';
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
+  const { animationsEnabled, toggleAnimations } = useAnimationPreferences();
   const [monsterDialogue, setMonsterDialogue] = useState<string>('');
   const [showDialogue, setShowDialogue] = useState(false);
   const [selectingTarget, setSelectingTarget] = useState<'ally' | 'enemy' | null>(null);
@@ -2736,6 +2738,82 @@ export function CombatPage() {
                 className="action-panel-btn menu"
                 onClick={() => gameStore.setState({ showPauseMenu: true })}
               >
+                ⚙️ Menu
+              </button>
+              <button 
+                className={`animation-toggle-btn ${animationsEnabled ? 'active' : 'inactive'}`}
+                onClick={toggleAnimations}
+                title={animationsEnabled ? 'Désactiver les animations' : 'Activer les animations'}
+              >
+                <span className="toggle-icon">{animationsEnabled ? '✨' : '⏸️'}</span>
+                <span className="toggle-label">{animationsEnabled ? 'Anims ON' : 'Anims OFF'}</span>
+              </button>
+            </div>
+            <h4>⚔️ ACTIONS</h4>
+          </div>
+          <div className="action-buttons">
+            <button
+              className="action-btn attack"
+              onClick={() => handleAttack(currentTurn as Character)}
+            >
+              <span className="action-icon">⚔️</span>
+              <span>Attaque</span>
+              <span className="damage-preview">{(currentTurn as Character).attack} dégâts</span>
+            </button>
+            {(currentTurn as Character).skills?.filter(s => s.currentCooldown === 0 || s.currentCooldown === undefined).map(skill => (
+              <div key={skill.id} className="skill-btn-wrapper">
+                <button
+                  className={`action-btn skill ${skill.type || ''}`}
+                  onClick={() => handleSkillSelect(skill)}
+                >
+                  <span>{skill.name}</span>
+                  <span className="damage-preview">
+                    {skill.type === 'heal' ? `+${skill.healing} PV` : `${skill.damage} dégâts`}
+                  </span>
+                </button>
+                <div className="skill-tooltip">
+                  <div className="tooltip-header">{skill.name}</div>
+                  <p className="tooltip-desc">{skill.description}</p>
+                  <div className="tooltip-stats">
+                    {skill.damage > 0 && (
+                      <div className="tooltip-stat">
+                        <span className="stat-name">Dégâts</span>
+                        <span className="stat-value">{skill.damage}</span>
+                      </div>
+                    )}
+                    {skill.healing && skill.healing > 0 && (
+                      <div className="tooltip-stat">
+                        <span className="stat-name">Soins</span>
+                        <span className="stat-value heal">+{skill.healing}</span>
+                      </div>
+                    )}
+                    {skill.cooldown && skill.cooldown > 0 && (
+                      <div className="tooltip-stat">
+                        <span className="stat-name">Recharge</span>
+                        <span className="stat-value">{skill.cooldown} tours</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {(currentTurn as Character).skills?.filter(s => s.currentCooldown && s.currentCooldown > 0).map(skill => (
+              <div key={skill.id} className="skill-btn-wrapper">
+                <button
+                  className="action-btn skill on-cooldown"
+                  disabled
+                >
+                  <span>{skill.name}</span>
+                  <span className="cooldown-indicator">🕐 {skill.currentCooldown} tours</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tour monstre/boss */}
+      {!isPlayerTurn && (
                 ⏸️ Menu
               </button>
             </div>
