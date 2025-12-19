@@ -1,0 +1,150 @@
+/* ============================================
+   Z-INDEX HIERARCHY
+   Centralisation de tous les z-index pour éviter les superpositions
+   ============================================ */
+
+/* 
+   HIÉRARCHIE DES Z-INDEX:
+   
+   Niveau 0-10    : Éléments de base (arrière-plan)
+   Niveau 50-100  : Éléments interactifs de page
+   Niveau 500     : Turn order, tooltips, indicateurs
+   Niveau 1000    : Modals de base (Treasure, Event, Attack Roll)
+   Niveau 1500    : Menus contextuels
+   Niveau 2000    : Modals importants (Inventory, Dice, History)
+   Niveau 2500    : Fiche personnage en combat
+   Niveau 3000    : Éléments prioritaires (Pause Menu)
+   Niveau 3500    : Bestiary
+   Niveau 4000    : Confirmation d'action (le plus haut)
+*/
+
+:root {
+  /* Définition des variables z-index */
+  --z-base: 1;
+  --z-interactive: 50;
+  --z-turn-order: 500;
+  --z-tooltip: 600;
+  --z-modal-base: 1000;
+  --z-context-menu: 1500;
+  --z-modal-important: 2000;
+  --z-character-sheet: 2500;
+  --z-pause-menu: 3000;
+  --z-bestiary: 3500;
+  --z-confirmation: 4000;
+}
+
+/* ============================================
+   CORRECTIONS DE SUPERPOSITION MOBILE
+   ============================================ */
+
+/* Sur mobile, les éléments fixés en bas ne doivent pas se superposer */
+@media screen and (max-width: 768px) {
+  /* Turn order en bas - niveau bas */
+  .turn-order {
+    z-index: var(--z-turn-order) !important;
+  }
+  
+  /* Selected team panel - niveau plus haut que turn order */
+  .selected-team-panel {
+    z-index: calc(var(--z-turn-order) + 50) !important;
+  }
+  
+  /* S'assurer que les modals passent au-dessus */
+  .inventory-modal-overlay,
+  .bestiary-overlay,
+  .character-sheet-overlay,
+  .pause-menu-overlay,
+  .action-confirmation-overlay {
+    z-index: var(--z-modal-important) !important;
+  }
+}
+
+/* ============================================
+   NORMALISATION DES OVERLAYS
+   ============================================ */
+
+/* Treasure Modal */
+.treasure-modal-overlay {
+  z-index: var(--z-modal-base);
+}
+
+/* Event Modal */
+.event-modal-overlay {
+  z-index: var(--z-modal-base);
+}
+
+/* Attack Roll Indicator */
+.attack-roll-indicator {
+  z-index: var(--z-modal-base);
+}
+
+/* Inventory Modal */
+.inventory-modal-overlay {
+  z-index: var(--z-modal-important);
+}
+
+/* Dice Roller */
+.dice-roller-overlay {
+  z-index: var(--z-modal-important);
+}
+
+/* Game History Modal */
+.history-overlay {
+  z-index: var(--z-modal-important);
+}
+
+/* Character Sheet */
+.character-sheet-overlay {
+  z-index: var(--z-character-sheet);
+}
+
+/* Context Menu */
+.context-menu {
+  z-index: var(--z-context-menu);
+}
+
+/* Pause Menu */
+.pause-menu-overlay {
+  z-index: var(--z-pause-menu);
+}
+
+/* Bestiary */
+.bestiary-overlay {
+  z-index: var(--z-bestiary);
+}
+
+/* Action Confirmation (le plus prioritaire) */
+.action-confirmation-overlay {
+  z-index: var(--z-confirmation);
+}
+
+/* Target Selection Modal */
+.target-selection-modal {
+  z-index: calc(var(--z-confirmation) + 100);
+}
+
+/* ============================================
+   CORRECTIONS SPÉCIFIQUES
+   ============================================ */
+
+/* S'assurer que le bouton close est toujours visible */
+.character-sheet .close-btn,
+.inventory-modal .close-btn,
+.bestiary-modal .close-btn,
+.pause-menu .close-btn {
+  z-index: 10;
+}
+
+/* Drops modal doit être au-dessus des autres éléments de combat */
+.drops-modal {
+  z-index: calc(var(--z-modal-base) + 200);
+}
+
+/* Tooltips au-dessus des éléments interactifs */
+.tooltip,
+.skill-tooltip,
+.item-tooltip {
+  z-index: var(--z-tooltip);
+}
+
+

@@ -16,6 +16,7 @@ import './App.css';
 import './styles/responsive.css';
 import './styles/animations-toggle.css';
 import './styles/device-specific.css';
+import './styles/z-index.css';
 
 function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());
