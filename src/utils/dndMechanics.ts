@@ -2,7 +2,7 @@
 // MÉCANIQUES D&D 5e - Jets de dés et calculs
 // ============================================
 
-import { Character, Monster, Skill } from '../types/game.types';
+import { Character, Monster, Skill, AbilityScores } from '../types/game.types';
 
 // Types de dés
 export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';

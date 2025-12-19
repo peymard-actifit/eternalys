@@ -10,22 +10,40 @@ import { GameOverScreen } from './components/GameOverScreen';
 import { InventoryModal } from './components/InventoryModal';
 import { SummaryScreen } from './components/SummaryScreen';
 import { PauseMenu } from './components/PauseMenu';
+import { Bestiary } from './components/Bestiary';
 import './App.css';
 
 function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());
+  const [showBestiary, setShowBestiary] = useState(false);
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
   }, []);
 
-  // Gestion de la touche I pour l'inventaire et Échap pour le menu pause
+  // Gestion des raccourcis clavier
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const currentState = gameStore.getState();
     const { phase, showInventory, showPauseMenu } = currentState;
     
+    // B - Bestiaire (disponible partout sauf menu principal)
+    if ((e.key === 'b' || e.key === 'B') && !showInventory && !showPauseMenu) {
+      if (phase !== 'menu') {
+        e.preventDefault();
+        setShowBestiary(prev => !prev);
+        return;
+      }
+    }
+    
     // Échap - Menu pause (sauf sur le menu principal et les écrans de fin)
     if (e.key === 'Escape') {
+      // Si le bestiaire est ouvert, le fermer d'abord
+      if (showBestiary) {
+        e.preventDefault();
+        setShowBestiary(false);
+        return;
+      }
+      
       // Si l'inventaire est ouvert, le fermer d'abord
       if (showInventory) {
         e.preventDefault();
@@ -42,13 +60,13 @@ function App() {
     }
     
     // I - Inventaire (seulement pendant l'exploration et le combat)
-    if ((e.key === 'i' || e.key === 'I') && !showPauseMenu) {
+    if ((e.key === 'i' || e.key === 'I') && !showPauseMenu && !showBestiary) {
       if (phase === 'dungeon' || phase === 'combat') {
         e.preventDefault();
         gameStore.setState({ showInventory: !showInventory });
       }
     }
-  }, []);
+  }, [showBestiary]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -95,7 +113,7 @@ function App() {
       {renderPage()}
       {showInventory && <InventoryModal />}
       {showPauseMenu && <PauseMenu />}
-      
+      <Bestiary isOpen={showBestiary} onClose={() => setShowBestiary(false)} />
     </div>
   );
 }
