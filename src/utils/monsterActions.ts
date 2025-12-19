@@ -396,9 +396,9 @@ export function decideMonsterAction(monster: Monster, aliveTeam: Character[], cu
     let targets: Character[];
     if (skill.areaOfEffect) {
       targets = aliveTeam;
-    } else if (skill.multiattack) {
+    } else if (skill.attackCount && skill.attackCount > 1) {
       // Multi-attaque : plusieurs cibles possibles
-      targets = aliveTeam.slice(0, skill.multiattack);
+      targets = aliveTeam.slice(0, skill.attackCount);
     } else {
       targets = [getMonsterTarget(aliveTeam)];
     }

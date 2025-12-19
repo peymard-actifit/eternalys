@@ -4,20 +4,27 @@
  * ============================================
  * 
  * Ce fichier centralise toute la logique de combat pour :
- * - Éviter la duplication de code
- * - Garantir la cohérence des calculs
- * - Faciliter les tests et la maintenance
+ * - Calculs de dégâts
+ * - Vol de vie et épines
+ * - Tracking des stats
+ * - Gestion des buffs et cooldowns
+ * 
+ * Pour l'accès au state, utiliser les fonctions de combatUtils.ts
+ * Pour les mécaniques D&D (jets de dés), utiliser dndMechanics.ts
  */
 
 import { gameStore } from '../store/gameStore';
-import { Character, Monster, Skill, MonsterSkill, ActiveBuff, DamageType, CombatHistoryEntry } from '../types/game.types';
+import { Character, Monster, Skill, ActiveBuff, DamageType } from '../types/game.types';
 import { 
   makeAttackRoll, 
-  rollDamage, 
-  makeSavingThrow, 
-  getAbilityModifier,
-  AttackRollResult 
+  rollDamage
 } from './dndMechanics';
+import {
+  getCharacterFromState,
+  updateCharacterInState,
+  isSkillOnCooldown,
+  getAvailableSkills as getAvailableSkillsFromUtils
+} from './combatUtils';
 
 // ============================================
 // TYPES
@@ -32,7 +39,7 @@ export interface DamageResult {
   damage: number;
   isCritical: boolean;
   damageType: string;
-  absorbed: number; // Dégâts absorbés par PV temporaires
+  absorbed: number;
 }
 
 export interface AttackResult {
@@ -213,20 +220,13 @@ export function applyLifesteal(
 ): { stolen: number; newHp: number } {
   if (lifestealPercent <= 0 || damage <= 0) return { stolen: 0, newHp: 0 };
   
-  const attacker = gameStore.getState().team.find(c => c.id === attackerId);
+  const attacker = getCharacterFromState(attackerId);
   if (!attacker) return { stolen: 0, newHp: 0 };
   
   const stolen = Math.floor(damage * lifestealPercent / 100);
   if (stolen > 0) {
     const newHp = Math.min(attacker.maxHp, attacker.hp + stolen);
-    
-    // Mettre à jour le personnage
-    const currentTeam = gameStore.getState().team;
-    const updatedTeam = currentTeam.map(c => 
-      c.id === attackerId ? { ...c, hp: newHp } : c
-    );
-    gameStore.setState({ team: updatedTeam });
-    
+    updateCharacterInState(attackerId, { hp: newHp });
     return { stolen, newHp };
   }
   
@@ -398,16 +398,13 @@ export function addBuff(characterId: string, buff: ActiveBuff): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
     if (c.id === characterId) {
-      // Vérifier si un buff du même type existe déjà
       const existingBuffIndex = (c.buffs || []).findIndex(b => b.id === buff.id);
       let newBuffs: ActiveBuff[];
       
       if (existingBuffIndex >= 0) {
-        // Remplacer le buff existant
         newBuffs = [...(c.buffs || [])];
         newBuffs[existingBuffIndex] = buff;
       } else {
-        // Ajouter le nouveau buff
         newBuffs = [...(c.buffs || []), buff];
       }
       
@@ -433,7 +430,7 @@ export function addBuff(characterId: string, buff: ActiveBuff): void {
  * Applique la régénération passive d'un personnage
  */
 export function applyRegeneration(characterId: string): { healed: number; log: string | null } {
-  const char = gameStore.getState().team.find(c => c.id === characterId);
+  const char = getCharacterFromState(characterId);
   if (!char) return { healed: 0, log: null };
   
   if (char.passiveEffects?.regeneration && char.passiveEffects.regeneration > 0) {
@@ -528,35 +525,12 @@ export function performPlayerAttack(
   };
 }
 
-/**
- * Vérifie si une compétence est en cooldown
- */
-export function isSkillOnCooldown(skill: Skill): boolean {
-  return !!(skill.currentCooldown && skill.currentCooldown > 0);
-}
+// ============================================
+// RE-EXPORTS pour compatibilité
+// ============================================
 
-/**
- * Obtient les compétences disponibles d'un personnage
- */
-export function getAvailableSkills(character: Character): Skill[] {
-  return (character.skills || []).filter(s => !isSkillOnCooldown(s));
-}
-
-/**
- * Obtient un personnage à jour depuis le state global
- */
-export function getCharacterFromState(characterId: string): Character | undefined {
-  return gameStore.getState().team.find(c => c.id === characterId);
-}
-
-/**
- * Met à jour un personnage dans le state global
- */
-export function updateCharacterInState(characterId: string, updates: Partial<Character>): void {
-  const currentTeam = gameStore.getState().team;
-  const updatedTeam = currentTeam.map(c => 
-    c.id === characterId ? { ...c, ...updates } : c
-  );
-  gameStore.setState({ team: updatedTeam });
-}
+// Re-export depuis combatUtils pour éviter de casser les imports existants
+export { isSkillOnCooldown } from './combatUtils';
+export { getAvailableSkillsFromUtils as getAvailableSkills };
+export { getCharacterFromState, updateCharacterInState } from './combatUtils';
 

@@ -107,9 +107,6 @@ function App() {
     }
   };
 
-  // Phases où les hints sont affichés
-  const showHints = phase === 'dungeon' || phase === 'combat';
-
   return (
     <div className="app">
       {renderPage()}
