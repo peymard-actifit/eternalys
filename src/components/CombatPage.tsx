@@ -33,6 +33,8 @@ export function CombatPage() {
   const [combatTurn, setCombatTurn] = useState(1);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
   const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false);
+  const [isActionsMinimized, setIsActionsMinimized] = useState(false);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTurnRef = useRef<string | null>(null);
   // Utiliser une ref pour accumuler les drops de manière SYNCHRONE
   // (useState est asynchrone et causerait des problèmes avec checkCombatEnd)
@@ -175,6 +177,21 @@ export function CombatPage() {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, entity });
+  };
+
+  // Long press pour mobile - ouvrir la fiche
+  const handleTouchStart = (entity: Character | Monster) => {
+    longPressTimerRef.current = setTimeout(() => {
+      setSelectedEntity(entity);
+      setShowCharacterSheet(true);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
   };
 
   // Ouvrir la fiche depuis le menu contextuel
@@ -2512,6 +2529,13 @@ export function CombatPage() {
         </button>
 
         <div className={`combat-history-panel ${isHistoryExpanded ? 'expanded' : 'compact'} ${isMobileHistoryOpen ? 'mobile-open' : ''}`}>
+          {/* Bouton fermer mobile */}
+          <button 
+            className="close-history-btn"
+            onClick={() => setIsMobileHistoryOpen(false)}
+          >
+            ✕
+          </button>
           <div className="history-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}>
             <h4>📜 Historique ({combatHistory.length})</h4>
             <button className="history-toggle-btn">
@@ -2608,6 +2632,9 @@ export function CombatPage() {
                     className={`enemy-card ${isCurrentTurn ? 'active-turn' : ''} ${isSelected ? 'selected' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${dmgType}` : ''}`}
                     onClick={() => !isDead && gameStore.setState({ selectedEnemyIndex: idx })}
                     onContextMenu={(e) => handleContextMenu(e, enemy)}
+                    onTouchStart={() => handleTouchStart(enemy)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchCancel={handleTouchEnd}
                   >
                     <div className="enemy-portrait-container">
                       <div className={`enemy-portrait ${isAnimating && isCurrentTurn ? 'attacking' : ''}`}>
@@ -2704,6 +2731,9 @@ export function CombatPage() {
                   className={`team-fighter ${isCurrent ? 'active-turn' : ''} ${isDead ? 'dead' : ''} ${isReceivingDamage ? `damage-${damageType}` : ''}`}
                   title={getStatsTooltip(character)}
                   onContextMenu={(e) => handleContextMenu(e, character)}
+                  onTouchStart={() => handleTouchStart(character)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchCancel={handleTouchEnd}
                 >
                   <span className="fighter-portrait">{character.portrait}</span>
                   <div className="fighter-info">
@@ -2768,28 +2798,33 @@ export function CombatPage() {
       </div>
 
       {isPlayerTurn && !isAnimating && !selectingTarget && (currentTurn as Character).hp > 0 && (
-        <div className="combat-actions">
+        <div className={`combat-actions action-panel ${isActionsMinimized ? 'minimized' : ''}`}>
           <div className="actions-header">
             <div className="action-panel-buttons">
               <button 
                 className="action-panel-btn inventory"
                 onClick={() => gameStore.setState({ showInventory: true })}
               >
-                🎒 Inventaire
+                🎒 Inv
               </button>
               <button 
                 className="action-panel-btn menu"
                 onClick={() => gameStore.setState({ showPauseMenu: true })}
               >
-                ⚙️ Menu
+                ⚙️
               </button>
               <button 
                 className={`animation-toggle-btn ${autoMode ? 'auto-on' : 'auto-off'}`}
                 onClick={toggleAutoMode}
-                title={autoMode ? 'Mode Auto activé - Cliquez pour désactiver' : 'Mode Auto désactivé - Cliquez pour activer'}
+                title={autoMode ? 'Mode Auto activé' : 'Mode Auto désactivé'}
               >
                 <span className="toggle-icon">{autoMode ? '🔓' : '🔒'}</span>
-                <span className="toggle-label">Auto {autoMode ? 'ON' : 'OFF'}</span>
+              </button>
+              <button 
+                className="minimize-actions-btn"
+                onClick={() => setIsActionsMinimized(!isActionsMinimized)}
+              >
+                {isActionsMinimized ? '▼ Ouvrir' : '▲ Réduire'}
               </button>
             </div>
             <h4>⚔️ ACTIONS</h4>

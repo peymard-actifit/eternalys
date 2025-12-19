@@ -830,16 +830,17 @@
   }
 
   .team-member {
-    padding: 0.25rem;
-    gap: 0.15rem;
+    padding: 0.3rem;
+    gap: 0.2rem;
     border-radius: 6px;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-height: 70px;
   }
 
   .member-portrait {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .member-info {
@@ -847,10 +848,11 @@
   }
 
   .member-name {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 0.15rem;
   }
 
   .member-class {
@@ -858,12 +860,14 @@
   }
 
   .hp-bar {
-    height: 6px;
-    border-radius: 3px;
+    height: 10px;
+    border-radius: 5px;
+    overflow: visible;
   }
 
   .hp-text {
-    font-size: 0.4rem;
+    font-size: 0.5rem;
+    line-height: 10px;
   }
 
   .member-abilities {
@@ -909,7 +913,7 @@
     overflow: hidden;
   }
 
-  /* Grille de la carte - cases alignées */
+  /* Grille de la carte - cases FIXES et alignées */
   .map-grid {
     display: flex;
     flex-direction: column;
@@ -921,6 +925,7 @@
     display: flex;
     gap: 1px;
     justify-content: center;
+    height: 28px; /* Hauteur fixe pour éviter les sauts */
   }
 
   .map-cell {
@@ -932,14 +937,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
   }
 
   .map-cell.current {
     font-size: 0.95rem;
+    /* Pas d'animation qui change la taille */
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
+    animation: none;
   }
 
   .map-cell.adjacent {
     font-size: 0.75rem;
+    /* Border uniforme pour éviter les décalages */
+    border: 1px dashed rgba(155, 89, 182, 0.7);
+    animation: none;
+  }
+
+  .map-cell.adjacent:hover {
+    transform: none; /* Pas de scale qui décale */
+    background: rgba(155, 89, 182, 0.5);
   }
 
   .map-cell.unknown {
