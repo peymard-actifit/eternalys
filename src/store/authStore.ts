@@ -24,16 +24,31 @@ const createAuthStore = () => {
   };
 
   const listeners: Set<() => void> = new Set();
+  let initialized = false;
 
-  // Charger l'utilisateur depuis le localStorage au démarrage
-  const storedUser = localStorage.getItem('eternalys_user');
-  if (storedUser) {
+  // Fonction pour initialiser depuis localStorage (appelée seulement côté client)
+  const initFromStorage = () => {
+    if (initialized) return;
+    initialized = true;
+    
+    if (typeof window === 'undefined') return;
+    
     try {
-      state.currentUser = JSON.parse(storedUser);
-      state.isAuthenticated = true;
+      const storedUser = localStorage.getItem('eternalys_user');
+      if (storedUser) {
+        state.currentUser = JSON.parse(storedUser);
+        state.isAuthenticated = true;
+      }
     } catch (e) {
-      localStorage.removeItem('eternalys_user');
+      try {
+        localStorage.removeItem('eternalys_user');
+      } catch {}
     }
+  };
+
+  // Initialiser si on est côté client
+  if (typeof window !== 'undefined') {
+    initFromStorage();
   }
 
   return {
@@ -59,7 +74,11 @@ const createAuthStore = () => {
         isAuthenticated: true,
         isLoading: false
       };
-      localStorage.setItem('eternalys_user', JSON.stringify(user));
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('eternalys_user', JSON.stringify(user));
+        }
+      } catch {}
       listeners.forEach(listener => listener());
     },
 
@@ -74,7 +93,11 @@ const createAuthStore = () => {
         saves: [],
         history: []
       };
-      localStorage.removeItem('eternalys_user');
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('eternalys_user');
+        }
+      } catch {}
       listeners.forEach(listener => listener());
     },
 
