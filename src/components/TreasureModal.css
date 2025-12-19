@@ -422,3 +422,303 @@
   font-style: italic;
 }
 
+/* ========== RESPONSIVE TABLETTE ========== */
+@media (max-width: 768px) {
+  .treasure-modal {
+    padding: 1.2rem;
+    max-width: 95%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .treasure-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .treasure-reveal {
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .treasure-icon-container {
+    width: 70px;
+    height: 70px;
+  }
+
+  .treasure-icon {
+    font-size: 2.8rem;
+  }
+
+  .treasure-glow {
+    width: 80px;
+    height: 80px;
+  }
+
+  .treasure-name {
+    font-size: 1.2rem;
+  }
+
+  .treasure-description {
+    font-size: 0.9rem;
+  }
+
+  .treasure-selection {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+
+  .character-choices {
+    max-height: none;
+  }
+
+  .character-choice {
+    padding: 0.6rem 0.8rem;
+    gap: 0.6rem;
+  }
+
+  .choice-portrait {
+    font-size: 1.6rem;
+  }
+
+  .choice-name {
+    font-size: 0.85rem;
+  }
+
+  .choice-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    font-size: 0.6rem;
+  }
+
+  .treasure-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+}
+
+/* ========== RESPONSIVE MOBILE ========== */
+@media (max-width: 480px) {
+  .treasure-modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .treasure-modal {
+    padding: 0.8rem;
+    max-width: 100%;
+    max-height: 95vh;
+    margin-top: 0.5rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .treasure-header {
+    margin-bottom: 0.8rem;
+  }
+
+  .treasure-header h2 {
+    font-size: 0.95rem;
+  }
+
+  .treasure-reveal {
+    margin-bottom: 0.8rem;
+    gap: 0.6rem;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .treasure-icon-container {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+  }
+
+  .treasure-icon {
+    font-size: 2rem;
+  }
+
+  .treasure-glow {
+    width: 60px;
+    height: 60px;
+  }
+
+  .treasure-info {
+    text-align: left;
+  }
+
+  .treasure-name {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .treasure-rarity {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .treasure-description {
+    font-size: 0.75rem;
+  }
+
+  .treasure-selection {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 0.8rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .treasure-selection h4 {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .character-choices {
+    gap: 0.4rem;
+  }
+
+  .character-choice {
+    padding: 0.5rem;
+    gap: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .choice-portrait {
+    font-size: 1.4rem;
+  }
+
+  .choice-name {
+    font-size: 0.8rem;
+  }
+
+  .choice-class {
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .choice-hp {
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .choice-stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+    font-size: 0.55rem;
+    padding: 0.2rem;
+    gap: 0.1rem;
+  }
+
+  .choice-stats-grid span {
+    padding: 0.1rem;
+  }
+
+  .choice-check {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .treasure-btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
+
+  .defeated-overlay {
+    font-size: 1.2rem;
+    left: 2rem;
+  }
+
+  /* Page de confirmation */
+  .treasure-assignment {
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .assigned-to {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .character-badge {
+    padding: 0.4rem 0.8rem;
+    gap: 0.5rem;
+  }
+
+  .char-portrait {
+    font-size: 1.4rem;
+  }
+
+  .char-name {
+    font-size: 0.85rem;
+  }
+
+  .char-class {
+    font-size: 0.7rem;
+  }
+
+  .applied-effects {
+    padding-top: 0.6rem;
+  }
+
+  .effects-label {
+    font-size: 0.75rem;
+  }
+
+  .effects-list {
+    gap: 0.3rem;
+  }
+
+  .effect-tag {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* ========== TRÈS PETITS ÉCRANS ========== */
+@media (max-height: 600px) {
+  .treasure-modal {
+    max-height: 98vh;
+    padding: 0.6rem;
+  }
+
+  .treasure-reveal {
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .treasure-icon-container {
+    width: 40px;
+    height: 40px;
+  }
+
+  .treasure-icon {
+    font-size: 1.6rem;
+  }
+
+  .treasure-selection {
+    margin-bottom: 0.5rem;
+  }
+
+  .character-choice {
+    padding: 0.4rem;
+  }
+
+  .choice-portrait {
+    font-size: 1.2rem;
+  }
+
+  .choice-stats-grid {
+    display: none;
+  }
+
+  .treasure-btn {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+}

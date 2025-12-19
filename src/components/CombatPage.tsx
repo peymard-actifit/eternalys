@@ -129,10 +129,10 @@ export function CombatPage() {
   
   // Auto-fermer l'indicateur de jet d'attaque
   // - Mode normal: après 2 secondes si pas waitForClick
-  // - Mode auto: après 500ms même si waitForClick
+  // - Mode auto: après 1.2s même si waitForClick
   useEffect(() => {
     if (lastAttackResult) {
-      const delay = autoMode ? 500 : (!lastAttackResult.waitForClick ? 2000 : 0);
+      const delay = autoMode ? 1200 : (!lastAttackResult.waitForClick ? 2000 : 0);
       
       if (delay > 0) {
         const timer = setTimeout(() => {
@@ -146,7 +146,7 @@ export function CombatPage() {
     }
   }, [lastAttackResult, autoMode]);
 
-  // Auto-fermer le dice roll en mode auto
+  // Auto-fermer le dice roll en mode auto (1.5s)
   useEffect(() => {
     if (activeDiceRoll && autoMode && activeDiceRoll.waitForClick) {
       const timer = setTimeout(() => {
@@ -154,17 +154,17 @@ export function CombatPage() {
           activeDiceRoll.onDismiss();
         }
         setActiveDiceRoll(null);
-      }, 800);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [activeDiceRoll, autoMode]);
 
-  // Auto-confirmer les actions en mode auto
+  // Auto-confirmer les actions en mode auto (0.8s)
   useEffect(() => {
     if (pendingAction && autoMode) {
       const timer = setTimeout(() => {
         confirmAction();
-      }, 300);
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [pendingAction, autoMode]);
