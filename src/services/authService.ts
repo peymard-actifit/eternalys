@@ -1,14 +1,5 @@
-import { supabase } from '../lib/supabase';
+import { supabase, canUseSupabase } from '../lib/supabase';
 import type { User, SafeUser, GameSave, GameHistory, NewGameHistory } from '../types/database.types';
-
-/**
- * Vérifie si Supabase est correctement configuré
- */
-function isSupabaseConfigured(): boolean {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  return !!(url && key && url.length > 0 && key.length > 0);
-}
 
 /**
  * Hash simple pour le mot de passe
@@ -38,7 +29,7 @@ export const authService = {
    * Inscription d'un nouvel utilisateur
    */
   async register(username: string, password: string): Promise<{ user: SafeUser | null; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { user: null, error: 'Base de données non configurée. Le jeu fonctionne en mode hors-ligne.' };
     }
     
@@ -84,7 +75,7 @@ export const authService = {
    * Connexion d'un utilisateur
    */
   async login(username: string, password: string): Promise<{ user: SafeUser | null; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { user: null, error: 'Base de données non configurée. Le jeu fonctionne en mode hors-ligne.' };
     }
     
@@ -132,7 +123,7 @@ export const authService = {
    * Récupérer tous les utilisateurs (admin seulement)
    */
   async getAllUsers(): Promise<{ users: SafeUser[]; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { users: [], error: 'Base de données non configurée' };
     }
     
@@ -158,7 +149,7 @@ export const authService = {
    */
   async ensureAdminExists(): Promise<void> {
     // Ne rien faire si Supabase n'est pas configuré
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       console.log('Supabase non configuré - mode hors-ligne');
       return;
     }
@@ -198,7 +189,7 @@ export const saveService = {
    * Récupérer les sauvegardes d'un utilisateur
    */
   async getSaves(userId: string): Promise<{ saves: GameSave[]; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { saves: [], error: 'Base de données non configurée' };
     }
     
@@ -224,7 +215,7 @@ export const saveService = {
    * Sauvegarder une partie
    */
   async saveGame(userId: string, slotNumber: number, saveName: string, gameState: object, playTime: number): Promise<{ save: GameSave | null; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { save: null, error: 'Base de données non configurée' };
     }
     
@@ -284,7 +275,7 @@ export const saveService = {
    * Charger une sauvegarde
    */
   async loadGame(userId: string, slotNumber: number): Promise<{ save: GameSave | null; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { save: null, error: 'Base de données non configurée' };
     }
     
@@ -311,7 +302,7 @@ export const saveService = {
    * Supprimer une sauvegarde
    */
   async deleteSave(userId: string, slotNumber: number): Promise<{ success: boolean; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { success: false, error: 'Base de données non configurée' };
     }
     
@@ -342,7 +333,7 @@ export const historyService = {
    * Récupérer l'historique d'un utilisateur
    */
   async getHistory(userId: string): Promise<{ history: GameHistory[]; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { history: [], error: 'Base de données non configurée' };
     }
     
@@ -369,7 +360,7 @@ export const historyService = {
    * Ajouter une entrée à l'historique
    */
   async addToHistory(entry: NewGameHistory): Promise<{ history: GameHistory | null; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { history: null, error: 'Base de données non configurée' };
     }
     
@@ -395,7 +386,7 @@ export const historyService = {
    * Supprimer l'historique d'un utilisateur
    */
   async clearHistory(userId: string): Promise<{ success: boolean; error: string | null }> {
-    if (!isSupabaseConfigured()) {
+    if (!canUseSupabase() || !supabase) {
       return { success: false, error: 'Base de données non configurée' };
     }
     

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, canUseSupabase } from '../lib/supabase';
 import { authService } from '../services/authService';
 import './DebugSupabase.css';
 
@@ -18,6 +18,18 @@ export function DebugSupabase({ onClose }: { onClose: () => void }) {
     setIsRunning(true);
     setResults([]);
     const newResults: TestResult[] = [];
+
+    // Vérifier si Supabase est configuré
+    if (!canUseSupabase() || !supabase) {
+      newResults.push({ 
+        table: 'config', 
+        status: 'error', 
+        message: 'Supabase non configuré - Variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY manquantes' 
+      });
+      setResults([...newResults]);
+      setIsRunning(false);
+      return;
+    }
 
     // Test table users
     newResults.push({ table: 'users', status: 'pending', message: 'Test en cours...' });
