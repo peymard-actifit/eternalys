@@ -1,51 +1,62 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'eternalys_animations_enabled';
+const STORAGE_KEY = 'eternalys_auto_mode';
 
 interface AnimationPreferences {
+  autoMode: boolean;
+  toggleAutoMode: () => void;
+  setAutoMode: (enabled: boolean) => void;
+  // Alias pour compatibilité
   animationsEnabled: boolean;
   toggleAnimations: () => void;
   setAnimations: (enabled: boolean) => void;
 }
 
 export function useAnimationPreferences(): AnimationPreferences {
-  const [animationsEnabled, setAnimationsEnabled] = useState<boolean>(() => {
+  const [autoMode, setAutoModeState] = useState<boolean>(() => {
     // Charger la préférence depuis localStorage
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      return stored === 'true';
-    }
-    // Par défaut, vérifier si l'utilisateur préfère réduire les animations
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }
-    return true;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    } catch {}
+    return false; // Par défaut, mode auto désactivé
   });
 
   // Sauvegarder dans localStorage quand la préférence change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(animationsEnabled));
+    try {
+      localStorage.setItem(STORAGE_KEY, String(autoMode));
+    } catch {}
     
     // Appliquer la classe au body pour désactiver les animations globalement
-    if (animationsEnabled) {
-      document.body.classList.remove('no-animations');
-    } else {
+    if (autoMode) {
       document.body.classList.add('no-animations');
+      document.body.classList.add('auto-mode');
+    } else {
+      document.body.classList.remove('no-animations');
+      document.body.classList.remove('auto-mode');
     }
-  }, [animationsEnabled]);
+  }, [autoMode]);
 
-  const toggleAnimations = useCallback(() => {
-    setAnimationsEnabled(prev => !prev);
+  const toggleAutoMode = useCallback(() => {
+    setAutoModeState(prev => !prev);
   }, []);
 
-  const setAnimations = useCallback((enabled: boolean) => {
-    setAnimationsEnabled(enabled);
+  const setAutoMode = useCallback((enabled: boolean) => {
+    setAutoModeState(enabled);
   }, []);
 
+  // Alias pour compatibilité
   return {
-    animationsEnabled,
-    toggleAnimations,
-    setAnimations
+    autoMode,
+    toggleAutoMode,
+    setAutoMode,
+    // Compatibilité avec l'ancien nom
+    animationsEnabled: !autoMode,
+    toggleAnimations: toggleAutoMode,
+    setAnimations: (enabled: boolean) => setAutoMode(!enabled)
   };
 }
 

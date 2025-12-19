@@ -10,7 +10,7 @@ export function DungeonPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [hoveredEntry, setHoveredEntry] = useState<HistoryEntry | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const { animationsEnabled, toggleAnimations } = useAnimationPreferences();
+  const { autoMode, toggleAutoMode } = useAnimationPreferences();
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
@@ -245,11 +245,12 @@ export function DungeonPage() {
               ⏸️ Menu
             </button>
             <button 
-              className={`animation-toggle-btn ${animationsEnabled ? 'active' : 'inactive'}`}
-              onClick={toggleAnimations}
-              title={animationsEnabled ? 'Désactiver les animations' : 'Activer les animations'}
+              className={`animation-toggle-btn ${autoMode ? 'auto-on' : 'auto-off'}`}
+              onClick={toggleAutoMode}
+              title={autoMode ? 'Mode Auto activé' : 'Mode Auto désactivé'}
             >
-              <span className="toggle-icon">{animationsEnabled ? '✨' : '⏸️'}</span>
+              <span className="toggle-icon">{autoMode ? '🔓' : '🔒'}</span>
+              <span className="toggle-label">Auto {autoMode ? 'ON' : 'OFF'}</span>
             </button>
           </div>
           <h3>👥 Équipe - Niveau {state.dungeonLevel}</h3>

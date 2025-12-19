@@ -26,6 +26,22 @@ export function WelcomePage({ onEnterGame }: WelcomePageProps) {
     return authStore.subscribe(() => setAuthState(authStore.getState()));
   }, []);
 
+  // Gestion de la touche Échap pour revenir au menu principal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mode !== 'welcome') {
+        e.preventDefault();
+        setMode('welcome');
+        setError('');
+        setPassword('');
+        setConfirmPassword('');
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mode]);
+
   // Si déjà connecté, entrer directement
   useEffect(() => {
     if (authState.isAuthenticated && authState.currentUser) {

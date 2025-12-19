@@ -111,6 +111,21 @@ body.no-animations .combat-page.screen-shake {
   color: #e0e0e0;
 }
 
+/* Mode Auto activé (cadenas ouvert) */
+.animation-toggle-btn.auto-on {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.3));
+  border-color: rgba(46, 204, 113, 0.5);
+  color: #2ecc71;
+}
+
+/* Mode Auto désactivé (cadenas fermé) */
+.animation-toggle-btn.auto-off {
+  background: linear-gradient(135deg, rgba(100, 100, 100, 0.2), rgba(60, 60, 60, 0.3));
+  border-color: rgba(150, 150, 150, 0.3);
+  color: #b0b0b0;
+}
+
+/* Ancien support pour compatibilité */
 .animation-toggle-btn.active {
   background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.3));
   border-color: rgba(46, 204, 113, 0.5);

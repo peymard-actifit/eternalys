@@ -24,7 +24,7 @@ import './CombatPage.css';
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
-  const { animationsEnabled, toggleAnimations } = useAnimationPreferences();
+  const { autoMode, toggleAutoMode } = useAnimationPreferences();
   const [monsterDialogue, setMonsterDialogue] = useState<string>('');
   const [showDialogue, setShowDialogue] = useState(false);
   const [selectingTarget, setSelectingTarget] = useState<'ally' | 'enemy' | null>(null);
@@ -127,13 +127,47 @@ export function CombatPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showCharacterSheet, contextMenu, lastAttackResult]);
   
-  // Auto-fermer l'indicateur de jet d'attaque après 2 secondes (seulement si pas waitForClick)
+  // Auto-fermer l'indicateur de jet d'attaque
+  // - Mode normal: après 2 secondes si pas waitForClick
+  // - Mode auto: après 500ms même si waitForClick
   useEffect(() => {
-    if (lastAttackResult && !lastAttackResult.waitForClick) {
-      const timer = setTimeout(() => setLastAttackResult(null), 2000);
+    if (lastAttackResult) {
+      const delay = autoMode ? 500 : (!lastAttackResult.waitForClick ? 2000 : 0);
+      
+      if (delay > 0) {
+        const timer = setTimeout(() => {
+          if (lastAttackResult.onDismiss) {
+            lastAttackResult.onDismiss();
+          }
+          setLastAttackResult(null);
+        }, delay);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [lastAttackResult, autoMode]);
+
+  // Auto-fermer le dice roll en mode auto
+  useEffect(() => {
+    if (activeDiceRoll && autoMode && activeDiceRoll.waitForClick) {
+      const timer = setTimeout(() => {
+        if (activeDiceRoll.onDismiss) {
+          activeDiceRoll.onDismiss();
+        }
+        setActiveDiceRoll(null);
+      }, 800);
       return () => clearTimeout(timer);
     }
-  }, [lastAttackResult]);
+  }, [activeDiceRoll, autoMode]);
+
+  // Auto-confirmer les actions en mode auto
+  useEffect(() => {
+    if (pendingAction && autoMode) {
+      const timer = setTimeout(() => {
+        confirmAction();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingAction, autoMode]);
 
   // Gérer le clic droit sur une entité
   const handleContextMenu = (e: React.MouseEvent, entity: Character | Monster) => {
@@ -2741,12 +2775,12 @@ export function CombatPage() {
                 ⚙️ Menu
               </button>
               <button 
-                className={`animation-toggle-btn ${animationsEnabled ? 'active' : 'inactive'}`}
-                onClick={toggleAnimations}
-                title={animationsEnabled ? 'Désactiver les animations' : 'Activer les animations'}
+                className={`animation-toggle-btn ${autoMode ? 'auto-on' : 'auto-off'}`}
+                onClick={toggleAutoMode}
+                title={autoMode ? 'Mode Auto activé - Cliquez pour désactiver' : 'Mode Auto désactivé - Cliquez pour activer'}
               >
-                <span className="toggle-icon">{animationsEnabled ? '✨' : '⏸️'}</span>
-                <span className="toggle-label">{animationsEnabled ? 'Anims ON' : 'Anims OFF'}</span>
+                <span className="toggle-icon">{autoMode ? '🔓' : '🔒'}</span>
+                <span className="toggle-label">Auto {autoMode ? 'ON' : 'OFF'}</span>
               </button>
             </div>
             <h4>⚔️ ACTIONS</h4>
