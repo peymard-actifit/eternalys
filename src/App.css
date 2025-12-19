@@ -60,3 +60,35 @@
   color: #9b59b6;
   margin-right: 0.4rem;
 }
+
+/* Écran de chargement */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
+}
+
+.loading-content {
+  text-align: center;
+  color: #9b59b6;
+}
+
+.loading-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-content p {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}

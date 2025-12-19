@@ -116,6 +116,72 @@ type Listener = () => void;
 let state: GameState = { ...initialState };
 let listeners: Listener[] = [];
 
+// Clé pour localStorage
+const STORAGE_KEY = 'eternalys_game_state';
+
+// Phases qui peuvent être persistées (pas menu, pas écrans de fin)
+const PERSISTABLE_PHASES = ['character_select', 'dungeon', 'combat', 'event', 'treasure'];
+
+// Sauvegarder l'état dans localStorage
+const saveToLocalStorage = (gameState: GameState) => {
+  try {
+    // Ne sauvegarder que si on est dans une phase de jeu actif
+    if (PERSISTABLE_PHASES.includes(gameState.phase)) {
+      // Créer une copie minimale pour la sauvegarde (éviter les données circulaires)
+      const stateToSave = {
+        phase: gameState.phase,
+        team: gameState.team,
+        currentRoom: gameState.currentRoom,
+        rooms: gameState.rooms,
+        encounterCount: gameState.encounterCount,
+        combatCount: gameState.combatCount,
+        bossScaling: gameState.bossScaling,
+        currentEnemies: gameState.currentEnemies,
+        combatTurn: gameState.combatTurn,
+        turnOrder: gameState.turnOrder,
+        currentTurnIndex: gameState.currentTurnIndex,
+        history: gameState.history,
+        pendingTreasures: gameState.pendingTreasures,
+        selectedEnemyIndex: gameState.selectedEnemyIndex,
+        dungeonLevel: gameState.dungeonLevel,
+        roomsPerLevel: gameState.roomsPerLevel,
+        previousBossId: gameState.previousBossId,
+        monsterScaling: gameState.monsterScaling,
+        bossScalingMultiplier: gameState.bossScalingMultiplier
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    }
+  } catch (e) {
+    console.warn('Impossible de sauvegarder l\'état du jeu:', e);
+  }
+};
+
+// Charger l'état depuis localStorage
+const loadFromLocalStorage = (): Partial<GameState> | null => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Vérifier que la phase est valide
+      if (parsed && PERSISTABLE_PHASES.includes(parsed.phase)) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('Impossible de charger l\'état du jeu:', e);
+  }
+  return null;
+};
+
+// Effacer la sauvegarde
+const clearLocalStorage = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    // Ignorer
+  }
+};
+
 export const gameStore = {
   getState: (): GameState => state,
   
@@ -128,7 +194,25 @@ export const gameStore = {
   
   setState: (newState: Partial<GameState>) => {
     state = { ...state, ...newState };
+    // Sauvegarder automatiquement à chaque changement d'état
+    saveToLocalStorage(state);
     listeners.forEach(l => l());
+  },
+  
+  // Restaurer l'état sauvegardé (appelé au démarrage)
+  restoreSavedState: (): boolean => {
+    const saved = loadFromLocalStorage();
+    if (saved && saved.team && saved.team.length > 0) {
+      state = { ...initialState, ...saved };
+      listeners.forEach(l => l());
+      return true;
+    }
+    return false;
+  },
+  
+  // Effacer la sauvegarde locale
+  clearSavedState: () => {
+    clearLocalStorage();
   },
   
   // Actions
@@ -900,6 +984,9 @@ export const gameStore = {
   },
   
   resetGame: () => {
+    // Effacer la sauvegarde locale
+    clearLocalStorage();
+    
     state = { 
       ...initialState, 
       rooms: createInitialRooms(), 

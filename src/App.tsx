@@ -25,6 +25,18 @@ function App() {
   const [showBestiary, setShowBestiary] = useState(false);
   const [hasEnteredGame, setHasEnteredGame] = useState(false);
   const [authState, setAuthState] = useState(authStore.getState());
+  const [isRestoring, setIsRestoring] = useState(true);
+  
+  // Restaurer l'état du jeu au chargement
+  useEffect(() => {
+    // Tenter de restaurer une partie en cours
+    const wasRestored = gameStore.restoreSavedState();
+    if (wasRestored) {
+      // Une partie était en cours, entrer directement dans le jeu
+      setHasEnteredGame(true);
+    }
+    setIsRestoring(false);
+  }, []);
   
   // Écouter les changements d'authentification
   useEffect(() => {
@@ -42,7 +54,8 @@ function App() {
       // Si l'utilisateur s'est déconnecté, revenir à la page de bienvenue
       if (!newAuthState.isAuthenticated && !newAuthState.currentUser) {
         setHasEnteredGame(false);
-        // Réinitialiser le jeu au menu
+        // Réinitialiser le jeu au menu et effacer la sauvegarde locale
+        gameStore.clearSavedState();
         gameStore.setState({ phase: 'menu' });
       }
     });
@@ -115,6 +128,18 @@ function App() {
   const handleEnterGame = useCallback(() => {
     setHasEnteredGame(true);
   }, []);
+
+  // Afficher un écran de chargement pendant la restauration
+  if (isRestoring) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-content">
+          <span className="loading-icon">🏰</span>
+          <p>Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Si l'utilisateur n'a pas encore passé l'écran de bienvenue
   if (!hasEnteredGame) {

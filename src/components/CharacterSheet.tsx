@@ -2,7 +2,7 @@ import { Character, Monster } from '../types/game.types';
 import './CharacterSheet.css';
 
 interface CharacterSheetProps {
-  entity: Character | Monster;
+  entity: Character | Monster | null | undefined;
   onClose: () => void;
 }
 
@@ -45,14 +45,32 @@ const ABILITY_NAMES: Record<string, string> = {
 };
 
 // Calcul du modificateur D&D
-const getModifier = (score: number): number => Math.floor((score - 10) / 2);
+const getModifier = (score: number): number => {
+  if (typeof score !== 'number' || isNaN(score)) return 0;
+  return Math.floor((score - 10) / 2);
+};
 
 // Formater le modificateur avec signe
 const formatModifier = (mod: number): string => mod >= 0 ? `+${mod}` : `${mod}`;
 
 export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
-  const isCharacter = 'class' in entity;
-  const isMonster = 'isBoss' in entity;
+  // Protection contre les entités null/undefined
+  if (!entity) {
+    return (
+      <div className="character-sheet-overlay" onClick={onClose}>
+        <div className="character-sheet" onClick={e => e.stopPropagation()}>
+          <button className="close-btn" onClick={onClose}>✕</button>
+          <div className="sheet-error">
+            <p>⚠️ Impossible de charger les informations</p>
+            <button onClick={onClose}>Fermer</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isCharacter = entity && 'class' in entity;
+  const isMonster = entity && ('isBoss' in entity || 'creatureType' in entity);
   
   // Gestion de la touche Échap
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -2791,29 +2791,45 @@
     gap: 0.15rem;
   }
 
-  .action-btn {
-    padding: 0.25rem;
-    font-size: 0.5rem;
+  /* Boutons TRÈS compacts - même taille pour attaque et compétences */
+  .action-btn,
+  .action-btn.attack,
+  .action-btn.skill {
+    padding: 0.2rem 0.15rem !important;
+    font-size: 0.45rem !important;
     border-radius: 4px;
-    min-height: 35px;
+    min-height: 28px !important;
+    max-height: 32px !important;
   }
 
   .action-btn .action-icon {
-    font-size: 0.8rem;
+    font-size: 0.7rem !important;
+    margin-bottom: 0.05rem;
+  }
+
+  .action-btn .action-name {
+    font-size: 0.4rem !important;
+    line-height: 1.1;
   }
 
   .damage-preview {
-    font-size: 0.4rem;
+    font-size: 0.35rem !important;
+    margin-top: 0.05rem;
   }
 
-  .skills-grid {
+  .skills-grid,
+  .actions-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.15rem;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.1rem !important;
   }
 
   .cooldown-text {
-    font-size: 0.4rem;
+    font-size: 0.35rem;
+  }
+
+  .cooldown-overlay {
+    font-size: 0.6rem !important;
   }
 
   /* DiceRoller compact */
