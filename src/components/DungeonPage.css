@@ -917,50 +917,57 @@
   .map-grid {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
     align-items: center;
   }
 
   .map-row {
     display: flex;
-    gap: 1px;
+    gap: 2px;
     justify-content: center;
-    height: 28px; /* Hauteur fixe pour éviter les sauts */
   }
 
+  /* TOUTES les cases ont la MÊME taille et border pour éviter les décalages */
   .map-cell {
-    width: 28px;
-    height: 28px;
-    font-size: 0.85rem;
-    border-radius: 3px;
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    border-radius: 4px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    border: 2px solid transparent; /* Border invisible mais présente */
   }
 
   .map-cell.current {
-    font-size: 0.95rem;
-    /* Pas d'animation qui change la taille */
-    box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
+    font-size: 1rem;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
     animation: none;
+    border-color: transparent;
   }
 
   .map-cell.adjacent {
-    font-size: 0.75rem;
-    /* Border uniforme pour éviter les décalages */
-    border: 1px dashed rgba(155, 89, 182, 0.7);
+    font-size: 0.8rem;
+    /* Border visible mais MÊME taille que les autres */
+    border-color: rgba(155, 89, 182, 0.7);
+    border-style: dashed;
     animation: none;
   }
 
   .map-cell.adjacent:hover {
-    transform: none; /* Pas de scale qui décale */
+    transform: none;
     background: rgba(155, 89, 182, 0.5);
+    border-style: solid;
   }
 
   .map-cell.unknown {
-    font-size: 0.5rem;
+    font-size: 0.55rem;
+  }
+
+  .map-cell.visited {
+    border-color: transparent;
   }
 
   /* Actions compactes en bas */

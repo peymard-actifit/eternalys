@@ -2679,23 +2679,65 @@
     display: none;
   }
 
+  /* BARRE D'INITIATIVE - positionnée en bas sur mobile */
+  .turn-order {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid rgba(155, 89, 182, 0.3);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .turn-order h4 {
+    font-size: 0.65rem;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .turn-list {
+    flex: 1;
+    overflow-x: auto;
+    gap: 0.3rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .turn-item {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
   /* MENU D'ACTIONS RÉDUCTIBLE */
-  .action-panel {
+  .action-panel,
+  .combat-actions {
     padding: 0.3rem;
     border-radius: 8px;
     flex: 0 0 auto;
     max-height: none;
     overflow-y: visible;
     transition: all 0.3s ease;
+    margin-bottom: 50px; /* Espace pour la barre d'initiative en bas */
   }
 
-  .action-panel.minimized {
+  .action-panel.minimized,
+  .combat-actions.minimized {
     max-height: 40px;
     overflow: hidden;
   }
 
   .action-panel.minimized .actions-grid,
-  .action-panel.minimized .skills-grid {
+  .action-panel.minimized .skills-grid,
+  .combat-actions.minimized .actions-grid,
+  .combat-actions.minimized .skills-grid {
     display: none;
   }
 
