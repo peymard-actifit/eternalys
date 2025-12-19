@@ -349,6 +349,7 @@ export interface Monster {
   // Boss
   isBoss: boolean;
   isLegendary?: boolean;
+  isHostileNpc?: boolean; // Pour les personnages hostiles nommés (Strahd, Zariel, etc.)
   // Résistances D&D
   resistances?: DamageType[];
   immunities?: DamageType[];

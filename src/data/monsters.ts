@@ -2060,6 +2060,1684 @@ const INVISIBLE_STALKER: Monster = {
 };
 
 // ============================================
+// PERSONNAGES HOSTILES NOMMÉS (Archdevils, Demon Lords, etc.)
+// ============================================
+
+// ARCHDEVILS - Les Seigneurs des Neuf Enfers
+const ZARIEL: Monster = {
+  id: 'zariel',
+  name: 'Zariel',
+  hp: 580, maxHp: 580,
+  armorClass: 21,
+  abilities: createAbilities(27, 24, 28, 26, 27, 30),
+  attack: 45, defense: 21, magicDefense: 25, speed: 50,
+  challengeRating: 26, xpReward: 90000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '👿',
+  isBoss: true,
+  isHostileNpc: true,
+  resistances: ['cold'],
+  immunities: ['fire', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Zariel, Archidiablesse d\'Avernus, première couche des Neuf Enfers. Ancienne ange déchue, elle mène les légions infernales dans la Guerre du Sang.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'attack', name: 'Attaque', cost: 1, damage: 35, damageType: 'slashing', description: 'Frappe avec son épée' },
+    { id: 'teleport', name: 'Téléportation', cost: 1, damage: 0, damageType: 'force', description: 'Se téléporte jusqu\'à 120 pieds' },
+    { id: 'fireball', name: 'Boule de feu infernale', cost: 2, damage: 45, damageType: 'fire', description: 'Boule de feu touchant tous les ennemis' }
+  ],
+  skills: [
+    { id: 'longsword', name: 'Épée longue de Zariel', damage: 40, damageType: 'slashing', type: 'attack', description: 'Triple attaque à l\'épée', attackCount: 3 },
+    { id: 'javelin', name: 'Javelot de feu', damage: 35, damageType: 'fire', type: 'attack', description: 'Javelot enflammé' }
+  ],
+  ultimateSkill: {
+    id: 'horrid_touch', name: 'Toucher Horrifique', damage: 60, damageType: 'necrotic', type: 'special',
+    description: 'Zariel canalise l\'énergie des Enfers pour infliger des dégâts nécrotiques dévastateurs'
+  }
+};
+
+const ASMODEUS: Monster = {
+  id: 'asmodeus',
+  name: 'Asmodeus',
+  hp: 750, maxHp: 750,
+  armorClass: 22,
+  abilities: createAbilities(30, 21, 30, 30, 28, 30),
+  attack: 50, defense: 22, magicDefense: 30, speed: 40,
+  challengeRating: 30, xpReward: 155000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '😈',
+  isBoss: true,
+  isHostileNpc: true,
+  resistances: ['cold'],
+  immunities: ['fire', 'poison', 'bludgeoning', 'piercing', 'slashing'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Asmodeus, Seigneur Suprême des Neuf Enfers, le plus puissant des archidiables. Il règne depuis Nessus, la neuvième couche.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'ruby_rod', name: 'Sceptre de Rubis', cost: 2, damage: 55, damageType: 'force', description: 'Frappe avec son sceptre légendaire' },
+    { id: 'hellfire', name: 'Feu infernal', cost: 3, damage: 70, damageType: 'fire', description: 'Déchaîne les flammes de Nessus' }
+  ],
+  skills: [
+    { id: 'ruby_rod_strike', name: 'Sceptre de Rubis', damage: 55, damageType: 'force', type: 'attack', description: 'Frappe dévastatrice' },
+    { id: 'dominate', name: 'Domination', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Tente de dominer l\'esprit' }
+  ],
+  ultimateSkill: {
+    id: 'avatar_destruction', name: 'Avatar de Destruction', damage: 100, damageType: 'fire', type: 'special',
+    description: 'Asmodeus révèle sa vraie forme divine, infligeant des dégâts catastrophiques'
+  }
+};
+
+const MEPHISTOPHELES: Monster = {
+  id: 'mephistopheles',
+  name: 'Méphistophélès',
+  hp: 520, maxHp: 520,
+  armorClass: 20,
+  abilities: createAbilities(24, 22, 26, 30, 26, 28),
+  attack: 40, defense: 20, magicDefense: 28, speed: 50,
+  challengeRating: 25, xpReward: 75000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🔥',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'cold', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Méphistophélès, Archidiable de Cania, huitième couche des Enfers. Maître du feu infernal et des pactes.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'hellfire_bolt', name: 'Trait de feu infernal', cost: 1, damage: 40, damageType: 'fire', description: 'Rayon de flammes' },
+    { id: 'cone_cold', name: 'Cône de froid', cost: 2, damage: 50, damageType: 'cold', description: 'Souffle glacial de Cania' }
+  ],
+  skills: [
+    { id: 'trident', name: 'Trident de Cania', damage: 38, damageType: 'piercing', type: 'attack', description: 'Attaque au trident', attackCount: 2 },
+    { id: 'hellfire', name: 'Feu infernal', damage: 45, damageType: 'fire', type: 'attack', description: 'Flammes des Enfers' }
+  ],
+  ultimateSkill: {
+    id: 'cania_winter', name: 'Hiver de Cania', damage: 70, damageType: 'cold', type: 'special',
+    description: 'Invoque le froid mortel de la huitième couche'
+  }
+};
+
+const DISPATER: Monster = {
+  id: 'dispater',
+  name: 'Dispater',
+  hp: 480, maxHp: 480,
+  armorClass: 21,
+  abilities: createAbilities(26, 20, 26, 28, 26, 26),
+  attack: 38, defense: 21, magicDefense: 26, speed: 30,
+  challengeRating: 24, xpReward: 62000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🏛️',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Dispater, Archidiable de Dis, deuxième couche des Enfers. Le Père de la Tromperie, rusé et paranoïaque.',
+  skills: [
+    { id: 'iron_staff', name: 'Bâton de fer', damage: 40, damageType: 'bludgeoning', type: 'attack', description: 'Frappe avec son bâton enchanté' }
+  ],
+  ultimateSkill: {
+    id: 'iron_prison', name: 'Prison de Fer', damage: 55, damageType: 'bludgeoning', type: 'special',
+    description: 'Emprisonne les ennemis dans des chaînes de fer infernal'
+  }
+};
+
+const MAMMON: Monster = {
+  id: 'mammon',
+  name: 'Mammon',
+  hp: 460, maxHp: 460,
+  armorClass: 19,
+  abilities: createAbilities(24, 18, 26, 26, 24, 28),
+  attack: 36, defense: 19, magicDefense: 24, speed: 30,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '💰',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'poison'],
+  description: 'Mammon, Archidiable de Minauros, troisième couche. Seigneur de l\'avarice et de la cupidité.',
+  skills: [
+    { id: 'golden_claws', name: 'Griffes dorées', damage: 35, damageType: 'slashing', type: 'attack', description: 'Griffes recouvertes d\'or maudit' }
+  ]
+};
+
+const BELIAL: Monster = {
+  id: 'belial',
+  name: 'Bélial',
+  hp: 450, maxHp: 450,
+  armorClass: 20,
+  abilities: createAbilities(26, 22, 24, 24, 22, 28),
+  attack: 38, defense: 20, magicDefense: 22, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🗡️',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'poison'],
+  description: 'Bélial, Archidiable de Phlegethos, quatrième couche. Maître de la séduction et du feu.',
+  skills: [
+    { id: 'ranseur', name: 'Ranseur enflammé', damage: 40, damageType: 'piercing', type: 'attack', description: 'Arme d\'hast enflammée' }
+  ]
+};
+
+const LEVISTUS: Monster = {
+  id: 'levistus',
+  name: 'Lévistus',
+  hp: 420, maxHp: 420,
+  armorClass: 20,
+  abilities: createAbilities(22, 20, 26, 26, 24, 26),
+  attack: 35, defense: 20, magicDefense: 24, speed: 0,
+  challengeRating: 22, xpReward: 41000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🧊',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['cold', 'poison'],
+  description: 'Lévistus, Archidiable de Stygia, cinquième couche. Prisonnier éternel dans un bloc de glace par Asmodeus.',
+  skills: [
+    { id: 'ice_rapier', name: 'Rapière de glace', damage: 38, damageType: 'cold', type: 'attack', description: 'Lame de glace éternelle' }
+  ]
+};
+
+const GLASYA: Monster = {
+  id: 'glasya',
+  name: 'Glasya',
+  hp: 400, maxHp: 400,
+  armorClass: 21,
+  abilities: createAbilities(22, 26, 22, 24, 22, 28),
+  attack: 34, defense: 21, magicDefense: 22, speed: 50,
+  challengeRating: 22, xpReward: 41000,
+  creatureType: 'fiend', size: 'medium',
+  portrait: '👸',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'poison'],
+  description: 'Glasya, Archidiablesse de Malbolge, sixième couche. Fille d\'Asmodeus, Princesse des Enfers.',
+  skills: [
+    { id: 'scourge', name: 'Fléau de Malbolge', damage: 36, damageType: 'slashing', type: 'attack', description: 'Fouet démoniaque' }
+  ]
+};
+
+const BAALZEBUL: Monster = {
+  id: 'baalzebul',
+  name: 'Baalzébul',
+  hp: 440, maxHp: 440,
+  armorClass: 19,
+  abilities: createAbilities(24, 20, 26, 28, 24, 26),
+  attack: 36, defense: 19, magicDefense: 26, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🪰',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['fire', 'poison'],
+  description: 'Baalzébul, Archidiable de Maladomini, septième couche. Le Seigneur des Mouches, autrefois bel ange.',
+  skills: [
+    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 42, damageType: 'piercing', type: 'attack', description: 'Nuée d\'insectes démoniaques', areaOfEffect: true }
+  ]
+};
+
+// DEMON LORDS - Seigneurs Démons de l'Abysse
+const DEMOGORGON: Monster = {
+  id: 'demogorgon',
+  name: 'Demogorgon',
+  hp: 496, maxHp: 496,
+  armorClass: 22,
+  abilities: createAbilities(29, 14, 26, 20, 17, 25),
+  attack: 45, defense: 22, magicDefense: 20, speed: 50,
+  challengeRating: 26, xpReward: 90000,
+  creatureType: 'fiend', size: 'huge',
+  portrait: '🐙',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Demogorgon, Prince des Démons, le Maître à Deux Têtes. L\'un des seigneurs démons les plus puissants de l\'Abysse.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'tail', name: 'Queue', cost: 1, damage: 30, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'maddening_gaze', name: 'Regard fou', cost: 2, damage: 0, damageType: 'psychic', description: 'Regard rendant fou' }
+  ],
+  skills: [
+    { id: 'tentacle', name: 'Tentacules', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Double attaque tentaculaire', attackCount: 2 },
+    { id: 'gaze', name: 'Regard hypnotique', damage: 25, damageType: 'psychic', type: 'attack', description: 'Regard de folie' }
+  ],
+  ultimateSkill: {
+    id: 'primal_scream', name: 'Hurlement Primordial', damage: 80, damageType: 'psychic', type: 'special',
+    description: 'Les deux têtes hurlent à l\'unisson, infligeant une folie dévastatrice'
+  }
+};
+
+const ORCUS: Monster = {
+  id: 'orcus',
+  name: 'Orcus',
+  hp: 405, maxHp: 405,
+  armorClass: 17,
+  abilities: createAbilities(27, 14, 25, 20, 20, 25),
+  attack: 42, defense: 17, magicDefense: 22, speed: 40,
+  challengeRating: 26, xpReward: 90000,
+  creatureType: 'fiend', size: 'huge',
+  portrait: '💀',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['necrotic', 'poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Orcus, Prince des Morts-Vivants, Seigneur Démon de Thanatos. Il porte la Baguette d\'Orcus, artefact de mort.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'tail', name: 'Queue', cost: 1, damage: 28, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wand', name: 'Baguette d\'Orcus', cost: 2, damage: 45, damageType: 'necrotic', description: 'Pouvoir nécrotique' }
+  ],
+  skills: [
+    { id: 'wand_strike', name: 'Baguette d\'Orcus', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Frappe avec l\'artefact légendaire' },
+    { id: 'tail_attack', name: 'Queue', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Frappe caudale' }
+  ],
+  ultimateSkill: {
+    id: 'undead_army', name: 'Armée des Morts', damage: 60, damageType: 'necrotic', type: 'special',
+    description: 'Orcus invoque la puissance de la mort elle-même'
+  }
+};
+
+const GRAZZT: Monster = {
+  id: 'grazzt',
+  name: 'Graz\'zt',
+  hp: 378, maxHp: 378,
+  armorClass: 20,
+  abilities: createAbilities(22, 15, 24, 23, 21, 26),
+  attack: 38, defense: 20, magicDefense: 24, speed: 40,
+  challengeRating: 24, xpReward: 62000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🖤',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Graz\'zt, le Prince Sombre, Seigneur Démon de l\'indulgence. Le plus séduisant et rusé des princes démons.',
+  skills: [
+    { id: 'wave_of_sorrow', name: 'Vague de Chagrin', damage: 40, damageType: 'slashing', type: 'attack', description: 'Épée légendaire' },
+    { id: 'charm', name: 'Charme', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Tentative de charme' }
+  ]
+};
+
+const YEENOGHU: Monster = {
+  id: 'yeenoghu',
+  name: 'Yeenoghu',
+  hp: 348, maxHp: 348,
+  armorClass: 20,
+  abilities: createAbilities(29, 16, 23, 15, 24, 15),
+  attack: 42, defense: 20, magicDefense: 18, speed: 50,
+  challengeRating: 24, xpReward: 62000,
+  creatureType: 'fiend', size: 'huge',
+  portrait: '🐺',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Yeenoghu, le Seigneur des Gnolls, Prince de la Sauvagerie. Il erre dans l\'Abysse avec sa horde de démons.',
+  skills: [
+    { id: 'flail', name: 'Fléau de Butchery', damage: 42, damageType: 'bludgeoning', type: 'attack', description: 'Triple attaque au fléau', attackCount: 3 }
+  ]
+};
+
+const JUIBLEX: Monster = {
+  id: 'juiblex',
+  name: 'Juiblex',
+  hp: 350, maxHp: 350,
+  armorClass: 18,
+  abilities: createAbilities(24, 10, 23, 20, 20, 16),
+  attack: 35, defense: 18, magicDefense: 20, speed: 30,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'huge',
+  portrait: '🧪',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['acid', 'poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Juiblex, le Seigneur Sans Visage, Prince des Vases. Une masse de corruption et de décomposition.',
+  skills: [
+    { id: 'acid_splash', name: 'Éclaboussure acide', damage: 40, damageType: 'acid', type: 'attack', description: 'Projection d\'acide', areaOfEffect: true }
+  ]
+};
+
+const ZUGGTMOY: Monster = {
+  id: 'zuggtmoy',
+  name: 'Zuggtmoy',
+  hp: 304, maxHp: 304,
+  armorClass: 18,
+  abilities: createAbilities(22, 15, 22, 20, 19, 24),
+  attack: 32, defense: 18, magicDefense: 22, speed: 30,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🍄',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Zuggtmoy, la Reine des Champignons, Dame de la Décomposition. Elle règne sur Shedaklah dans l\'Abysse.',
+  skills: [
+    { id: 'spore_burst', name: 'Explosion de spores', damage: 35, damageType: 'poison', type: 'attack', description: 'Nuage de spores toxiques', areaOfEffect: true }
+  ]
+};
+
+const BAPHOMET: Monster = {
+  id: 'baphomet',
+  name: 'Baphomet',
+  hp: 319, maxHp: 319,
+  armorClass: 22,
+  abilities: createAbilities(30, 14, 26, 18, 24, 16),
+  attack: 44, defense: 22, magicDefense: 20, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'huge',
+  portrait: '🐂',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Baphomet, le Prince des Bêtes, Seigneur du Labyrinthe Sans Fin. Le patron des minotaures.',
+  skills: [
+    { id: 'heartcleaver', name: 'Fendeur de Cœurs', damage: 45, damageType: 'slashing', type: 'attack', description: 'Grande hache démoniaque' },
+    { id: 'charge', name: 'Charge', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Charge brutale avec cornes' }
+  ]
+};
+
+const FRAZURBLUU: Monster = {
+  id: 'frazurbluu',
+  name: 'Fraz-Urb\'luu',
+  hp: 337, maxHp: 337,
+  armorClass: 18,
+  abilities: createAbilities(29, 12, 25, 26, 24, 26),
+  attack: 38, defense: 18, magicDefense: 26, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'fiend', size: 'large',
+  portrait: '🎭',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['poison'],
+  resistances: ['cold', 'fire', 'lightning'],
+  description: 'Fraz-Urb\'luu, le Prince de la Tromperie. Maître des illusions et de la manipulation.',
+  skills: [
+    { id: 'phantasmal_killer', name: 'Assassin fantomatique', damage: 40, damageType: 'psychic', type: 'attack', description: 'Illusion mortelle' }
+  ]
+};
+
+// AUTRES PERSONNAGES HOSTILES ICONIQUES
+const STRAHD_VON_ZAROVICH: Monster = {
+  id: 'strahd',
+  name: 'Strahd von Zarovich',
+  hp: 144, maxHp: 144,
+  armorClass: 16,
+  abilities: createAbilities(18, 18, 18, 20, 15, 18),
+  attack: 22, defense: 16, magicDefense: 18, speed: 30,
+  challengeRating: 15, xpReward: 13000,
+  creatureType: 'undead', size: 'medium',
+  portrait: '🧛',
+  isBoss: true,
+  isHostileNpc: true,
+  resistances: ['necrotic'],
+  immunities: ['poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'poisoned'],
+  description: 'Strahd von Zarovich, le Comte Vampire de Barovie. Seigneur des ténèbres, prisonnier éternel de Ravenloft.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'move', name: 'Déplacement', cost: 1, damage: 0, damageType: 'bludgeoning', description: 'Se déplace sans provoquer' },
+    { id: 'unarmed', name: 'Attaque à mains nues', cost: 1, damage: 12, damageType: 'bludgeoning', description: 'Frappe vampirique' },
+    { id: 'bite', name: 'Morsure', cost: 2, damage: 18, damageType: 'necrotic', description: 'Morsure vampirique drainante' }
+  ],
+  skills: [
+    { id: 'unarmed', name: 'Frappe vampirique', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Attaque à mains nues', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'necrotic', type: 'attack', description: 'Morsure drainant la vie' },
+    { id: 'charm', name: 'Charme vampirique', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Charme une cible' }
+  ],
+  ultimateSkill: {
+    id: 'children_of_night', name: 'Enfants de la Nuit', damage: 40, damageType: 'necrotic', type: 'special',
+    description: 'Strahd invoque les créatures de la nuit à son service'
+  }
+};
+
+const ACERERAK: Monster = {
+  id: 'acererak',
+  name: 'Acérérak',
+  hp: 285, maxHp: 285,
+  armorClass: 21,
+  abilities: createAbilities(13, 16, 20, 27, 21, 20),
+  attack: 30, defense: 21, magicDefense: 27, speed: 30,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'undead', size: 'medium',
+  portrait: '💀',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['necrotic', 'poison', 'bludgeoning', 'piercing', 'slashing'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
+  description: 'Acérérak, l\'Archliche, créateur de la Tombe des Horreurs. L\'un des lanceurs de sorts les plus puissants.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'ray', name: 'Rayon', cost: 1, damage: 25, damageType: 'necrotic', description: 'Rayon d\'énergie' },
+    { id: 'disrupt', name: 'Perturbation', cost: 2, damage: 35, damageType: 'necrotic', description: 'Explosion nécrotique' }
+  ],
+  skills: [
+    { id: 'staff', name: 'Bâton de l\'Archimage', damage: 15, damageType: 'bludgeoning', type: 'attack', description: 'Frappe au bâton' },
+    { id: 'ray_of_sickness', name: 'Rayon de maladie', damage: 25, damageType: 'necrotic', type: 'attack', description: 'Rayon nécrotique' },
+    { id: 'finger_of_death', name: 'Doigt de mort', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Sort dévastateur', savingThrow: { ability: 'constitution', dc: 20 } }
+  ],
+  ultimateSkill: {
+    id: 'sphere_annihilation', name: 'Sphère d\'Annihilation', damage: 100, damageType: 'force', type: 'special',
+    description: 'Acérérak invoque une sphère qui annihile tout ce qu\'elle touche'
+  }
+};
+
+const VECNA: Monster = {
+  id: 'vecna',
+  name: 'Vecna',
+  hp: 350, maxHp: 350,
+  armorClass: 22,
+  abilities: createAbilities(14, 16, 22, 30, 24, 22),
+  attack: 32, defense: 22, magicDefense: 30, speed: 30,
+  challengeRating: 26, xpReward: 90000,
+  creatureType: 'undead', size: 'medium',
+  portrait: '👁️',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['necrotic', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
+  description: 'Vecna, le Chuchoteur, Dieu de la Magie Sombre et des Secrets. La liche qui devint dieu.',
+  skills: [
+    { id: 'dagger', name: 'Dague de Vecna', damage: 20, damageType: 'piercing', type: 'attack', description: 'Dague maudite' },
+    { id: 'deadly_ray', name: 'Rayon mortel', damage: 50, damageType: 'necrotic', type: 'attack', description: 'Rayon d\'énergie nécrotique' }
+  ],
+  ultimateSkill: {
+    id: 'rotten_fate', name: 'Destin Pourri', damage: 90, damageType: 'necrotic', type: 'special',
+    description: 'Vecna altère le destin de ses ennemis, les condamnant à la mort'
+  }
+};
+
+const TIAMAT: Monster = {
+  id: 'tiamat',
+  name: 'Tiamat',
+  hp: 615, maxHp: 615,
+  armorClass: 25,
+  abilities: createAbilities(30, 10, 30, 26, 26, 28),
+  attack: 50, defense: 25, magicDefense: 28, speed: 60,
+  challengeRating: 30, xpReward: 155000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🐲',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['acid', 'cold', 'fire', 'lightning', 'poison'],
+  conditionImmunities: ['charmed', 'frightened', 'poisoned', 'stunned'],
+  description: 'Tiamat, la Reine des Dragons Chromatiques, déesse à cinq têtes. La plus puissante des dragons.',
+  legendaryActionsPerTurn: 5,
+  legendaryActions: [
+    { id: 'bite', name: 'Morsure', cost: 1, damage: 40, damageType: 'piercing', description: 'Morsure d\'une tête' },
+    { id: 'breath_fire', name: 'Souffle de feu', cost: 2, damage: 50, damageType: 'fire', description: 'Tête rouge' },
+    { id: 'breath_cold', name: 'Souffle de froid', cost: 2, damage: 50, damageType: 'cold', description: 'Tête blanche' },
+    { id: 'breath_acid', name: 'Souffle acide', cost: 2, damage: 50, damageType: 'acid', description: 'Tête noire' },
+    { id: 'breath_lightning', name: 'Souffle de foudre', cost: 2, damage: 50, damageType: 'lightning', description: 'Tête bleue' },
+    { id: 'breath_poison', name: 'Souffle de poison', cost: 2, damage: 50, damageType: 'poison', description: 'Tête verte' }
+  ],
+  skills: [
+    { id: 'multiattack', name: 'Attaques multiples', damage: 35, damageType: 'slashing', type: 'attack', description: 'Griffes et morsures', attackCount: 5 },
+    { id: 'frightful_presence', name: 'Présence terrifiante', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Terreur divine' }
+  ],
+  ultimateSkill: {
+    id: 'five_headed_fury', name: 'Furie des Cinq Têtes', damage: 120, damageType: 'fire', type: 'special',
+    description: 'Les cinq têtes attaquent simultanément avec leurs souffles'
+  }
+};
+
+const BAHAMUT: Monster = {
+  id: 'bahamut',
+  name: 'Bahamut (Ennemi)',
+  hp: 585, maxHp: 585,
+  armorClass: 25,
+  abilities: createAbilities(30, 10, 30, 26, 28, 30),
+  attack: 48, defense: 25, magicDefense: 30, speed: 60,
+  challengeRating: 30, xpReward: 155000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '⚪',
+  isBoss: true,
+  isHostileNpc: true,
+  immunities: ['cold', 'radiant'],
+  conditionImmunities: ['charmed', 'frightened', 'poisoned', 'stunned'],
+  description: 'Bahamut, le Dragon de Platine, dieu des dragons métalliques. Sous forme hostile pour ceux qui défient la justice.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'bite', name: 'Morsure', cost: 1, damage: 42, damageType: 'piercing', description: 'Morsure divine' },
+    { id: 'divine_word', name: 'Mot divin', cost: 3, damage: 60, damageType: 'radiant', description: 'Parole divine' }
+  ],
+  skills: [
+    { id: 'breath_weapon', name: 'Souffle de froid', damage: 60, damageType: 'cold', type: 'attack', description: 'Souffle glacial', areaOfEffect: true },
+    { id: 'divine_radiance', name: 'Radiance divine', damage: 50, damageType: 'radiant', type: 'attack', description: 'Lumière purificatrice' }
+  ],
+  ultimateSkill: {
+    id: 'platinum_judgment', name: 'Jugement de Platine', damage: 100, damageType: 'radiant', type: 'special',
+    description: 'Bahamut juge tous ses ennemis avec la lumière divine'
+  }
+};
+
+// ============================================
+// DRAGONS SUPPLÉMENTAIRES (Tous les types et âges)
+// ============================================
+
+// DRAGONS CHROMATIQUES JEUNES
+const YOUNG_BLACK_DRAGON: Monster = {
+  id: 'young_black_dragon',
+  name: 'Jeune Dragon Noir',
+  hp: 127, maxHp: 127,
+  armorClass: 18,
+  abilities: createAbilities(19, 14, 17, 12, 11, 15),
+  attack: 20, defense: 18, magicDefense: 12, speed: 40,
+  challengeRating: 7, xpReward: 2900,
+  creatureType: 'dragon', size: 'large',
+  portrait: '🐉',
+  isBoss: false,
+  immunities: ['acid'],
+  description: 'Dragon noir sadique vivant dans les marécages. Son souffle d\'acide dissout tout.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 45, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 14 } }
+  ]
+};
+
+const YOUNG_BLUE_DRAGON: Monster = {
+  id: 'young_blue_dragon',
+  name: 'Jeune Dragon Bleu',
+  hp: 152, maxHp: 152,
+  armorClass: 18,
+  abilities: createAbilities(21, 10, 19, 14, 13, 17),
+  attack: 22, defense: 18, magicDefense: 14, speed: 40,
+  challengeRating: 9, xpReward: 5000,
+  creatureType: 'dragon', size: 'large',
+  portrait: '🐉',
+  isBoss: false,
+  immunities: ['lightning'],
+  description: 'Dragon bleu territorial du désert. Son souffle de foudre est dévastateur.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 55, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+  ]
+};
+
+const YOUNG_GREEN_DRAGON: Monster = {
+  id: 'young_green_dragon',
+  name: 'Jeune Dragon Vert',
+  hp: 136, maxHp: 136,
+  armorClass: 18,
+  abilities: createAbilities(19, 12, 17, 16, 13, 15),
+  attack: 20, defense: 18, magicDefense: 14, speed: 40,
+  challengeRating: 8, xpReward: 3900,
+  creatureType: 'dragon', size: 'large',
+  portrait: '🐉',
+  isBoss: false,
+  immunities: ['poison'],
+  description: 'Dragon vert manipulateur des forêts. Son souffle empoisonné est mortel.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 42, damageType: 'poison', type: 'attack', description: 'Cône de poison 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
+  ]
+};
+
+// DRAGONS CHROMATIQUES ADULTES
+const ADULT_BLACK_DRAGON: Monster = {
+  id: 'adult_black_dragon',
+  name: 'Dragon Noir Adulte',
+  hp: 195, maxHp: 195,
+  armorClass: 19,
+  abilities: createAbilities(23, 14, 21, 14, 13, 17),
+  attack: 28, defense: 19, magicDefense: 15, speed: 40,
+  challengeRating: 14, xpReward: 11500,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['acid'],
+  description: 'Dragon noir adulte, maître des marécages. Cruel et vindicatif.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 18, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 16, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 25, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 54, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 18 } }
+  ],
+  ultimateSkill: {
+    id: 'acid_torrent', name: 'Torrent d\'Acide', damage: 70, damageType: 'acid', type: 'special',
+    description: 'Le dragon déverse un déluge d\'acide corrosif'
+  }
+};
+
+const ADULT_BLUE_DRAGON: Monster = {
+  id: 'adult_blue_dragon',
+  name: 'Dragon Bleu Adulte',
+  hp: 225, maxHp: 225,
+  armorClass: 19,
+  abilities: createAbilities(25, 10, 23, 16, 15, 19),
+  attack: 30, defense: 19, magicDefense: 17, speed: 40,
+  challengeRating: 16, xpReward: 15000,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['lightning'],
+  description: 'Dragon bleu adulte du désert. Fier et territorial.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 20, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 66, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 19 } }
+  ],
+  ultimateSkill: {
+    id: 'storm_fury', name: 'Furie de la Tempête', damage: 80, damageType: 'lightning', type: 'special',
+    description: 'Le dragon déchaîne la puissance d\'un orage'
+  }
+};
+
+const ADULT_GREEN_DRAGON: Monster = {
+  id: 'adult_green_dragon',
+  name: 'Dragon Vert Adulte',
+  hp: 207, maxHp: 207,
+  armorClass: 19,
+  abilities: createAbilities(23, 12, 21, 18, 15, 17),
+  attack: 28, defense: 19, magicDefense: 17, speed: 40,
+  challengeRating: 15, xpReward: 13000,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['poison'],
+  description: 'Dragon vert adulte, maître manipulateur des forêts anciennes.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 18, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 16, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 26, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 56, damageType: 'poison', type: 'attack', description: 'Cône de poison 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 18 } }
+  ],
+  ultimateSkill: {
+    id: 'toxic_cloud', name: 'Nuage Toxique', damage: 70, damageType: 'poison', type: 'special',
+    description: 'Le dragon libère un nuage de poison persistant'
+  }
+};
+
+const ADULT_WHITE_DRAGON: Monster = {
+  id: 'adult_white_dragon',
+  name: 'Dragon Blanc Adulte',
+  hp: 200, maxHp: 200,
+  armorClass: 18,
+  abilities: createAbilities(22, 10, 22, 8, 12, 12),
+  attack: 26, defense: 18, magicDefense: 12, speed: 40,
+  challengeRating: 13, xpReward: 10000,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['cold'],
+  description: 'Dragon blanc adulte des terres glacées. Bestial et territorial.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 16, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 14, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 19 } }
+  ],
+  ultimateSkill: {
+    id: 'glacial_storm', name: 'Tempête Glaciaire', damage: 65, damageType: 'cold', type: 'special',
+    description: 'Le dragon déchaîne une tempête de glace'
+  }
+};
+
+// DRAGONS CHROMATIQUES ANCIENS (ajoutés aux existants)
+const ANCIENT_BLACK_DRAGON: Monster = {
+  id: 'ancient_black_dragon',
+  name: 'Dragon Noir Ancien',
+  hp: 367, maxHp: 367,
+  armorClass: 22,
+  abilities: createAbilities(27, 14, 25, 16, 15, 19),
+  attack: 38, defense: 22, magicDefense: 18, speed: 40,
+  challengeRating: 21, xpReward: 33000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['acid'],
+  description: 'Dragon noir ancien, seigneur des marécages. Millénaires de cruauté concentrée.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 22, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 20, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 34, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 67, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 22 } }
+  ],
+  ultimateSkill: {
+    id: 'acid_apocalypse', name: 'Apocalypse Acide', damage: 90, damageType: 'acid', type: 'special',
+    description: 'L\'acide consume tout sur son passage'
+  }
+};
+
+const ANCIENT_BLUE_DRAGON: Monster = {
+  id: 'ancient_blue_dragon',
+  name: 'Dragon Bleu Ancien',
+  hp: 481, maxHp: 481,
+  armorClass: 22,
+  abilities: createAbilities(29, 10, 27, 18, 17, 21),
+  attack: 42, defense: 22, magicDefense: 20, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['lightning'],
+  description: 'Dragon bleu ancien, empereur du désert. La foudre incarnée.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 24, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 88, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 120 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 23 } }
+  ],
+  ultimateSkill: {
+    id: 'thunderstorm', name: 'Tempête de Tonnerre', damage: 100, damageType: 'lightning', type: 'special',
+    description: 'La fureur d\'un orage primordial'
+  }
+};
+
+const ANCIENT_GREEN_DRAGON: Monster = {
+  id: 'ancient_green_dragon',
+  name: 'Dragon Vert Ancien',
+  hp: 385, maxHp: 385,
+  armorClass: 21,
+  abilities: createAbilities(27, 12, 25, 20, 17, 19),
+  attack: 38, defense: 21, magicDefense: 20, speed: 40,
+  challengeRating: 22, xpReward: 41000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['poison'],
+  description: 'Dragon vert ancien, maître des forêts primordiales. Manipulateur suprême.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 22, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 20, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 77, damageType: 'poison', type: 'attack', description: 'Cône de poison 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
+  ],
+  ultimateSkill: {
+    id: 'venomous_doom', name: 'Doom Venimeux', damage: 95, damageType: 'poison', type: 'special',
+    description: 'Un poison si puissant qu\'il corrompt l\'âme'
+  }
+};
+
+const ANCIENT_WHITE_DRAGON: Monster = {
+  id: 'ancient_white_dragon',
+  name: 'Dragon Blanc Ancien',
+  hp: 333, maxHp: 333,
+  armorClass: 20,
+  abilities: createAbilities(26, 10, 26, 10, 13, 14),
+  attack: 36, defense: 20, magicDefense: 14, speed: 40,
+  challengeRating: 20, xpReward: 25000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🐉',
+  isBoss: true,
+  immunities: ['cold'],
+  description: 'Dragon blanc ancien, roi des glaciers. Prédateur ultime des terres gelées.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 20, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 72, damageType: 'cold', type: 'attack', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
+  ],
+  ultimateSkill: {
+    id: 'ice_age', name: 'Ère Glaciaire', damage: 85, damageType: 'cold', type: 'special',
+    description: 'Le froid absolu qui gèle le temps lui-même'
+  }
+};
+
+// DRAGONS MÉTALLIQUES (Gold, Silver, Bronze, Copper, Brass)
+const YOUNG_GOLD_DRAGON: Monster = {
+  id: 'young_gold_dragon',
+  name: 'Jeune Dragon d\'Or',
+  hp: 178, maxHp: 178,
+  armorClass: 18,
+  abilities: createAbilities(23, 14, 21, 16, 13, 20),
+  attack: 24, defense: 18, magicDefense: 18, speed: 40,
+  challengeRating: 10, xpReward: 5900,
+  creatureType: 'dragon', size: 'large',
+  portrait: '✨',
+  isBoss: false,
+  immunities: ['fire'],
+  description: 'Dragon d\'or majestueux. Noble et juste, il protège les innocents.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 55, damageType: 'fire', type: 'attack', description: 'Cône de feu 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 17 } },
+    { id: 'weakening_breath', name: 'Souffle affaiblissant', damage: 0, damageType: 'force', type: 'debuff', description: 'Affaiblit les ennemis', recharge: { min: 5 }, savingThrow: { ability: 'strength', dc: 17 } }
+  ]
+};
+
+const ADULT_GOLD_DRAGON: Monster = {
+  id: 'adult_gold_dragon',
+  name: 'Dragon d\'Or Adulte',
+  hp: 256, maxHp: 256,
+  armorClass: 19,
+  abilities: createAbilities(27, 14, 25, 16, 15, 24),
+  attack: 32, defense: 19, magicDefense: 22, speed: 40,
+  challengeRating: 17, xpReward: 18000,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '✨',
+  isBoss: true,
+  immunities: ['fire'],
+  description: 'Dragon d\'or adulte, champion de la lumière et protecteur des royaumes.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 20, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 30, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 66, damageType: 'fire', type: 'attack', description: 'Cône de feu 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 21 } }
+  ],
+  ultimateSkill: {
+    id: 'divine_fire', name: 'Feu Divin', damage: 80, damageType: 'fire', type: 'special',
+    description: 'Flammes purificatrices de justice divine'
+  }
+};
+
+const ANCIENT_GOLD_DRAGON: Monster = {
+  id: 'ancient_gold_dragon',
+  name: 'Dragon d\'Or Ancien',
+  hp: 546, maxHp: 546,
+  armorClass: 22,
+  abilities: createAbilities(30, 14, 29, 18, 17, 28),
+  attack: 44, defense: 22, magicDefense: 26, speed: 40,
+  challengeRating: 24, xpReward: 62000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '✨',
+  isBoss: true,
+  immunities: ['fire'],
+  description: 'Dragon d\'or ancien, avatar de la justice. Le plus noble des dragons.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 24, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 40, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 91, damageType: 'fire', type: 'attack', description: 'Cône de feu 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 24 } }
+  ],
+  ultimateSkill: {
+    id: 'solar_judgment', name: 'Jugement Solaire', damage: 110, damageType: 'fire', type: 'special',
+    description: 'La lumière du soleil incarnée pour juger les impies'
+  }
+};
+
+const YOUNG_SILVER_DRAGON: Monster = {
+  id: 'young_silver_dragon',
+  name: 'Jeune Dragon d\'Argent',
+  hp: 168, maxHp: 168,
+  armorClass: 18,
+  abilities: createAbilities(23, 10, 21, 14, 11, 19),
+  attack: 24, defense: 18, magicDefense: 16, speed: 40,
+  challengeRating: 9, xpReward: 5000,
+  creatureType: 'dragon', size: 'large',
+  portrait: '🌙',
+  isBoss: false,
+  immunities: ['cold'],
+  description: 'Dragon d\'argent amical et protecteur. Aime la compagnie des humanoïdes.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', description: 'Cône de froid 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 17 } }
+  ]
+};
+
+const ADULT_SILVER_DRAGON: Monster = {
+  id: 'adult_silver_dragon',
+  name: 'Dragon d\'Argent Adulte',
+  hp: 243, maxHp: 243,
+  armorClass: 19,
+  abilities: createAbilities(27, 10, 25, 16, 13, 21),
+  attack: 32, defense: 19, magicDefense: 18, speed: 40,
+  challengeRating: 16, xpReward: 15000,
+  creatureType: 'dragon', size: 'huge',
+  portrait: '🌙',
+  isBoss: true,
+  immunities: ['cold'],
+  description: 'Dragon d\'argent adulte, gardien des cieux et ami des mortels vertueux.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 20, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 67, damageType: 'cold', type: 'attack', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 20 } }
+  ],
+  ultimateSkill: {
+    id: 'winter_blessing', name: 'Bénédiction de l\'Hiver', damage: 75, damageType: 'cold', type: 'special',
+    description: 'Le froid purificateur qui gèle le mal'
+  }
+};
+
+const ANCIENT_SILVER_DRAGON: Monster = {
+  id: 'ancient_silver_dragon',
+  name: 'Dragon d\'Argent Ancien',
+  hp: 487, maxHp: 487,
+  armorClass: 22,
+  abilities: createAbilities(30, 10, 29, 18, 15, 23),
+  attack: 44, defense: 22, magicDefense: 22, speed: 40,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'dragon', size: 'gargantuan',
+  portrait: '🌙',
+  isBoss: true,
+  immunities: ['cold'],
+  description: 'Dragon d\'argent ancien, sage gardien des royaumes mortels depuis des millénaires.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'detect', name: 'Détection', cost: 1, damage: 0, damageType: 'piercing', description: 'Perception de sagesse' },
+    { id: 'tail', name: 'Queue', cost: 1, damage: 24, damageType: 'bludgeoning', description: 'Frappe de queue' },
+    { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 90, damageType: 'cold', type: 'attack', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 24 } }
+  ],
+  ultimateSkill: {
+    id: 'eternal_frost', name: 'Givre Éternel', damage: 100, damageType: 'cold', type: 'special',
+    description: 'Un froid si profond qu\'il transcende le temps'
+  }
+};
+
+// ============================================
+// MORTS-VIVANTS LÉGENDAIRES ET PUISSANTS
+// ============================================
+
+const DEMILICH: Monster = {
+  id: 'demilich',
+  name: 'Démiliche',
+  hp: 80, maxHp: 80,
+  armorClass: 20,
+  abilities: createAbilities(1, 20, 10, 20, 17, 20),
+  attack: 28, defense: 20, magicDefense: 25, speed: 0,
+  challengeRating: 18, xpReward: 20000,
+  creatureType: 'undead', size: 'tiny',
+  portrait: '💀',
+  isBoss: true,
+  resistances: ['bludgeoning', 'piercing', 'slashing'],
+  immunities: ['necrotic', 'poison', 'psychic'],
+  conditionImmunities: ['charmed', 'deafened', 'exhaustion', 'frightened', 'paralyzed', 'petrified', 'poisoned', 'prone', 'stunned'],
+  description: 'Une liche dont le corps s\'est désintégré, ne laissant qu\'un crâne flottant d\'une puissance magique immense.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'flight', name: 'Vol', cost: 1, damage: 0, damageType: 'force', description: 'Se déplace' },
+    { id: 'dust_cloud', name: 'Nuage de poussière', cost: 2, damage: 25, damageType: 'necrotic', description: 'Nuage nécrotique' }
+  ],
+  skills: [
+    { id: 'life_drain', name: 'Drain de vie', damage: 28, damageType: 'necrotic', type: 'attack', description: 'Aspire l\'essence vitale' },
+    { id: 'howl', name: 'Hurlement', damage: 35, damageType: 'psychic', type: 'attack', description: 'Hurlement psychique dévastateur', areaOfEffect: true }
+  ],
+  ultimateSkill: {
+    id: 'soul_trap', name: 'Piège à Âmes', damage: 50, damageType: 'necrotic', type: 'special',
+    description: 'La démiliche tente de capturer l\'âme de sa victime'
+  }
+};
+
+const NIGHTWALKER: Monster = {
+  id: 'nightwalker',
+  name: 'Marcheur de Nuit',
+  hp: 297, maxHp: 297,
+  armorClass: 14,
+  abilities: createAbilities(22, 19, 24, 6, 9, 8),
+  attack: 32, defense: 14, magicDefense: 12, speed: 40,
+  challengeRating: 20, xpReward: 25000,
+  creatureType: 'undead', size: 'huge',
+  portrait: '🌑',
+  isBoss: true,
+  resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
+  immunities: ['necrotic', 'poison'],
+  conditionImmunities: ['exhaustion', 'frightened', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
+  description: 'Une entité de pur néant des Royaumes des Ombres. Sa présence tue la lumière et la vie.',
+  skills: [
+    { id: 'enervating_focus', name: 'Focus énervant', damage: 35, damageType: 'necrotic', type: 'attack', description: 'Drain de vie dévastateur' },
+    { id: 'finger_of_doom', name: 'Doigt du destin', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Condamne une cible à mort' }
+  ],
+  ultimateSkill: {
+    id: 'annihilating_aura', name: 'Aura Annihilatrice', damage: 60, damageType: 'necrotic', type: 'special',
+    description: 'L\'aura du Marcheur de Nuit détruit tout ce qui l\'entoure'
+  }
+};
+
+const BODAK: Monster = {
+  id: 'bodak',
+  name: 'Bodak',
+  hp: 58, maxHp: 58,
+  armorClass: 15,
+  abilities: createAbilities(15, 16, 15, 7, 12, 12),
+  attack: 18, defense: 15, magicDefense: 12, speed: 30,
+  challengeRating: 6, xpReward: 2300,
+  creatureType: 'undead', size: 'medium',
+  portrait: '👁️',
+  isBoss: false,
+  resistances: ['cold', 'fire', 'necrotic'],
+  immunities: ['lightning', 'poison'],
+  conditionImmunities: ['charmed', 'frightened', 'poisoned'],
+  description: 'Humanoïde corrompu par une rencontre avec un pouvoir maléfique absolu. Son regard tue.',
+  skills: [
+    { id: 'fist', name: 'Poing', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Frappe mortelle' },
+    { id: 'death_gaze', name: 'Regard de mort', damage: 22, damageType: 'necrotic', type: 'attack', description: 'Regard qui tue', savingThrow: { ability: 'constitution', dc: 13 } }
+  ]
+};
+
+const SKULL_LORD: Monster = {
+  id: 'skull_lord',
+  name: 'Seigneur des Crânes',
+  hp: 105, maxHp: 105,
+  armorClass: 18,
+  abilities: createAbilities(14, 16, 17, 16, 15, 21),
+  attack: 22, defense: 18, magicDefense: 20, speed: 30,
+  challengeRating: 15, xpReward: 13000,
+  creatureType: 'undead', size: 'medium',
+  portrait: '💀',
+  isBoss: true,
+  resistances: ['cold'],
+  immunities: ['necrotic', 'poison'],
+  conditionImmunities: ['charmed', 'deafened', 'exhaustion', 'frightened', 'poisoned', 'stunned', 'unconscious'],
+  description: 'Un mort-vivant à trois crânes, ancien serviteur de Vecna. Chaque crâne possède une personnalité distincte.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'bone_staff', name: 'Bâton d\'os', cost: 1, damage: 16, damageType: 'bludgeoning', description: 'Frappe au bâton' },
+    { id: 'spell', name: 'Sort', cost: 2, damage: 22, damageType: 'necrotic', description: 'Lance un sort' }
+  ],
+  skills: [
+    { id: 'bone_staff', name: 'Bâton d\'os', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Bâton enchanté', attackCount: 2 },
+    { id: 'finger_of_death', name: 'Doigt de mort', damage: 36, damageType: 'necrotic', type: 'attack', description: 'Rayon nécrotique' }
+  ],
+  ultimateSkill: {
+    id: 'masters_call', name: 'Appel du Maître', damage: 45, damageType: 'necrotic', type: 'special',
+    description: 'Canalise le pouvoir de Vecna'
+  }
+};
+
+const BONECLAW: Monster = {
+  id: 'boneclaw',
+  name: 'Griffe d\'Os',
+  hp: 127, maxHp: 127,
+  armorClass: 16,
+  abilities: createAbilities(19, 16, 15, 13, 15, 9),
+  attack: 22, defense: 16, magicDefense: 14, speed: 40,
+  challengeRating: 12, xpReward: 8400,
+  creatureType: 'undead', size: 'large',
+  portrait: '🦴',
+  isBoss: false,
+  resistances: ['cold', 'necrotic'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
+  description: 'Une liche échouée dont la transformation a mal tourné. Liée à un maître vivant.',
+  skills: [
+    { id: 'piercing_claw', name: 'Griffe perforante', damage: 25, damageType: 'piercing', type: 'attack', description: 'Griffes extensibles', attackCount: 2 },
+    { id: 'shadow_jump', name: 'Saut d\'ombre', damage: 0, damageType: 'necrotic', type: 'special', description: 'Se téléporte via les ombres' }
+  ]
+};
+
+// ============================================
+// ABERRATIONS PUISSANTES
+// ============================================
+
+const ELDER_BRAIN: Monster = {
+  id: 'elder_brain',
+  name: 'Cerveau Ancestral',
+  hp: 210, maxHp: 210,
+  armorClass: 10,
+  abilities: createAbilities(15, 10, 20, 21, 19, 24),
+  attack: 28, defense: 10, magicDefense: 24, speed: 5,
+  challengeRating: 14, xpReward: 11500,
+  creatureType: 'aberration', size: 'large',
+  portrait: '🧠',
+  isBoss: true,
+  immunities: ['psychic'],
+  conditionImmunities: ['charmed', 'frightened', 'prone'],
+  description: 'Le cerveau collectif d\'une colonie de flagelleurs mentaux. Intelligence extraterrestre pure.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'tentacle', name: 'Tentacule', cost: 1, damage: 18, damageType: 'bludgeoning', description: 'Frappe tentaculaire' },
+    { id: 'break_concentration', name: 'Brise concentration', cost: 2, damage: 0, damageType: 'psychic', description: 'Perturbe mentalement' },
+    { id: 'psychic_pulse', name: 'Pulse psychique', cost: 3, damage: 35, damageType: 'psychic', description: 'Onde psychique' }
+  ],
+  skills: [
+    { id: 'tentacle', name: 'Tentacule', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Frappe gluante' },
+    { id: 'mind_blast', name: 'Souffle mental', damage: 32, damageType: 'psychic', type: 'attack', description: 'Cône psychique 60 pieds', areaOfEffect: true, savingThrow: { ability: 'intelligence', dc: 18 } }
+  ],
+  ultimateSkill: {
+    id: 'psychic_link', name: 'Lien Psychique', damage: 50, damageType: 'psychic', type: 'special',
+    description: 'Écrase l\'esprit de ses ennemis avec l\'intelligence collective'
+  }
+};
+
+const NEOTHELID: Monster = {
+  id: 'neothelid',
+  name: 'Néothélide',
+  hp: 325, maxHp: 325,
+  armorClass: 16,
+  abilities: createAbilities(27, 7, 21, 3, 16, 12),
+  attack: 35, defense: 16, magicDefense: 12, speed: 30,
+  challengeRating: 13, xpReward: 10000,
+  creatureType: 'aberration', size: 'gargantuan',
+  portrait: '🪱',
+  isBoss: true,
+  immunities: ['psychic'],
+  description: 'Un ver géant issu d\'un tadpole de flagelleur mental qui a grandi sans hôte. Bestial et vorace.',
+  skills: [
+    { id: 'tentacles', name: 'Tentacules', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Tentacules écrasants' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 42, damageType: 'acid', type: 'attack', description: 'Cône d\'acide 60 pieds', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+  ],
+  ultimateSkill: {
+    id: 'psychic_scream', name: 'Hurlement Psychique', damage: 55, damageType: 'psychic', type: 'special',
+    description: 'Hurlement psychique primitif et dévastateur'
+  }
+};
+
+const STAR_SPAWN_EMISSARY: Monster = {
+  id: 'star_spawn_emissary',
+  name: 'Émissaire des Étoiles',
+  hp: 290, maxHp: 290,
+  armorClass: 19,
+  abilities: createAbilities(27, 18, 25, 25, 20, 23),
+  attack: 38, defense: 19, magicDefense: 24, speed: 40,
+  challengeRating: 21, xpReward: 33000,
+  creatureType: 'aberration', size: 'large',
+  portrait: '⭐',
+  isBoss: true,
+  resistances: ['acid', 'cold', 'fire', 'necrotic', 'psychic'],
+  immunities: ['bludgeoning', 'piercing', 'slashing'],
+  conditionImmunities: ['charmed', 'frightened'],
+  description: 'Émissaire des Anciens, venu des étoiles pour annoncer la fin de toute chose.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'attack', name: 'Attaque', cost: 1, damage: 28, damageType: 'slashing', description: 'Frappe griffue' },
+    { id: 'teleport', name: 'Téléportation', cost: 2, damage: 0, damageType: 'force', description: 'Se téléporte' }
+  ],
+  skills: [
+    { id: 'lashing_claw', name: 'Griffe cinglante', damage: 28, damageType: 'slashing', type: 'attack', description: 'Griffes stellaires', attackCount: 2 },
+    { id: 'psychic_orb', name: 'Orbe psychique', damage: 35, damageType: 'psychic', type: 'attack', description: 'Orbe d\'énergie cosmique' }
+  ],
+  ultimateSkill: {
+    id: 'cosmic_form', name: 'Forme Cosmique', damage: 70, damageType: 'force', type: 'special',
+    description: 'Révèle sa vraie forme cosmique, anéantissant les esprits'
+  }
+};
+
+const KRAKEN: Monster = {
+  id: 'kraken',
+  name: 'Kraken',
+  hp: 472, maxHp: 472,
+  armorClass: 18,
+  abilities: createAbilities(30, 11, 25, 22, 18, 20),
+  attack: 42, defense: 18, magicDefense: 20, speed: 20,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'monstrosity', size: 'gargantuan',
+  portrait: '🐙',
+  isBoss: true,
+  immunities: ['lightning'],
+  resistances: ['cold'],
+  conditionImmunities: ['frightened', 'paralyzed'],
+  description: 'Titan des profondeurs océaniques. Capable de détruire des flottes entières.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'tentacle_attack', name: 'Tentacule', cost: 1, damage: 25, damageType: 'bludgeoning', description: 'Frappe tentaculaire' },
+    { id: 'ink_cloud', name: 'Nuage d\'encre', cost: 2, damage: 0, damageType: 'poison', description: 'Obscurcit la zone' },
+    { id: 'fling', name: 'Projection', cost: 3, damage: 35, damageType: 'bludgeoning', description: 'Projette une créature' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', description: 'Morsure titanesque' },
+    { id: 'tentacle', name: 'Tentacule', damage: 25, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de tentacule' },
+    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', description: 'Foudre des profondeurs', areaOfEffect: true, recharge: { min: 5 } }
+  ],
+  ultimateSkill: {
+    id: 'maelstrom', name: 'Maelström', damage: 80, damageType: 'bludgeoning', type: 'special',
+    description: 'Crée un tourbillon dévastateur qui engloutit tout'
+  }
+};
+
+// ============================================
+// CÉLESTES ET ENTITÉS DIVINES
+// ============================================
+
+const EMPYREAN: Monster = {
+  id: 'empyrean',
+  name: 'Empyréen',
+  hp: 313, maxHp: 313,
+  armorClass: 22,
+  abilities: createAbilities(30, 21, 30, 21, 22, 27),
+  attack: 42, defense: 22, magicDefense: 26, speed: 50,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'celestial', size: 'huge',
+  portrait: '👼',
+  isBoss: true,
+  immunities: ['bludgeoning', 'piercing', 'slashing'],
+  description: 'Enfant d\'un dieu, titan céleste d\'une beauté et puissance inégalées.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'attack', name: 'Attaque', cost: 1, damage: 30, damageType: 'bludgeoning', description: 'Frappe divine' },
+    { id: 'spell', name: 'Sort', cost: 2, damage: 35, damageType: 'radiant', description: 'Magie divine' },
+    { id: 'trembling_strike', name: 'Frappe tremblante', cost: 3, damage: 45, damageType: 'thunder', description: 'Impact sismique' }
+  ],
+  skills: [
+    { id: 'maul', name: 'Maul', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Arme divine titanesque', attackCount: 2 },
+    { id: 'bolt', name: 'Trait de foudre', damage: 40, damageType: 'lightning', type: 'attack', description: 'Foudre céleste' }
+  ],
+  ultimateSkill: {
+    id: 'divine_wrath', name: 'Courroux Divin', damage: 90, damageType: 'radiant', type: 'special',
+    description: 'La colère d\'un enfant de dieu'
+  }
+};
+
+const PLANETAR: Monster = {
+  id: 'planetar',
+  name: 'Planétar',
+  hp: 200, maxHp: 200,
+  armorClass: 19,
+  abilities: createAbilities(24, 20, 24, 19, 22, 25),
+  attack: 32, defense: 19, magicDefense: 24, speed: 40,
+  challengeRating: 16, xpReward: 15000,
+  creatureType: 'celestial', size: 'large',
+  portrait: '😇',
+  isBoss: true,
+  resistances: ['radiant'],
+  immunities: ['necrotic', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Ange guerrier, commandant des armées célestes. Juste et impitoyable.',
+  skills: [
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 28, damageType: 'slashing', type: 'attack', description: 'Épée divine', attackCount: 2 },
+    { id: 'healing_touch', name: 'Toucher guérisseur', damage: -30, damageType: 'radiant', type: 'buff', description: 'Guérit un allié' }
+  ],
+  ultimateSkill: {
+    id: 'angelic_strike', name: 'Frappe Angélique', damage: 55, damageType: 'radiant', type: 'special',
+    description: 'Frappe avec toute la puissance des cieux'
+  }
+};
+
+const DEV: Monster = {
+  id: 'deva',
+  name: 'Deva',
+  hp: 136, maxHp: 136,
+  armorClass: 17,
+  abilities: createAbilities(18, 18, 18, 17, 20, 20),
+  attack: 24, defense: 17, magicDefense: 20, speed: 30,
+  challengeRating: 10, xpReward: 5900,
+  creatureType: 'celestial', size: 'medium',
+  portrait: '✨',
+  isBoss: false,
+  resistances: ['radiant'],
+  immunities: ['necrotic', 'poison'],
+  conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
+  description: 'Ange messager, souvent envoyé sur le plan matériel pour guider les mortels.',
+  skills: [
+    { id: 'mace', name: 'Masse', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Masse céleste', attackCount: 2 },
+    { id: 'healing_touch', name: 'Toucher guérisseur', damage: -25, damageType: 'radiant', type: 'buff', description: 'Guérit un allié' }
+  ]
+};
+
+// ============================================
+// GÉANTS SUPPLÉMENTAIRES
+// ============================================
+
+const STORM_GIANT: Monster = {
+  id: 'storm_giant',
+  name: 'Géant des Tempêtes',
+  hp: 230, maxHp: 230,
+  armorClass: 16,
+  abilities: createAbilities(29, 14, 20, 16, 18, 18),
+  attack: 32, defense: 16, magicDefense: 18, speed: 50,
+  challengeRating: 13, xpReward: 10000,
+  creatureType: 'giant', size: 'huge',
+  portrait: '⛈️',
+  isBoss: true,
+  resistances: ['cold'],
+  immunities: ['lightning', 'thunder'],
+  description: 'Le plus noble et puissant des géants. Maître des tempêtes et des océans.',
+  skills: [
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 35, damageType: 'slashing', type: 'attack', description: 'Épée titanesque', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 30, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' },
+    { id: 'lightning_strike', name: 'Frappe de foudre', damage: 40, damageType: 'lightning', type: 'attack', description: 'Canalise la foudre' }
+  ],
+  ultimateSkill: {
+    id: 'tempest_fury', name: 'Furie Tempétueuse', damage: 60, damageType: 'lightning', type: 'special',
+    description: 'Déchaîne toute la puissance de la tempête'
+  }
+};
+
+const HILL_GIANT: Monster = {
+  id: 'hill_giant',
+  name: 'Géant des Collines',
+  hp: 105, maxHp: 105,
+  armorClass: 13,
+  abilities: createAbilities(21, 8, 19, 5, 9, 6),
+  attack: 18, defense: 13, magicDefense: 8, speed: 40,
+  challengeRating: 5, xpReward: 1800,
+  creatureType: 'giant', size: 'huge',
+  portrait: '🏔️',
+  isBoss: false,
+  description: 'Le plus stupide et gourmand des géants. Brutal et affamé.',
+  skills: [
+    { id: 'greatclub', name: 'Gourdin géant', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Frappe brutale', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' }
+  ]
+};
+
+// ============================================
+// HUMANOÏDES HOSTILES
+// ============================================
+
+const DROW_MATRON: Monster = {
+  id: 'drow_matron',
+  name: 'Matriarche Drow',
+  hp: 180, maxHp: 180,
+  armorClass: 18,
+  abilities: createAbilities(14, 18, 16, 18, 20, 20),
+  attack: 26, defense: 18, magicDefense: 22, speed: 30,
+  challengeRating: 15, xpReward: 13000,
+  creatureType: 'humanoid', size: 'medium',
+  portrait: '🕷️',
+  isBoss: true,
+  isHostileNpc: true,
+  resistances: ['poison'],
+  immunities: [],
+  description: 'Haute prêtresse de Lolth, dirigeant une maison noble drow. Impitoyable et rusée.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'summon_demon', name: 'Invocation démoniaque', cost: 2, damage: 25, damageType: 'necrotic', description: 'Invoque un démon' },
+    { id: 'divine_spell', name: 'Sort divin', cost: 1, damage: 18, damageType: 'necrotic', description: 'Sort de Lolth' }
+  ],
+  skills: [
+    { id: 'rod', name: 'Bâton de serpents', damage: 18, damageType: 'piercing', type: 'attack', description: 'Bâton vivant', attackCount: 2 },
+    { id: 'flame_strike', name: 'Colonne de feu', damage: 28, damageType: 'fire', type: 'attack', description: 'Flammes divines' },
+    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 22, damageType: 'piercing', type: 'attack', description: 'Nuée d\'araignées', areaOfEffect: true }
+  ],
+  ultimateSkill: {
+    id: 'lolth_blessing', name: 'Bénédiction de Lolth', damage: 50, damageType: 'necrotic', type: 'special',
+    description: 'Canalise le pouvoir de la Reine Araignée'
+  }
+};
+
+const GITHYANKI_SUPREME_COMMANDER: Monster = {
+  id: 'githyanki_supreme_commander',
+  name: 'Commandant Suprême Githyanki',
+  hp: 187, maxHp: 187,
+  armorClass: 18,
+  abilities: createAbilities(19, 17, 18, 16, 16, 18),
+  attack: 28, defense: 18, magicDefense: 18, speed: 30,
+  challengeRating: 14, xpReward: 11500,
+  creatureType: 'humanoid', size: 'medium',
+  portrait: '⚔️',
+  isBoss: true,
+  isHostileNpc: true,
+  description: 'Chef de guerre githyanki, servant la reine-liche Vlaakith. Maître de l\'épée argentée.',
+  skills: [
+    { id: 'silver_sword', name: 'Épée d\'argent', damage: 28, damageType: 'slashing', type: 'attack', description: 'Épée capable de couper les liens astraux', attackCount: 3 },
+    { id: 'misty_step', name: 'Pas brumeux', damage: 0, damageType: 'force', type: 'special', description: 'Téléportation courte' }
+  ],
+  ultimateSkill: {
+    id: 'astral_strike', name: 'Frappe Astrale', damage: 55, damageType: 'psychic', type: 'special',
+    description: 'Attaque transcendant les plans'
+  }
+};
+
+const ARCHMAGE: Monster = {
+  id: 'archmage',
+  name: 'Archimage',
+  hp: 99, maxHp: 99,
+  armorClass: 12,
+  abilities: createAbilities(10, 14, 12, 20, 15, 16),
+  attack: 22, defense: 12, magicDefense: 24, speed: 30,
+  challengeRating: 12, xpReward: 8400,
+  creatureType: 'humanoid', size: 'medium',
+  portrait: '🧙',
+  isBoss: true,
+  isHostileNpc: true,
+  resistances: [],
+  immunities: [],
+  description: 'Maître des arcanes, capable de lancer les sorts les plus dévastateurs.',
+  skills: [
+    { id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', description: 'Dague enchantée' },
+    { id: 'fire_bolt', name: 'Trait de feu', damage: 18, damageType: 'fire', type: 'attack', description: 'Rayon de feu' },
+    { id: 'cone_of_cold', name: 'Cône de froid', damage: 36, damageType: 'cold', type: 'attack', description: 'Vague de froid', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 17 } },
+    { id: 'lightning_bolt', name: 'Éclair', damage: 32, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre', savingThrow: { ability: 'dexterity', dc: 17 } }
+  ],
+  ultimateSkill: {
+    id: 'time_stop', name: 'Arrêt du Temps', damage: 60, damageType: 'force', type: 'special',
+    description: 'Arrête le temps pour frapper sans riposte'
+  }
+};
+
+// ============================================
+// MONSTRUOSITÉS ICONIQUES
+// ============================================
+
+const HYDRA: Monster = {
+  id: 'hydra',
+  name: 'Hydre',
+  hp: 172, maxHp: 172,
+  armorClass: 15,
+  abilities: createAbilities(20, 12, 20, 2, 10, 7),
+  attack: 24, defense: 15, magicDefense: 10, speed: 30,
+  challengeRating: 8, xpReward: 3900,
+  creatureType: 'monstrosity', size: 'huge',
+  portrait: '🐲',
+  isBoss: false,
+  description: 'Bête à multiples têtes qui repoussent quand on les coupe. Terreur des marais.',
+  skills: [
+    { id: 'bite', name: 'Morsures', damage: 18, damageType: 'piercing', type: 'attack', description: '5 morsures (une par tête)', attackCount: 5 }
+  ]
+};
+
+const PURPLE_WORM: Monster = {
+  id: 'purple_worm',
+  name: 'Ver Pourpre',
+  hp: 247, maxHp: 247,
+  armorClass: 18,
+  abilities: createAbilities(28, 7, 22, 1, 8, 4),
+  attack: 32, defense: 18, magicDefense: 8, speed: 50,
+  challengeRating: 15, xpReward: 13000,
+  creatureType: 'monstrosity', size: 'gargantuan',
+  portrait: '🪱',
+  isBoss: true,
+  description: 'Ver géant des profondeurs. Capable d\'avaler des créatures entières.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', description: 'Morsure dévorante' },
+    { id: 'tail_stinger', name: 'Dard de queue', damage: 28, damageType: 'piercing', type: 'attack', description: 'Dard venimeux', effect: { type: 'poison', value: 15, turns: 3 } }
+  ],
+  ultimateSkill: {
+    id: 'swallow', name: 'Engloutir', damage: 50, damageType: 'acid', type: 'special',
+    description: 'Tente d\'avaler sa proie'
+  }
+};
+
+const ROC: Monster = {
+  id: 'roc',
+  name: 'Roc',
+  hp: 248, maxHp: 248,
+  armorClass: 15,
+  abilities: createAbilities(28, 10, 20, 3, 10, 9),
+  attack: 32, defense: 15, magicDefense: 10, speed: 20,
+  challengeRating: 11, xpReward: 7200,
+  creatureType: 'monstrosity', size: 'gargantuan',
+  portrait: '🦅',
+  isBoss: true,
+  description: 'Oiseau légendaire géant. Capable d\'emporter des éléphants dans ses serres.',
+  skills: [
+    { id: 'beak', name: 'Bec', damage: 32, damageType: 'piercing', type: 'attack', description: 'Bec titanesque' },
+    { id: 'talons', name: 'Serres', damage: 28, damageType: 'slashing', type: 'attack', description: 'Serres agrippantes' }
+  ],
+  ultimateSkill: {
+    id: 'dive_attack', name: 'Attaque en Piqué', damage: 55, damageType: 'bludgeoning', type: 'special',
+    description: 'Plonge du ciel à grande vitesse'
+  }
+};
+
+const BEHIR: Monster = {
+  id: 'behir',
+  name: 'Béhir',
+  hp: 168, maxHp: 168,
+  armorClass: 17,
+  abilities: createAbilities(23, 16, 18, 7, 14, 12),
+  attack: 26, defense: 17, magicDefense: 14, speed: 50,
+  challengeRating: 11, xpReward: 7200,
+  creatureType: 'monstrosity', size: 'huge',
+  portrait: '⚡',
+  isBoss: false,
+  immunities: ['lightning'],
+  description: 'Serpent géant à plusieurs pattes. Ennemi ancestral des dragons.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure avec constriction' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 42, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 20 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+  ]
+};
+
+const BULETTE: Monster = {
+  id: 'bulette',
+  name: 'Bulette',
+  hp: 94, maxHp: 94,
+  armorClass: 17,
+  abilities: createAbilities(19, 11, 21, 2, 10, 5),
+  attack: 20, defense: 17, magicDefense: 10, speed: 40,
+  challengeRating: 5, xpReward: 1800,
+  creatureType: 'monstrosity', size: 'large',
+  portrait: '🦈',
+  isBoss: false,
+  description: 'Requin terrestre. Surgit du sol pour dévorer ses proies.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure puissante' },
+    { id: 'deadly_leap', name: 'Bond mortel', damage: 25, damageType: 'bludgeoning', type: 'attack', description: 'Saute sur sa proie', areaOfEffect: true }
+  ]
+};
+
+const GORGON: Monster = {
+  id: 'gorgon',
+  name: 'Gorgone',
+  hp: 114, maxHp: 114,
+  armorClass: 19,
+  abilities: createAbilities(20, 11, 18, 2, 12, 7),
+  attack: 22, defense: 19, magicDefense: 12, speed: 40,
+  challengeRating: 5, xpReward: 1800,
+  creatureType: 'monstrosity', size: 'large',
+  portrait: '🐂',
+  isBoss: false,
+  conditionImmunities: ['petrified'],
+  description: 'Taureau de fer au souffle pétrifiant. Pas à confondre avec la Méduse.',
+  skills: [
+    { id: 'gore', name: 'Encornage', damage: 20, damageType: 'piercing', type: 'attack', description: 'Charge aux cornes' },
+    { id: 'petrifying_breath', name: 'Souffle pétrifiant', damage: 0, damageType: 'poison', type: 'debuff', description: 'Pétrifie les victimes', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 13 } }
+  ]
+};
+
+// ============================================
+// CRÉATURES ÉLÉMENTAIRES PUISSANTES
+// ============================================
+
+const PHOENIX: Monster = {
+  id: 'phoenix',
+  name: 'Phénix',
+  hp: 175, maxHp: 175,
+  armorClass: 18,
+  abilities: createAbilities(19, 26, 21, 2, 21, 18),
+  attack: 30, defense: 18, magicDefense: 20, speed: 120,
+  challengeRating: 16, xpReward: 15000,
+  creatureType: 'elemental', size: 'gargantuan',
+  portrait: '🔥',
+  isBoss: true,
+  resistances: ['bludgeoning', 'piercing', 'slashing'],
+  immunities: ['fire', 'poison'],
+  conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned'],
+  description: 'Oiseau de feu immortel. Renaît de ses cendres après chaque mort.',
+  skills: [
+    { id: 'beak', name: 'Bec', damage: 28, damageType: 'fire', type: 'attack', description: 'Bec enflammé' },
+    { id: 'fiery_talons', name: 'Serres ardentes', damage: 25, damageType: 'fire', type: 'attack', description: 'Serres de flammes' }
+  ],
+  ultimateSkill: {
+    id: 'inferno_rebirth', name: 'Renaissance Infernale', damage: 65, damageType: 'fire', type: 'special',
+    description: 'Explose en flammes et renaît de ses cendres'
+  }
+};
+
+const ZARATAN: Monster = {
+  id: 'zaratan',
+  name: 'Zaratan',
+  hp: 307, maxHp: 307,
+  armorClass: 21,
+  abilities: createAbilities(30, 10, 30, 2, 21, 18),
+  attack: 38, defense: 21, magicDefense: 18, speed: 40,
+  challengeRating: 22, xpReward: 41000,
+  creatureType: 'elemental', size: 'gargantuan',
+  portrait: '🐢',
+  isBoss: true,
+  resistances: ['cold', 'fire', 'lightning'],
+  immunities: ['poison'],
+  conditionImmunities: ['exhaustion', 'paralyzed', 'petrified', 'poisoned', 'stunned'],
+  description: 'Tortue titanesque élémentaire. Une île vivante qui erre à travers les plans.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'stomp', name: 'Piétinement', cost: 1, damage: 28, damageType: 'bludgeoning', description: 'Écrase tout' },
+    { id: 'quake', name: 'Séisme', cost: 2, damage: 35, damageType: 'bludgeoning', description: 'Fait trembler le sol' }
+  ],
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure titanesque' },
+    { id: 'stomp', name: 'Piétinement', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Écrase les ennemis' }
+  ],
+  ultimateSkill: {
+    id: 'earth_splitting', name: 'Fracture Terrestre', damage: 75, damageType: 'bludgeoning', type: 'special',
+    description: 'Fait se fissurer la terre elle-même'
+  }
+};
+
+const ELDER_TEMPEST: Monster = {
+  id: 'elder_tempest',
+  name: 'Tempête Ancestrale',
+  hp: 264, maxHp: 264,
+  armorClass: 19,
+  abilities: createAbilities(23, 28, 23, 2, 21, 18),
+  attack: 36, defense: 19, magicDefense: 20, speed: 120,
+  challengeRating: 23, xpReward: 50000,
+  creatureType: 'elemental', size: 'gargantuan',
+  portrait: '🌪️',
+  isBoss: true,
+  resistances: ['bludgeoning', 'piercing', 'slashing'],
+  immunities: ['lightning', 'poison', 'thunder'],
+  conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned'],
+  description: 'Manifestation vivante d\'une tempête primordiale. Destruction incarnée.',
+  legendaryActionsPerTurn: 3,
+  legendaryActions: [
+    { id: 'lightning', name: 'Éclair', cost: 1, damage: 30, damageType: 'lightning', description: 'Frappe de foudre' },
+    { id: 'screaming_wind', name: 'Vent hurlant', cost: 2, damage: 25, damageType: 'thunder', description: 'Bourrasque dévastatrice' }
+  ],
+  skills: [
+    { id: 'thunderous_slam', name: 'Frappe tonitruante', damage: 35, damageType: 'thunder', type: 'attack', description: 'Impact de tonnerre' },
+    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', description: 'Pluie d\'éclairs', areaOfEffect: true }
+  ],
+  ultimateSkill: {
+    id: 'primal_storm', name: 'Tempête Primordiale', damage: 85, damageType: 'lightning', type: 'special',
+    description: 'Déchaîne toute la fureur élémentaire'
+  }
+};
+
+// ============================================
 // LISTES DE MONSTRES
 // ============================================
 
@@ -2072,19 +3750,29 @@ export const MONSTERS_BY_CR: { [key: number]: Monster[] } = {
   2: [OGRE, GHAST, GARGOYLE, MIMIC, ANKHEG, CENTAUR, ETTERCAP, GELATINOUS_CUBE, GRIFFON, NOTHIC],
   3: [WEREWOLF, HELL_HOUND, MINOTAUR, OWLBEAR, WIGHT, BASILISK, DOPPELGANGER, GREEN_HAG, MANTICORE, PHASE_SPIDER, YETI],
   4: [BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS],
-  5: [TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN],
-  6: [YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER],
-  7: [MIND_FLAYER, STONE_GIANT],
-  8: [FROST_GIANT],
-  9: [FIRE_GIANT, CLOUD_GIANT],
-  10: [YOUNG_RED_DRAGON, ABOLETH],
-  13: [BEHOLDER, VAMPIRE],
-  17: [ADULT_RED_DRAGON, DEATH_KNIGHT],
+  5: [TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON],
+  6: [YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK],
+  7: [MIND_FLAYER, STONE_GIANT, YOUNG_BLACK_DRAGON],
+  8: [FROST_GIANT, YOUNG_GREEN_DRAGON, HYDRA],
+  9: [FIRE_GIANT, CLOUD_GIANT, YOUNG_BLUE_DRAGON, YOUNG_SILVER_DRAGON],
+  10: [YOUNG_RED_DRAGON, ABOLETH, YOUNG_GOLD_DRAGON, DEV],
+  11: [ROC, BEHIR],
+  12: [ARCHMAGE, BONECLAW],
+  13: [BEHOLDER, VAMPIRE, ADULT_WHITE_DRAGON, STORM_GIANT, NEOTHELID],
+  14: [ADULT_BLACK_DRAGON, ELDER_BRAIN, GITHYANKI_SUPREME_COMMANDER],
+  15: [ADULT_GREEN_DRAGON, STRAHD_VON_ZAROVICH, PURPLE_WORM, DROW_MATRON, SKULL_LORD],
+  16: [ADULT_BLUE_DRAGON, ADULT_SILVER_DRAGON, PLANETAR, PHOENIX],
+  17: [ADULT_RED_DRAGON, DEATH_KNIGHT, ADULT_GOLD_DRAGON],
+  18: [DEMILICH],
   19: [BALOR],
-  20: [PIT_FIEND],
-  21: [LICH, SOLAR],
-  24: [ANCIENT_RED_DRAGON],
-  30: [TARRASQUE]
+  20: [PIT_FIEND, ANCIENT_WHITE_DRAGON, NIGHTWALKER],
+  21: [LICH, SOLAR, ANCIENT_BLACK_DRAGON, STAR_SPAWN_EMISSARY],
+  22: [ANCIENT_GREEN_DRAGON, LEVISTUS, GLASYA, ZARATAN],
+  23: [ANCIENT_BLUE_DRAGON, ANCIENT_SILVER_DRAGON, MAMMON, BELIAL, BAALZEBUL, ACERERAK, BAPHOMET, ZUGGTMOY, JUIBLEX, FRAZURBLUU, YEENOGHU, GRAZZT, KRAKEN, EMPYREAN, ELDER_TEMPEST],
+  24: [ANCIENT_RED_DRAGON, ANCIENT_GOLD_DRAGON, DISPATER],
+  25: [MEPHISTOPHELES],
+  26: [ZARIEL, DEMOGORGON, ORCUS, VECNA],
+  30: [TARRASQUE, ASMODEUS, TIAMAT, BAHAMUT]
 };
 
 export const ALL_MONSTERS: Monster[] = [
@@ -2103,33 +3791,65 @@ export const ALL_MONSTERS: Monster[] = [
   // CR 4
   BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS,
   // CR 5
-  TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN,
+  TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON,
   // CR 6
-  YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER,
-  // CR 7+
-  MIND_FLAYER, STONE_GIANT,
-  FROST_GIANT, FIRE_GIANT, CLOUD_GIANT,
-  YOUNG_RED_DRAGON, ABOLETH,
-  // BOSS
-  BEHOLDER, VAMPIRE,
-  ADULT_RED_DRAGON, DEATH_KNIGHT,
-  BALOR, PIT_FIEND,
-  LICH, SOLAR,
-  ANCIENT_RED_DRAGON,
-  TARRASQUE
+  YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK,
+  // CR 7-10 (Jeunes dragons et monstres)
+  MIND_FLAYER, STONE_GIANT, YOUNG_BLACK_DRAGON,
+  FROST_GIANT, YOUNG_GREEN_DRAGON, HYDRA,
+  FIRE_GIANT, CLOUD_GIANT, YOUNG_BLUE_DRAGON, YOUNG_SILVER_DRAGON,
+  YOUNG_RED_DRAGON, ABOLETH, YOUNG_GOLD_DRAGON, DEV,
+  // CR 11-12
+  ROC, BEHIR, ARCHMAGE, BONECLAW,
+  // CR 13-17 (Dragons adultes, boss intermédiaires, célestes, élémentaires)
+  BEHOLDER, VAMPIRE, ADULT_WHITE_DRAGON, STORM_GIANT, NEOTHELID,
+  ADULT_BLACK_DRAGON, ELDER_BRAIN, GITHYANKI_SUPREME_COMMANDER,
+  ADULT_GREEN_DRAGON, STRAHD_VON_ZAROVICH, PURPLE_WORM, DROW_MATRON, SKULL_LORD,
+  ADULT_BLUE_DRAGON, ADULT_SILVER_DRAGON, PLANETAR, PHOENIX,
+  ADULT_RED_DRAGON, DEATH_KNIGHT, ADULT_GOLD_DRAGON,
+  // CR 18
+  DEMILICH,
+  // CR 19-21 (Boss puissants)
+  BALOR,
+  PIT_FIEND, ANCIENT_WHITE_DRAGON, NIGHTWALKER,
+  LICH, SOLAR, ANCIENT_BLACK_DRAGON, STAR_SPAWN_EMISSARY,
+  // CR 22-24 (Dragons anciens, Archidiables, Seigneurs démons, Titans)
+  ANCIENT_GREEN_DRAGON, LEVISTUS, GLASYA, ZARATAN,
+  ANCIENT_BLUE_DRAGON, ANCIENT_SILVER_DRAGON, MAMMON, BELIAL, BAALZEBUL, ACERERAK, BAPHOMET, ZUGGTMOY, JUIBLEX, FRAZURBLUU, YEENOGHU, GRAZZT, KRAKEN, EMPYREAN, ELDER_TEMPEST,
+  ANCIENT_RED_DRAGON, ANCIENT_GOLD_DRAGON, DISPATER,
+  MEPHISTOPHELES,
+  // CR 26+ (Entités quasi-divines)
+  ZARIEL, DEMOGORGON, ORCUS, VECNA,
+  // CR 30 (Divinités et créatures légendaires)
+  TARRASQUE, ASMODEUS, TIAMAT, BAHAMUT
 ];
 
 // Alias pour compatibilité avec l'ancien code
 export const MONSTERS = ALL_MONSTERS;
 
+// PERSONNAGES HOSTILES NOMMÉS (pour le bestiaire)
+export const HOSTILE_NPCS: Monster[] = [
+  // Archidiables
+  ZARIEL, ASMODEUS, MEPHISTOPHELES, DISPATER, MAMMON, BELIAL, LEVISTUS, GLASYA, BAALZEBUL,
+  // Seigneurs Démons
+  DEMOGORGON, ORCUS, GRAZZT, YEENOGHU, JUIBLEX, ZUGGTMOY, BAPHOMET, FRAZURBLUU,
+  // Morts-vivants légendaires
+  STRAHD_VON_ZAROVICH, ACERERAK, VECNA,
+  // Divinités hostiles
+  TIAMAT, BAHAMUT,
+  // Autres personnages hostiles nommés
+  DROW_MATRON, GITHYANKI_SUPREME_COMMANDER, ARCHMAGE
+];
+
 // Boss organisés par tier de difficulté
-export const BOSSES_TIER_1: Monster[] = [BEHOLDER, VAMPIRE]; // Niveau 1 du donjon
-export const BOSSES_TIER_2: Monster[] = [ADULT_RED_DRAGON, DEATH_KNIGHT, LICH]; // Niveau 2 du donjon
-export const BOSSES_TIER_3: Monster[] = [ANCIENT_RED_DRAGON, BALOR, PIT_FIEND, SOLAR]; // Niveau 3+ du donjon
-export const BOSSES_TIER_4: Monster[] = [TARRASQUE]; // Niveau 4+ du donjon (légendaire)
+export const BOSSES_TIER_1: Monster[] = [BEHOLDER, VAMPIRE, ADULT_WHITE_DRAGON, STORM_GIANT]; // Niveau 1 du donjon
+export const BOSSES_TIER_2: Monster[] = [ADULT_RED_DRAGON, DEATH_KNIGHT, LICH, ADULT_BLACK_DRAGON, ADULT_BLUE_DRAGON, ADULT_GREEN_DRAGON, ADULT_GOLD_DRAGON, ADULT_SILVER_DRAGON, STRAHD_VON_ZAROVICH, PURPLE_WORM, DROW_MATRON, PLANETAR, PHOENIX, SKULL_LORD, ELDER_BRAIN, DEMILICH]; // Niveau 2 du donjon
+export const BOSSES_TIER_3: Monster[] = [ANCIENT_RED_DRAGON, ANCIENT_WHITE_DRAGON, ANCIENT_BLACK_DRAGON, ANCIENT_BLUE_DRAGON, ANCIENT_GREEN_DRAGON, ANCIENT_GOLD_DRAGON, ANCIENT_SILVER_DRAGON, BALOR, PIT_FIEND, SOLAR, ACERERAK, NIGHTWALKER, STAR_SPAWN_EMISSARY, KRAKEN, EMPYREAN, ZARATAN, ELDER_TEMPEST]; // Niveau 3 du donjon
+export const BOSSES_TIER_4: Monster[] = [ZARIEL, MEPHISTOPHELES, DISPATER, DEMOGORGON, ORCUS, GRAZZT, YEENOGHU, BAPHOMET, VECNA, MAMMON, BELIAL, LEVISTUS, GLASYA, BAALZEBUL, ZUGGTMOY, JUIBLEX, FRAZURBLUU]; // Niveau 4 du donjon (Archidiables et Seigneurs Démons)
+export const BOSSES_TIER_5: Monster[] = [TARRASQUE, ASMODEUS, TIAMAT, BAHAMUT]; // Niveau 5+ (Divinités et Tarrasque)
 
 export const BOSSES: Monster[] = [
-  ...BOSSES_TIER_1, ...BOSSES_TIER_2, ...BOSSES_TIER_3, ...BOSSES_TIER_4
+  ...BOSSES_TIER_1, ...BOSSES_TIER_2, ...BOSSES_TIER_3, ...BOSSES_TIER_4, ...BOSSES_TIER_5
 ];
 
 // ============================================
@@ -2177,14 +3897,17 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   let bossList: Monster[];
   
   // Sélectionner le tier de boss en fonction du niveau du donjon
-  if (dungeonLevel >= 4) {
-    // Niveau 4+ : tous les boss possibles (y compris Tarrasque)
+  if (dungeonLevel >= 5) {
+    // Niveau 5+ : tous les boss possibles (y compris divinités)
+    bossList = [...BOSSES_TIER_4, ...BOSSES_TIER_5];
+  } else if (dungeonLevel === 4) {
+    // Niveau 4 : Archidiables et Seigneurs Démons
     bossList = [...BOSSES_TIER_3, ...BOSSES_TIER_4];
   } else if (dungeonLevel === 3) {
-    // Niveau 3 : boss tier 2-3
+    // Niveau 3 : Dragons anciens et boss puissants
     bossList = [...BOSSES_TIER_2, ...BOSSES_TIER_3];
   } else if (dungeonLevel === 2) {
-    // Niveau 2 : boss tier 1-2
+    // Niveau 2 : Dragons adultes et boss intermédiaires
     bossList = [...BOSSES_TIER_1, ...BOSSES_TIER_2];
   } else {
     // Niveau 1 : boss tier 1 uniquement

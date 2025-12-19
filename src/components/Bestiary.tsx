@@ -65,11 +65,12 @@ const formatCR = (cr: number): string => {
 
 // Types de tri
 type SortMode = 'type' | 'cr' | 'name';
+type FilterMode = CreatureType | 'all' | 'hostileNpc' | 'boss';
 
 export function Bestiary({ isOpen, onClose }: BestiaryProps) {
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('type');
-  const [filterType, setFilterType] = useState<CreatureType | 'all'>('all');
+  const [filterType, setFilterType] = useState<FilterMode>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fermer avec Échap
@@ -91,7 +92,11 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
   // Filtrer les monstres
   let filteredMonsters = [...ALL_MONSTERS];
   
-  if (filterType !== 'all') {
+  if (filterType === 'hostileNpc') {
+    filteredMonsters = filteredMonsters.filter(m => m.isHostileNpc === true);
+  } else if (filterType === 'boss') {
+    filteredMonsters = filteredMonsters.filter(m => m.isBoss === true);
+  } else if (filterType !== 'all') {
     filteredMonsters = filteredMonsters.filter(m => m.creatureType === filterType);
   }
   
@@ -198,6 +203,20 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
             onClick={() => setFilterType('all')}
           >
             Tous ({ALL_MONSTERS.length})
+          </button>
+          <button 
+            className={`type-filter-btn special ${filterType === 'hostileNpc' ? 'active' : ''}`}
+            onClick={() => setFilterType('hostileNpc')}
+            title="Personnages hostiles nommés"
+          >
+            👿 PNJ ({ALL_MONSTERS.filter(m => m.isHostileNpc).length})
+          </button>
+          <button 
+            className={`type-filter-btn special ${filterType === 'boss' ? 'active' : ''}`}
+            onClick={() => setFilterType('boss')}
+            title="Boss"
+          >
+            💀 Boss ({ALL_MONSTERS.filter(m => m.isBoss).length})
           </button>
           {creatureTypes.map(type => {
             const count = ALL_MONSTERS.filter(m => m.creatureType === type).length;
