@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { gameStore } from '../store/gameStore';
 import { authStore } from '../store/authStore';
 import { authService } from '../services/authService';
@@ -7,6 +7,7 @@ import { GameHistoryModal } from './GameHistoryModal';
 import { AuthModal } from './AuthModal';
 import { SaveModal } from './SaveModal';
 import { AdminPanel } from './AdminPanel';
+import { DebugSupabase } from './DebugSupabase';
 import './MenuPage.css';
 
 export function MenuPage() {
@@ -14,7 +15,21 @@ export function MenuPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [showSave, setShowSave] = useState<'save' | 'load' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const [authState, setAuthState] = useState(authStore.getState());
+
+  // Raccourci Ctrl+Shift+D pour debug
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      e.preventDefault();
+      setShowDebug(prev => !prev);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   useEffect(() => {
     // S'assurer que le compte admin existe
@@ -133,6 +148,7 @@ export function MenuPage() {
         />
       )}
       {showAdmin && <AdminPanel onClose={() => setShowAdmin(false)} />}
+      {showDebug && <DebugSupabase onClose={() => setShowDebug(false)} />}
     </div>
   );
 }
