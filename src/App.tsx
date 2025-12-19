@@ -11,13 +11,18 @@ import { InventoryModal } from './components/InventoryModal';
 import { SummaryScreen } from './components/SummaryScreen';
 import { PauseMenu } from './components/PauseMenu';
 import { Bestiary } from './components/Bestiary';
+import { useDeviceClass } from './hooks/useDeviceDetection';
 import './App.css';
 import './styles/responsive.css';
 import './styles/animations-toggle.css';
+import './styles/device-specific.css';
 
 function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [showBestiary, setShowBestiary] = useState(false);
+  
+  // Détection automatique du type d'appareil et ajout des classes CSS
+  useDeviceClass();
   
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));

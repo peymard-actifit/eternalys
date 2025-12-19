@@ -549,34 +549,330 @@
   font-size: 0.85rem;
 }
 
-/* Responsive */
+/* ============================================
+   RESPONSIVE - Mobile (max 480px)
+   ============================================ */
 @media (max-width: 480px) {
+  .character-sheet-overlay {
+    padding: 0;
+    align-items: flex-start;
+  }
+  
   .character-sheet {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    height: auto;
     padding: 1rem;
-    max-height: 90vh;
+    border-radius: 0;
+    margin: 0;
+    border-left: none;
+    border-right: none;
+    overflow-y: visible;
+  }
+  
+  .close-btn {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1001;
+  }
+  
+  .sheet-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+    padding-right: 0;
   }
   
   .entity-portrait-large {
     font-size: 3rem;
     width: 70px;
     height: 70px;
+    margin: 0 auto;
+  }
+  
+  .entity-info {
+    text-align: center;
   }
   
   .entity-name {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
   
+  .entity-class {
+    font-size: 0.85rem;
+  }
+  
+  .monster-tags {
+    justify-content: center;
+  }
+  
+  .sheet-hp-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .hp-bar-container {
+    width: 100%;
+    height: 32px;
+  }
+  
+  .hp-text {
+    font-size: 1rem;
+  }
+  
+  .armor-class {
+    align-self: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Caractéristiques - 2 colonnes sur mobile */
   .abilities-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.3rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
   }
   
   .ability-box {
-    padding: 0.3rem;
+    padding: 0.5rem;
+  }
+  
+  .ability-icon {
+    font-size: 1.2rem;
+  }
+  
+  .ability-name {
+    font-size: 0.65rem;
+  }
+  
+  .ability-score {
+    font-size: 1.3rem;
+  }
+  
+  .ability-mod {
+    font-size: 0.9rem;
+  }
+  
+  /* Stats de combat - 2 colonnes */
+  .combat-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .combat-stat {
+    padding: 0.5rem;
+  }
+  
+  .combat-stat .stat-icon {
+    font-size: 1.2rem;
+  }
+  
+  .combat-stat .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .combat-stat .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  /* Résistances */
+  .resistance-icons {
+    gap: 0.4rem;
+  }
+  
+  .resistance-icon {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .resistance-icon .resistance-name {
+    font-size: 0.75rem;
+  }
+  
+  /* Effets passifs */
+  .passive-effects {
+    gap: 0.4rem;
+  }
+  
+  .passive-effect {
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .passive-effect .effect-icon {
+    font-size: 1.1rem;
+  }
+  
+  .passive-effect .effect-name {
+    font-size: 0.75rem;
+  }
+  
+  .passive-effect .effect-value {
+    font-size: 0.8rem;
+  }
+  
+  /* Compétences */
+  .skills-list {
+    gap: 0.5rem;
+  }
+  
+  .skill-entry {
+    padding: 0.6rem;
+  }
+  
+  .skill-name {
+    font-size: 0.95rem;
+  }
+  
+  .skill-cooldown {
+    font-size: 0.75rem;
+  }
+  
+  .skill-details {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .skill-description {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+  
+  /* Challenge Rating */
+  .cr-section {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  
+  .cr-label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .cr-value {
+    font-size: 1.3rem;
+  }
+  
+  .xp-value {
+    font-size: 0.8rem;
+  }
+  
+  /* Description */
+  .monster-description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  
+  /* Titres de section */
+  .abilities-section h3,
+  .combat-stats-section h3,
+  .resistances-section h3,
+  .skills-section h3,
+  .description-section h3 {
+    font-size: 0.95rem;
+    margin: 0.75rem 0 0.5rem 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Tablette (481px - 768px)
+   ============================================ */
+@media (min-width: 481px) and (max-width: 768px) {
+  .character-sheet-overlay {
+    padding: 1rem;
+  }
+  
+  .character-sheet {
+    width: 95%;
+    max-width: 550px;
+    max-height: 90vh;
+    padding: 1.25rem;
+  }
+  
+  .entity-portrait-large {
+    font-size: 3.5rem;
+    width: 85px;
+    height: 85px;
+  }
+  
+  .entity-name {
+    font-size: 1.5rem;
+  }
+  
+  /* 3 colonnes sur tablette */
+  .abilities-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
   }
   
   .combat-stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Paysage mobile
+   ============================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .character-sheet-overlay {
+    padding: 0.5rem;
+  }
+  
+  .character-sheet {
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sheet-header {
+    flex-direction: row;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .entity-portrait-large {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+  }
+  
+  .entity-name {
+    font-size: 1.2rem;
+  }
+  
+  .abilities-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.25rem;
+  }
+  
+  .ability-box {
+    padding: 0.25rem;
+  }
+  
+  .ability-icon {
+    font-size: 0.9rem;
+  }
+  
+  .ability-name {
+    font-size: 0.5rem;
+  }
+  
+  .ability-score {
+    font-size: 1rem;
+  }
+  
+  .ability-mod {
+    font-size: 0.7rem;
+  }
+  
+  /* Masquer les sections moins essentielles en paysage */
+  .description-section {
+    display: none;
   }
 }
 
