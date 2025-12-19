@@ -73,6 +73,14 @@ export function CombatPage() {
     target: string;
   } | null>(null);
   
+  // Action en attente de confirmation (pour la fenêtre modale)
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'attack' | 'skill';
+    skill?: Skill;
+    target?: Monster | Character;
+    attacker?: Character;
+  } | null>(null);
+  
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
   }, []);
@@ -1495,19 +1503,38 @@ export function CombatPage() {
     return updatedLogs;
   }, [aliveEnemies, team, combatTurn, triggerDamageEffect, addCombatHistoryEntry]);
 
-  const handleAttack = () => {
-    if (!isPlayerTurn || isAnimating || selectingTarget) return;
+  // Demander confirmation pour une attaque de base
+  const requestAttack = () => {
+    if (!isPlayerTurn || isAnimating || selectingTarget || pendingAction) return;
     if (aliveEnemies.length === 0) return;
     
-    setIsAnimating(true);
-    
-    // IMPORTANT: Récupérer le personnage depuis le STATE GLOBAL pour avoir les passiveEffects à jour
     const currentCharId = (currentTurn as Character).id;
     const globalTeam = gameStore.getState().team;
     const attacker = globalTeam.find(c => c.id === currentCharId) || (currentTurn as Character);
-    
-    // Cibler l'ennemi sélectionné
     const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
+    
+    setPendingAction({
+      type: 'attack',
+      attacker,
+      target
+    });
+  };
+  
+  // Annuler l'action en attente
+  const cancelPendingAction = () => {
+    setPendingAction(null);
+  };
+  
+  // Exécuter l'attaque après confirmation
+  const executeAttack = async () => {
+    if (!pendingAction || pendingAction.type !== 'attack') return;
+    
+    const attacker = pendingAction.attacker!;
+    const target = pendingAction.target as Monster;
+    
+    setPendingAction(null);
+    setIsAnimating(true);
+    
     const logs = [...combatLog];
     
     // === JET DE TOUCHE D&D 5e ===
@@ -1518,15 +1545,18 @@ export function CombatPage() {
     // Afficher le résultat du jet avec les 2 dés si avantage/désavantage
     const rolls = attackResult.attackRoll.rolls;
     
-    // Afficher l'animation de dés 3D avec les valeurs pré-calculées (joueur: pas de waitForClick)
-    setActiveDiceRoll({
-      dieType: 'd20',
-      count: 1,
-      modifier: attackResult.totalAttackBonus,
-      damageType: 'physical',
-      label: `${attacker.name} attaque ${target.name} !`,
-      preRolledValues: rolls,
-      waitForClick: false
+    // Afficher l'animation de dés 3D avec waitForClick pour attendre le clic du joueur
+    await new Promise<void>(resolve => {
+      setActiveDiceRoll({
+        dieType: 'd20',
+        count: 1,
+        modifier: attackResult.totalAttackBonus,
+        damageType: 'physical',
+        label: `${attacker.name} attaque ${target.name} !`,
+        preRolledValues: rolls,
+        waitForClick: true,
+        onDismiss: resolve
+      });
     });
     
     setLastAttackResult({
@@ -1646,35 +1676,64 @@ export function CombatPage() {
     setIsAnimating(false);
   };
 
-  const handleSkillSelect = (skill: Skill) => {
-    if (!isPlayerTurn || isAnimating) return;
+  // Demander confirmation pour une compétence
+  const requestSkillUse = (skill: Skill) => {
+    if (!isPlayerTurn || isAnimating || pendingAction) return;
     
     // Vérifier le cooldown
     if (skill.currentCooldown && skill.currentCooldown > 0) {
       return; // Compétence en cooldown, ne rien faire
     }
     
+    const currentCharId = (currentTurn as Character).id;
+    const globalTeam = gameStore.getState().team;
+    const attacker = globalTeam.find(c => c.id === currentCharId) || (currentTurn as Character);
+    
     // Pour les compétences de type 'damage' (obtenues via objets), cibler ennemi par défaut
     const targetType = skill.targetType || (skill.type === 'heal' || skill.type === 'buff' ? 'ally' : 'enemy');
     
     if (targetType === 'all_allies' || targetType === 'self') {
-      executeSkill(skill, currentTurn as Character, targetType === 'self' ? currentTurn as Character : null);
+      // Pour self et all_allies, pas besoin de sélection de cible, demander confirmation directement
+      setPendingAction({
+        type: 'skill',
+        skill,
+        attacker,
+        target: targetType === 'self' ? attacker : undefined
+      });
       return;
     }
     
     if (targetType === 'ally') {
+      // Besoin de sélectionner un allié, ouvrir la sélection de cible
       setSelectingTarget('ally');
       setPendingSkill(skill);
     } else {
-      // Cibler l'ennemi sélectionné (s'applique aussi aux compétences de type 'damage')
+      // Compétence offensive, cibler l'ennemi sélectionné et demander confirmation
       const target = aliveEnemies.find(e => e.id === selectedEnemy.id) || aliveEnemies[0];
-      executeSkill(skill, currentTurn as Character, target);
+      setPendingAction({
+        type: 'skill',
+        skill,
+        attacker,
+        target
+      });
     }
   };
 
   const handleTargetSelect = (target: Character) => {
     if (!pendingSkill || !selectingTarget) return;
-    executeSkill(pendingSkill, currentTurn as Character, target);
+    
+    const currentCharId = (currentTurn as Character).id;
+    const globalTeam = gameStore.getState().team;
+    const attacker = globalTeam.find(c => c.id === currentCharId) || (currentTurn as Character);
+    
+    // Demander confirmation avec la cible sélectionnée
+    setPendingAction({
+      type: 'skill',
+      skill: pendingSkill,
+      attacker,
+      target
+    });
+    
     setSelectingTarget(null);
     setPendingSkill(null);
   };
@@ -1683,8 +1742,24 @@ export function CombatPage() {
     setSelectingTarget(null);
     setPendingSkill(null);
   };
+  
+  // Confirmer et exécuter l'action en attente
+  const confirmAction = async () => {
+    if (!pendingAction) return;
+    
+    if (pendingAction.type === 'attack') {
+      await executeAttack();
+    } else if (pendingAction.type === 'skill' && pendingAction.skill && pendingAction.attacker) {
+      const skill = pendingAction.skill;
+      const attacker = pendingAction.attacker;
+      const target = pendingAction.target || null;
+      
+      setPendingAction(null);
+      executeSkill(skill, attacker, target as Character | Monster | null);
+    }
+  };
 
-  const executeSkill = (skill: Skill, attackerParam: Character, target: Character | Monster | null) => {
+  const executeSkill = async (skill: Skill, attackerParam: Character, target: Character | Monster | null) => {
     setIsAnimating(true);
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
@@ -1939,15 +2014,18 @@ export function CombatPage() {
           const skillRolls = skillAttackResult.attackRoll.rolls;
           const chosenSkillRoll = skillAttackResult.attackRoll.chosenRoll || skillRolls[0];
           
-          // Afficher l'animation de dés 3D avec valeurs pré-calculées (joueur: pas de waitForClick)
-          setActiveDiceRoll({
-            dieType: 'd20',
-            count: 1,
-            modifier: skillAttackResult.totalAttackBonus,
-            damageType: isSpell ? 'magical' : 'physical',
-            label: `${attacker.name}: ${skill.name}`,
-            preRolledValues: skillRolls,
-            waitForClick: false
+          // Afficher l'animation de dés 3D avec waitForClick pour attendre le clic du joueur
+          await new Promise<void>(resolve => {
+            setActiveDiceRoll({
+              dieType: 'd20',
+              count: 1,
+              modifier: skillAttackResult.totalAttackBonus,
+              damageType: isSpell ? 'magical' : 'physical',
+              label: `${attacker.name}: ${skill.name}`,
+              preRolledValues: skillRolls,
+              waitForClick: true,
+              onDismiss: resolve
+            });
           });
           
           setLastAttackResult({
@@ -2640,7 +2718,7 @@ export function CombatPage() {
           </div>
           <div className="action-buttons">
             <div className="skill-btn-wrapper">
-              <button className="action-btn attack" onClick={handleAttack}>
+              <button className="action-btn attack" onClick={requestAttack}>
                 ⚔️ Attaque
                 <span className="damage-preview">({(currentTurn as Character).attack} physique)</span>
               </button>
@@ -2673,7 +2751,7 @@ export function CombatPage() {
                 <div key={skill.id} className="skill-btn-wrapper">
                   <button 
                     className={`action-btn skill ${skill.type} ${skill.damageType || 'physical'} ${isOnCooldown ? 'on-cooldown' : ''}`}
-                    onClick={() => handleSkillSelect(skill)}
+                    onClick={() => requestSkillUse(skill)}
                     disabled={isOnCooldown}
                   >
                     {getSkillIcon(skill)} {skill.name}
@@ -2844,6 +2922,53 @@ export function CombatPage() {
         </div>
       )}
       
+      {/* Fenêtre de confirmation d'action */}
+      {pendingAction && (
+        <div className="action-confirmation-overlay" onClick={cancelPendingAction}>
+          <div className="action-confirmation-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirmation-header">
+              <h3>⚔️ Confirmer l'action</h3>
+            </div>
+            <div className="confirmation-content">
+              {pendingAction.type === 'attack' ? (
+                <p>
+                  <span className="confirmation-actor">{pendingAction.attacker?.portrait} {pendingAction.attacker?.name}</span>
+                  <span className="confirmation-arrow">➤</span>
+                  <span className="confirmation-action">Attaque</span>
+                  <span className="confirmation-arrow">➤</span>
+                  <span className="confirmation-target">{'portrait' in (pendingAction.target || {}) ? (pendingAction.target as Monster).portrait : ''} {pendingAction.target?.name}</span>
+                </p>
+              ) : (
+                <p>
+                  <span className="confirmation-actor">{pendingAction.attacker?.portrait} {pendingAction.attacker?.name}</span>
+                  <span className="confirmation-arrow">➤</span>
+                  <span className="confirmation-action">{pendingAction.skill?.name}</span>
+                  {pendingAction.target && (
+                    <>
+                      <span className="confirmation-arrow">➤</span>
+                      <span className="confirmation-target">
+                        {'portrait' in pendingAction.target ? pendingAction.target.portrait : ''} {pendingAction.target.name}
+                      </span>
+                    </>
+                  )}
+                </p>
+              )}
+              {pendingAction.skill?.description && (
+                <p className="confirmation-description">{pendingAction.skill.description}</p>
+              )}
+            </div>
+            <div className="confirmation-buttons">
+              <button className="confirmation-btn cancel" onClick={cancelPendingAction}>
+                ❌ Annuler
+              </button>
+              <button className="confirmation-btn confirm" onClick={confirmAction}>
+                ✅ Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Menu contextuel (clic droit) */}
       {contextMenu && (
         <div 
