@@ -1,15 +1,20 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { gameStore } from '../store/gameStore';
+import { authStore } from '../store/authStore';
 import { saveGameToHistory } from '../lib/gameHistory';
+import { SaveModal } from './SaveModal';
 import './PauseMenu.css';
 
 export function PauseMenu() {
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const authState = authStore.getState();
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && !showSaveModal) {
       e.preventDefault();
       gameStore.setState({ showPauseMenu: false });
     }
-  }, []);
+  }, [showSaveModal]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -18,6 +23,10 @@ export function PauseMenu() {
 
   const handleResume = () => {
     gameStore.setState({ showPauseMenu: false });
+  };
+
+  const handleSave = () => {
+    setShowSaveModal(true);
   };
 
   const handleRestart = () => {
@@ -65,6 +74,12 @@ export function PauseMenu() {
             ▶️ Reprendre
           </button>
           
+          {authState.isAuthenticated && (
+            <button className="pause-btn save" onClick={handleSave}>
+              💾 Sauvegarder
+            </button>
+          )}
+          
           <button className="pause-btn restart" onClick={handleRestart}>
             🔄 Recommencer la partie
           </button>
@@ -78,10 +93,23 @@ export function PauseMenu() {
           </button>
         </div>
 
+        {!authState.isAuthenticated && (
+          <div className="pause-save-hint">
+            💡 Connectez-vous pour sauvegarder votre progression
+          </div>
+        )}
+
         <div className="pause-footer">
           <span className="game-title">Ethernalys</span>
         </div>
       </div>
+
+      {showSaveModal && (
+        <SaveModal 
+          mode="save" 
+          onClose={() => setShowSaveModal(false)}
+        />
+      )}
     </div>
   );
 }

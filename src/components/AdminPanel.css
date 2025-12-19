@@ -1,0 +1,279 @@
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+
+.admin-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4500;
+  animation: fadeIn 0.2s ease;
+  padding: 1rem;
+}
+
+.admin-panel {
+  background: linear-gradient(180deg, #1a1428 0%, #0d0a14 100%);
+  border: 3px solid #ffd700;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.3),
+    inset 0 0 60px rgba(255, 215, 0, 0.05);
+}
+
+.admin-panel .close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(139, 69, 69, 0.8);
+  border: 2px solid #8b4545;
+  color: #e0d0c0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-panel .close-btn:hover {
+  background: #8b4545;
+  transform: scale(1.1);
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.admin-header h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  color: #ffd700;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.admin-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: #a0a0a0;
+  margin: 0;
+}
+
+.admin-loading {
+  text-align: center;
+  padding: 3rem;
+  color: #a0a0a0;
+  font-size: 1.1rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.admin-error {
+  text-align: center;
+  padding: 2rem;
+  color: #e74c3c;
+  font-size: 1.1rem;
+}
+
+.admin-error button {
+  display: block;
+  margin: 1rem auto 0;
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-error button:hover {
+  background: rgba(231, 76, 60, 0.4);
+}
+
+/* Stats */
+.users-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.stat-box {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 100px;
+}
+
+.stat-value {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+}
+
+/* Liste des utilisateurs */
+.users-list {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #4a3a5a;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.users-list-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(155, 89, 182, 0.2);
+  border-bottom: 1px solid #4a3a5a;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #9b59b6;
+}
+
+.user-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.2);
+  font-size: 0.9rem;
+  color: #c0c0c0;
+  transition: background 0.2s;
+}
+
+.user-row:last-child {
+  border-bottom: none;
+}
+
+.user-row:hover {
+  background: rgba(155, 89, 182, 0.1);
+}
+
+.user-row.admin {
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.user-row.current {
+  background: rgba(155, 89, 182, 0.15);
+}
+
+.col-username {
+  font-weight: bold;
+  color: #e0d0c0;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.role-badge.admin {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+}
+
+.role-badge.user {
+  background: rgba(100, 100, 100, 0.2);
+  color: #a0a0a0;
+  border: 1px solid rgba(100, 100, 100, 0.5);
+}
+
+.refresh-btn {
+  display: block;
+  margin: 0 auto;
+  background: rgba(155, 89, 182, 0.2);
+  border: 1px solid #9b59b6;
+  color: #9b59b6;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: rgba(155, 89, 182, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE - Mobile
+   ============================================ */
+@media screen and (max-width: 600px) {
+  .admin-panel {
+    padding: 1rem;
+  }
+
+  .admin-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .users-stats {
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    flex: 1 1 80px;
+    min-width: 80px;
+    padding: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .users-list-header,
+  .user-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .col-created,
+  .col-login {
+    font-size: 0.75rem;
+  }
+}
+
+
