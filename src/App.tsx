@@ -24,13 +24,30 @@ function App() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [showBestiary, setShowBestiary] = useState(false);
   const [hasEnteredGame, setHasEnteredGame] = useState(false);
+  const [authState, setAuthState] = useState(authStore.getState());
   
-  // Vérifier si l'utilisateur est déjà connecté au chargement
+  // Écouter les changements d'authentification
   useEffect(() => {
-    const authState = authStore.getState();
-    if (authState.isAuthenticated && authState.currentUser) {
+    // Vérifier si l'utilisateur est déjà connecté au chargement
+    const currentAuthState = authStore.getState();
+    if (currentAuthState.isAuthenticated && currentAuthState.currentUser) {
       setHasEnteredGame(true);
     }
+    
+    // S'abonner aux changements d'auth pour détecter la déconnexion
+    const unsubscribe = authStore.subscribe(() => {
+      const newAuthState = authStore.getState();
+      setAuthState(newAuthState);
+      
+      // Si l'utilisateur s'est déconnecté, revenir à la page de bienvenue
+      if (!newAuthState.isAuthenticated && !newAuthState.currentUser) {
+        setHasEnteredGame(false);
+        // Réinitialiser le jeu au menu
+        gameStore.setState({ phase: 'menu' });
+      }
+    });
+    
+    return () => unsubscribe();
   }, []);
   
   // Détection automatique du type d'appareil et ajout des classes CSS

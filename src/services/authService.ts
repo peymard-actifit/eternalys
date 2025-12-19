@@ -98,10 +98,15 @@ export const authService = {
       }
 
       // Mettre à jour last_login
-      await supabase
+      const now = new Date().toISOString();
+      const { error: updateError } = await supabase
         .from('users')
-        .update({ last_login: new Date().toISOString() })
+        .update({ last_login: now })
         .eq('id', user.id);
+      
+      if (updateError) {
+        console.warn('Impossible de mettre à jour last_login:', updateError);
+      }
 
       // Retourner l'utilisateur sans le mot de passe
       const safeUser: SafeUser = {
@@ -109,7 +114,7 @@ export const authService = {
         username: user.username,
         is_admin: user.is_admin,
         created_at: user.created_at,
-        last_login: new Date().toISOString()
+        last_login: now
       };
 
       return { user: safeUser, error: null };
