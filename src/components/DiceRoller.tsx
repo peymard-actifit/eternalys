@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
+import { 
+  DieType, 
+  DiceRollResult, 
+  rollDie, 
+  rollDice as rollDiceFromMechanics 
+} from '../utils/dndMechanics';
 import './DiceRoller.css';
 
-// Types de dés D&D
-export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
+// Ré-export des types et fonctions pour la compatibilité
+export type { DieType } from '../utils/dndMechanics';
 
+// Interface pour les props du composant DiceRoller
 export interface DiceRoll {
   dieType: DieType;
   count: number;
@@ -13,6 +20,7 @@ export interface DiceRoll {
   preRolledValues?: number[]; // Valeurs pré-calculées (pour éviter de relancer)
 }
 
+// Alias pour la compatibilité avec l'ancien code
 export interface DiceResult {
   rolls: number[];
   total: number;
@@ -21,6 +29,9 @@ export interface DiceResult {
   isNatural1?: boolean;
   isNatural20?: boolean;
   dieType: DieType;
+  chosenRoll?: number;
+  hasAdvantage?: boolean;
+  hasDisadvantage?: boolean;
 }
 
 interface DiceRollerProps {
@@ -31,23 +42,7 @@ interface DiceRollerProps {
   waitForClick?: boolean; // Si true, attend un clic pour fermer
 }
 
-// Maximum pour chaque type de dé
-const DIE_MAX: Record<DieType, number> = {
-  'd4': 4,
-  'd6': 6,
-  'd8': 8,
-  'd10': 10,
-  'd12': 12,
-  'd20': 20,
-  'd100': 100
-};
-
-// Fonction utilitaire pour lancer un dé
-export function rollDie(dieType: DieType): number {
-  return Math.floor(Math.random() * DIE_MAX[dieType]) + 1;
-}
-
-// Fonction pour lancer plusieurs dés avec support avantage/désavantage
+// Fonction wrapper pour la compatibilité - utilise la version centralisée
 export function rollDice(
   dieType: DieType, 
   count: number, 
@@ -55,36 +50,18 @@ export function rollDice(
   hasAdvantage: boolean = false,
   hasDisadvantage: boolean = false
 ): DiceResult {
-  const rolls: number[] = [];
-  
-  // Pour le d20 avec avantage/désavantage, lancer 2 dés
-  if (dieType === 'd20' && count === 1 && (hasAdvantage || hasDisadvantage)) {
-    const roll1 = rollDie(dieType);
-    const roll2 = rollDie(dieType);
-    const chosenRoll = hasAdvantage 
-      ? Math.max(roll1, roll2) 
-      : Math.min(roll1, roll2);
-    rolls.push(chosenRoll);
-    // On pourrait stocker les deux pour affichage mais on garde le choisi
-  } else {
-    for (let i = 0; i < count; i++) {
-      rolls.push(rollDie(dieType));
-    }
-  }
-  
-  const total = rolls.reduce((sum, r) => sum + r, 0) + modifier;
-  const isNatural20 = dieType === 'd20' && rolls.some(r => r === 20);
-  const isNatural1 = dieType === 'd20' && rolls.some(r => r === 1);
-  const isCritical = isNatural20;
-  
-  return { 
-    rolls, 
-    total, 
-    modifier, 
-    isCritical, 
-    isNatural1,
-    isNatural20,
-    dieType 
+  const result = rollDiceFromMechanics(dieType, count, modifier, hasAdvantage, hasDisadvantage);
+  return {
+    rolls: result.rolls,
+    total: result.total,
+    modifier: result.modifier,
+    isCritical: result.isNatural20,
+    isNatural1: result.isNatural1,
+    isNatural20: result.isNatural20,
+    dieType: result.dieType,
+    chosenRoll: result.chosenRoll,
+    hasAdvantage: result.hasAdvantage,
+    hasDisadvantage: result.hasDisadvantage
   };
 }
 
@@ -109,6 +86,17 @@ export function parseDiceString(diceString: string): DiceRoll | null {
   
   return { dieType, count, modifier };
 }
+
+// Maximum pour chaque type de dé (pour l'animation)
+const DIE_MAX: Record<DieType, number> = {
+  'd4': 4,
+  'd6': 6,
+  'd8': 8,
+  'd10': 10,
+  'd12': 12,
+  'd20': 20,
+  'd100': 100
+};
 
 // ============================================
 // COMPOSANT DÉ 3D ANIMÉ STYLE BALDUR'S GATE 3
