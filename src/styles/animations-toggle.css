@@ -3,55 +3,81 @@
    Quand .no-animations est sur body, désactive toutes les animations
    ============================================ */
 
-/* Désactiver toutes les animations quand mode sans animation actif */
+/* Désactiver TOUTES les animations quand mode sans animation actif */
+body.no-animations,
 body.no-animations * {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  animation-delay: 0ms !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 0 !important;
+  transition: none !important;
+  transition-duration: 0s !important;
+  will-change: auto !important;
 }
 
 body.no-animations *::before,
 body.no-animations *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  transition: none !important;
 }
 
-/* Garder certaines transitions essentielles pour l'UX */
+/* NE PAS désactiver transform pour les éléments de layout statiques */
+/* Certains éléments utilisent transform pour le positionnement, pas l'animation */
+
+/* Désactiver spécifiquement les transforms ANIMÉES */
+body.no-animations .screen-shake,
+body.no-animations .dice-cube,
+body.no-animations .die-rolling,
+body.no-animations .pulse-animation,
+body.no-animations .shake-animation {
+  transform: none !important;
+  animation: none !important;
+}
+
+/* Garder les transitions MINIMALES pour le feedback utilisateur */
 body.no-animations button,
 body.no-animations .action-btn,
 body.no-animations .target-btn,
-body.no-animations .direction-btn {
-  transition-duration: 0.1s !important;
+body.no-animations .direction-btn,
+body.no-animations .skill-btn,
+body.no-animations .panel-btn {
+  /* Réautoriser seulement opacity et background */
+  transition: opacity 0.1s ease, background-color 0.1s ease !important;
+  transform: none !important;
 }
 
-/* Désactiver les keyframe animations spécifiques */
+/* Les éléments avec animations intégrées */
 body.no-animations .enemy-portrait,
-body.no-animations .combat-page.screen-shake,
-body.no-animations .map-cell.current,
-body.no-animations .map-cell.adjacent,
-body.no-animations .game-title,
 body.no-animations .boss-label,
+body.no-animations .game-title,
 body.no-animations .temp-hp-fill,
 body.no-animations .turn-indicator,
-body.no-animations .dice-3d,
-body.no-animations .combat-history-entry {
-  animation: none !important;
-}
-
-/* Désactiver les effets de glow pulsants */
-body.no-animations .boss-warning,
+body.no-animations .map-cell.current,
+body.no-animations .map-cell.adjacent,
+body.no-animations .combat-history-entry,
 body.no-animations .treasure-notification,
 body.no-animations .cooldown-indicator,
 body.no-animations .click-to-continue,
-body.no-animations .attack-roll-indicator.critical {
+body.no-animations .attack-roll-indicator {
   animation: none !important;
 }
 
-/* Les dés restent visibles mais sans animation */
-body.no-animations .die-3d.nat20 .die-value,
-body.no-animations .die-rolling {
+/* Désactiver les dés 3D en mode sans animation */
+body.no-animations .dice-roller-overlay {
+  /* Afficher le résultat directement sans animation */
+  opacity: 1 !important;
+}
+
+/* Désactiver les effets de dégâts */
+body.no-animations .damage-effect,
+body.no-animations .heal-effect,
+body.no-animations .critical-effect {
+  animation: none !important;
+}
+
+/* Désactiver le shake screen */
+body.no-animations .combat-page.screen-shake {
   animation: none !important;
 }
 
@@ -76,7 +102,7 @@ body.no-animations .die-rolling {
   font-size: 0.75rem;
   font-family: 'Cinzel', serif;
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* Pas de transition ici pour éviter les problèmes */
 }
 
 .animation-toggle-btn:hover {
@@ -113,6 +139,23 @@ body.no-animations .die-rolling {
 }
 
 /* ============================================
+   MOBILE - Désactiver les animations problématiques par défaut
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Sur appareils tactiles, réduire les animations même quand activées */
+  .screen-shake {
+    animation: none !important;
+  }
+  
+  /* Désactiver les transforms sur hover (pas de hover sur mobile) */
+  button:hover,
+  .action-btn:hover,
+  .skill-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* ============================================
    INDICATEUR DE STATUT DES ANIMATIONS
    ============================================ */
 .animations-status {
@@ -128,12 +171,17 @@ body.no-animations .die-rolling {
   z-index: 100;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-.animations-status.visible {
+/* Afficher brièvement quand changé - mais seulement si animations activées */
+body:not(.no-animations) .animations-status.visible {
   opacity: 1;
   animation: statusFade 2s ease forwards;
+}
+
+body.no-animations .animations-status.visible {
+  opacity: 1;
+  /* Pas d'animation, juste visible puis disparaît */
 }
 
 @keyframes statusFade {

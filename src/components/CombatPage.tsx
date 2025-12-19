@@ -2754,7 +2754,7 @@ export function CombatPage() {
           <div className="action-buttons">
             <button
               className="action-btn attack"
-              onClick={() => handleAttack(currentTurn as Character)}
+              onClick={requestAttack}
             >
               <span className="action-icon">⚔️</span>
               <span>Attaque</span>
