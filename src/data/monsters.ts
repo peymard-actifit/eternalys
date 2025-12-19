@@ -6255,20 +6255,423 @@ const SORROWSWORN_ANGRY: Monster = {
 };
 
 // ============================================
+// DRAGONS SUPPLÉMENTAIRES (jeunes et wyrmlings)
+// ============================================
+
+const WYRMLING_WHITE: Monster = {
+  id: 'wyrmling_white', name: 'Dragonnet Blanc', hp: 32, maxHp: 32, armorClass: 16,
+  abilities: createAbilities(14, 10, 14, 5, 10, 11),
+  attack: 12, defense: 16, magicDefense: 10, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['cold'], description: 'Jeune dragon blanc, prédateur des glaciers.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 16, damageType: 'cold', type: 'attack', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
+  ]
+};
+
+const WYRMLING_BLACK: Monster = {
+  id: 'wyrmling_black', name: 'Dragonnet Noir', hp: 33, maxHp: 33, armorClass: 17,
+  abilities: createAbilities(15, 14, 13, 10, 11, 13),
+  attack: 12, defense: 17, magicDefense: 12, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['acid'], description: 'Jeune dragon noir, embusqué dans les marais.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 16, damageType: 'acid', type: 'attack', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+  ]
+};
+
+const WYRMLING_GREEN: Monster = {
+  id: 'wyrmling_green', name: 'Dragonnet Vert', hp: 38, maxHp: 38, armorClass: 17,
+  abilities: createAbilities(15, 12, 13, 14, 11, 13),
+  attack: 12, defense: 17, magicDefense: 14, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['poison'], description: 'Jeune dragon vert, manipulateur des forêts.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'poison_breath', name: 'Souffle de poison', damage: 18, damageType: 'poison', type: 'attack', description: 'Cône empoisonné', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 11 } }
+  ]
+};
+
+const WYRMLING_BLUE: Monster = {
+  id: 'wyrmling_blue', name: 'Dragonnet Bleu', hp: 52, maxHp: 52, armorClass: 17,
+  abilities: createAbilities(17, 10, 15, 12, 11, 15),
+  attack: 14, defense: 17, magicDefense: 14, speed: 30,
+  challengeRating: 3, xpReward: 700, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['lightning'], description: 'Jeune dragon bleu, tyran des déserts.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 22, damageType: 'lightning', type: 'attack', description: 'Ligne électrique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
+  ]
+};
+
+const WYRMLING_RED: Monster = {
+  id: 'wyrmling_red', name: 'Dragonnet Rouge', hp: 75, maxHp: 75, armorClass: 17,
+  abilities: createAbilities(19, 10, 17, 12, 11, 15),
+  attack: 16, defense: 17, magicDefense: 14, speed: 30,
+  challengeRating: 4, xpReward: 1100, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['fire'], description: 'Jeune dragon rouge, destructeur né.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 24, damageType: 'fire', type: 'attack', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
+  ]
+};
+
+const WYRMLING_BRASS: Monster = {
+  id: 'wyrmling_brass', name: 'Dragonnet d\'Airain', hp: 16, maxHp: 16, armorClass: 16,
+  abilities: createAbilities(15, 10, 13, 10, 11, 13),
+  attack: 10, defense: 16, magicDefense: 12, speed: 30,
+  challengeRating: 1, xpReward: 200, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['fire'], description: 'Jeune dragon d\'airain, bavard et amical.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'breath_weapon', name: 'Souffle', damage: 8, damageType: 'fire', type: 'attack', description: 'Ligne de feu ou souffle soporifique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+  ]
+};
+
+const WYRMLING_BRONZE: Monster = {
+  id: 'wyrmling_bronze', name: 'Dragonnet de Bronze', hp: 32, maxHp: 32, armorClass: 17,
+  abilities: createAbilities(17, 10, 15, 12, 11, 15),
+  attack: 12, defense: 17, magicDefense: 14, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['lightning'], description: 'Jeune dragon de bronze, gardien des côtes.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'breath_weapon', name: 'Souffle', damage: 14, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
+  ]
+};
+
+const WYRMLING_COPPER: Monster = {
+  id: 'wyrmling_copper', name: 'Dragonnet de Cuivre', hp: 22, maxHp: 22, armorClass: 16,
+  abilities: createAbilities(15, 12, 13, 14, 11, 13),
+  attack: 10, defense: 16, magicDefense: 14, speed: 30,
+  challengeRating: 1, xpReward: 200, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['acid'], description: 'Jeune dragon de cuivre, farceur et rusé.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 12, damageType: 'acid', type: 'attack', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+  ]
+};
+
+const WYRMLING_GOLD: Monster = {
+  id: 'wyrmling_gold', name: 'Dragonnet d\'Or', hp: 60, maxHp: 60, armorClass: 17,
+  abilities: createAbilities(19, 14, 17, 14, 11, 16),
+  attack: 14, defense: 17, magicDefense: 16, speed: 30,
+  challengeRating: 3, xpReward: 700, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['fire'], description: 'Jeune dragon d\'or, noble et juste.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 22, damageType: 'fire', type: 'attack', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
+  ]
+};
+
+const WYRMLING_SILVER: Monster = {
+  id: 'wyrmling_silver', name: 'Dragonnet d\'Argent', hp: 45, maxHp: 45, armorClass: 17,
+  abilities: createAbilities(17, 10, 15, 12, 11, 15),
+  attack: 12, defense: 17, magicDefense: 14, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
+  immunities: ['cold'], description: 'Jeune dragon d\'argent, protecteur des mortels.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 18, damageType: 'cold', type: 'attack', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
+  ]
+};
+
+// ============================================
+// CRÉATURES DE L'OUTRETERRE SUPPLÉMENTAIRES
+// ============================================
+
+const MYCONID_SPROUT: Monster = {
+  id: 'myconid_sprout', name: 'Pousse Mycéloïde', hp: 7, maxHp: 7, armorClass: 10,
+  abilities: createAbilities(8, 10, 10, 8, 11, 5),
+  attack: 4, defense: 10, magicDefense: 10, speed: 10,
+  challengeRating: 0, xpReward: 10, creatureType: 'plant', size: 'small', portrait: '🍄', isBoss: false,
+  description: 'Jeune champignon humanoïde.',
+  skills: [{ id: 'fist', name: 'Poing', damage: 3, damageType: 'bludgeoning', type: 'attack', description: 'Coup' }]
+};
+
+const MYCONID_ADULT: Monster = {
+  id: 'myconid_adult', name: 'Mycéloïde Adulte', hp: 22, maxHp: 22, armorClass: 12,
+  abilities: createAbilities(10, 10, 12, 10, 13, 7),
+  attack: 8, defense: 12, magicDefense: 12, speed: 20,
+  challengeRating: 0.5, xpReward: 100, creatureType: 'plant', size: 'medium', portrait: '🍄', isBoss: false,
+  description: 'Champignon humanoïde communicant par spores.',
+  skills: [
+    { id: 'fist', name: 'Poing', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Coup' },
+    { id: 'pacifying_spores', name: 'Spores pacifiantes', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Endort la cible', savingThrow: { ability: 'constitution', dc: 11 } }
+  ]
+};
+
+const MYCONID_SOVEREIGN: Monster = {
+  id: 'myconid_sovereign', name: 'Souverain Mycéloïde', hp: 60, maxHp: 60, armorClass: 13,
+  abilities: createAbilities(12, 10, 14, 13, 15, 10),
+  attack: 12, defense: 13, magicDefense: 16, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'plant', size: 'large', portrait: '🍄', isBoss: false,
+  description: 'Chef des mycéloïdes, maître des spores.',
+  skills: [
+    { id: 'fist', name: 'Poing', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Coup', attackCount: 2 },
+    { id: 'animating_spores', name: 'Spores animantes', damage: 0, damageType: 'necrotic', type: 'buff', description: 'Réanime un cadavre' }
+  ]
+};
+
+const QUAGGOTH: Monster = {
+  id: 'quaggoth', name: 'Quaggoth', hp: 45, maxHp: 45, armorClass: 13,
+  abilities: createAbilities(17, 12, 16, 6, 12, 7),
+  attack: 14, defense: 13, magicDefense: 10, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '🦍', isBoss: false,
+  immunities: ['poison'], conditionImmunities: ['poisoned'],
+  description: 'Humanoïde bestial de l\'Outreterre.',
+  skills: [{ id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }]
+};
+
+const QUAGGOTH_THONOT: Monster = {
+  id: 'quaggoth_thonot', name: 'Quaggoth Thonot', hp: 45, maxHp: 45, armorClass: 13,
+  abilities: createAbilities(17, 12, 16, 6, 12, 7),
+  attack: 14, defense: 13, magicDefense: 14, speed: 30,
+  challengeRating: 3, xpReward: 700, creatureType: 'humanoid', size: 'medium', portrait: '🦍', isBoss: false,
+  immunities: ['poison'], conditionImmunities: ['poisoned'],
+  description: 'Quaggoth chaman aux pouvoirs psychiques.',
+  skills: [
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
+    { id: 'mind_blast', name: 'Décharge mentale', damage: 14, damageType: 'psychic', type: 'attack', description: 'Attaque psychique', savingThrow: { ability: 'wisdom', dc: 12 } }
+  ]
+};
+
+const FLUMPH: Monster = {
+  id: 'flumph', name: 'Flumph', hp: 7, maxHp: 7, armorClass: 12,
+  abilities: createAbilities(6, 15, 10, 14, 14, 11),
+  attack: 6, defense: 12, magicDefense: 14, speed: 5,
+  challengeRating: 0.125, xpReward: 25, creatureType: 'aberration', size: 'small', portrait: '🪼', isBoss: false,
+  description: 'Créature bienveillante de l\'Outreterre.',
+  skills: [{ id: 'tendrils', name: 'Tentacules', damage: 6, damageType: 'piercing', type: 'attack', description: 'Tentacules acides' }]
+};
+
+const KUTO_TOA: Monster = {
+  id: 'kuo_toa', name: 'Kuo-Toa', hp: 18, maxHp: 18, armorClass: 13,
+  abilities: createAbilities(13, 10, 11, 11, 10, 8),
+  attack: 10, defense: 13, magicDefense: 10, speed: 30,
+  challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
+  description: 'Homme-poisson fanatique des profondeurs.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lance' }
+  ]
+};
+
+const KUTO_TOA_WHIP: Monster = {
+  id: 'kuo_toa_whip', name: 'Fouetteur Kuo-Toa', hp: 65, maxHp: 65, armorClass: 11,
+  abilities: createAbilities(14, 10, 14, 12, 14, 11),
+  attack: 14, defense: 11, magicDefense: 16, speed: 30,
+  challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
+  description: 'Prêtre kuo-toa aux pouvoirs divins.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'pincer_staff', name: 'Bâton-pince', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Prise au piège' },
+    { id: 'sacred_flame', name: 'Flamme sacrée', damage: 10, damageType: 'radiant', type: 'attack', description: 'Feu divin' }
+  ]
+};
+
+const KUTO_TOA_ARCHPRIEST: Monster = {
+  id: 'kuo_toa_archpriest', name: 'Archiprêtre Kuo-Toa', hp: 97, maxHp: 97, armorClass: 13,
+  abilities: createAbilities(16, 14, 16, 13, 16, 14),
+  attack: 18, defense: 13, magicDefense: 18, speed: 30,
+  challengeRating: 6, xpReward: 2300, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
+  description: 'Grand prêtre kuo-toa aux pouvoirs immenses.',
+  skills: [
+    { id: 'scepter', name: 'Sceptre', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Sceptre sacré', attackCount: 2 },
+    { id: 'spirit_guardians', name: 'Esprits gardiens', damage: 20, damageType: 'radiant', type: 'attack', description: 'Aura divine', areaOfEffect: true }
+  ]
+};
+
+const TROGLODYTE: Monster = {
+  id: 'troglodyte', name: 'Troglodyte', hp: 13, maxHp: 13, armorClass: 11,
+  abilities: createAbilities(14, 10, 14, 6, 10, 6),
+  attack: 10, defense: 11, magicDefense: 8, speed: 30,
+  challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🦎', isBoss: false,
+  description: 'Reptile humanoïde à l\'odeur nauséabonde.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+  ]
+};
+
+const GRIMLOCK: Monster = {
+  id: 'grimlock', name: 'Grimlock', hp: 11, maxHp: 11, armorClass: 11,
+  abilities: createAbilities(16, 12, 12, 9, 8, 6),
+  attack: 10, defense: 11, magicDefense: 8, speed: 30,
+  challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '👤', isBoss: false,
+  conditionImmunities: ['blinded'],
+  description: 'Humain aveugle des profondeurs.',
+  skills: [{ id: 'spiked_bone_club', name: 'Massue d\'os', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Massue' }]
+};
+
+const DUERGAR: Monster = {
+  id: 'duergar', name: 'Duergar', hp: 26, maxHp: 26, armorClass: 16,
+  abilities: createAbilities(14, 11, 14, 11, 10, 9),
+  attack: 12, defense: 16, magicDefense: 12, speed: 25,
+  challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'medium', portrait: '⛏️', isBoss: false,
+  resistances: ['poison'], description: 'Nain gris des profondeurs.',
+  skills: [
+    { id: 'war_pick', name: 'Pic de guerre', damage: 10, damageType: 'piercing', type: 'attack', description: 'Pic' },
+    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lancer' }
+  ]
+};
+
+const SVIRFNEBLIN: Monster = {
+  id: 'svirfneblin', name: 'Svirfneblin', hp: 16, maxHp: 16, armorClass: 15,
+  abilities: createAbilities(15, 14, 14, 12, 10, 9),
+  attack: 10, defense: 15, magicDefense: 12, speed: 20,
+  challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'small', portrait: '🧙', isBoss: false,
+  description: 'Gnome des profondeurs, discret et prudent.',
+  skills: [
+    { id: 'war_pick', name: 'Pic de guerre', damage: 8, damageType: 'piercing', type: 'attack', description: 'Pic' },
+    { id: 'poisoned_dart', name: 'Fléchette empoisonnée', damage: 6, damageType: 'piercing', type: 'attack', description: 'Fléchette' }
+  ]
+};
+
+// ============================================
+// CRÉATURES SUPPLÉMENTAIRES VARIÉES
+// ============================================
+
+const GIANT_ELK: Monster = {
+  id: 'giant_elk', name: 'Élan Géant', hp: 42, maxHp: 42, armorClass: 14,
+  abilities: createAbilities(19, 16, 14, 7, 14, 10),
+  attack: 14, defense: 14, magicDefense: 12, speed: 60,
+  challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'huge', portrait: '🦌', isBoss: false,
+  description: 'Élan majestueux de taille colossale.',
+  skills: [
+    { id: 'ram', name: 'Coup de bois', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Charge' },
+    { id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Piétinement' }
+  ]
+};
+
+const GIANT_BOAR: Monster = {
+  id: 'giant_boar', name: 'Sanglier Géant', hp: 42, maxHp: 42, armorClass: 12,
+  abilities: createAbilities(17, 10, 16, 2, 7, 5),
+  attack: 12, defense: 12, magicDefense: 8, speed: 40,
+  challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'large', portrait: '🐗', isBoss: false,
+  description: 'Sanglier massif aux défenses mortelles.',
+  skills: [{ id: 'tusk', name: 'Défense', damage: 14, damageType: 'slashing', type: 'attack', description: 'Défenses' }]
+};
+
+const GIANT_CONSTRICTOR_SNAKE: Monster = {
+  id: 'giant_constrictor_snake', name: 'Serpent Constricteur Géant', hp: 60, maxHp: 60, armorClass: 12,
+  abilities: createAbilities(19, 14, 12, 1, 10, 3),
+  attack: 14, defense: 12, magicDefense: 8, speed: 30,
+  challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'huge', portrait: '🐍', isBoss: false,
+  description: 'Serpent géant qui écrase ses proies.',
+  skills: [
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'constrict', name: 'Constriction', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Étranglement' }
+  ]
+};
+
+const GIANT_EAGLE: Monster = {
+  id: 'giant_eagle', name: 'Aigle Géant', hp: 26, maxHp: 26, armorClass: 13,
+  abilities: createAbilities(16, 17, 13, 8, 14, 10),
+  attack: 12, defense: 13, magicDefense: 12, speed: 10,
+  challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🦅', isBoss: false,
+  description: 'Aigle majestueux capable de transporter des humains.',
+  skills: [
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Bec' },
+    { id: 'talons', name: 'Serres', damage: 12, damageType: 'slashing', type: 'attack', description: 'Serres' }
+  ]
+};
+
+const GIANT_OCTOPUS: Monster = {
+  id: 'giant_octopus', name: 'Pieuvre Géante', hp: 52, maxHp: 52, armorClass: 11,
+  abilities: createAbilities(17, 13, 13, 4, 10, 4),
+  attack: 12, defense: 11, magicDefense: 10, speed: 10,
+  challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🐙', isBoss: false,
+  description: 'Pieuvre massive des profondeurs océanes.',
+  skills: [{ id: 'tentacles', name: 'Tentacules', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Tentacules' }]
+};
+
+const GIANT_OWL: Monster = {
+  id: 'giant_owl', name: 'Hibou Géant', hp: 19, maxHp: 19, armorClass: 12,
+  abilities: createAbilities(13, 15, 12, 8, 13, 10),
+  attack: 10, defense: 12, magicDefense: 12, speed: 5,
+  challengeRating: 0.25, xpReward: 50, creatureType: 'beast', size: 'large', portrait: '🦉', isBoss: false,
+  description: 'Hibou géant, sage gardien des forêts.',
+  skills: [{ id: 'talons', name: 'Serres', damage: 10, damageType: 'slashing', type: 'attack', description: 'Serres' }]
+};
+
+const GIANT_SHARK: Monster = {
+  id: 'giant_shark', name: 'Requin Géant', hp: 126, maxHp: 126, armorClass: 13,
+  abilities: createAbilities(23, 11, 21, 1, 10, 5),
+  attack: 20, defense: 13, magicDefense: 8, speed: 0,
+  challengeRating: 5, xpReward: 1800, creatureType: 'beast', size: 'huge', portrait: '🦈', isBoss: false,
+  description: 'Prédateur suprême des océans.',
+  skills: [{ id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', description: 'Mâchoires géantes' }]
+};
+
+const GIANT_VULTURE: Monster = {
+  id: 'giant_vulture', name: 'Vautour Géant', hp: 22, maxHp: 22, armorClass: 10,
+  abilities: createAbilities(15, 10, 15, 6, 12, 7),
+  attack: 10, defense: 10, magicDefense: 10, speed: 10,
+  challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🦅', isBoss: false,
+  description: 'Charognard géant des terres désolées.',
+  skills: [
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Bec' },
+    { id: 'talons', name: 'Serres', damage: 8, damageType: 'slashing', type: 'attack', description: 'Serres' }
+  ]
+};
+
+const RIDING_HORSE: Monster = {
+  id: 'riding_horse', name: 'Cheval de selle', hp: 13, maxHp: 13, armorClass: 10,
+  abilities: createAbilities(16, 10, 12, 2, 11, 7),
+  attack: 8, defense: 10, magicDefense: 8, speed: 60,
+  challengeRating: 0.25, xpReward: 50, creatureType: 'beast', size: 'large', portrait: '🐴', isBoss: false,
+  description: 'Cheval domestique pour la monte.',
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Ruade' }]
+};
+
+const WARHORSE: Monster = {
+  id: 'warhorse', name: 'Cheval de guerre', hp: 19, maxHp: 19, armorClass: 11,
+  abilities: createAbilities(18, 12, 13, 2, 12, 7),
+  attack: 10, defense: 11, magicDefense: 10, speed: 60,
+  challengeRating: 0.5, xpReward: 100, creatureType: 'beast', size: 'large', portrait: '🐴', isBoss: false,
+  description: 'Destrier entraîné au combat.',
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Ruade' }]
+};
+
+const NIGHTMARE: Monster = {
+  id: 'nightmare', name: 'Cauchemar', hp: 68, maxHp: 68, armorClass: 13,
+  abilities: createAbilities(18, 15, 16, 10, 13, 15),
+  attack: 16, defense: 13, magicDefense: 14, speed: 60,
+  challengeRating: 3, xpReward: 700, creatureType: 'fiend', size: 'large', portrait: '🐴', isBoss: false,
+  immunities: ['fire'], description: 'Destrier infernal aux sabots enflammés.',
+  skills: [
+    { id: 'hooves', name: 'Sabots', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Sabots de feu' },
+    { id: 'ethereal_stride', name: 'Passage éthéré', damage: 0, damageType: 'force', type: 'special', description: 'Voyage entre les plans' }
+  ]
+};
+
+const PEGASUS: Monster = {
+  id: 'pegasus', name: 'Pégase', hp: 59, maxHp: 59, armorClass: 12,
+  abilities: createAbilities(18, 15, 16, 10, 15, 13),
+  attack: 14, defense: 12, magicDefense: 14, speed: 60,
+  challengeRating: 2, xpReward: 450, creatureType: 'celestial', size: 'large', portrait: '🐎', isBoss: false,
+  description: 'Cheval ailé céleste, pur et noble.',
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Sabots' }]
+};
+
+// ============================================
 // LISTES DE MONSTRES
 // ============================================
 
 export const MONSTERS_BY_CR: { [key: number]: Monster[] } = {
-  0: [RAT, BAT, LEMURE, HOMUNCULUS, AWAKENED_SHRUB, CRAWLING_CLAW],
-  0.125: [GIANT_RAT, KOBOLD, STIRGE, MANES, TWIG_BLIGHT, MERFOLK, MODRON_MONODRONE],
-  0.25: [SKELETON, ZOMBIE, GOBLIN, WOLF, FLYING_SWORD, PSEUDODRAGON, SPRITE, DRETCH, PIXIE, BLINK_DOG, NEEDLE_BLIGHT, OBLEX_SPAWN, MUD_MEPHIT, STEAM_MEPHIT, SMOKE_MEPHIT, DROW, GIANT_CENTIPEDE, SORROWSWORN_WRETCHED],
-  0.5: [ORC, HOBGOBLIN, SHADOW, COCKATRICE, DARKMANTLE, RUST_MONSTER, WORG, SATYR, VINE_BLIGHT, GRAY_OOZE, SAHUAGIN, DUST_MEPHIT, ICE_MEPHIT, MAGMA_MEPHIT, GIANT_WASP, DARKLINGS, NORKER, SKULK, PIERCER],
-  1: [BUGBEAR, GHOUL, DIRE_WOLF, SPECTER, BROWN_BEAR, ANIMATED_ARMOR, DEATH_DOG, DRYAD, HARPY, HIPPOGRIFF, IMP, QUASIT, GIANT_SPIDER, SCARECROW, QUICKLING, GOBLIN_BOSS, HALF_OGRE, SEA_SPAWN, NILBOG],
-  2: [OGRE, GHAST, GARGOYLE, MIMIC, ANKHEG, CENTAUR, ETTERCAP, GELATINOUS_CUBE, GRIFFON, NOTHIC, GRICK, PERYTON, BANDIT_CAPTAIN, CULT_FANATIC, PRIEST, SEA_HAG, AWAKENED_TREE, GIBBERING_MOUTHER, OCHRE_JELLY, INTELLECT_DEVOURER, WERERAT, ORC_EYE_OF_GRUUMSH, ZOMBIE_OGRE, WILL_O_WISP, POLTERGEIST, AZER, CARRION_CRAWLER, GIANT_OGRE, OGRE_ZOMBIE, GITHZERAI_MONK, MODRON_PENTADRONE, DARKLING_ELDER, MEENLOCK],
-  3: [WEREWOLF, HELL_HOUND, MINOTAUR, OWLBEAR, WIGHT, BASILISK, DOPPELGANGER, GREEN_HAG, MANTICORE, PHASE_SPIDER, YETI, MUMMY, DISPLACER_BEAST, HOOK_HORROR, WINTER_WOLF, LEUCROTTA, BEARDED_DEVIL, VETERAN, GIANT_SCORPION, REDCAP, GRELL, SPECTATOR, HOBGOBLIN_CAPTAIN, DEEP_SCION, CAVE_FISHER, GITHYANKI_WARRIOR],
-  4: [BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS, DEATHLOCK, HELMED_HORROR, BLACK_PUDDING, WEREBOAR, WERETIGER, ORC_WAR_CHIEF, ETTIN],
-  5: [TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON, REVENANT, ALLIP, SPAWN_OF_KYUSS, CATOBLEPAS, GLADIATOR, GIANT_CROCODILE, TRICERATOPS, NIGHT_HAG, FLESH_GOLEM, OTYUGH, ADULT_OBLEX, UMBER_HULK, STAR_SPAWN_MANGLER, WEREBEAR, VAMPIRE_SPAWN, BONEYARD_HULK, SAHUAGIN_BARON, TROLLWIFE, DROW_ELITE_WARRIOR, MEZZOLOTH, ROPER, SLAAD_RED, BANDERHOBB],
-  6: [YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK, VROCK, MAGE, MAMMOTH, ANNIS_HAG, HOBGOBLIN_WARLORD, GALEB_DUHR, CYCLOPS],
+  0: [RAT, BAT, LEMURE, HOMUNCULUS, AWAKENED_SHRUB, CRAWLING_CLAW, MYCONID_SPROUT],
+  0.125: [GIANT_RAT, KOBOLD, STIRGE, MANES, TWIG_BLIGHT, MERFOLK, MODRON_MONODRONE, FLUMPH],
+  0.25: [SKELETON, ZOMBIE, GOBLIN, WOLF, FLYING_SWORD, PSEUDODRAGON, SPRITE, DRETCH, PIXIE, BLINK_DOG, NEEDLE_BLIGHT, OBLEX_SPAWN, MUD_MEPHIT, STEAM_MEPHIT, SMOKE_MEPHIT, DROW, GIANT_CENTIPEDE, SORROWSWORN_WRETCHED, KUTO_TOA, TROGLODYTE, GRIMLOCK, GIANT_OWL, RIDING_HORSE],
+  0.5: [ORC, HOBGOBLIN, SHADOW, COCKATRICE, DARKMANTLE, RUST_MONSTER, WORG, SATYR, VINE_BLIGHT, GRAY_OOZE, SAHUAGIN, DUST_MEPHIT, ICE_MEPHIT, MAGMA_MEPHIT, GIANT_WASP, DARKLINGS, NORKER, SKULK, PIERCER, MYCONID_ADULT, SVIRFNEBLIN, WARHORSE],
+  1: [BUGBEAR, GHOUL, DIRE_WOLF, SPECTER, BROWN_BEAR, ANIMATED_ARMOR, DEATH_DOG, DRYAD, HARPY, HIPPOGRIFF, IMP, QUASIT, GIANT_SPIDER, SCARECROW, QUICKLING, GOBLIN_BOSS, HALF_OGRE, SEA_SPAWN, NILBOG, WYRMLING_BRASS, WYRMLING_COPPER, KUTO_TOA_WHIP, DUERGAR, GIANT_EAGLE, GIANT_OCTOPUS, GIANT_VULTURE],
+  2: [OGRE, GHAST, GARGOYLE, MIMIC, ANKHEG, CENTAUR, ETTERCAP, GELATINOUS_CUBE, GRIFFON, NOTHIC, GRICK, PERYTON, BANDIT_CAPTAIN, CULT_FANATIC, PRIEST, SEA_HAG, AWAKENED_TREE, GIBBERING_MOUTHER, OCHRE_JELLY, INTELLECT_DEVOURER, WERERAT, ORC_EYE_OF_GRUUMSH, ZOMBIE_OGRE, WILL_O_WISP, POLTERGEIST, AZER, CARRION_CRAWLER, GIANT_OGRE, OGRE_ZOMBIE, GITHZERAI_MONK, MODRON_PENTADRONE, DARKLING_ELDER, MEENLOCK, WYRMLING_WHITE, WYRMLING_BLACK, WYRMLING_GREEN, WYRMLING_BRONZE, WYRMLING_SILVER, MYCONID_SOVEREIGN, QUAGGOTH, GIANT_ELK, GIANT_BOAR, GIANT_CONSTRICTOR_SNAKE, PEGASUS],
+  3: [WEREWOLF, HELL_HOUND, MINOTAUR, OWLBEAR, WIGHT, BASILISK, DOPPELGANGER, GREEN_HAG, MANTICORE, PHASE_SPIDER, YETI, MUMMY, DISPLACER_BEAST, HOOK_HORROR, WINTER_WOLF, LEUCROTTA, BEARDED_DEVIL, VETERAN, GIANT_SCORPION, REDCAP, GRELL, SPECTATOR, HOBGOBLIN_CAPTAIN, DEEP_SCION, CAVE_FISHER, GITHYANKI_WARRIOR, WYRMLING_BLUE, WYRMLING_GOLD, QUAGGOTH_THONOT, NIGHTMARE],
+  4: [BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS, DEATHLOCK, HELMED_HORROR, BLACK_PUDDING, WEREBOAR, WERETIGER, ORC_WAR_CHIEF, ETTIN, WYRMLING_RED],
+  5: [TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON, REVENANT, ALLIP, SPAWN_OF_KYUSS, CATOBLEPAS, GLADIATOR, GIANT_CROCODILE, TRICERATOPS, NIGHT_HAG, FLESH_GOLEM, OTYUGH, ADULT_OBLEX, UMBER_HULK, STAR_SPAWN_MANGLER, WEREBEAR, VAMPIRE_SPAWN, BONEYARD_HULK, SAHUAGIN_BARON, TROLLWIFE, DROW_ELITE_WARRIOR, MEZZOLOTH, ROPER, SLAAD_RED, BANDERHOBB, GIANT_SHARK],
+  6: [YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK, VROCK, MAGE, MAMMOTH, ANNIS_HAG, HOBGOBLIN_WARLORD, GALEB_DUHR, CYCLOPS, KUTO_TOA_ARCHPRIEST],
   7: [MIND_FLAYER, STONE_GIANT, YOUNG_BLACK_DRAGON, GRICK_ALPHA, GIANT_APE, BHEUR_HAG, KORRED, SHIELD_GUARDIAN, ONI, DROW_MAGE, DRAEGLOTH, SLAAD_BLUE],
   8: [FROST_GIANT, YOUNG_GREEN_DRAGON, HYDRA, ASSASSIN, SWORD_WRAITH_COMMANDER, HEZROU, CHAIN_DEVIL, BLACKGUARD, TYRANNOSAURUS_REX, CLOAKER, DROW_PRIESTESS, FOMORIAN, ANKHEG_QUEEN, SLAAD_GREEN, GITHYANKI_KNIGHT],
   9: [FIRE_GIANT, CLOUD_GIANT, YOUNG_BLUE_DRAGON, YOUNG_SILVER_DRAGON, BONE_DEVIL, GLABREZU, WAR_PRIEST, CHAMPION, CLAY_GOLEM, TREANT, NYCALOTH, SLAAD_GRAY, SORROWSWORN_LONELY],
@@ -6294,23 +6697,23 @@ export const MONSTERS_BY_CR: { [key: number]: Monster[] } = {
 
 export const ALL_MONSTERS: Monster[] = [
   // CR 0-1/8
-  RAT, BAT, GIANT_RAT, KOBOLD, STIRGE, LEMURE, MANES, HOMUNCULUS, AWAKENED_SHRUB, TWIG_BLIGHT, CRAWLING_CLAW, MERFOLK, MODRON_MONODRONE,
+  RAT, BAT, GIANT_RAT, KOBOLD, STIRGE, LEMURE, MANES, HOMUNCULUS, AWAKENED_SHRUB, TWIG_BLIGHT, CRAWLING_CLAW, MERFOLK, MODRON_MONODRONE, MYCONID_SPROUT, FLUMPH,
   // CR 1/4
-  SKELETON, ZOMBIE, GOBLIN, WOLF, FLYING_SWORD, PSEUDODRAGON, SPRITE, DRETCH, PIXIE, BLINK_DOG, NEEDLE_BLIGHT, OBLEX_SPAWN, MUD_MEPHIT, STEAM_MEPHIT, SMOKE_MEPHIT, DROW, GIANT_CENTIPEDE, SORROWSWORN_WRETCHED,
+  SKELETON, ZOMBIE, GOBLIN, WOLF, FLYING_SWORD, PSEUDODRAGON, SPRITE, DRETCH, PIXIE, BLINK_DOG, NEEDLE_BLIGHT, OBLEX_SPAWN, MUD_MEPHIT, STEAM_MEPHIT, SMOKE_MEPHIT, DROW, GIANT_CENTIPEDE, SORROWSWORN_WRETCHED, KUTO_TOA, TROGLODYTE, GRIMLOCK, GIANT_OWL, RIDING_HORSE,
   // CR 1/2
-  ORC, HOBGOBLIN, SHADOW, COCKATRICE, DARKMANTLE, RUST_MONSTER, WORG, SATYR, VINE_BLIGHT, GRAY_OOZE, SAHUAGIN, DUST_MEPHIT, ICE_MEPHIT, MAGMA_MEPHIT, GIANT_WASP, DARKLINGS, NORKER, SKULK, PIERCER,
+  ORC, HOBGOBLIN, SHADOW, COCKATRICE, DARKMANTLE, RUST_MONSTER, WORG, SATYR, VINE_BLIGHT, GRAY_OOZE, SAHUAGIN, DUST_MEPHIT, ICE_MEPHIT, MAGMA_MEPHIT, GIANT_WASP, DARKLINGS, NORKER, SKULK, PIERCER, MYCONID_ADULT, SVIRFNEBLIN, WARHORSE,
   // CR 1
-  BUGBEAR, GHOUL, DIRE_WOLF, SPECTER, BROWN_BEAR, ANIMATED_ARMOR, DEATH_DOG, DRYAD, HARPY, HIPPOGRIFF, IMP, QUASIT, GIANT_SPIDER, SCARECROW, QUICKLING, GOBLIN_BOSS, HALF_OGRE, SEA_SPAWN, NILBOG,
+  BUGBEAR, GHOUL, DIRE_WOLF, SPECTER, BROWN_BEAR, ANIMATED_ARMOR, DEATH_DOG, DRYAD, HARPY, HIPPOGRIFF, IMP, QUASIT, GIANT_SPIDER, SCARECROW, QUICKLING, GOBLIN_BOSS, HALF_OGRE, SEA_SPAWN, NILBOG, WYRMLING_BRASS, WYRMLING_COPPER, KUTO_TOA_WHIP, DUERGAR, GIANT_EAGLE, GIANT_OCTOPUS, GIANT_VULTURE,
   // CR 2
-  OGRE, GHAST, GARGOYLE, MIMIC, ANKHEG, CENTAUR, ETTERCAP, GELATINOUS_CUBE, GRIFFON, NOTHIC, GRICK, PERYTON, BANDIT_CAPTAIN, CULT_FANATIC, PRIEST, SEA_HAG, AWAKENED_TREE, GIBBERING_MOUTHER, OCHRE_JELLY, INTELLECT_DEVOURER, WERERAT, ORC_EYE_OF_GRUUMSH, ZOMBIE_OGRE, WILL_O_WISP, POLTERGEIST, AZER, CARRION_CRAWLER, GIANT_OGRE, OGRE_ZOMBIE, GITHZERAI_MONK, MODRON_PENTADRONE, DARKLING_ELDER, MEENLOCK,
+  OGRE, GHAST, GARGOYLE, MIMIC, ANKHEG, CENTAUR, ETTERCAP, GELATINOUS_CUBE, GRIFFON, NOTHIC, GRICK, PERYTON, BANDIT_CAPTAIN, CULT_FANATIC, PRIEST, SEA_HAG, AWAKENED_TREE, GIBBERING_MOUTHER, OCHRE_JELLY, INTELLECT_DEVOURER, WERERAT, ORC_EYE_OF_GRUUMSH, ZOMBIE_OGRE, WILL_O_WISP, POLTERGEIST, AZER, CARRION_CRAWLER, GIANT_OGRE, OGRE_ZOMBIE, GITHZERAI_MONK, MODRON_PENTADRONE, DARKLING_ELDER, MEENLOCK, WYRMLING_WHITE, WYRMLING_BLACK, WYRMLING_GREEN, WYRMLING_BRONZE, WYRMLING_SILVER, MYCONID_SOVEREIGN, QUAGGOTH, GIANT_ELK, GIANT_BOAR, GIANT_CONSTRICTOR_SNAKE, PEGASUS,
   // CR 3
-  WEREWOLF, HELL_HOUND, MINOTAUR, OWLBEAR, WIGHT, BASILISK, DOPPELGANGER, GREEN_HAG, MANTICORE, PHASE_SPIDER, YETI, MUMMY, DISPLACER_BEAST, HOOK_HORROR, WINTER_WOLF, LEUCROTTA, BEARDED_DEVIL, VETERAN, GIANT_SCORPION, REDCAP, GRELL, SPECTATOR, HOBGOBLIN_CAPTAIN, DEEP_SCION, CAVE_FISHER, GITHYANKI_WARRIOR,
+  WEREWOLF, HELL_HOUND, MINOTAUR, OWLBEAR, WIGHT, BASILISK, DOPPELGANGER, GREEN_HAG, MANTICORE, PHASE_SPIDER, YETI, MUMMY, DISPLACER_BEAST, HOOK_HORROR, WINTER_WOLF, LEUCROTTA, BEARDED_DEVIL, VETERAN, GIANT_SCORPION, REDCAP, GRELL, SPECTATOR, HOBGOBLIN_CAPTAIN, DEEP_SCION, CAVE_FISHER, GITHYANKI_WARRIOR, WYRMLING_BLUE, WYRMLING_GOLD, QUAGGOTH_THONOT, NIGHTMARE,
   // CR 4
-  BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS, DEATHLOCK, HELMED_HORROR, BLACK_PUDDING, WEREBOAR, WERETIGER, ORC_WAR_CHIEF, ETTIN,
+  BANSHEE, FLAMESKULL, CHUUL, COUATL, GHOST, SUCCUBUS, DEATHLOCK, HELMED_HORROR, BLACK_PUDDING, WEREBOAR, WERETIGER, ORC_WAR_CHIEF, ETTIN, WYRMLING_RED,
   // CR 5
-  TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON, REVENANT, ALLIP, SPAWN_OF_KYUSS, CATOBLEPAS, GLADIATOR, GIANT_CROCODILE, TRICERATOPS, NIGHT_HAG, FLESH_GOLEM, OTYUGH, ADULT_OBLEX, UMBER_HULK, STAR_SPAWN_MANGLER, WEREBEAR, VAMPIRE_SPAWN, BONEYARD_HULK, SAHUAGIN_BARON, TROLLWIFE, DROW_ELITE_WARRIOR, MEZZOLOTH, ROPER, SLAAD_RED, BANDERHOBB,
+  TROLL, WRAITH, SALAMANDER, GIANT, AIR_ELEMENTAL, EARTH_ELEMENTAL, FIRE_ELEMENTAL, WATER_ELEMENTAL, SHAMBLING_MOUND, UNICORN, HILL_GIANT, BULETTE, GORGON, REVENANT, ALLIP, SPAWN_OF_KYUSS, CATOBLEPAS, GLADIATOR, GIANT_CROCODILE, TRICERATOPS, NIGHT_HAG, FLESH_GOLEM, OTYUGH, ADULT_OBLEX, UMBER_HULK, STAR_SPAWN_MANGLER, WEREBEAR, VAMPIRE_SPAWN, BONEYARD_HULK, SAHUAGIN_BARON, TROLLWIFE, DROW_ELITE_WARRIOR, MEZZOLOTH, ROPER, SLAAD_RED, BANDERHOBB, GIANT_SHARK,
   // CR 6
-  YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK, VROCK, MAGE, MAMMOTH, ANNIS_HAG, HOBGOBLIN_WARLORD, GALEB_DUHR, CYCLOPS,
+  YOUNG_WHITE_DRAGON, MEDUSA, CHIMERA, DRIDER, INVISIBLE_STALKER, BODAK, VROCK, MAGE, MAMMOTH, ANNIS_HAG, HOBGOBLIN_WARLORD, GALEB_DUHR, CYCLOPS, KUTO_TOA_ARCHPRIEST,
   // CR 7-10 (Jeunes dragons, monstres, fiélons, constructs, slaads)
   MIND_FLAYER, STONE_GIANT, YOUNG_BLACK_DRAGON, GRICK_ALPHA, GIANT_APE, BHEUR_HAG, KORRED, SHIELD_GUARDIAN, ONI, DROW_MAGE, DRAEGLOTH, SLAAD_BLUE,
   FROST_GIANT, YOUNG_GREEN_DRAGON, HYDRA, ASSASSIN, SWORD_WRAITH_COMMANDER, HEZROU, CHAIN_DEVIL, BLACKGUARD, TYRANNOSAURUS_REX, CLOAKER, DROW_PRIESTESS, FOMORIAN, ANKHEG_QUEEN, SLAAD_GREEN, GITHYANKI_KNIGHT,
