@@ -4,7 +4,6 @@ import { authStore } from '../store/authStore';
 import { authService } from '../services/authService';
 import { VERSION } from '../version';
 import { GameHistoryModal } from './GameHistoryModal';
-import { AuthModal } from './AuthModal';
 import { SaveModal } from './SaveModal';
 import { AdminPanel } from './AdminPanel';
 import { DebugSupabase } from './DebugSupabase';
@@ -12,7 +11,6 @@ import './MenuPage.css';
 
 export function MenuPage() {
   const [showHistory, setShowHistory] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
   const [showSave, setShowSave] = useState<'save' | 'load' | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
@@ -57,9 +55,9 @@ export function MenuPage() {
   return (
     <div className="menu-page">
       <div className="menu-content">
-        {/* Barre utilisateur */}
-        <div className="user-bar">
-          {isAuthenticated && currentUser ? (
+        {/* Barre utilisateur - Affichée seulement si connecté */}
+        {isAuthenticated && currentUser && (
+          <div className="user-bar">
             <div className="user-info">
               <span className="user-name">
                 {currentUser.is_admin ? '👑 ' : '👤 '}
@@ -76,12 +74,8 @@ export function MenuPage() {
                 </button>
               </div>
             </div>
-          ) : (
-            <button className="login-btn" onClick={() => setShowAuth(true)}>
-              🔑 Connexion / Inscription
-            </button>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="title-section">
           <h1 className="game-title">Ethernalys</h1>
@@ -134,12 +128,6 @@ export function MenuPage() {
       </footer>
 
       {showHistory && <GameHistoryModal onClose={() => setShowHistory(false)} />}
-      {showAuth && (
-        <AuthModal 
-          onClose={() => setShowAuth(false)} 
-          onSuccess={() => setShowAuth(false)} 
-        />
-      )}
       {showSave && (
         <SaveModal 
           mode={showSave} 
