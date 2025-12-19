@@ -1,0 +1,155 @@
+/* ============================================
+   ANIMATIONS TOGGLE SYSTEM
+   Quand .no-animations est sur body, désactive toutes les animations
+   ============================================ */
+
+/* Désactiver toutes les animations quand mode sans animation actif */
+body.no-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+}
+
+body.no-animations *::before,
+body.no-animations *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Garder certaines transitions essentielles pour l'UX */
+body.no-animations button,
+body.no-animations .action-btn,
+body.no-animations .target-btn,
+body.no-animations .direction-btn {
+  transition-duration: 0.1s !important;
+}
+
+/* Désactiver les keyframe animations spécifiques */
+body.no-animations .enemy-portrait,
+body.no-animations .combat-page.screen-shake,
+body.no-animations .map-cell.current,
+body.no-animations .map-cell.adjacent,
+body.no-animations .game-title,
+body.no-animations .boss-label,
+body.no-animations .temp-hp-fill,
+body.no-animations .turn-indicator,
+body.no-animations .dice-3d,
+body.no-animations .combat-history-entry {
+  animation: none !important;
+}
+
+/* Désactiver les effets de glow pulsants */
+body.no-animations .boss-warning,
+body.no-animations .treasure-notification,
+body.no-animations .cooldown-indicator,
+body.no-animations .click-to-continue,
+body.no-animations .attack-roll-indicator.critical {
+  animation: none !important;
+}
+
+/* Les dés restent visibles mais sans animation */
+body.no-animations .die-3d.nat20 .die-value,
+body.no-animations .die-rolling {
+  animation: none !important;
+}
+
+/* ============================================
+   BOUTON TOGGLE ANIMATIONS
+   ============================================ */
+.animation-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.animation-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  background: linear-gradient(135deg, rgba(100, 100, 100, 0.2), rgba(60, 60, 60, 0.3));
+  border: 1px solid rgba(150, 150, 150, 0.3);
+  border-radius: 6px;
+  color: #b0b0b0;
+  font-size: 0.75rem;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.animation-toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(120, 120, 120, 0.3), rgba(80, 80, 80, 0.4));
+  border-color: rgba(180, 180, 180, 0.4);
+  color: #e0e0e0;
+}
+
+.animation-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.3));
+  border-color: rgba(46, 204, 113, 0.5);
+  color: #2ecc71;
+}
+
+.animation-toggle-btn.inactive {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(192, 57, 43, 0.2));
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+.toggle-icon {
+  font-size: 1rem;
+}
+
+.toggle-label {
+  display: none;
+}
+
+/* Afficher le label sur écrans plus grands */
+@media screen and (min-width: 600px) {
+  .toggle-label {
+    display: inline;
+  }
+}
+
+/* ============================================
+   INDICATEUR DE STATUT DES ANIMATIONS
+   ============================================ */
+.animations-status {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(20, 20, 30, 0.9);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.7rem;
+  color: #888;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.animations-status.visible {
+  opacity: 1;
+  animation: statusFade 2s ease forwards;
+}
+
+@keyframes statusFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animations-status.enabled {
+  border-color: rgba(46, 204, 113, 0.5);
+  color: #2ecc71;
+}
+
+.animations-status.disabled {
+  border-color: rgba(231, 76, 60, 0.5);
+  color: #e74c3c;
+}
+

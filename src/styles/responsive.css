@@ -1,0 +1,787 @@
+/* ============================================
+   RESPONSIVE DESIGN - Mobile, Tablet, Desktop
+   ============================================ */
+
+/* Variables pour les breakpoints */
+:root {
+  --mobile-max: 480px;
+  --tablet-max: 768px;
+  --laptop-max: 1024px;
+  --desktop-min: 1025px;
+}
+
+/* ============================================
+   BASE - Styles tactiles globaux
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Écrans tactiles */
+  button, .clickable, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Désactiver les hovers sur mobile */
+  .action-btn:hover,
+  .direction-btn:hover,
+  .target-btn:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   MOBILE - Smartphones (max 480px)
+   ============================================ */
+@media screen and (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+  
+  /* Menu Page */
+  .menu-page {
+    padding: 1rem;
+  }
+  
+  .game-title {
+    font-size: 2.2rem !important;
+    letter-spacing: 0.05em;
+  }
+  
+  .game-subtitle {
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .game-description {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  .start-button {
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .history-button {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.5rem;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .menu-footer {
+    font-size: 0.75rem;
+  }
+  
+  /* Character Select Page */
+  .character-select-page {
+    padding: 0.5rem;
+  }
+  
+  .character-select-page h1 {
+    font-size: 1.5rem;
+  }
+  
+  .character-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem;
+  }
+  
+  .character-card {
+    padding: 1rem;
+  }
+  
+  .character-card .portrait {
+    font-size: 2.5rem;
+  }
+  
+  .selected-team-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 12px 12px 0 0;
+    max-height: 40vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  
+  /* Dungeon Page */
+  .dungeon-page {
+    padding: 0.5rem;
+  }
+  
+  .dungeon-layout {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem;
+  }
+  
+  .team-panel {
+    order: 2;
+    padding: 0.5rem;
+  }
+  
+  .panel-action-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .panel-btn {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  .team-panel h3 {
+    font-size: 0.9rem;
+  }
+  
+  .team-member {
+    padding: 0.5rem;
+  }
+  
+  .member-portrait {
+    font-size: 1.5rem;
+  }
+  
+  .member-name {
+    font-size: 0.8rem;
+  }
+  
+  .member-abilities {
+    flex-wrap: wrap;
+  }
+  
+  .ability-tag {
+    font-size: 0.5rem;
+    padding: 0.05rem 0.15rem;
+  }
+  
+  .dungeon-map-container {
+    order: 1;
+  }
+  
+  .dungeon-map {
+    min-height: 300px;
+    padding: 0.5rem;
+  }
+  
+  .map-cell {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+  
+  .map-cell.current {
+    font-size: 1.2rem;
+  }
+  
+  .history-panel {
+    order: 3;
+    max-height: 150px;
+  }
+  
+  .history-entry {
+    min-width: 120px;
+    padding: 0.5rem;
+  }
+  
+  .dungeon-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .encounter-counter {
+    font-size: 0.9rem;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  /* Combat Page */
+  .combat-page {
+    padding: 0.5rem;
+  }
+  
+  .combat-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .combat-main-layout {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem;
+  }
+  
+  .combat-arena {
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .enemy-section {
+    min-width: auto;
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .enemy-portrait {
+    font-size: 3rem;
+  }
+  
+  .enemy-name {
+    font-size: 1.1rem;
+  }
+  
+  .enemy-hp-bar {
+    width: 100%;
+    max-width: 180px;
+  }
+  
+  .versus {
+    font-size: 1.5rem;
+    transform: rotate(90deg);
+  }
+  
+  .team-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .team-fighter {
+    min-width: 140px;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .fighter-portrait {
+    font-size: 1.5rem;
+  }
+  
+  .fighter-name {
+    font-size: 0.8rem;
+  }
+  
+  .fighter-class {
+    font-size: 0.65rem;
+  }
+  
+  /* Actions de combat */
+  .combat-actions {
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+  }
+  
+  .action-panel-buttons {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  
+  .action-panel-btn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .action-buttons {
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    font-size: 0.85rem;
+    padding: 0.8rem 1rem;
+    min-width: 110px;
+  }
+  
+  .damage-preview {
+    font-size: 0.65rem;
+  }
+  
+  /* Combat History */
+  .combat-history-panel {
+    padding: 0.5rem;
+  }
+  
+  .combat-history-panel.compact {
+    max-height: 150px;
+  }
+  
+  .combat-history-panel.expanded {
+    max-height: 60vh;
+    min-height: 300px;
+  }
+  
+  .combat-history-entry {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .history-portrait {
+    font-size: 1.5rem;
+  }
+  
+  .history-action {
+    font-size: 0.95rem;
+  }
+  
+  .history-target {
+    font-size: 0.85rem;
+  }
+  
+  .history-damage,
+  .history-heal {
+    font-size: 0.95rem;
+  }
+  
+  /* Turn Order */
+  .turn-order {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 12px 12px 0 0;
+    padding: 0.5rem;
+    z-index: 50;
+  }
+  
+  .turn-list {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .turn-item {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  
+  /* Modals */
+  .target-selection-modal,
+  .action-confirmation-modal,
+  .drops-modal {
+    width: 95%;
+    max-width: none;
+    padding: 1rem;
+    max-height: 85vh;
+  }
+  
+  .target-selection-modal h3,
+  .confirmation-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .target-btn {
+    padding: 0.8rem;
+  }
+  
+  .target-portrait {
+    font-size: 2rem;
+  }
+  
+  .confirmation-content p {
+    font-size: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .confirmation-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .confirmation-btn {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* Attack Roll Indicator */
+  .attack-roll-indicator {
+    width: 90%;
+    max-width: 320px;
+    padding: 1rem;
+  }
+  
+  .roll-header {
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .die-3d {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .die-3d .die-value {
+    font-size: 1.5rem;
+  }
+  
+  .roll-total {
+    font-size: 1.4rem;
+  }
+  
+  /* Inventory Modal */
+  .inventory-modal-overlay .inventory-modal {
+    width: 95%;
+    height: 90vh;
+    padding: 0.8rem;
+  }
+  
+  .inventory-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .equipment-slot {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+  
+  .inventory-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+  }
+  
+  .inventory-slot {
+    width: 45px;
+    height: 45px;
+  }
+  
+  /* Bestiary */
+  .bestiary-overlay .bestiary-modal {
+    width: 95%;
+    height: 90vh;
+    padding: 0.5rem;
+  }
+  
+  .bestiary-filters {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  
+  .type-filter-btn {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .monster-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+  }
+  
+  .monster-card {
+    padding: 0.5rem;
+  }
+  
+  .monster-card .portrait {
+    font-size: 1.8rem;
+  }
+  
+  /* Character Sheet */
+  .character-sheet-modal {
+    width: 95%;
+    max-height: 85vh;
+    padding: 0.8rem;
+  }
+  
+  .sheet-abilities {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.3rem;
+  }
+  
+  .ability-box {
+    padding: 0.4rem;
+  }
+  
+  /* Dice Roller */
+  .dice-roller-overlay .dice-container {
+    width: 90%;
+    padding: 1rem;
+  }
+  
+  .dice-3d {
+    width: 70px;
+    height: 70px;
+  }
+  
+  /* Enemies Grid */
+  .enemies-grid {
+    gap: 0.5rem;
+  }
+  
+  .enemy-card {
+    min-width: 140px;
+    max-width: 160px;
+    padding: 0.6rem;
+  }
+  
+  .enemy-card .enemy-portrait {
+    font-size: 2.5rem;
+  }
+  
+  .enemy-card .enemy-name {
+    font-size: 0.9rem;
+  }
+  
+  .enemy-card .enemy-hp-bar {
+    width: 100%;
+    height: 16px;
+  }
+}
+
+/* ============================================
+   TABLET - Tablettes (481px - 768px)
+   ============================================ */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+  
+  /* Menu Page */
+  .game-title {
+    font-size: 3rem !important;
+  }
+  
+  .start-button {
+    font-size: 1.3rem;
+    padding: 1.1rem 3rem;
+  }
+  
+  /* Character Select */
+  .character-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Dungeon */
+  .dungeon-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .team-panel {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .team-panel h3 {
+    grid-column: 1 / -1;
+  }
+  
+  .map-cell {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+  
+  /* Combat */
+  .combat-main-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .combat-arena {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .enemy-section {
+    min-width: 200px;
+  }
+  
+  .team-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .team-fighter {
+    min-width: 180px;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    min-width: 130px;
+  }
+  
+  /* Turn Order */
+  .turn-order {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  /* Modals */
+  .target-selection-modal,
+  .action-confirmation-modal {
+    width: 90%;
+    max-width: 450px;
+  }
+  
+  .inventory-modal-overlay .inventory-modal {
+    width: 90%;
+    height: 85vh;
+  }
+  
+  .bestiary-overlay .bestiary-modal {
+    width: 90%;
+    height: 85vh;
+  }
+  
+  /* Enemies Grid */
+  .enemies-grid {
+    justify-content: center;
+  }
+  
+  .enemy-card {
+    min-width: 160px;
+  }
+}
+
+/* ============================================
+   LAPTOP - Petits écrans (769px - 1024px)
+   ============================================ */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  /* Dungeon */
+  .dungeon-layout {
+    grid-template-columns: 180px 1fr 200px;
+  }
+  
+  .map-cell {
+    width: 48px;
+    height: 48px;
+  }
+  
+  /* Combat */
+  .combat-main-layout {
+    grid-template-columns: 200px 1fr;
+  }
+  
+  .team-fighter {
+    min-width: 180px;
+  }
+}
+
+/* ============================================
+   LANDSCAPE MODE - Mode paysage mobile
+   ============================================ */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .menu-page {
+    padding: 0.5rem;
+    justify-content: flex-start;
+    padding-top: 1rem;
+  }
+  
+  .game-title {
+    font-size: 2rem !important;
+  }
+  
+  .game-description {
+    display: none;
+  }
+  
+  .menu-decoration {
+    margin: 0.5rem 0;
+  }
+  
+  .start-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+  
+  .menu-footer {
+    position: relative;
+    margin-top: 0.5rem;
+  }
+  
+  /* Combat en paysage */
+  .combat-page {
+    padding: 0.3rem;
+  }
+  
+  .combat-header {
+    margin-bottom: 0.3rem;
+  }
+  
+  .combat-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .combat-arena {
+    padding: 0.5rem;
+  }
+  
+  .enemy-portrait {
+    font-size: 2.5rem;
+  }
+  
+  .combat-actions {
+    padding: 0.5rem;
+  }
+  
+  .combat-history-panel.compact {
+    max-height: 100px;
+  }
+  
+  .turn-order {
+    padding: 0.3rem;
+  }
+  
+  .turn-item {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .menu-page,
+  .combat-page,
+  .dungeon-page {
+    background: white !important;
+  }
+  
+  button,
+  .action-btn,
+  .direction-btn {
+    display: none;
+  }
+}
+
+/* ============================================
+   HIGH DPI SCREENS
+   ============================================ */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .game-title,
+  .enemy-name,
+  .fighter-name {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION (Accessibilité)
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .enemy-portrait,
+  .map-cell.current,
+  .map-cell.adjacent {
+    animation: none !important;
+  }
+}
+
