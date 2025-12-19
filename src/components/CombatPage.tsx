@@ -71,6 +71,8 @@ export function CombatPage() {
     hasDisadvantage?: boolean;
     attacker: string;
     target: string;
+    waitForClick?: boolean; // Attendre un clic pour fermer
+    onDismiss?: () => void; // Callback quand fermé
   } | null>(null);
   
   // Action en attente de confirmation (pour la fenêtre modale)
@@ -123,9 +125,9 @@ export function CombatPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showCharacterSheet, contextMenu, lastAttackResult]);
   
-  // Auto-fermer l'indicateur de jet d'attaque après 2 secondes
+  // Auto-fermer l'indicateur de jet d'attaque après 2 secondes (seulement si pas waitForClick)
   useEffect(() => {
-    if (lastAttackResult) {
+    if (lastAttackResult && !lastAttackResult.waitForClick) {
       const timer = setTimeout(() => setLastAttackResult(null), 2000);
       return () => clearTimeout(timer);
     }
@@ -874,17 +876,21 @@ export function CombatPage() {
               });
             });
             
-            // Afficher le résultat du jet pour le monstre (après le clic)
-            setLastAttackResult({
-              roll: monsterAttackResult.attackRoll.rolls[0],
-              modifier: monsterAttackResult.totalAttackBonus,
-              total: monsterAttackResult.attackRoll.total,
-              targetAC: monsterAttackResult.targetAC,
-              hit: monsterAttackResult.hit,
-              isCritical: monsterAttackResult.isCriticalHit,
-              isCriticalMiss: monsterAttackResult.isCriticalMiss,
-              attacker: currentMonster.name,
-              target: target.name
+            // Afficher le résultat du jet pour le monstre et attendre le clic
+            await new Promise<void>(resolve => {
+              setLastAttackResult({
+                roll: monsterAttackResult.attackRoll.rolls[0],
+                modifier: monsterAttackResult.totalAttackBonus,
+                total: monsterAttackResult.attackRoll.total,
+                targetAC: monsterAttackResult.targetAC,
+                hit: monsterAttackResult.hit,
+                isCritical: monsterAttackResult.isCriticalHit,
+                isCriticalMiss: monsterAttackResult.isCriticalMiss,
+                attacker: currentMonster.name,
+                target: target.name,
+                waitForClick: true,
+                onDismiss: resolve
+              });
             });
             
             if (monsterAttackResult.isCriticalMiss) {
@@ -993,16 +999,21 @@ export function CombatPage() {
               });
             });
             
-            setLastAttackResult({
-              roll: fallbackAttackResult.attackRoll.rolls[0],
-              modifier: fallbackAttackResult.totalAttackBonus,
-              total: fallbackAttackResult.attackRoll.total,
-              targetAC: fallbackAttackResult.targetAC,
-              hit: fallbackAttackResult.hit,
-              isCritical: fallbackAttackResult.isCriticalHit,
-              isCriticalMiss: fallbackAttackResult.isCriticalMiss,
-              attacker: currentMonster.name,
-              target: target.name
+            // Afficher le résultat et attendre le clic
+            await new Promise<void>(resolve => {
+              setLastAttackResult({
+                roll: fallbackAttackResult.attackRoll.rolls[0],
+                modifier: fallbackAttackResult.totalAttackBonus,
+                total: fallbackAttackResult.attackRoll.total,
+                targetAC: fallbackAttackResult.targetAC,
+                hit: fallbackAttackResult.hit,
+                isCritical: fallbackAttackResult.isCriticalHit,
+                isCriticalMiss: fallbackAttackResult.isCriticalMiss,
+                attacker: currentMonster.name,
+                target: target.name,
+                waitForClick: true,
+                onDismiss: resolve
+              });
             });
             
             if (!fallbackAttackResult.hit) {
@@ -1097,17 +1108,21 @@ export function CombatPage() {
               });
             });
             
-            // Afficher le résultat du jet
-            setLastAttackResult({
-              roll: skillAttackResult.attackRoll.rolls[0],
-              modifier: skillAttackResult.totalAttackBonus,
-              total: skillAttackResult.attackRoll.total,
-              targetAC: skillAttackResult.targetAC,
-              hit: skillAttackResult.hit,
-              isCritical: skillAttackResult.isCriticalHit,
-              isCriticalMiss: skillAttackResult.isCriticalMiss,
-              attacker: monster.name,
-              target: target.name
+            // Afficher le résultat du jet et attendre le clic
+            await new Promise<void>(resolve => {
+              setLastAttackResult({
+                roll: skillAttackResult.attackRoll.rolls[0],
+                modifier: skillAttackResult.totalAttackBonus,
+                total: skillAttackResult.attackRoll.total,
+                targetAC: skillAttackResult.targetAC,
+                hit: skillAttackResult.hit,
+                isCritical: skillAttackResult.isCriticalHit,
+                isCriticalMiss: skillAttackResult.isCriticalMiss,
+                attacker: monster.name,
+                target: target.name,
+                waitForClick: true,
+                onDismiss: resolve
+              });
             });
             
             if (skillAttackResult.isCriticalMiss) {
@@ -1559,19 +1574,24 @@ export function CombatPage() {
       });
     });
     
-    setLastAttackResult({
-      roll: rolls[0],
-      roll2: rolls.length > 1 ? rolls[1] : undefined,
-      modifier: attackResult.totalAttackBonus,
-      total: attackResult.attackRoll.total,
-      targetAC: attackResult.targetAC,
-      hit: attackResult.hit,
-      isCritical: attackResult.isCriticalHit,
-      isCriticalMiss: attackResult.isCriticalMiss,
-      hasAdvantage,
-      hasDisadvantage,
-      attacker: attacker.name,
-      target: target.name
+    // Afficher le résultat et attendre le clic du joueur pour continuer
+    await new Promise<void>(resolve => {
+      setLastAttackResult({
+        roll: rolls[0],
+        roll2: rolls.length > 1 ? rolls[1] : undefined,
+        modifier: attackResult.totalAttackBonus,
+        total: attackResult.attackRoll.total,
+        targetAC: attackResult.targetAC,
+        hit: attackResult.hit,
+        isCritical: attackResult.isCriticalHit,
+        isCriticalMiss: attackResult.isCriticalMiss,
+        hasAdvantage,
+        hasDisadvantage,
+        attacker: attacker.name,
+        target: target.name,
+        waitForClick: true,
+        onDismiss: resolve
+      });
     });
     
     // Log du jet de touche avec les 2 dés affichés
@@ -2028,19 +2048,24 @@ export function CombatPage() {
             });
           });
           
-          setLastAttackResult({
-            roll: skillRolls[0],
-            roll2: skillRolls.length > 1 ? skillRolls[1] : undefined,
-            modifier: skillAttackResult.totalAttackBonus,
-            total: skillAttackResult.attackRoll.total,
-            targetAC: skillAttackResult.targetAC,
-            hit: skillAttackResult.hit,
-            isCritical: skillAttackResult.isCriticalHit,
-            isCriticalMiss: skillAttackResult.isCriticalMiss,
-            hasAdvantage,
-            hasDisadvantage,
-            attacker: attacker.name,
-            target: target.name
+          // Afficher le résultat et attendre le clic du joueur
+          await new Promise<void>(resolve => {
+            setLastAttackResult({
+              roll: skillRolls[0],
+              roll2: skillRolls.length > 1 ? skillRolls[1] : undefined,
+              modifier: skillAttackResult.totalAttackBonus,
+              total: skillAttackResult.attackRoll.total,
+              targetAC: skillAttackResult.targetAC,
+              hit: skillAttackResult.hit,
+              isCritical: skillAttackResult.isCriticalHit,
+              isCriticalMiss: skillAttackResult.isCriticalMiss,
+              hasAdvantage,
+              hasDisadvantage,
+              attacker: attacker.name,
+              target: target.name,
+              waitForClick: true,
+              onDismiss: resolve
+            });
           });
           
           // Log du jet de touche avec indication d'avantage si applicable
@@ -3021,8 +3046,13 @@ export function CombatPage() {
       {/* Indicateur de jet d'attaque D&D amélioré */}
       {lastAttackResult && (
         <div 
-          className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''} ${lastAttackResult.isCriticalMiss ? 'critical-miss' : ''}`}
-          onClick={() => setLastAttackResult(null)}
+          className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''} ${lastAttackResult.isCriticalMiss ? 'critical-miss' : ''} ${lastAttackResult.waitForClick ? 'clickable' : ''}`}
+          onClick={() => {
+            if (lastAttackResult.onDismiss) {
+              lastAttackResult.onDismiss();
+            }
+            setLastAttackResult(null);
+          }}
         >
           <div className="roll-header">
             <span className="roll-attacker">{lastAttackResult.attacker}</span>
@@ -3079,6 +3109,11 @@ export function CombatPage() {
              lastAttackResult.isCriticalMiss ? '💨 ÉCHEC CRITIQUE !' :
              lastAttackResult.hit ? '✓ TOUCHÉ !' : '✗ RATÉ !'}
           </div>
+          {lastAttackResult.waitForClick && (
+            <div className="click-to-continue">
+              👆 Cliquez pour continuer
+            </div>
+          )}
         </div>
       )}
     </div>
