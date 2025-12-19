@@ -10,6 +10,7 @@ export interface DiceRoll {
   modifier: number;
   damageType?: string;
   label?: string;
+  preRolledValues?: number[]; // Valeurs pré-calculées (pour éviter de relancer)
 }
 
 export interface DiceResult {
@@ -27,6 +28,7 @@ interface DiceRollerProps {
   onComplete: (result: DiceResult) => void;
   showAnimation?: boolean;
   damageType?: string;
+  waitForClick?: boolean; // Si true, attend un clic pour fermer
 }
 
 // Maximum pour chaque type de dé
@@ -180,34 +182,65 @@ function Animated3DDie({
 // ============================================
 // COMPOSANT PRINCIPAL DE LANCER DE DÉS
 // ============================================
-export function DiceRoller({ roll, onComplete, showAnimation = true, damageType }: DiceRollerProps) {
+export function DiceRoller({ roll, onComplete, showAnimation = true, damageType, waitForClick = false }: DiceRollerProps) {
   const [result, setResult] = useState<DiceResult | null>(null);
   const [phase, setPhase] = useState<'rolling' | 'result'>('rolling');
+  const [canClose, setCanClose] = useState(false);
   
   const handleComplete = useCallback((diceResult: DiceResult) => {
     onComplete(diceResult);
   }, [onComplete]);
   
+  const handleClick = useCallback(() => {
+    if (canClose && result) {
+      handleComplete(result);
+    }
+  }, [canClose, result, handleComplete]);
+  
   useEffect(() => {
-    // Effectuer le lancer immédiatement
-    const diceResult = rollDice(roll.dieType, roll.count, roll.modifier);
+    // Utiliser les valeurs pré-calculées si disponibles, sinon lancer
+    let diceResult: DiceResult;
+    if (roll.preRolledValues && roll.preRolledValues.length > 0) {
+      // Utiliser les valeurs déjà calculées
+      const total = roll.preRolledValues.reduce((a, b) => a + b, 0) + roll.modifier;
+      const isNatural20 = roll.dieType === 'd20' && roll.preRolledValues.some(v => v === 20);
+      const isNatural1 = roll.dieType === 'd20' && roll.preRolledValues.every(v => v === 1);
+      
+      diceResult = {
+        rolls: roll.preRolledValues,
+        total,
+        modifier: roll.modifier,
+        isCritical: isNatural20,
+        isNatural1,
+        isNatural20,
+        dieType: roll.dieType
+      };
+    } else {
+      // Lancer les dés normalement
+      diceResult = rollDice(roll.dieType, roll.count, roll.modifier);
+    }
+    
     setResult(diceResult);
     
     // Timer pour la phase de résultat
     const resultTimer = setTimeout(() => {
       setPhase('result');
-    }, 900 + (roll.count * 150));
+      setCanClose(true);
+    }, 800 + (roll.count * 100));
     
-    // Timer pour callback final
-    const completeTimer = setTimeout(() => {
-      handleComplete(diceResult);
-    }, 1800 + (roll.count * 150));
+    // Timer pour fermeture automatique (sauf si waitForClick)
+    let completeTimer: NodeJS.Timeout | undefined;
+    if (!waitForClick) {
+      completeTimer = setTimeout(() => {
+        handleComplete(diceResult);
+      }, 1500 + (roll.count * 100));
+    }
     
     return () => {
       clearTimeout(resultTimer);
-      clearTimeout(completeTimer);
+      if (completeTimer) clearTimeout(completeTimer);
     };
-  }, [roll, handleComplete]);
+  }, [roll.dieType, roll.count, roll.modifier, roll.preRolledValues, waitForClick, handleComplete]);
   
   if (!showAnimation || !result) {
     return null;
@@ -216,7 +249,10 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
   const effectiveDamageType = damageType || roll.damageType;
   
   return (
-    <div className={`dice-roller-overlay ${phase}`}>
+    <div 
+      className={`dice-roller-overlay ${phase} ${waitForClick && canClose ? 'clickable' : ''}`}
+      onClick={waitForClick ? handleClick : undefined}
+    >
       <div className="dice-roller-container">
         {roll.label && (
           <div className="dice-roll-label">{roll.label}</div>
@@ -228,7 +264,7 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
               key={index}
               dieType={roll.dieType}
               finalValue={value}
-              delay={index * 150}
+              delay={index * 100}
               damageType={effectiveDamageType}
             />
           ))}
@@ -241,7 +277,7 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
               {result.rolls.length > 1 && (
                 <>
                   <span className="rolls-breakdown">
-                    ({result.rolls.join(' + ')})
+                    ({result.rolls.join(' / ')})
                   </span>
                 </>
               )}
@@ -259,6 +295,10 @@ export function DiceRoller({ roll, onComplete, showAnimation = true, damageType 
             )}
             {result.isNatural1 && !result.isCritical && (
               <div className="fail-banner">💨 ÉCHEC CRITIQUE !</div>
+            )}
+            
+            {waitForClick && canClose && (
+              <div className="click-to-continue">Cliquez pour continuer</div>
             )}
           </div>
         )}
