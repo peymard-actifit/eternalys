@@ -6,35 +6,12 @@ import { getRandomTreasure, Treasure, allTreasures } from '../data/treasures';
 // Calculer le modificateur D&D à partir d'une caractéristique
 const getModifier = (score: number): number => Math.floor((score - 10) / 2);
 
-// Appliquer les bonus des caractéristiques D&D aux stats de combat
-const applyAbilityBonuses = (char: Character): Character => {
-  if (!char.abilities) return char;
-  
-  const strMod = getModifier(char.abilities.strength);
-  const intMod = getModifier(char.abilities.intelligence);
-  const conMod = getModifier(char.abilities.constitution);
-  const wisMod = getModifier(char.abilities.wisdom);
-  
-  return {
-    ...char,
-    // Force augmente l'attaque physique
-    attack: char.attack + strMod * 2,
-    // Intelligence augmente l'attaque magique
-    magicAttack: (char.magicAttack || 0) + intMod * 2,
-    // Constitution augmente les PV et la défense
-    maxHp: char.maxHp + conMod * 5,
-    hp: char.hp + conMod * 5,
-    defense: char.defense + Math.floor(conMod * 1.5),
-    // Sagesse augmente la défense magique
-    magicDefense: char.magicDefense + wisMod * 2,
-    // Sauvegarder les stats de base
-    baseAttack: char.attack + strMod * 2,
-    baseMagicAttack: (char.magicAttack || 0) + intMod * 2,
-    baseDefense: char.defense + Math.floor(conMod * 1.5),
-    baseMagicDefense: char.magicDefense + wisMod * 2,
-    baseSpeed: char.speed
-  };
-};
+// Import des fonctions D&D
+import { 
+  getAbilityModifier, 
+  getProficiencyBonus, 
+  calculateArmorClass 
+} from '../config/dndSystem';
 
 // Récupérer les monstres accompagnateurs d'un boss
 const getBossMinions = (boss: Monster): Monster[] => {
@@ -565,26 +542,21 @@ export const gameStore = {
   },
   
   initCombatMultiple: (enemies: Monster[]) => {
-    // Initialiser les baseStats des personnages et réinitialiser les cooldowns
-    const teamWithBaseStats = state.team.map(c => ({
+    // Préparer les personnages pour le combat (réinitialiser cooldowns, buffs)
+    const teamReady = state.team.map(c => ({
       ...c,
-      baseAttack: c.baseAttack ?? c.attack,
-      baseMagicAttack: c.baseMagicAttack ?? (c.magicAttack || 0),
-      baseDefense: c.baseDefense ?? c.defense,
-      baseMagicDefense: c.baseMagicDefense ?? c.magicDefense,
-      baseSpeed: c.baseSpeed ?? c.speed,
       buffs: c.buffs || [],
       // Réinitialiser les cooldowns au début du combat
       skills: c.skills.map(skill => ({ ...skill, currentCooldown: 0 }))
     }));
     
-    // Mettre à jour l'équipe avec les baseStats
-    gameStore.setState({ team: teamWithBaseStats });
+    // Mettre à jour l'équipe
+    gameStore.setState({ team: teamReady });
     
-    const aliveTeam = teamWithBaseStats.filter(c => c.hp > 0);
+    const aliveTeam = teamReady.filter(c => c.hp > 0);
     
-    // Ajouter les stats de base aux monstres pour le tracking des modificateurs
-    const monstersWithBaseStats = enemies.map(e => {
+    // Préparer les monstres pour le combat
+    const monstersReady = enemies.map(e => {
       // Réinitialiser les actions légendaires pour les créatures légendaires
       if (e.legendaryActionsPerTurn) {
         resetLegendaryActions(e);
@@ -592,24 +564,24 @@ export const gameStore = {
       
       return {
         ...e,
-        baseAttack: e.baseAttack ?? e.attack,
-        baseMagicAttack: e.baseMagicAttack ?? (e.magicAttack || 0),
-        baseDefense: e.baseDefense ?? e.defense,
-        baseMagicDefense: e.baseMagicDefense ?? e.magicDefense,
-        baseSpeed: e.baseSpeed ?? e.speed,
         buffs: e.buffs || [],
         ultimateUsed: e.ultimateUsed ?? false,
         legendaryActionsRemaining: e.legendaryActionsPerTurn || 0
       };
     });
     
-    const allCombatants = [...aliveTeam, ...monstersWithBaseStats];
-    const turnOrder = allCombatants.sort((a, b) => b.speed - a.speed);
+    // Trier par initiative (DEX modifier)
+    const allCombatants = [...aliveTeam, ...monstersReady];
+    const turnOrder = allCombatants.sort((a, b) => {
+      const aInit = getModifier(a.abilities?.dexterity || 10);
+      const bInit = getModifier(b.abilities?.dexterity || 10);
+      return bInit - aInit;
+    });
     
-    const enemyNames = monstersWithBaseStats.map(e => e.name).join(', ');
-    const combatTitle = monstersWithBaseStats.length > 1 
-      ? `Combat contre ${monstersWithBaseStats.length} ennemis : ${enemyNames} !`
-      : `Combat contre ${monstersWithBaseStats[0].name} !`;
+    const enemyNames = monstersReady.map(e => e.name).join(', ');
+    const combatTitle = monstersReady.length > 1 
+      ? `Combat contre ${monstersReady.length} ennemis : ${enemyNames} !`
+      : `Combat contre ${monstersReady[0].name} !`;
     
     gameStore.setState({
       turnOrder,
@@ -617,51 +589,59 @@ export const gameStore = {
       combatLog: [combatTitle],
       combatHistory: [],
       combatTurn: 1,
-      currentEnemies: monstersWithBaseStats,
-      currentEnemy: monstersWithBaseStats[0],
+      currentEnemies: monstersReady,
+      currentEnemy: monstersReady[0],
       selectedEnemyIndex: 0
     });
   },
   
-  // Recalculer les stats d'un personnage à partir des valeurs de base + buffs actifs
+  // Recalculer les stats d'un personnage en utilisant le système D&D
   recalculateStats: (character: Character): Character => {
-    // Récupérer les stats de base (ou utiliser les stats actuelles si baseStats non définis)
-    const baseAttack = character.baseAttack ?? character.attack;
-    const baseMagicAttack = character.baseMagicAttack ?? (character.magicAttack || 0);
-    const baseDefense = character.baseDefense ?? character.defense;
-    const baseMagicDefense = character.baseMagicDefense ?? character.magicDefense;
-    const baseSpeed = character.baseSpeed ?? character.speed;
+    const abilities = character.abilities;
+    if (!abilities) return character;
     
-    // Calculer les bonus de tous les buffs actifs
-    let attackBonus = 0;
-    let magicAttackBonus = 0;
-    let defenseBonus = 0;
-    let magicDefenseBonus = 0;
-    let speedBonus = 0;
+    // Bonus de maîtrise basé sur le niveau
+    const proficiencyBonus = getProficiencyBonus(character.level || 1);
     
+    // Calcul de la CA (10 + DEX + armure)
+    let baseAC = 10;
+    let acBonus = 0;
+    
+    // Appliquer les buffs à la CA
     if (character.buffs) {
       character.buffs.forEach(buff => {
-        if (buff.type === 'attack') attackBonus += buff.value;
-        else if (buff.type === 'magicAttack') magicAttackBonus += buff.value;
-        else if (buff.type === 'defense') defenseBonus += buff.value;
-        else if (buff.type === 'magicDefense') magicDefenseBonus += buff.value;
-        else if (buff.type === 'speed') speedBonus += buff.value;
+        if (buff.type === 'ac') acBonus += buff.value;
+      });
+    }
+    
+    const armorClass = baseAC + getAbilityModifier(abilities.dexterity) + acBonus;
+    
+    // Calcul de la vitesse
+    let speedBonus = 0;
+    if (character.buffs) {
+      character.buffs.forEach(buff => {
+        if (buff.type === 'speed') speedBonus += buff.value;
+      });
+    }
+    const speed = Math.max(1, (character.speed || 30) + speedBonus);
+    
+    // Appliquer les buffs aux caractéristiques
+    let updatedAbilities = { ...abilities };
+    if (character.buffs) {
+      character.buffs.forEach(buff => {
+        if (buff.type === 'ability' && buff.abilityAffected) {
+          updatedAbilities[buff.abilityAffected] = (updatedAbilities[buff.abilityAffected] || 10) + buff.value;
+        }
       });
     }
     
     return {
       ...character,
-      attack: Math.max(1, baseAttack + attackBonus),
-      magicAttack: Math.max(0, baseMagicAttack + magicAttackBonus),
-      defense: Math.max(0, baseDefense + defenseBonus),
-      magicDefense: Math.max(0, baseMagicDefense + magicDefenseBonus),
-      speed: Math.max(1, baseSpeed + speedBonus),
-      // S'assurer que les baseStats sont définies
-      baseAttack,
-      baseMagicAttack,
-      baseDefense,
-      baseMagicDefense,
-      baseSpeed
+      abilities: updatedAbilities,
+      armorClass,
+      speed,
+      proficiencyBonus,
+      initiative: getAbilityModifier(updatedAbilities.dexterity)
     };
   },
   

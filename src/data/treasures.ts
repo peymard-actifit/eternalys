@@ -1351,77 +1351,94 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         character.maxHp += effect.value || 0;
         character.hp += effect.value || 0;
         effects.push(`+${effect.value} PV max`);
-      } else if (effect.stat === 'attack') {
-        character.attack += effect.value || 0;
-        if (character.baseAttack !== undefined) {
-          character.baseAttack += effect.value || 0;
+      } else if (effect.stat === 'attack' || effect.stat === 'strength') {
+        // Convertir en bonus de Force (système D&D)
+        if (character.abilities) {
+          character.abilities.strength = (character.abilities.strength || 10) + (effect.value || 0);
         }
-        effects.push(`+${effect.value} ⚔️ Attaque`);
-      } else if (effect.stat === 'magicAttack') {
-        character.magicAttack = (character.magicAttack || 0) + (effect.value || 0);
-        if (character.baseMagicAttack !== undefined) {
-          character.baseMagicAttack += effect.value || 0;
+        effects.push(`+${effect.value} 💪 Force`);
+      } else if (effect.stat === 'magicAttack' || effect.stat === 'intelligence') {
+        // Convertir en bonus d'Intelligence (système D&D)
+        if (character.abilities) {
+          character.abilities.intelligence = (character.abilities.intelligence || 10) + (effect.value || 0);
         }
-        effects.push(`+${effect.value} ✨ Att. Magique`);
-      } else if (effect.stat === 'defense') {
-        character.defense += effect.value || 0;
-        if (character.baseDefense !== undefined) {
-          character.baseDefense += effect.value || 0;
+        effects.push(`+${effect.value} 📚 Intelligence`);
+      } else if (effect.stat === 'defense' || effect.stat === 'armorClass') {
+        // Convertir en bonus de CA (système D&D)
+        character.armorClass = (character.armorClass || 10) + (effect.value || 0);
+        effects.push(`+${effect.value} 🛡️ CA`);
+      } else if (effect.stat === 'magicDefense' || effect.stat === 'wisdom') {
+        // Convertir en bonus de Sagesse (système D&D)
+        if (character.abilities) {
+          character.abilities.wisdom = (character.abilities.wisdom || 10) + (effect.value || 0);
         }
-        effects.push(`+${effect.value} 🛡️ Défense`);
-      } else if (effect.stat === 'magicDefense') {
-        character.magicDefense = (character.magicDefense || 0) + (effect.value || 0);
-        if (character.baseMagicDefense !== undefined) {
-          character.baseMagicDefense += effect.value || 0;
-        }
-        effects.push(`+${effect.value} 🔮 Rés. Magique`);
+        effects.push(`+${effect.value} 👁️ Sagesse`);
       } else if (effect.stat === 'speed') {
-        character.speed += effect.value || 0;
-        if (character.baseSpeed !== undefined) {
-          character.baseSpeed += effect.value || 0;
-        }
+        character.speed = (character.speed || 30) + (effect.value || 0);
         effects.push(`+${effect.value} 💨 Vitesse`);
+      } else if (effect.stat === 'dexterity') {
+        if (character.abilities) {
+          character.abilities.dexterity = (character.abilities.dexterity || 10) + (effect.value || 0);
+        }
+        effects.push(`+${effect.value} 🏃 Dextérité`);
+      } else if (effect.stat === 'constitution') {
+        if (character.abilities) {
+          character.abilities.constitution = (character.abilities.constitution || 10) + (effect.value || 0);
+        }
+        // Bonus aux PV
+        const hpBonus = (effect.value || 0) * (character.level || 1);
+        character.maxHp = (character.maxHp || 10) + hpBonus;
+        character.hp = (character.hp || 10) + hpBonus;
+        effects.push(`+${effect.value} ❤️ Constitution (+${hpBonus} PV)`);
+      } else if (effect.stat === 'charisma') {
+        if (character.abilities) {
+          character.abilities.charisma = (character.abilities.charisma || 10) + (effect.value || 0);
+        }
+        effects.push(`+${effect.value} 💬 Charisme`);
       }
       break;
       
     case 'buff':
-      // Buff multiple selon le trésor
+      // Buff multiple selon le trésor (converti en système D&D)
       if (treasure.id === 'coeur_dragon') {
         character.maxHp += 25;
         character.hp += 25;
-        character.attack += 4;
-        if (character.baseAttack !== undefined) character.baseAttack += 4;
-        effects.push('+25 PV max', '+4 ⚔️ Attaque');
+        if (character.abilities) {
+          character.abilities.strength = (character.abilities.strength || 10) + 2;
+        }
+        effects.push('+25 PV max', '+2 💪 Force');
       } else if (treasure.id === 'couronne_roi') {
         character.maxHp += 35;
         character.hp += 35;
-        character.attack += 8;
-        character.defense += 6;
-        if (character.baseAttack !== undefined) character.baseAttack += 8;
-        if (character.baseDefense !== undefined) character.baseDefense += 6;
-        effects.push('+35 PV max', '+8 ⚔️ Attaque', '+6 🛡️ Défense');
+        if (character.abilities) {
+          character.abilities.strength = (character.abilities.strength || 10) + 2;
+          character.abilities.charisma = (character.abilities.charisma || 10) + 2;
+        }
+        character.armorClass = (character.armorClass || 10) + 2;
+        effects.push('+35 PV max', '+2 💪 Force', '+2 💬 Charisme', '+2 🛡️ CA');
       } else if (treasure.id === 'armure_divine') {
         character.maxHp += 30;
         character.hp += 30;
-        character.defense += 10;
-        character.magicDefense = (character.magicDefense || 0) + 8;
-        if (character.baseDefense !== undefined) character.baseDefense += 10;
-        if (character.baseMagicDefense !== undefined) character.baseMagicDefense += 8;
-        effects.push('+30 PV max', '+10 🛡️ Défense', '+8 🔮 Rés. Magique');
+        character.armorClass = (character.armorClass || 10) + 4;
+        if (character.abilities) {
+          character.abilities.wisdom = (character.abilities.wisdom || 10) + 2;
+        }
+        effects.push('+30 PV max', '+4 🛡️ CA', '+2 👁️ Sagesse');
       } else if (treasure.id === 'orbe_cosmos') {
-        character.magicAttack = (character.magicAttack || 0) + 12;
-        character.magicDefense = (character.magicDefense || 0) + 10;
-        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 12;
-        if (character.baseMagicDefense !== undefined) character.baseMagicDefense += 10;
-        effects.push('+12 ✨ Att. Magique', '+10 🔮 Rés. Magique');
+        if (character.abilities) {
+          character.abilities.intelligence = (character.abilities.intelligence || 10) + 4;
+          character.abilities.wisdom = (character.abilities.wisdom || 10) + 3;
+        }
+        effects.push('+4 📚 Intelligence', '+3 👁️ Sagesse');
       } else if (treasure.id === 'anneau_trois_souhaits') {
         character.maxHp += 35;
         character.hp += 35;
-        character.attack += 8;
-        character.magicAttack = (character.magicAttack || 0) + 8;
-        if (character.baseAttack !== undefined) character.baseAttack += 8;
-        if (character.baseMagicAttack !== undefined) character.baseMagicAttack += 8;
-        effects.push('+35 PV max', '+8 ⚔️ Attaque', '+8 ✨ Att. Magique');
+        if (character.abilities) {
+          character.abilities.strength = (character.abilities.strength || 10) + 2;
+          character.abilities.intelligence = (character.abilities.intelligence || 10) + 2;
+          character.abilities.charisma = (character.abilities.charisma || 10) + 2;
+        }
+        effects.push('+35 PV max', '+2 💪 Force', '+2 📚 Intelligence', '+2 💬 Charisme');
       }
       break;
       
@@ -1457,13 +1474,11 @@ export function applyTreasureEffect(treasure: Treasure, character: Character): s
         
         switch (passiveType) {
           case 'initiative':
-            // Bonus d'initiative = bonus de vitesse proportionnel
-            const speedBonus = Math.floor(character.speed * passiveValue / 100);
-            character.speed += speedBonus;
-            if (character.baseSpeed !== undefined) {
-              character.baseSpeed += speedBonus;
+            // Bonus d'initiative = bonus de Dextérité (système D&D)
+            if (character.abilities) {
+              character.abilities.dexterity = (character.abilities.dexterity || 10) + 1;
             }
-            effects.push(`+${passiveValue}% 💨 Initiative`);
+            effects.push(`+1 🏃 Dextérité (Initiative)`);
             break;
           case 'regeneration':
             character.passiveEffects.regeneration = (character.passiveEffects.regeneration || 0) + passiveValue;

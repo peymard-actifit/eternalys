@@ -1,9 +1,6 @@
 /**
  * Combat Utilities - Fonctions d'accès au state
- * 
- * Ce fichier contient uniquement les fonctions d'accès au state global.
- * Pour les actions de combat (dégâts, lifesteal, buffs), utiliser combatActions.ts
- * Pour les mécaniques D&D (jets de dés, sauvegardes), utiliser dndMechanics.ts
+ * VERSION D&D PURE - Sans anciennes stats
  */
 
 import { gameStore } from '../store/gameStore';
@@ -15,7 +12,6 @@ import { Character, Monster, Skill, ActiveBuff } from '../types/game.types';
 
 /**
  * Récupère un personnage depuis le state global par son ID.
- * TOUJOURS utiliser cette fonction pour obtenir un personnage à jour.
  */
 export function getCharacterFromState(characterId: string): Character | undefined {
   return gameStore.getState().team.find(c => c.id === characterId);
@@ -30,7 +26,6 @@ export function getAliveCharacters(): Character[] {
 
 /**
  * Met à jour un personnage dans le state global.
- * Préserve automatiquement tous les autres personnages et leurs propriétés.
  */
 export function updateCharacterInState(
   characterId: string, 
@@ -48,7 +43,7 @@ export function updateCharacterInState(
 }
 
 /**
- * Met à jour les skills d'un personnage (préserve les autres propriétés).
+ * Met à jour les skills d'un personnage.
  */
 export function updateCharacterSkills(
   characterId: string,
@@ -121,7 +116,6 @@ export function applySkillCooldown(characterId: string, skillId: string, cooldow
 
 /**
  * Décrémente les cooldowns de toutes les compétences d'un personnage.
- * Retourne les noms des compétences qui sont redevenues disponibles.
  */
 export function decrementCharacterCooldowns(characterId: string): string[] {
   const readySkills: string[] = [];
@@ -153,7 +147,7 @@ export function isSkillOnCooldown(skill: Skill): boolean {
 }
 
 /**
- * Filtre les compétences disponibles (pas en cooldown).
+ * Filtre les compétences disponibles.
  */
 export function getAvailableSkills(character: Character): Skill[] {
   return (character.skills || []).filter(s => !isSkillOnCooldown(s));
@@ -180,19 +174,7 @@ export function addBuffToCharacter(characterId: string, buff: ActiveBuff): void 
     newBuffs = [...(character.buffs || []), buff];
   }
   
-  const updatedChar = updateCharacterInState(characterId, { buffs: newBuffs });
-  
-  // Recalculer les stats
-  if (updatedChar) {
-    const recalculated = gameStore.recalculateStats(updatedChar);
-    updateCharacterInState(characterId, {
-      attack: recalculated.attack,
-      magicAttack: recalculated.magicAttack,
-      defense: recalculated.defense,
-      magicDefense: recalculated.magicDefense,
-      speed: recalculated.speed
-    });
-  }
+  updateCharacterInState(characterId, { buffs: newBuffs });
 }
 
 // ============================================
@@ -212,4 +194,3 @@ export function hasPassiveEffect(character: Character, effect: keyof NonNullable
 export function getPassiveEffectValue(character: Character, effect: keyof NonNullable<Character['passiveEffects']>): number {
   return character.passiveEffects?.[effect] || 0;
 }
-

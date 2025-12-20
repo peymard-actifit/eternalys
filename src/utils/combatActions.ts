@@ -1,23 +1,18 @@
 /**
  * ============================================
- * ACTIONS DE COMBAT - Logique centralisée
+ * ACTIONS DE COMBAT - VERSION D&D PURE
  * ============================================
- * 
- * Ce fichier centralise toute la logique de combat pour :
- * - Calculs de dégâts
- * - Vol de vie et épines
- * - Tracking des stats
- * - Gestion des buffs et cooldowns
- * 
- * Pour l'accès au state, utiliser les fonctions de combatUtils.ts
- * Pour les mécaniques D&D (jets de dés), utiliser dndMechanics.ts
+ * Logique de combat basée à 100% sur D&D 5e
  */
 
 import { gameStore } from '../store/gameStore';
 import { Character, Monster, Skill, ActiveBuff, DamageType } from '../types/game.types';
 import { 
   makeAttackRoll, 
-  rollDamage
+  rollDamage,
+  getAbilityModifier,
+  getArmorClass,
+  DamageRollResult
 } from './dndMechanics';
 import {
   getCharacterFromState,
@@ -54,9 +49,6 @@ export interface AttackResult {
 // FONCTIONS DE TRACKING (Stats de combat)
 // ============================================
 
-/**
- * Enregistre les dégâts infligés par un personnage
- */
 export function trackDamageDealt(attackerId: string, damage: number): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -72,9 +64,6 @@ export function trackDamageDealt(attackerId: string, damage: number): void {
   gameStore.setState({ team: updatedTeam });
 }
 
-/**
- * Enregistre les dégâts subis par un personnage
- */
 export function trackDamageTaken(targetId: string, damage: number): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -90,9 +79,6 @@ export function trackDamageTaken(targetId: string, damage: number): void {
   gameStore.setState({ team: updatedTeam });
 }
 
-/**
- * Enregistre les soins effectués par un personnage
- */
 export function trackHealing(healerId: string, healing: number): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -108,9 +94,6 @@ export function trackHealing(healerId: string, healing: number): void {
   gameStore.setState({ team: updatedTeam });
 }
 
-/**
- * Enregistre un monstre tué par un personnage
- */
 export function trackMonsterKill(killerId: string, monsterName: string): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -127,11 +110,13 @@ export function trackMonsterKill(killerId: string, monsterName: string): void {
 }
 
 // ============================================
-// FONCTIONS DE CALCUL DE DÉGÂTS
+// CALCUL DE DÉGÂTS D&D
 // ============================================
 
 /**
- * Calcule les dégâts finaux après application des résistances
+ * Calcule les dégâts finaux D&D
+ * - Pas de bonus d'attaque/défense numériques
+ * - Utilise les résistances/immunités/vulnérabilités
  */
 export function calculateDamage(
   baseDamage: number,
@@ -140,37 +125,24 @@ export function calculateDamage(
   damageType: string = 'physical',
   isCritical: boolean = false
 ): number {
-  const isPhysical = ['physical', 'bludgeoning', 'piercing', 'slashing'].includes(damageType);
+  let damage = baseDamage;
   
-  // Bonus de stat offensive
-  const attackStat = isPhysical 
-    ? attacker.attack 
-    : ('magicAttack' in attacker ? attacker.magicAttack || 0 : 0);
-  const statBonus = Math.floor(attackStat * 0.3);
-  
-  // Défense
-  const defenseStat = isPhysical 
-    ? defender.defense 
-    : ('magicDefense' in defender ? defender.magicDefense : defender.defense);
-  
-  let damage = Math.max(1, baseDamage + statBonus - defenseStat);
-  
-  // Critique
+  // Double en cas de critique
   if (isCritical) {
     damage = Math.floor(damage * 2);
   }
   
-  // Résistances
+  // Résistances (demi-dégâts)
   if (defender.resistances?.includes(damageType as DamageType)) {
     damage = Math.floor(damage * 0.5);
   }
   
-  // Immunités
+  // Immunités (0 dégâts)
   if (defender.immunities?.includes(damageType as DamageType)) {
     damage = 0;
   }
   
-  // Vulnérabilités
+  // Vulnérabilités (double dégâts)
   if (defender.vulnerabilities?.includes(damageType as DamageType)) {
     damage = Math.floor(damage * 2);
   }
@@ -179,7 +151,7 @@ export function calculateDamage(
 }
 
 /**
- * Vérifie si un personnage réussit une esquive passive
+ * Vérifie une esquive passive
  */
 export function checkEvasion(target: Character): boolean {
   if (target.passiveEffects?.evasion) {
@@ -190,10 +162,10 @@ export function checkEvasion(target: Character): boolean {
 }
 
 /**
- * Vérifie un coup critique passif (hors jet d'attaque)
+ * Vérifie un coup critique passif
  */
 export function checkCritical(attacker: Character): { isCritical: boolean; multiplier: number } {
-  let critChance = 5; // 5% de base
+  let critChance = 5;
   
   if (attacker.passiveEffects?.critical) {
     critChance += attacker.passiveEffects.critical;
@@ -207,12 +179,9 @@ export function checkCritical(attacker: Character): { isCritical: boolean; multi
 }
 
 // ============================================
-// FONCTIONS DE VOL DE VIE ET ÉPINES
+// VOL DE VIE ET ÉPINES
 // ============================================
 
-/**
- * Calcule et applique le vol de vie
- */
 export function applyLifesteal(
   attackerId: string,
   damage: number,
@@ -233,9 +202,6 @@ export function applyLifesteal(
   return { stolen: 0, newHp: attacker.hp };
 }
 
-/**
- * Calcule le lifesteal total (skill + passif)
- */
 export function getTotalLifesteal(character: Character, skill?: Skill): number {
   let total = skill?.lifesteal || 0;
   
@@ -246,9 +212,6 @@ export function getTotalLifesteal(character: Character, skill?: Skill): number {
   return total;
 }
 
-/**
- * Applique le renvoi de dégâts (épines)
- */
 export function applyThorns(
   target: Character,
   damage: number,
@@ -257,7 +220,6 @@ export function applyThorns(
   const logs: string[] = [];
   let totalReflected = 0;
   
-  // 1. Renvoi via buff temporaire
   const reflectBuff = target.buffs?.find(b => b.type === 'damage_reflect');
   if (reflectBuff && damage > 0) {
     const reflected = Math.max(1, Math.floor(damage * reflectBuff.value / 100));
@@ -267,7 +229,6 @@ export function applyThorns(
     trackDamageDealt(target.id, reflected);
   }
   
-  // 2. Épines passives
   if (target.passiveEffects?.thorns && target.passiveEffects.thorns > 0 && damage > 0) {
     const thorns = Math.max(1, Math.floor(damage * target.passiveEffects.thorns / 100));
     enemy.hp = Math.max(0, enemy.hp - thorns);
@@ -280,14 +241,10 @@ export function applyThorns(
 }
 
 // ============================================
-// FONCTIONS DE CIBLAGE
+// CIBLAGE
 // ============================================
 
-/**
- * Choisit la cible du monstre (prend en compte la provocation)
- */
 export function getMonsterTarget(aliveTeam: Character[]): Character {
-  // Vérifier si un personnage a le buff Provocation
   const tauntingChars = aliveTeam.filter(c => 
     c.buffs?.some(b => b.type === 'damage_reflect' && b.isApplied)
   );
@@ -296,17 +253,13 @@ export function getMonsterTarget(aliveTeam: Character[]): Character {
     return tauntingChars[Math.floor(Math.random() * tauntingChars.length)];
   }
   
-  // Cible aléatoire
   return aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
 }
 
 // ============================================
-// FONCTIONS DE BUFFS / COOLDOWNS
+// BUFFS / COOLDOWNS
 // ============================================
 
-/**
- * Applique un cooldown à une compétence
- */
 export function applySkillCooldown(characterId: string, skillId: string, cooldownValue: number): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -323,9 +276,6 @@ export function applySkillCooldown(characterId: string, skillId: string, cooldow
   gameStore.setState({ team: updatedTeam });
 }
 
-/**
- * Décrémente les cooldowns d'un personnage
- */
 export function decrementCooldowns(characterId: string): string[] {
   const readySkills: string[] = [];
   const currentTeam = gameStore.getState().team;
@@ -351,9 +301,6 @@ export function decrementCooldowns(characterId: string): string[] {
   return readySkills;
 }
 
-/**
- * Décrémente les buffs d'un personnage et retire les expirés
- */
 export function decrementBuffs(characterId: string): { expired: string[]; logs: string[] } {
   const expired: string[] = [];
   const logs: string[] = [];
@@ -380,20 +327,9 @@ export function decrementBuffs(characterId: string): { expired: string[]; logs: 
   
   gameStore.setState({ team: updatedTeam });
   
-  // Recalculer les stats si des buffs ont expiré
-  if (expired.length > 0) {
-    const char = updatedTeam.find(c => c.id === characterId);
-    if (char) {
-      gameStore.recalculateStats(char);
-    }
-  }
-  
   return { expired, logs };
 }
 
-/**
- * Ajoute un buff à un personnage
- */
 export function addBuff(characterId: string, buff: ActiveBuff): void {
   const currentTeam = gameStore.getState().team;
   const updatedTeam = currentTeam.map(c => {
@@ -414,21 +350,12 @@ export function addBuff(characterId: string, buff: ActiveBuff): void {
   });
   
   gameStore.setState({ team: updatedTeam });
-  
-  // Recalculer les stats
-  const char = updatedTeam.find(c => c.id === characterId);
-  if (char) {
-    gameStore.recalculateStats(char);
-  }
 }
 
 // ============================================
-// FONCTIONS DE RÉGÉNÉRATION
+// RÉGÉNÉRATION
 // ============================================
 
-/**
- * Applique la régénération passive d'un personnage
- */
 export function applyRegeneration(characterId: string): { healed: number; log: string | null } {
   const char = getCharacterFromState(characterId);
   if (!char) return { healed: 0, log: null };
@@ -466,12 +393,9 @@ export function applyRegeneration(characterId: string): { healed: number; log: s
 }
 
 // ============================================
-// FONCTIONS D'ATTAQUE
+// ATTAQUE DE BASE D&D
 // ============================================
 
-/**
- * Effectue une attaque de base d'un joueur
- */
 export function performPlayerAttack(
   attacker: Character,
   target: Monster,
@@ -480,10 +404,9 @@ export function performPlayerAttack(
 ): AttackResult {
   const logs: string[] = [];
   
-  // Jet d'attaque
+  // Jet d'attaque D&D
   const attackResult = makeAttackRoll(attacker, target, false, hasAdvantage, hasDisadvantage);
   
-  // Log du jet
   const chosenRoll = attackResult.attackRoll.chosenRoll || attackResult.attackRoll.rolls[0];
   const advantageText = hasAdvantage 
     ? `🎲🎲 (Avantage: ${attackResult.attackRoll.rolls.join('/')} → ${chosenRoll})`
@@ -493,7 +416,6 @@ export function performPlayerAttack(
   
   logs.push(`${advantageText} Jet d'attaque: ${chosenRoll} + ${attackResult.totalAttackBonus} = ${attackResult.attackRoll.total} vs CA ${attackResult.targetAC}`);
   
-  // Raté
   if (!attackResult.hit) {
     logs.push(`❌ ${attacker.name} rate son attaque contre ${target.name} !`);
     return {
@@ -505,12 +427,11 @@ export function performPlayerAttack(
     };
   }
   
-  // Calcul des dégâts
-  const damageResult = rollDamage(attacker.attack, 'physical', attackResult.isCriticalHit, 0);
-  let damage = calculateDamage(damageResult.totalDamage, attacker, target, 'physical', false);
+  // Jet de dégâts D&D
+  const damageResult = rollDamage(attacker, null, attackResult.isCriticalHit, false);
+  const damage = calculateDamage(damageResult.totalDamage, attacker, target, 'physical', false);
   
   if (attackResult.isCriticalHit) {
-    damage = Math.floor(damage * 2);
     logs.push(`💥 COUP CRITIQUE ! ${attacker.name} frappe avec puissance !`);
   }
   
@@ -526,11 +447,9 @@ export function performPlayerAttack(
 }
 
 // ============================================
-// RE-EXPORTS pour compatibilité
+// RE-EXPORTS
 // ============================================
 
-// Re-export depuis combatUtils pour éviter de casser les imports existants
 export { isSkillOnCooldown } from './combatUtils';
 export { getAvailableSkillsFromUtils as getAvailableSkills };
 export { getCharacterFromState, updateCharacterInState } from './combatUtils';
-

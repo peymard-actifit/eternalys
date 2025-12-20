@@ -1,8 +1,10 @@
 // ============================================
 // MÉCANIQUES D&D 5e - Jets de dés et calculs
 // ============================================
+// VERSION REFONTE COMPLÈTE - Système D&D pur
+// ============================================
 
-import { Character, Monster, Skill, AbilityScores } from '../types/game.types';
+import { Character, Monster, Skill, MonsterSkill, AbilityScores } from '../types/game.types';
 
 // Types de dés
 export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
@@ -17,7 +19,7 @@ export interface DiceRollResult {
   isNatural1?: boolean;
   hasAdvantage?: boolean;
   hasDisadvantage?: boolean;
-  chosenRoll?: number; // Le dé sélectionné (pour avantage/désavantage)
+  chosenRoll?: number;
 }
 
 // Résultat d'un jet d'attaque
@@ -38,6 +40,15 @@ export interface DamageRollResult {
   isCritical: boolean;
 }
 
+// Résultat d'un jet de sauvegarde
+export interface SavingThrowResult {
+  roll: DiceRollResult;
+  success: boolean;
+  dc: number;
+  ability: keyof AbilityScores;
+  totalBonus: number;
+}
+
 // Maximum pour chaque type de dé
 const DIE_MAX: Record<DieType, number> = {
   'd4': 4,
@@ -49,12 +60,20 @@ const DIE_MAX: Record<DieType, number> = {
   'd100': 100
 };
 
-// Lancer un seul dé
+// =============================================================================
+// LANCER DE DÉS
+// =============================================================================
+
+/**
+ * Lancer un seul dé
+ */
 export function rollDie(dieType: DieType): number {
   return Math.floor(Math.random() * DIE_MAX[dieType]) + 1;
 }
 
-// Lancer plusieurs dés
+/**
+ * Lancer plusieurs dés avec avantage/désavantage
+ */
 export function rollDice(
   dieType: DieType, 
   count: number, 
@@ -63,7 +82,7 @@ export function rollDice(
   disadvantage: boolean = false
 ): DiceRollResult {
   const rolls: number[] = [];
-  let allRolls: number[] = []; // Stocke tous les jets (pour avantage/désavantage)
+  let allRolls: number[] = [];
   let chosenRoll: number | undefined;
   
   // Pour les jets d20 avec avantage/désavantage
@@ -81,7 +100,7 @@ export function rollDice(
     } else {
       // Les deux s'annulent
       rolls.push(roll1);
-      allRolls = [roll1]; // Pas de second dé si annulation
+      allRolls = [roll1];
     }
   } else {
     for (let i = 0; i < count; i++) {
@@ -93,12 +112,11 @@ export function rollDice(
   
   const sum = rolls.reduce((a, b) => a + b, 0);
   const total = sum + modifier;
-  // Pour critique: vérifie le dé CHOISI (pas tous les dés)
   const isNatural20 = dieType === 'd20' && rolls[0] === 20;
   const isNatural1 = dieType === 'd20' && rolls[0] === 1;
   
   return {
-    rolls: allRolls, // Retourne TOUS les jets pour affichage
+    rolls: allRolls,
     total,
     modifier,
     dieType,
@@ -106,53 +124,131 @@ export function rollDice(
     isNatural1,
     hasAdvantage: advantage,
     hasDisadvantage: disadvantage,
-    chosenRoll // Le dé sélectionné (pour avantage/désavantage)
+    chosenRoll
   };
 }
 
-// Calculer le modificateur de caractéristique D&D
+// =============================================================================
+// CALCULS D&D
+// =============================================================================
+
+/**
+ * Calcule le modificateur de caractéristique D&D
+ */
 export function getAbilityModifier(score: number): number {
   return Math.floor((score - 10) / 2);
 }
 
-// Calculer le bonus de maîtrise basé sur le niveau
+/**
+ * Calcule le bonus de maîtrise basé sur le niveau (1-100)
+ */
 export function getProficiencyBonus(level: number): number {
-  return Math.floor((level - 1) / 4) + 2;
+  if (level <= 4) return 2;
+  if (level <= 8) return 3;
+  if (level <= 12) return 4;
+  if (level <= 16) return 5;
+  if (level <= 20) return 6;
+  // Niveaux épiques (21-100)
+  if (level <= 30) return 7;
+  if (level <= 40) return 8;
+  if (level <= 50) return 9;
+  if (level <= 60) return 10;
+  if (level <= 70) return 11;
+  if (level <= 80) return 12;
+  if (level <= 90) return 14;
+  return 16 + Math.floor((level - 90) / 5);
 }
 
-// Calculer le bonus d'attaque total
+/**
+ * Caractéristique de lancement de sorts par classe
+ */
+const SPELLCASTING_ABILITY: Record<string, keyof AbilityScores> = {
+  'Mage': 'intelligence',
+  'Nécromancien': 'intelligence',
+  'Élémentaliste': 'intelligence',
+  'Ensorceleur': 'charisma',
+  'Occultiste': 'charisma',
+  'Barde': 'charisma',
+  'Scalde': 'charisma',
+  'Paladin': 'charisma',
+  'Chevalier': 'charisma',
+  'Prêtresse': 'wisdom',
+  'Druide': 'wisdom',
+  'Oracle': 'wisdom',
+  'Clerc de Vie': 'wisdom',
+  'Rôdeur': 'wisdom',
+};
+
+/**
+ * Calcule le bonus d'attaque total
+ * SYSTÈME D&D PUR: utilise UNIQUEMENT les caractéristiques D&D
+ */
 export function getAttackBonus(attacker: Character | Monster, isSpell: boolean = false): number {
-  let bonus = 0;
-  
-  if ('class' in attacker) {
-    // Personnage joueur
-    const proficiency = getProficiencyBonus(attacker.level);
-    
-    if (isSpell) {
-      // Attaque de sort - utilise INT/WIS/CHA selon la classe
-      const spellMod = attacker.abilities 
-        ? Math.max(
-            getAbilityModifier(attacker.abilities.intelligence),
-            getAbilityModifier(attacker.abilities.wisdom),
-            getAbilityModifier(attacker.abilities.charisma)
-          )
-        : Math.floor((attacker.magicAttack || 0) / 3);
-      bonus = proficiency + spellMod;
-    } else {
-      // Attaque physique - utilise FOR ou DEX
-      const strMod = attacker.abilities ? getAbilityModifier(attacker.abilities.strength) : Math.floor(attacker.attack / 3);
-      const dexMod = attacker.abilities ? getAbilityModifier(attacker.abilities.dexterity) : Math.floor(attacker.speed / 10);
-      bonus = proficiency + Math.max(strMod, dexMod);
-    }
-  } else {
-    // Monstre - bonus basé sur CR et stats
-    bonus = Math.floor(attacker.attack / 2);
+  // Vérifier que les abilities existent
+  if (!attacker.abilities) {
+    console.warn('Entité sans abilities, utilisation de valeurs par défaut');
+    return 2;
   }
   
-  return bonus;
+  const abilities = attacker.abilities;
+  
+  if ('class' in attacker) {
+    // === PERSONNAGE JOUEUR ===
+    const proficiency = attacker.proficiencyBonus || getProficiencyBonus(attacker.level || 1);
+    
+    if (isSpell) {
+      // Attaque de sort - utilise la caractéristique de lancement de sort
+      const spellAbility = SPELLCASTING_ABILITY[attacker.class] || 'intelligence';
+      const spellMod = getAbilityModifier(abilities[spellAbility]);
+      return proficiency + spellMod;
+    } else {
+      // Attaque physique - utilise FOR ou DEX (le meilleur)
+      const strMod = getAbilityModifier(abilities.strength);
+      const dexMod = getAbilityModifier(abilities.dexterity);
+      return proficiency + Math.max(strMod, dexMod);
+    }
+  } else {
+    // === MONSTRE ===
+    // Bonus d'attaque basé sur le CR
+    const cr = attacker.challengeRating || 1;
+    const profBonus = Math.floor(cr / 4) + 2;
+    
+    if (isSpell) {
+      // Utilise la meilleure caractéristique mentale
+      const intMod = getAbilityModifier(abilities.intelligence);
+      const wisMod = getAbilityModifier(abilities.wisdom);
+      const chaMod = getAbilityModifier(abilities.charisma);
+      return profBonus + Math.max(intMod, wisMod, chaMod);
+    } else {
+      // Utilise FOR ou DEX
+      const strMod = getAbilityModifier(abilities.strength);
+      const dexMod = getAbilityModifier(abilities.dexterity);
+      return profBonus + Math.max(strMod, dexMod);
+    }
+  }
 }
 
-// Effectuer un jet d'attaque
+/**
+ * Obtient la CA d'une entité (système D&D pur)
+ */
+export function getArmorClass(entity: Character | Monster): number {
+  // Si armorClass est défini, l'utiliser
+  if (entity.armorClass && entity.armorClass > 0) {
+    return entity.armorClass;
+  }
+  
+  // Sinon, calculer: 10 + mod(DEX)
+  if (entity.abilities) {
+    return 10 + getAbilityModifier(entity.abilities.dexterity);
+  }
+  
+  // Fallback absolu
+  return 10;
+}
+
+/**
+ * Effectue un jet d'attaque D&D pur
+ */
 export function makeAttackRoll(
   attacker: Character | Monster,
   target: Character | Monster,
@@ -161,9 +257,7 @@ export function makeAttackRoll(
   hasDisadvantage: boolean = false
 ): AttackRollResult {
   const attackBonus = getAttackBonus(attacker, isSpell);
-  const targetAC = 'armorClass' in target && target.armorClass 
-    ? target.armorClass 
-    : 10 + Math.floor(target.defense / 2);
+  const targetAC = getArmorClass(target);
   
   const attackRoll = rollDice('d20', 1, attackBonus, hasAdvantage, hasDisadvantage);
   
@@ -183,7 +277,13 @@ export function makeAttackRoll(
   };
 }
 
-// Parser une chaîne de dégâts D&D (ex: "2d6", "1d8+3", "3d6")
+// =============================================================================
+// SYSTÈME DE DÉGÂTS
+// =============================================================================
+
+/**
+ * Parse une chaîne de dégâts D&D (ex: "2d6", "1d8+3", "3d6")
+ */
 export function parseDamageString(damageStr: string): { dieType: DieType; count: number; modifier: number } | null {
   const match = damageStr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
   if (!match) return null;
@@ -203,11 +303,10 @@ export function parseDamageString(damageStr: string): { dieType: DieType; count:
   return { dieType, count, modifier };
 }
 
-// Calculer les dés de dégâts basés sur la valeur de dégâts
+/**
+ * Calcule les dés de dégâts selon une valeur de base
+ */
 export function getDamageDice(damage: number): { dieType: DieType; count: number } {
-  // Approximation: on convertit les dégâts fixes en jets de dés
-  // Moyenne d4=2.5, d6=3.5, d8=4.5, d10=5.5, d12=6.5
-  
   if (damage <= 3) return { dieType: 'd4', count: 1 };
   if (damage <= 5) return { dieType: 'd6', count: 1 };
   if (damage <= 7) return { dieType: 'd8', count: 1 };
@@ -219,23 +318,92 @@ export function getDamageDice(damage: number): { dieType: DieType; count: number
   if (damage <= 35) return { dieType: 'd8', count: 4 };
   if (damage <= 45) return { dieType: 'd10', count: 4 };
   
-  // Pour les très gros dégâts
   const d10Count = Math.ceil(damage / 5.5);
-  return { dieType: 'd10', count: Math.min(d10Count, 10) };
+  return { dieType: 'd10', count: Math.min(d10Count, 12) };
 }
 
-// Effectuer un jet de dégâts
+/**
+ * Calcule le bonus de dégâts selon la caractéristique
+ */
+export function getDamageModifier(attacker: Character | Monster, isSpell: boolean = false): number {
+  if (!attacker.abilities) return 0;
+  
+  if ('class' in attacker && isSpell) {
+    // Sorts: bonus selon la classe
+    const spellAbility = SPELLCASTING_ABILITY[attacker.class] || 'intelligence';
+    return getAbilityModifier(attacker.abilities[spellAbility]);
+  }
+  
+  // Attaque physique: FOR ou DEX
+  const strMod = getAbilityModifier(attacker.abilities.strength);
+  const dexMod = getAbilityModifier(attacker.abilities.dexterity);
+  return Math.max(strMod, dexMod);
+}
+
+/**
+ * Effectue un jet de dégâts D&D
+ */
 export function rollDamage(
+  attacker: Character | Monster,
+  skill: Skill | MonsterSkill | null,
+  isCritical: boolean = false,
+  isSpell: boolean = false
+): DamageRollResult {
+  let dieType: DieType = 'd6';
+  let count = 1;
+  let baseModifier = 0;
+  let damageType = 'physical';
+  
+  // Si la compétence a des dés de dégâts définis
+  if (skill?.damageDice) {
+    const parsed = parseDamageString(skill.damageDice);
+    if (parsed) {
+      dieType = parsed.dieType;
+      count = parsed.count;
+      baseModifier = parsed.modifier;
+    }
+  } else if (skill?.damage && skill.damage > 0) {
+    // Sinon, calculer depuis la valeur de dégâts
+    const dice = getDamageDice(skill.damage);
+    dieType = dice.dieType;
+    count = dice.count;
+  } else {
+    // Attaque de base: 1d8 pour mêlée, 1d6 pour distance
+    dieType = isSpell ? 'd8' : 'd8';
+    count = 1;
+  }
+  
+  // Ajouter le modificateur de caractéristique
+  const abilityMod = getDamageModifier(attacker, isSpell);
+  const totalModifier = baseModifier + abilityMod;
+  
+  // Type de dégâts
+  damageType = skill?.damageType || (isSpell ? 'magical' : 'physical');
+  
+  // En cas de critique, doubler les dés
+  const actualCount = isCritical ? count * 2 : count;
+  
+  const damageRoll = rollDice(dieType, actualCount, totalModifier);
+  
+  return {
+    damageRoll,
+    totalDamage: Math.max(1, damageRoll.total),
+    damageType,
+    isCritical
+  };
+}
+
+/**
+ * Effectue un jet de dégâts simplifié (pour compatibilité)
+ */
+export function rollDamageSimple(
   baseDamage: number,
   damageType: string,
   isCritical: boolean = false,
   bonusModifier: number = 0
 ): DamageRollResult {
   const { dieType, count } = getDamageDice(baseDamage);
-  
-  // En cas de critique, on double les dés (pas le modificateur)
   const actualCount = isCritical ? count * 2 : count;
-  
   const damageRoll = rollDice(dieType, actualCount, bonusModifier);
   
   return {
@@ -246,9 +414,14 @@ export function rollDamage(
   };
 }
 
-// Appliquer les PV temporaires
+// =============================================================================
+// PV TEMPORAIRES
+// =============================================================================
+
+/**
+ * Applique les PV temporaires
+ */
 export function applyTemporaryHp(character: Character, amount: number): Character {
-  // Les PV temporaires ne s'accumulent pas - on garde le maximum
   const currentTempHp = character.temporaryHp || 0;
   return {
     ...character,
@@ -256,7 +429,9 @@ export function applyTemporaryHp(character: Character, amount: number): Characte
   };
 }
 
-// Appliquer des dégâts en tenant compte des PV temporaires
+/**
+ * Applique des dégâts en tenant compte des PV temporaires
+ */
 export function applyDamageWithTempHp(
   character: Character, 
   damage: number
@@ -266,7 +441,6 @@ export function applyDamageWithTempHp(
   let newTempHp = character.temporaryHp || 0;
   let newHp = character.hp;
   
-  // Les PV temporaires absorbent les dégâts en premier
   if (newTempHp > 0) {
     damageToTempHp = Math.min(newTempHp, damage);
     newTempHp -= damageToTempHp;
@@ -286,14 +460,18 @@ export function applyDamageWithTempHp(
   };
 }
 
-// Calculer si une compétence a l'avantage
+// =============================================================================
+// AVANTAGE / DÉSAVANTAGE
+// =============================================================================
+
+/**
+ * Vérifie si l'attaquant a l'avantage
+ */
 export function hasAdvantageOnAttack(attacker: Character, target: Character | Monster): boolean {
-  // Vérifier les buffs d'avantage
   if (attacker.buffs?.some(b => b.type === 'advantage')) {
     return true;
   }
   
-  // Cible à terre, invisible qui attaque, etc.
   if ('conditions' in target && target.conditions?.includes('prone')) {
     return true;
   }
@@ -301,9 +479,10 @@ export function hasAdvantageOnAttack(attacker: Character, target: Character | Mo
   return false;
 }
 
-// Calculer si une compétence a le désavantage
+/**
+ * Vérifie si l'attaquant a le désavantage
+ */
 export function hasDisadvantageOnAttack(attacker: Character, target: Character | Monster): boolean {
-  // Vérifier les debuffs de désavantage
   if (attacker.buffs?.some(b => b.type === 'disadvantage' && b.value < 0)) {
     return true;
   }
@@ -311,27 +490,22 @@ export function hasDisadvantageOnAttack(attacker: Character, target: Character |
   return false;
 }
 
-// ============================================
-// JETS DE SAUVEGARDE D&D 5e
-// ============================================
+// =============================================================================
+// JETS DE SAUVEGARDE
+// =============================================================================
 
-export interface SavingThrowResult {
-  roll: DiceRollResult;
-  success: boolean;
-  dc: number;
-  ability: keyof AbilityScores;
-  totalBonus: number;
-}
-
-// Calculer le bonus de jet de sauvegarde
+/**
+ * Calcule le bonus de jet de sauvegarde
+ */
 export function getSavingThrowBonus(
   entity: Character | Monster, 
   ability: keyof AbilityScores
 ): number {
+  if (!entity.abilities) return 0;
+  
   const abilityScore = entity.abilities[ability];
   const modifier = getAbilityModifier(abilityScore);
   
-  // Les personnages ont des maîtrises de jets de sauvegarde
   if ('savingThrowProficiencies' in entity && entity.savingThrowProficiencies) {
     if (entity.savingThrowProficiencies.includes(ability)) {
       const proficiency = entity.proficiencyBonus || getProficiencyBonus(entity.level || 1);
@@ -339,17 +513,16 @@ export function getSavingThrowBonus(
     }
   }
   
-  // Les monstres utilisent leur CR pour le bonus
   if ('challengeRating' in entity) {
-    // Certains monstres ont des sauvegardes fortes dans certaines stats
-    // Pour simplifier, on utilise juste le modificateur
     return modifier;
   }
   
   return modifier;
 }
 
-// Effectuer un jet de sauvegarde
+/**
+ * Effectue un jet de sauvegarde
+ */
 export function makeSavingThrow(
   target: Character | Monster,
   ability: keyof AbilityScores,
@@ -360,7 +533,6 @@ export function makeSavingThrow(
   const bonus = getSavingThrowBonus(target, ability);
   const roll = rollDice('d20', 1, bonus, hasAdvantage, hasDisadvantage);
   
-  // 20 naturel = réussite automatique, 1 naturel = échec automatique
   const success = roll.isNatural20 || (!roll.isNatural1 && roll.total >= dc);
   
   return {
@@ -372,7 +544,23 @@ export function makeSavingThrow(
   };
 }
 
-// Labels pour les caractéristiques
+/**
+ * Calcule le DD des jets de sauvegarde
+ */
+export function getSpellSaveDC(caster: Character): number {
+  if (!caster.abilities) return 10;
+  
+  const proficiency = caster.proficiencyBonus || getProficiencyBonus(caster.level || 1);
+  const spellAbility = SPELLCASTING_ABILITY[caster.class] || 'intelligence';
+  const abilityMod = getAbilityModifier(caster.abilities[spellAbility]);
+  
+  return 8 + proficiency + abilityMod;
+}
+
+// =============================================================================
+// LABELS ET CONSTANTES
+// =============================================================================
+
 export const ABILITY_LABELS: Record<keyof AbilityScores, string> = {
   strength: 'Force',
   dexterity: 'Dextérité',
@@ -382,3 +570,21 @@ export const ABILITY_LABELS: Record<keyof AbilityScores, string> = {
   charisma: 'Charisme'
 };
 
+export const DAMAGE_TYPE_LABELS: Record<string, string> = {
+  physical: 'Physique',
+  slashing: 'Tranchant',
+  piercing: 'Perforant',
+  bludgeoning: 'Contondant',
+  fire: 'Feu',
+  cold: 'Froid',
+  lightning: 'Foudre',
+  acid: 'Acide',
+  poison: 'Poison',
+  necrotic: 'Nécrotique',
+  radiant: 'Radiant',
+  force: 'Force',
+  psychic: 'Psychique',
+  thunder: 'Tonnerre',
+  magical: 'Magique',
+  holy: 'Sacré'
+};

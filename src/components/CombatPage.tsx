@@ -298,22 +298,43 @@ export function CombatPage() {
     return '#27ae60'; // Vert
   };
 
-  // Calcul des modifications de stats pour le tooltip
+  // Calcul des modifications de stats pour le tooltip (système D&D)
   const getStatModifiers = (entity: Character | Monster) => {
     const mods: { stat: string; base: number; current: number; diff: number }[] = [];
     
-    // Utiliser baseStats si disponibles, sinon utiliser les stats actuelles comme base
-    const baseAttack = 'baseAttack' in entity && entity.baseAttack !== undefined ? entity.baseAttack : entity.attack;
-    const baseMagicAttack = 'baseMagicAttack' in entity && entity.baseMagicAttack !== undefined ? entity.baseMagicAttack : (entity.magicAttack || 0);
-    const baseDefense = 'baseDefense' in entity && entity.baseDefense !== undefined ? entity.baseDefense : entity.defense;
-    const baseMagicDefense = 'baseMagicDefense' in entity && entity.baseMagicDefense !== undefined ? entity.baseMagicDefense : entity.magicDefense;
-    const baseSpeed = 'baseSpeed' in entity && entity.baseSpeed !== undefined ? entity.baseSpeed : entity.speed;
-    
-    mods.push({ stat: 'Attaque', base: baseAttack, current: entity.attack, diff: entity.attack - baseAttack });
-    mods.push({ stat: 'Att. Magique', base: baseMagicAttack, current: entity.magicAttack || 0, diff: (entity.magicAttack || 0) - baseMagicAttack });
-    mods.push({ stat: 'Défense', base: baseDefense, current: entity.defense, diff: entity.defense - baseDefense });
-    mods.push({ stat: 'Déf. Magique', base: baseMagicDefense, current: entity.magicDefense, diff: entity.magicDefense - baseMagicDefense });
-    mods.push({ stat: 'Vitesse', base: baseSpeed, current: entity.speed, diff: entity.speed - baseSpeed });
+    // Afficher les caractéristiques D&D et leurs modificateurs
+    if (entity.abilities) {
+      const getModifier = (score: number) => Math.floor((score - 10) / 2);
+      
+      // CA (Armor Class)
+      const baseAC = 10 + getModifier(entity.abilities.dexterity);
+      const currentAC = entity.armorClass || baseAC;
+      mods.push({ stat: 'CA', base: baseAC, current: currentAC, diff: currentAC - baseAC });
+      
+      // Vitesse
+      const baseSpeed = 30; // Vitesse de base standard
+      const currentSpeed = entity.speed || 30;
+      mods.push({ stat: 'Vitesse', base: baseSpeed, current: currentSpeed, diff: currentSpeed - baseSpeed });
+      
+      // Bonus aux caractéristiques (si buffs actifs)
+      const abilityNames: Record<string, string> = {
+        strength: 'FOR', dexterity: 'DEX', constitution: 'CON',
+        intelligence: 'INT', wisdom: 'SAG', charisma: 'CHA'
+      };
+      
+      Object.entries(entity.abilities).forEach(([key, value]) => {
+        const abilityKey = key as keyof typeof entity.abilities;
+        const buff = entity.buffs?.find(b => b.type === 'ability' && b.abilityAffected === abilityKey);
+        if (buff) {
+          mods.push({ 
+            stat: abilityNames[key] || key.toUpperCase(), 
+            base: value - buff.value, 
+            current: value, 
+            diff: buff.value 
+          });
+        }
+      });
+    }
     
     return mods;
   };
@@ -480,14 +501,13 @@ export function CombatPage() {
       // Mettre à jour les buffs du personnage
       updatedChar.buffs = updatedBuffs;
       
-      // IMPORTANT: Recalculer les stats à partir des baseStats + buffs restants
-      // Cela garantit que les stats reviennent à la normale quand un buff expire
+      // IMPORTANT: Recalculer les stats D&D à partir des buffs restants
       const recalculated = gameStore.recalculateStats(updatedChar);
-      updatedChar.attack = recalculated.attack;
-      updatedChar.magicAttack = recalculated.magicAttack;
-      updatedChar.defense = recalculated.defense;
-      updatedChar.magicDefense = recalculated.magicDefense;
+      updatedChar.abilities = recalculated.abilities;
+      updatedChar.armorClass = recalculated.armorClass;
       updatedChar.speed = recalculated.speed;
+      updatedChar.proficiencyBonus = recalculated.proficiencyBonus;
+      updatedChar.initiative = recalculated.initiative;
       
       // Logger les buffs expirés
       if (expiredBuffNames.length > 0) {
@@ -642,9 +662,9 @@ export function CombatPage() {
       if (c.id === killerId) {
         const stats = c.stats || { totalDamageDealt: 0, totalDamageTaken: 0, totalHealingDone: 0, monstersKilled: [] };
         const updatedMonstersKilled = [...stats.monstersKilled, { ...monster }];
-        // Mettre à jour le monstre le plus puissant
+        // Mettre à jour le monstre le plus puissant (basé sur le CR)
         let strongestMonster = stats.strongestMonsterKilled;
-        if (!strongestMonster || (monster.attack + monster.defense) > (strongestMonster.attack + strongestMonster.defense)) {
+        if (!strongestMonster || (monster.challengeRating || 0) > (strongestMonster.challengeRating || 0)) {
           strongestMonster = { ...monster };
         }
         return {
@@ -707,43 +727,43 @@ export function CombatPage() {
     
     const isPhysical = isPhysicalDamage(damageType);
     
-    if ('class' in attacker) {
+    // Système D&D: bonus de dégâts basé sur les caractéristiques
+    if (attacker.abilities) {
       if (isPhysical) {
-        // Bonus d'attaque physique (Force via les stats de base)
-        const attackBonus = Math.floor(attacker.attack * 0.3);
-        totalDamage += attackBonus;
+        // Bonus de Force pour les attaques physiques
+        const strMod = Math.floor((attacker.abilities.strength - 10) / 2);
+        totalDamage += Math.max(0, strMod);
       } else {
-        // Bonus d'attaque magique (Intelligence via les stats de base)
-        const magicStat = attacker.magicAttack || 0;
-        const magicBonus = Math.floor(magicStat * 0.3);
-        totalDamage += magicBonus;
+        // Bonus d'Intelligence/Sagesse/Charisme pour les sorts (selon la classe)
+        const intMod = Math.floor((attacker.abilities.intelligence - 10) / 2);
+        const wisMod = Math.floor((attacker.abilities.wisdom - 10) / 2);
+        const chaMod = Math.floor((attacker.abilities.charisma - 10) / 2);
+        // Prendre le meilleur modificateur pour les dégâts magiques
+        const magicMod = Math.max(intMod, wisMod, chaMod);
+        totalDamage += Math.max(0, magicMod);
       }
     }
     
-    // Bonus contre certains types de monstres
+    // Bonus contre certains types de monstres (D&D)
     if (skill && 'isBoss' in target) {
       // Bonus vs démons (fiends en D&D)
-      if (skill.bonusVsDemon && (target.monsterType === 'demon' || target.creatureType === 'fiend')) {
+      if (skill.bonusVsDemon && target.creatureType === 'fiend') {
         totalDamage += skill.bonusVsDemon;
       }
       // Bonus vs morts-vivants
-      if (skill.bonusVsUndead && (target.monsterType === 'undead' || target.creatureType === 'undead')) {
+      if (skill.bonusVsUndead && target.creatureType === 'undead') {
         totalDamage += skill.bonusVsUndead;
       }
     }
     
-    // Appliquer le multiplicateur de critique
+    // Appliquer le multiplicateur de critique (D&D: dés de dégâts doublés, simplifié ici)
     if (isCritical) {
       totalDamage = Math.floor(totalDamage * 2);
     }
     
-    // Calculer la défense appropriée
-    let defense = 0;
-    if (isPhysical) {
-      defense = target.defense;
-    } else {
-      defense = 'magicDefense' in target ? target.magicDefense : Math.floor(target.defense * 0.5);
-    }
+    // Système D&D: les dégâts passent, mais la CA détermine si l'attaque touche (géré ailleurs)
+    // Les résistances peuvent réduire les dégâts
+    let damageReduction = 0;
     
     // Vérifier les résistances/immunités/vulnérabilités (D&D)
     if ('resistances' in target && target.resistances?.includes(damageType as any)) {
@@ -769,7 +789,9 @@ export function CombatPage() {
       // Note: la réduction des PV temporaires sera gérée dans le code appelant
     }
     
-    return Math.max(1, totalDamage - defense);
+    // Système D&D: les dégâts ne sont pas réduits par une "défense" statique
+    // La CA détermine si l'attaque touche, les résistances réduisent les dégâts
+    return Math.max(1, totalDamage);
   };
   
   // Appliquer les épines (thorns) quand un personnage reçoit des dégâts
@@ -854,20 +876,35 @@ export function CombatPage() {
                   const debuffIcon = effect.stat === 'speed' ? '🥶' : effect.stat === 'defense' ? '💔' : '📉';
                   
                   if (!target.buffs) target.buffs = [];
+                  // Convertir les anciens debuffs en système D&D
+                  const debuffType = effect.stat === 'defense' || effect.stat === 'magicDefense' ? 'ac' : 
+                                    effect.stat === 'attack' ? 'ability' : 
+                                    effect.stat === 'magicAttack' ? 'ability' : 'speed';
+                  const abilityAffected = effect.stat === 'attack' ? 'strength' : 
+                                         effect.stat === 'magicAttack' ? 'intelligence' : undefined;
+                  
                   target.buffs.push({
-                    type: effect.stat as 'attack' | 'defense' | 'speed' | 'magicAttack' | 'magicDefense',
+                    id: `debuff_${effect.stat}_${Date.now()}`,
+                    type: debuffType as any,
+                    abilityAffected: abilityAffected as any,
                     value: -debuffValue,
                     turnsRemaining: effect.turns,
                     name: `Debuff ${effect.stat}`,
+                    ownerId: target.id,
                     icon: debuffIcon,
                     isApplied: true
                   });
                   
-                  // Appliquer le debuff
-                  if (effect.stat === 'defense') target.defense = Math.max(0, target.defense - debuffValue);
-                  else if (effect.stat === 'speed') target.speed = Math.max(1, target.speed - debuffValue);
-                  else if (effect.stat === 'attack') target.attack = Math.max(1, target.attack - debuffValue);
-                  else if (effect.stat === 'magicDefense') target.magicDefense = Math.max(0, target.magicDefense - debuffValue);
+                  // Appliquer le debuff D&D
+                  if (effect.stat === 'defense' || effect.stat === 'magicDefense') {
+                    target.armorClass = Math.max(0, (target.armorClass || 10) - debuffValue);
+                  } else if (effect.stat === 'speed') {
+                    target.speed = Math.max(1, (target.speed || 30) - debuffValue);
+                  } else if (effect.stat === 'attack' && target.abilities) {
+                    target.abilities.strength = Math.max(1, target.abilities.strength - debuffValue);
+                  } else if (effect.stat === 'magicAttack' && target.abilities) {
+                    target.abilities.intelligence = Math.max(1, target.abilities.intelligence - debuffValue);
+                  }
                   
                   logs.push(`⬇️ ${target.name} subit -${debuffValue} ${effect.stat} !`);
                 }
@@ -1039,8 +1076,10 @@ export function CombatPage() {
                 });
                 checkCombatEnd(logs, null, undefined, enemies);
               } else {
-                // TOUCHÉ ! Calcul des dégâts
-                let damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+                // TOUCHÉ ! Calcul des dégâts D&D
+                // Dégâts de base basés sur le CR du monstre
+                const baseDamage = Math.max(4, Math.floor(currentMonster.challengeRating * 1.5) + 2);
+                let damage = calculateDamage(baseDamage, currentMonster, target, 'physical');
                 
                 // Dégâts doublés sur critique
                 if (monsterAttackResult.isCriticalHit) {
@@ -1125,7 +1164,9 @@ export function CombatPage() {
               logs.push(`💨 ${target.name} esquive l'attaque de ${currentMonster.name} !`);
               checkCombatEnd(logs, null, undefined, enemies);
             } else {
-              let damage = calculateDamage(currentMonster.attack, currentMonster, target, 'physical');
+              // Dégâts de base basés sur le CR du monstre (système D&D)
+              const baseFallbackDamage = Math.max(4, Math.floor(currentMonster.challengeRating * 1.5) + 2);
+              let damage = calculateDamage(baseFallbackDamage, currentMonster, target, 'physical');
               if (fallbackAttackResult.isCriticalHit) {
                 damage = Math.floor(damage * 2);
               }
@@ -1406,17 +1447,20 @@ export function CombatPage() {
     
     // Vérifier si TOUS les monstres sont morts
     if (stillAliveEnemies.length === 0) {
-      // TOUS les ennemis sont vaincus !
+      // TOUS les ennemis sont vaincus ! Nettoyer les buffs D&D
       const cleanTeam = state.team.map(c => {
         let cleanChar = { ...c };
         if (c.buffs) {
           c.buffs.forEach(buff => {
             if (buff.isApplied) {
-              if (buff.type === 'attack') cleanChar.attack = Math.max(1, cleanChar.attack - buff.value);
-              else if (buff.type === 'magicAttack') cleanChar.magicAttack = Math.max(1, (cleanChar.magicAttack || 0) - buff.value);
-              else if (buff.type === 'defense') cleanChar.defense = Math.max(0, cleanChar.defense - buff.value);
-              else if (buff.type === 'magicDefense') cleanChar.magicDefense = Math.max(0, cleanChar.magicDefense - buff.value);
-              else if (buff.type === 'speed') cleanChar.speed = Math.max(1, cleanChar.speed - buff.value);
+              // Système D&D: inverser les effets des buffs
+              if (buff.type === 'ability' && buff.abilityAffected && cleanChar.abilities) {
+                cleanChar.abilities[buff.abilityAffected] = Math.max(1, cleanChar.abilities[buff.abilityAffected] - buff.value);
+              } else if (buff.type === 'ac') {
+                cleanChar.armorClass = Math.max(0, (cleanChar.armorClass || 10) - buff.value);
+              } else if (buff.type === 'speed') {
+                cleanChar.speed = Math.max(1, (cleanChar.speed || 30) - buff.value);
+              }
             }
           });
         }
@@ -1464,17 +1508,20 @@ export function CombatPage() {
     const currentGlobalTeamForCheck = gameStore.getState().team;
     const teamAlive = currentGlobalTeamForCheck.some(c => c.hp > 0);
     if (!teamAlive) {
-      // L'équipe est vaincue
+      // L'équipe est vaincue - nettoyer les buffs D&D
       const cleanTeam = currentGlobalTeamForCheck.map(c => {
         let cleanChar = { ...c };
         if (c.buffs) {
           c.buffs.forEach(buff => {
             if (buff.isApplied) {
-              if (buff.type === 'attack') cleanChar.attack = Math.max(1, cleanChar.attack - buff.value);
-              else if (buff.type === 'magicAttack') cleanChar.magicAttack = Math.max(1, (cleanChar.magicAttack || 0) - buff.value);
-              else if (buff.type === 'defense') cleanChar.defense = Math.max(0, cleanChar.defense - buff.value);
-              else if (buff.type === 'magicDefense') cleanChar.magicDefense = Math.max(0, cleanChar.magicDefense - buff.value);
-              else if (buff.type === 'speed') cleanChar.speed = Math.max(1, cleanChar.speed - buff.value);
+              // Système D&D: inverser les effets des buffs
+              if (buff.type === 'ability' && buff.abilityAffected && cleanChar.abilities) {
+                cleanChar.abilities[buff.abilityAffected] = Math.max(1, cleanChar.abilities[buff.abilityAffected] - buff.value);
+              } else if (buff.type === 'ac') {
+                cleanChar.armorClass = Math.max(0, (cleanChar.armorClass || 10) - buff.value);
+              } else if (buff.type === 'speed') {
+                cleanChar.speed = Math.max(1, (cleanChar.speed || 30) - buff.value);
+              }
             }
           });
         }
@@ -1580,12 +1627,12 @@ export function CombatPage() {
     
     updatedLogs.push(`⚡ ${monster.name} utilise ${action.name} ! (Action légendaire)`);
     
-    // Appliquer les effets de l'action
+    // Appliquer les effets de l'action (système D&D - pas de réduction par défense, CA détermine si ça touche)
     if (action.damage && action.damage > 0) {
       const aliveTeam = team.filter(c => c.hp > 0);
       if (aliveTeam.length > 0) {
         const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
-        const damage = Math.max(1, action.damage - target.defense);
+        const damage = Math.max(1, action.damage); // Les actions légendaires touchent automatiquement en D&D
         target.hp = Math.max(0, target.hp - damage);
         
         updatedLogs.push(`  → ${target.name} subit ${damage} dégâts !`);
@@ -2060,10 +2107,11 @@ export function CombatPage() {
           
           const getStatLabel = (stat: string) => {
             switch (stat) {
-              case 'attack': return 'Attaque';
-              case 'magicAttack': return 'Att. Magique';
-              case 'defense': return 'Défense';
-              case 'magicDefense': return 'Rés. Magique';
+              case 'ability': return skill.buffStats.ability ? 
+                { strength: 'Force', dexterity: 'Dextérité', constitution: 'Constitution',
+                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[skill.buffStats.ability] || stat
+                : 'Caractéristique';
+              case 'ac': return 'Classe d\'Armure';
               case 'speed': return 'Vitesse';
               default: return stat;
             }
@@ -2073,6 +2121,7 @@ export function CombatPage() {
             id: skill.id + '_' + Date.now() + '_' + t.id,
             name: skill.name,
             type: skill.buffStats.stat as any,
+            abilityAffected: skill.buffStats.ability,
             value: skill.buffStats.value,
             turnsRemaining: skill.buffStats.turns,
             ownerId: t.id,
@@ -2084,18 +2133,13 @@ export function CombatPage() {
           if (!t.buffs) t.buffs = [];
           t.buffs = [...t.buffs, buff];
           
-          // Recalculer les stats à partir des baseStats + tous les buffs actifs
+          // Recalculer les stats avec le nouveau système D&D
           const recalculated = gameStore.recalculateStats(t);
-          t.attack = recalculated.attack;
-          t.magicAttack = recalculated.magicAttack;
-          t.defense = recalculated.defense;
-          t.magicDefense = recalculated.magicDefense;
+          t.abilities = recalculated.abilities;
+          t.armorClass = recalculated.armorClass;
           t.speed = recalculated.speed;
-          t.baseAttack = recalculated.baseAttack;
-          t.baseMagicAttack = recalculated.baseMagicAttack;
-          t.baseDefense = recalculated.baseDefense;
-          t.baseMagicDefense = recalculated.baseMagicDefense;
-          t.baseSpeed = recalculated.baseSpeed;
+          t.proficiencyBonus = recalculated.proficiencyBonus;
+          t.initiative = recalculated.initiative;
           
           logs.push(`${t.name} gagne +${skill.buffStats.value} ${getStatLabel(skill.buffStats.stat)} pendant ${skill.buffStats.turns} tours !`);
         }
@@ -2395,36 +2439,44 @@ export function CombatPage() {
     }
   };
 
-  // Générer le tooltip des stats avec les modifications
+  // Générer le tooltip des stats avec les modifications (système D&D)
   const getStatsTooltip = (entity: Character | Monster): string => {
     const lines: string[] = [];
+    const getModifier = (score: number) => Math.floor((score - 10) / 2);
+    const formatMod = (mod: number) => mod >= 0 ? `+${mod}` : `${mod}`;
     
     if ('class' in entity) {
       // C'est un personnage
       const char = entity as Character;
-      lines.push(`📊 ${char.name} - ${char.class}`);
+      lines.push(`📊 ${char.name} - ${char.class} Niv.${char.level || 1}`);
       lines.push(`─────────────────`);
-      lines.push(`⚔️ Attaque: ${char.attack}`);
-      lines.push(`✨ Att. Magique: ${char.magicAttack || 0}`);
-      lines.push(`🛡️ Défense: ${char.defense}`);
-      lines.push(`🔮 Rés. Magique: ${char.magicDefense}`);
-      lines.push(`💨 Vitesse: ${char.speed}`);
+      lines.push(`🛡️ CA: ${char.armorClass || 10}`);
+      lines.push(`💨 Vitesse: ${char.speed || 30} ft`);
+      lines.push(`🎯 Maîtrise: +${char.proficiencyBonus || 2}`);
+      lines.push(`─────────────────`);
+      if (char.abilities) {
+        lines.push(`💪 FOR: ${char.abilities.strength} (${formatMod(getModifier(char.abilities.strength))})`);
+        lines.push(`🏃 DEX: ${char.abilities.dexterity} (${formatMod(getModifier(char.abilities.dexterity))})`);
+        lines.push(`❤️ CON: ${char.abilities.constitution} (${formatMod(getModifier(char.abilities.constitution))})`);
+        lines.push(`📚 INT: ${char.abilities.intelligence} (${formatMod(getModifier(char.abilities.intelligence))})`);
+        lines.push(`👁️ SAG: ${char.abilities.wisdom} (${formatMod(getModifier(char.abilities.wisdom))})`);
+        lines.push(`💬 CHA: ${char.abilities.charisma} (${formatMod(getModifier(char.abilities.charisma))})`);
+      }
       
       if (char.buffs && char.buffs.length > 0) {
         lines.push(`─────────────────`);
         lines.push(`✨ Buffs actifs:`);
         char.buffs.forEach(buff => {
-          const sign = buff.type === 'regen' || buff.type === 'damage_reflect' ? '' : '+';
+          const sign = buff.value >= 0 ? '+' : '';
           let statName = '';
           switch (buff.type) {
-            case 'attack': statName = 'ATK'; break;
-            case 'magicAttack': statName = 'MAG'; break;
-            case 'defense': statName = 'DEF'; break;
-            case 'magicDefense': statName = 'RÉS'; break;
+            case 'ability': statName = buff.abilityAffected?.toUpperCase() || 'CARAC'; break;
+            case 'ac': statName = 'CA'; break;
             case 'speed': statName = 'VIT'; break;
             case 'regen': statName = 'Régén PV/tour'; break;
             case 'damage_reflect': statName = 'Renvoi %'; break;
             case 'poison': statName = 'Poison'; break;
+            default: statName = buff.type.toUpperCase();
           }
           lines.push(`  ${buff.icon} ${buff.name}: ${sign}${buff.value} ${statName} (${buff.turnsRemaining}t)`);
         });
@@ -2434,11 +2486,13 @@ export function CombatPage() {
       const monster = entity as Monster;
       lines.push(`👹 ${monster.name}`);
       if (monster.isBoss) lines.push(`👑 BOSS`);
+      lines.push(`CR ${monster.challengeRating || '?'}`);
       lines.push(`─────────────────`);
-      lines.push(`⚔️ Attaque: ${monster.attack}`);
-      lines.push(`🛡️ Défense: ${monster.defense}`);
-      lines.push(`🔮 Rés. Magique: ${monster.magicDefense}`);
-      lines.push(`💨 Vitesse: ${monster.speed}`);
+      lines.push(`🛡️ CA: ${monster.armorClass || 10}`);
+      lines.push(`💨 Vitesse: ${monster.speed || 30} ft`);
+      if (monster.abilities) {
+        lines.push(`FOR ${formatMod(getModifier(monster.abilities.strength))} | DEX ${formatMod(getModifier(monster.abilities.dexterity))} | CON ${formatMod(getModifier(monster.abilities.constitution))}`);
+      }
     }
     
     return lines.join('\n');
@@ -2738,27 +2792,16 @@ export function CombatPage() {
                       <span className="hp-text">{Math.max(0, enemy.hp)}/{enemy.maxHp}</span>
                     </div>
                     
-                    {/* Stats avec tooltip détaillé */}
+                    {/* Stats D&D avec tooltip détaillé */}
                     <div className="enemy-stats stats-with-tooltip">
-                      <span className={getStatModClass(enemy, 'attack')}>
-                        ⚔️ {enemy.attack}
-                        {getStatModIndicator(enemy, 'attack')}
+                      <span title="Classe d'Armure">
+                        🛡️ CA {enemy.armorClass || 10}
                       </span>
-                      <span className={getStatModClass(enemy, 'magicAttack')}>
-                        ✨ {enemy.magicAttack || 0}
-                        {getStatModIndicator(enemy, 'magicAttack')}
+                      <span title="Niveau de danger">
+                        ⚠️ CR {enemy.challengeRating || '?'}
                       </span>
-                      <span className={getStatModClass(enemy, 'defense')}>
-                        🛡️ {enemy.defense}
-                        {getStatModIndicator(enemy, 'defense')}
-                      </span>
-                      <span className={getStatModClass(enemy, 'magicDefense')}>
-                        🔮 {enemy.magicDefense}
-                        {getStatModIndicator(enemy, 'magicDefense')}
-                      </span>
-                      <span className={getStatModClass(enemy, 'speed')}>
-                        💨 {enemy.speed}
-                        {getStatModIndicator(enemy, 'speed')}
+                      <span title="Vitesse">
+                        💨 {enemy.speed || 30}
                       </span>
                       {renderStatsTooltip(enemy)}
                     </div>
@@ -2837,24 +2880,15 @@ export function CombatPage() {
                       </span>
                     </div>
                     <div className="fighter-all-stats stats-with-tooltip">
-                      <span className={getStatModClass(character, 'attack')}>
-                        ⚔️{character.attack}
-                        {character.buffs?.find(b => b.type === 'attack') && <span className="stat-mod-indicator">⬆</span>}
+                      <span title="Classe d'Armure">
+                        🛡️ CA {character.armorClass || 10}
+                        {character.buffs?.find(b => b.type === 'ac') && <span className="stat-mod-indicator">⬆</span>}
                       </span>
-                      <span className={getStatModClass(character, 'magicAttack')}>
-                        ✨{character.magicAttack || 0}
-                        {character.buffs?.find(b => b.type === 'magicAttack') && <span className="stat-mod-indicator">⬆</span>}
+                      <span title="Niveau">
+                        ⭐ Niv.{character.level || 1}
                       </span>
-                      <span className={getStatModClass(character, 'defense')}>
-                        🛡️{character.defense}
-                        {character.buffs?.find(b => b.type === 'defense') && <span className="stat-mod-indicator">⬆</span>}
-                      </span>
-                      <span className={getStatModClass(character, 'magicDefense')}>
-                        🔮{character.magicDefense}
-                        {character.buffs?.find(b => b.type === 'magicDefense') && <span className="stat-mod-indicator">⬆</span>}
-                      </span>
-                      <span className={getStatModClass(character, 'speed')}>
-                        💨{character.speed}
+                      <span title="Vitesse">
+                        💨 {character.speed || 30}
                         {character.buffs?.find(b => b.type === 'speed') && <span className="stat-mod-indicator">⬆</span>}
                       </span>
                       {renderStatsTooltip(character)}
@@ -2908,7 +2942,7 @@ export function CombatPage() {
             >
               <span className="action-icon">⚔️</span>
               <span>Attaque</span>
-              <span className="damage-preview">{(currentTurn as Character).attack} dégâts</span>
+              <span className="damage-preview">🎲 1d8 + FOR</span>
             </button>
             {(currentTurn as Character).skills?.filter(s => s.currentCooldown === 0 || s.currentCooldown === undefined).map(skill => (
               <div key={skill.id} className="skill-btn-wrapper">
@@ -3038,14 +3072,11 @@ export function CombatPage() {
                       <span className="char-portrait">{char.portrait}</span>
                       <div className="char-info">
                         <span className="char-name">{char.name}</span>
-                        <span className="char-class">{char.class}</span>
+                        <span className="char-class">{char.class} Niv.{char.level || 1}</span>
                         <div className="char-hp">❤️ {char.hp}/{char.maxHp}</div>
                         <div className="char-stats-grid">
-                          <span title="Attaque">⚔️ {char.attack}</span>
-                          <span title="Attaque Magique">✨ {char.magicAttack || 0}</span>
-                          <span title="Défense">🛡️ {char.defense}</span>
-                          <span title="Défense Magique">🔮 {char.magicDefense}</span>
-                          <span title="Vitesse">💨 {char.speed}</span>
+                          <span title="Classe d'Armure">🛡️ CA {char.armorClass || 10}</span>
+                          <span title="Vitesse">💨 {char.speed || 30}</span>
                         </div>
                       </div>
                     </button>

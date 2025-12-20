@@ -181,17 +181,6 @@ export interface Character {
   
   // === STATISTIQUES DE PARTIE ===
   stats?: CharacterStats;
-  
-  // === COMPATIBILITÉ (sera supprimé progressivement) ===
-  attack?: number;        // DEPRECATED - utiliser getAttackBonus()
-  magicAttack?: number;   // DEPRECATED - utiliser getSpellAttackBonus()
-  defense?: number;       // DEPRECATED - utiliser armorClass
-  magicDefense?: number;  // DEPRECATED
-  baseAttack?: number;
-  baseMagicAttack?: number;
-  baseDefense?: number;
-  baseMagicDefense?: number;
-  baseSpeed?: number;
 }
 
 // =============================================================================
@@ -201,7 +190,7 @@ export interface Character {
 export interface ActiveBuff {
   id: string;
   name: string;
-  type: 'ability' | 'ac' | 'damage' | 'healing' | 'speed' | 'resistance' | 'advantage' | 'regen' | 'poison' | 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'damage_reflect';
+  type: 'ability' | 'ac' | 'damage' | 'healing' | 'speed' | 'resistance' | 'advantage' | 'regen' | 'poison' | 'damage_reflect';
   abilityAffected?: keyof AbilityScores;
   value: number;
   turnsRemaining: number;
@@ -244,7 +233,7 @@ export interface Equipment {
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   description: string;
   
-  // Bonus aux caractéristiques (nouveau système)
+  // Bonus aux caractéristiques (système D&D)
   bonuses?: {
     strength?: number;
     dexterity?: number;
@@ -255,11 +244,6 @@ export interface Equipment {
     armorClass?: number;
     speed?: number;
     maxHp?: number;
-    // DEPRECATED - pour compatibilité
-    attack?: number;
-    magicAttack?: number;
-    defense?: number;
-    magicDefense?: number;
   };
   
   // Pour les armes
@@ -437,18 +421,6 @@ export interface Monster {
   
   // === BUFFS ===
   buffs?: ActiveBuff[];
-  
-  // === COMPATIBILITÉ (DEPRECATED) ===
-  attack?: number;
-  magicAttack?: number;
-  defense?: number;
-  magicDefense?: number;
-  baseAttack?: number;
-  baseMagicAttack?: number;
-  baseDefense?: number;
-  baseMagicDefense?: number;
-  baseSpeed?: number;
-  monsterType?: 'demon' | 'undead' | 'beast' | 'humanoid' | 'elemental' | 'dragon';
 }
 
 export interface LegendaryAction {

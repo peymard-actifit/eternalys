@@ -244,7 +244,7 @@ function generateCRBasedDrop(monster: Monster, effectType: DropEffectType): Omit
 // Déterminer les types de drops possibles selon le type de créature
 function getDropTypesForMonster(monster: Monster): DropEffectType[] {
   const types: DropEffectType[] = [];
-  const creatureType = monster.creatureType || monster.monsterType;
+  const creatureType = monster.creatureType;
   
   // Types de base toujours disponibles
   types.push('stat_attack', 'stat_defense', 'stat_hp');
@@ -255,7 +255,6 @@ function getDropTypesForMonster(monster: Monster): DropEffectType[] {
       types.push('resist_necrotic', 'skill_necrotic', 'lifesteal');
       break;
     case 'fiend':
-    case 'demon':
       types.push('resist_fire', 'skill_fire', 'stat_magic', 'lifesteal');
       break;
     case 'dragon':
@@ -340,58 +339,96 @@ export function getMonsterDrops(monster: Monster): InventoryItem[] {
   return drops;
 }
 
-// Appliquer les effets d'un item drop
+// Appliquer les effets d'un item drop (système D&D)
 export function applyDropEffect(item: InventoryItem, character: any): string[] {
   const effects: string[] = [];
   const desc = item.description.toLowerCase();
   
-  // Stats de base
-  const attackMatch = desc.match(/\+(\d+)\s*attaque\s*permanente/i);
-  if (attackMatch) {
-    const value = parseInt(attackMatch[1]);
-    character.attack += value;
-    if (character.baseAttack !== undefined) character.baseAttack += value;
-    effects.push(`+${value} ⚔️ Attaque`);
+  // Bonus de Force (remplace l'ancien bonus d'attaque)
+  const strMatch = desc.match(/\+(\d+)\s*(force|attaque\s*permanente)/i);
+  if (strMatch) {
+    const value = parseInt(strMatch[1]);
+    if (character.abilities) {
+      character.abilities.strength = (character.abilities.strength || 10) + value;
+    }
+    effects.push(`+${value} 💪 Force`);
   }
   
-  const magicAttackMatch = desc.match(/\+(\d+)\s*attaque\s*magique/i);
-  if (magicAttackMatch) {
-    const value = parseInt(magicAttackMatch[1]);
-    character.magicAttack = (character.magicAttack || 0) + value;
-    if (character.baseMagicAttack !== undefined) character.baseMagicAttack += value;
-    effects.push(`+${value} ✨ Att. Magique`);
+  // Bonus d'Intelligence (remplace l'ancien bonus d'attaque magique)
+  const intMatch = desc.match(/\+(\d+)\s*(intelligence|attaque\s*magique)/i);
+  if (intMatch) {
+    const value = parseInt(intMatch[1]);
+    if (character.abilities) {
+      character.abilities.intelligence = (character.abilities.intelligence || 10) + value;
+    }
+    effects.push(`+${value} 📚 Intelligence`);
   }
   
-  const defenseMatch = desc.match(/\+(\d+)\s*d[ée]fense\s*permanente/i);
-  if (defenseMatch) {
-    const value = parseInt(defenseMatch[1]);
-    character.defense += value;
-    if (character.baseDefense !== undefined) character.baseDefense += value;
-    effects.push(`+${value} 🛡️ Défense`);
+  // Bonus de CA (remplace l'ancien bonus de défense)
+  const acMatch = desc.match(/\+(\d+)\s*(ca|classe\s*d'armure|d[ée]fense\s*permanente)/i);
+  if (acMatch) {
+    const value = parseInt(acMatch[1]);
+    character.armorClass = (character.armorClass || 10) + value;
+    effects.push(`+${value} 🛡️ CA`);
   }
   
-  const magicDefMatch = desc.match(/\+(\d+)\s*r[ée]sistance\s*magique/i);
-  if (magicDefMatch) {
-    const value = parseInt(magicDefMatch[1]);
-    character.magicDefense = (character.magicDefense || 0) + value;
-    if (character.baseMagicDefense !== undefined) character.baseMagicDefense += value;
-    effects.push(`+${value} 🔮 Rés. Magique`);
+  // Bonus de Sagesse (remplace l'ancien bonus de résistance magique)
+  const wisMatch = desc.match(/\+(\d+)\s*(sagesse|r[ée]sistance\s*magique)/i);
+  if (wisMatch) {
+    const value = parseInt(wisMatch[1]);
+    if (character.abilities) {
+      character.abilities.wisdom = (character.abilities.wisdom || 10) + value;
+    }
+    effects.push(`+${value} 👁️ Sagesse`);
+  }
+  
+  // Bonus de Constitution (PV)
+  const conMatch = desc.match(/\+(\d+)\s*constitution/i);
+  if (conMatch) {
+    const value = parseInt(conMatch[1]);
+    if (character.abilities) {
+      character.abilities.constitution = (character.abilities.constitution || 10) + value;
+    }
+    // Bonus aux PV (environ 1 PV par niveau par point de CON)
+    const hpBonus = value * (character.level || 1);
+    character.maxHp = (character.maxHp || 10) + hpBonus;
+    character.hp = (character.hp || 10) + hpBonus;
+    effects.push(`+${value} ❤️ Constitution (+${hpBonus} PV)`);
   }
   
   const hpMatch = desc.match(/\+(\d+)\s*pv\s*(permanents)?/i);
   if (hpMatch) {
     const value = parseInt(hpMatch[1]);
-    character.maxHp += value;
-    character.hp += value;
+    character.maxHp = (character.maxHp || 10) + value;
+    character.hp = (character.hp || 10) + value;
     effects.push(`+${value} ❤️ PV`);
   }
   
   const speedMatch = desc.match(/\+(\d+)\s*vitesse/i);
   if (speedMatch) {
     const value = parseInt(speedMatch[1]);
-    character.speed += value;
-    if (character.baseSpeed !== undefined) character.baseSpeed += value;
+    character.speed = (character.speed || 30) + value;
     effects.push(`+${value} 💨 Vitesse`);
+  }
+  
+  // Bonus de Dextérité
+  const dexMatch = desc.match(/\+(\d+)\s*dext[ée]rit[ée]/i);
+  if (dexMatch) {
+    const value = parseInt(dexMatch[1]);
+    if (character.abilities) {
+      character.abilities.dexterity = (character.abilities.dexterity || 10) + value;
+    }
+    effects.push(`+${value} 🏃 Dextérité`);
+  }
+  
+  // Bonus de Charisme
+  const chaMatch = desc.match(/\+(\d+)\s*charisme/i);
+  if (chaMatch) {
+    const value = parseInt(chaMatch[1]);
+    if (character.abilities) {
+      character.abilities.charisma = (character.abilities.charisma || 10) + value;
+    }
+    effects.push(`+${value} 💬 Charisme`);
   }
   
   // Effets passifs (stockés pour le combat)
