@@ -180,32 +180,22 @@ export function GameHistoryModal({ onClose }: GameHistoryModalProps) {
 
                     {/* Statistiques du personnage */}
                     <div className="char-stats-section">
-                      <h5>📊 Statistiques</h5>
+                      <h5>📊 Statistiques D&D</h5>
                       <div className="stats-grid">
                         <div className="stat-box">
-                          <span className="stat-icon">⚔️</span>
-                          <span className="stat-val">{selectedGame.team[selectedCharIndex].attack || '?'}</span>
-                          <span className="stat-lbl">Attaque</span>
-                        </div>
-                        <div className="stat-box">
-                          <span className="stat-icon">✨</span>
-                          <span className="stat-val">{selectedGame.team[selectedCharIndex].magicAttack || 0}</span>
-                          <span className="stat-lbl">Att. Mag.</span>
-                        </div>
-                        <div className="stat-box">
                           <span className="stat-icon">🛡️</span>
-                          <span className="stat-val">{selectedGame.team[selectedCharIndex].defense || '?'}</span>
-                          <span className="stat-lbl">Défense</span>
+                          <span className="stat-val">{selectedGame.team[selectedCharIndex].armorClass || 10}</span>
+                          <span className="stat-lbl">CA</span>
                         </div>
                         <div className="stat-box">
-                          <span className="stat-icon">🔮</span>
-                          <span className="stat-val">{selectedGame.team[selectedCharIndex].magicDefense || 0}</span>
-                          <span className="stat-lbl">Rés. Mag.</span>
+                          <span className="stat-icon">🎯</span>
+                          <span className="stat-val">+{selectedGame.team[selectedCharIndex].proficiencyBonus || 2}</span>
+                          <span className="stat-lbl">Maîtrise</span>
                         </div>
                         <div className="stat-box">
-                          <span className="stat-icon">💨</span>
-                          <span className="stat-val">{selectedGame.team[selectedCharIndex].speed || '?'}</span>
-                          <span className="stat-lbl">Vitesse</span>
+                          <span className="stat-icon">📈</span>
+                          <span className="stat-val">{selectedGame.team[selectedCharIndex].level || 1}</span>
+                          <span className="stat-lbl">Niveau</span>
                         </div>
                       </div>
                     </div>
@@ -233,8 +223,7 @@ export function GameHistoryModal({ onClose }: GameHistoryModalProps) {
                               {selectedGame.team[selectedCharIndex].strongestMonsterKilled.name}
                             </span>
                             <span className="monster-stats">
-                              ⚔️ {selectedGame.team[selectedCharIndex].strongestMonsterKilled.attack} | 
-                              🛡️ {selectedGame.team[selectedCharIndex].strongestMonsterKilled.defense}
+                              ⚔️ CR {selectedGame.team[selectedCharIndex].strongestMonsterKilled.challengeRating || '?'}
                             </span>
                           </div>
                         </div>

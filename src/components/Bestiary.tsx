@@ -363,16 +363,12 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
                   <span className="stat-value">{selectedMonster.armorClass || 10}</span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-label">⚔️ Attaque</span>
-                  <span className="stat-value">{selectedMonster.attack}</span>
+                  <span className="stat-label">⚔️ CR</span>
+                  <span className="stat-value">{selectedMonster.challengeRating || 1}</span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-label">🛡️ Défense</span>
-                  <span className="stat-value">{selectedMonster.defense}</span>
-                </div>
-                <div className="stat-row">
-                  <span className="stat-label">💨 Vitesse</span>
-                  <span className="stat-value">{selectedMonster.speed}</span>
+                  <span className="stat-label">✨ XP</span>
+                  <span className="stat-value">{selectedMonster.xpReward || 50}</span>
                 </div>
               </div>
 

@@ -213,8 +213,7 @@ export const gameStore = {
       const withBonuses = applyAbilityBonuses(c);
       return { 
         ...withBonuses, 
-        buffs: [],
-        magicDefense: withBonuses.magicDefense || 10
+        buffs: []
       };
     });
     
@@ -267,15 +266,11 @@ export const gameStore = {
       // Scaling du boss = bossScaling (combats) + bossScalingMultiplier (niveau)
       const totalBossScaling = (state.bossScaling / 100) + (bossMultiplier - 1);
       
-      // Appliquer le scaling au boss
+      // Appliquer le scaling au boss (HP et dégâts uniquement, stats D&D restent fixes)
       const scaledBoss: Monster = {
         ...boss,
         hp: Math.floor(boss.hp * (1 + totalBossScaling)),
         maxHp: Math.floor(boss.maxHp * (1 + totalBossScaling)),
-        attack: Math.floor(boss.attack * (1 + totalBossScaling)),
-        magicAttack: boss.magicAttack ? Math.floor(boss.magicAttack * (1 + totalBossScaling)) : undefined,
-        defense: Math.floor(boss.defense * (1 + totalBossScaling)),
-        magicDefense: Math.floor(boss.magicDefense * (1 + totalBossScaling)),
         ultimateUsed: false,
         ultimateTurnTrigger: boss.ultimateTurnTrigger || 5,
         ultimateSkill: boss.ultimateSkill ? {
@@ -288,15 +283,11 @@ export const gameStore = {
         }))
       };
       
-      // Récupérer les monstres accompagnateurs thématiques (avec scaling)
+      // Récupérer les monstres accompagnateurs thématiques (avec scaling HP uniquement)
       const minions = getBossMinions(boss).map(m => ({
         ...m,
         hp: Math.floor(m.hp * monsterMultiplier),
-        maxHp: Math.floor(m.maxHp * monsterMultiplier),
-        attack: Math.floor(m.attack * monsterMultiplier),
-        magicAttack: m.magicAttack ? Math.floor(m.magicAttack * monsterMultiplier) : undefined,
-        defense: Math.floor(m.defense * monsterMultiplier),
-        magicDefense: Math.floor(m.magicDefense * monsterMultiplier)
+        maxHp: Math.floor(m.maxHp * monsterMultiplier)
       }));
       const allEnemies = [scaledBoss, ...minions];
       
@@ -832,7 +823,9 @@ export const gameStore = {
   },
   
   performAttack: (attacker: Character | Monster, target: Character | Monster, damage: number) => {
-    const actualDamage = Math.max(1, damage - target.defense);
+    // Le système D&D utilise la CA pour déterminer si une attaque touche
+    // Les dégâts sont appliqués directement sans réduction par défense
+    const actualDamage = Math.max(1, damage);
     target.hp = Math.max(0, target.hp - actualDamage);
     
     const log = [...state.combatLog, `${attacker.name} inflige ${actualDamage} dégâts à ${target.name} !`];
@@ -912,23 +905,23 @@ export const gameStore = {
         case 'damage':
           t.hp = Math.max(0, t.hp - effect.value);
           break;
-        case 'buff_attack':
-          t.attack += effect.value;
+        case 'buff_strength':
+          if (t.abilities) t.abilities.strength += effect.value;
           break;
-        case 'buff_magic_attack':
-          t.magicAttack = (t.magicAttack || 0) + effect.value;
+        case 'buff_dexterity':
+          if (t.abilities) t.abilities.dexterity += effect.value;
           break;
-        case 'buff_defense':
-          t.defense += effect.value;
+        case 'buff_constitution':
+          if (t.abilities) t.abilities.constitution += effect.value;
           break;
-        case 'debuff_attack':
-          t.attack = Math.max(1, t.attack - effect.value);
+        case 'debuff_strength':
+          if (t.abilities) t.abilities.strength = Math.max(1, t.abilities.strength - effect.value);
           break;
-        case 'debuff_magic_attack':
-          t.magicAttack = Math.max(1, (t.magicAttack || 0) - effect.value);
+        case 'debuff_dexterity':
+          if (t.abilities) t.abilities.dexterity = Math.max(1, t.abilities.dexterity - effect.value);
           break;
-        case 'debuff_defense':
-          t.defense = Math.max(0, t.defense - effect.value);
+        case 'debuff_constitution':
+          if (t.abilities) t.abilities.constitution = Math.max(1, t.abilities.constitution - effect.value);
           break;
       }
     });
@@ -948,8 +941,10 @@ export const gameStore = {
         });
         break;
       case 'buff_permanent':
+        // Les buffs permanents augmentent maintenant les PV max
         team.forEach(c => {
-          c.attack += treasure.effect.value;
+          c.maxHp += treasure.effect.value;
+          c.hp += treasure.effect.value;
         });
         break;
       case 'revive':

@@ -214,22 +214,23 @@ export function InventoryModal() {
         <p className="tooltip-desc">{hoveredEquipment.description}</p>
         {hoveredEquipment.bonuses && (
           <div className="tooltip-bonuses">
-            {hoveredEquipment.bonuses.attack && hoveredEquipment.bonuses.attack > 0 && (
-              <span className="bonus">⚔️ +{hoveredEquipment.bonuses.attack} Attaque</span>
+            {hoveredEquipment.bonuses.strength && hoveredEquipment.bonuses.strength > 0 && (
+              <span className="bonus">💪 +{hoveredEquipment.bonuses.strength} FOR</span>
             )}
-            {hoveredEquipment.bonuses.magicAttack && hoveredEquipment.bonuses.magicAttack > 0 && (
-              <span className="bonus">🔮 +{hoveredEquipment.bonuses.magicAttack} Attaque Mag.</span>
+            {hoveredEquipment.bonuses.dexterity && hoveredEquipment.bonuses.dexterity > 0 && (
+              <span className="bonus">🎯 +{hoveredEquipment.bonuses.dexterity} DEX</span>
             )}
-            {hoveredEquipment.bonuses.defense && hoveredEquipment.bonuses.defense > 0 && (
-              <span className="bonus">🛡️ +{hoveredEquipment.bonuses.defense} Défense</span>
+            {hoveredEquipment.bonuses.constitution && hoveredEquipment.bonuses.constitution > 0 && (
+              <span className="bonus">❤️ +{hoveredEquipment.bonuses.constitution} CON</span>
             )}
-            {hoveredEquipment.bonuses.magicDefense && hoveredEquipment.bonuses.magicDefense > 0 && (
-              <span className="bonus">✨ +{hoveredEquipment.bonuses.magicDefense} Déf. Mag.</span>
+            {hoveredEquipment.bonuses.intelligence && hoveredEquipment.bonuses.intelligence > 0 && (
+              <span className="bonus">📖 +{hoveredEquipment.bonuses.intelligence} INT</span>
             )}
-            {hoveredEquipment.bonuses.speed !== undefined && hoveredEquipment.bonuses.speed !== 0 && (
-              <span className={`bonus ${hoveredEquipment.bonuses.speed < 0 ? 'negative' : ''}`}>
-                💨 {hoveredEquipment.bonuses.speed > 0 ? '+' : ''}{hoveredEquipment.bonuses.speed} Vitesse
-              </span>
+            {hoveredEquipment.bonuses.wisdom && hoveredEquipment.bonuses.wisdom > 0 && (
+              <span className="bonus">🔮 +{hoveredEquipment.bonuses.wisdom} SAG</span>
+            )}
+            {hoveredEquipment.bonuses.charisma && hoveredEquipment.bonuses.charisma > 0 && (
+              <span className="bonus">✨ +{hoveredEquipment.bonuses.charisma} CHA</span>
             )}
             {hoveredEquipment.bonuses.armorClass && hoveredEquipment.bonuses.armorClass > 0 && (
               <span className="bonus">🔰 +{hoveredEquipment.bonuses.armorClass} CA</span>
@@ -474,40 +475,34 @@ export function InventoryModal() {
                 {renderEquipmentTooltip()}
               </div>
 
-              {/* Zone droite: Stats de combat et bonus d'équipement */}
+              {/* Zone droite: Stats de combat D&D */}
               <div className="combat-stats-panel">
-                <h3>⚔️ Combat</h3>
+                <h3>⚔️ Statistiques</h3>
                 <div className="combat-stats-grid">
-                  <div className="combat-stat attack">
-                    <span className="cs-icon">⚔️</span>
-                    <span className="cs-label">Attaque</span>
-                    <span className="cs-value">{currentCharacter.attack}</span>
-                    {equipmentBonuses.attack > 0 && (
-                      <span className="cs-bonus">(+{equipmentBonuses.attack})</span>
-                    )}
-                  </div>
-                  <div className="combat-stat magic-attack">
-                    <span className="cs-icon">🔮</span>
-                    <span className="cs-label">Att. Mag.</span>
-                    <span className="cs-value">{currentCharacter.magicAttack}</span>
-                    {equipmentBonuses.magicAttack > 0 && (
-                      <span className="cs-bonus">(+{equipmentBonuses.magicAttack})</span>
-                    )}
-                  </div>
-                  <div className="combat-stat defense">
+                  <div className="combat-stat armor-class">
                     <span className="cs-icon">🛡️</span>
-                    <span className="cs-label">Défense</span>
-                    <span className="cs-value">{currentCharacter.defense}</span>
-                    {equipmentBonuses.defense > 0 && (
-                      <span className="cs-bonus">(+{equipmentBonuses.defense})</span>
+                    <span className="cs-label">CA</span>
+                    <span className="cs-value">{currentCharacter.armorClass || 10}</span>
+                    {equipmentBonuses.armorClass && equipmentBonuses.armorClass > 0 && (
+                      <span className="cs-bonus">(+{equipmentBonuses.armorClass})</span>
                     )}
                   </div>
-                  <div className="combat-stat magic-defense">
-                    <span className="cs-icon">✨</span>
-                    <span className="cs-label">Déf. Mag.</span>
-                    <span className="cs-value">{currentCharacter.magicDefense}</span>
-                    {equipmentBonuses.magicDefense > 0 && (
-                      <span className="cs-bonus">(+{equipmentBonuses.magicDefense})</span>
+                  <div className="combat-stat proficiency">
+                    <span className="cs-icon">🎯</span>
+                    <span className="cs-label">Maîtrise</span>
+                    <span className="cs-value">+{currentCharacter.proficiencyBonus || 2}</span>
+                  </div>
+                  <div className="combat-stat initiative">
+                    <span className="cs-icon">⚡</span>
+                    <span className="cs-label">Initiative</span>
+                    <span className="cs-value">{currentCharacter.initiative || 0}</span>
+                  </div>
+                  <div className="combat-stat hp">
+                    <span className="cs-icon">❤️</span>
+                    <span className="cs-label">PV Max</span>
+                    <span className="cs-value">{currentCharacter.maxHp}</span>
+                    {equipmentBonuses.maxHp && equipmentBonuses.maxHp > 0 && (
+                      <span className="cs-bonus">(+{equipmentBonuses.maxHp})</span>
                     )}
                   </div>
                 </div>

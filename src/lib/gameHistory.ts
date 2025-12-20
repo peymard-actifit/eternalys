@@ -26,12 +26,8 @@ export function saveGameToHistory(
       portrait: c.portrait,
       finalHp: Math.max(0, c.hp),
       maxHp: c.maxHp,
-      // Statistiques du personnage
-      attack: c.attack,
-      magicAttack: c.magicAttack || 0,
-      defense: c.defense,
-      magicDefense: c.magicDefense,
-      speed: c.speed,
+      level: c.level || 1,
+      totalXP: c.totalXP || 0,
       // Performance en combat
       damageDealt: c.stats?.totalDamageDealt || 0,
       damageTaken: c.stats?.totalDamageTaken || 0,
@@ -41,8 +37,7 @@ export function saveGameToHistory(
       strongestMonsterKilled: c.stats?.strongestMonsterKilled ? {
         name: c.stats.strongestMonsterKilled.name,
         portrait: c.stats.strongestMonsterKilled.portrait,
-        attack: c.stats.strongestMonsterKilled.attack,
-        defense: c.stats.strongestMonsterKilled.defense,
+        challengeRating: c.stats.strongestMonsterKilled.challengeRating || 1,
         isBoss: c.stats.strongestMonsterKilled.isBoss
       } : undefined,
       // Inventaire

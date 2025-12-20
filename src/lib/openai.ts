@@ -58,12 +58,12 @@ export async function getMonsterAction(
 
 CONTEXTE DU COMBAT:
 - Tes PV: ${monster.hp}/${monster.maxHp}
-- Ton attaque: ${monster.attack}
-- Ta défense: ${monster.defense}
+- Ta CA: ${monster.armorClass || 10}
+- Ton CR: ${monster.challengeRating || 1}
 ${monster.isBoss ? '- Tu es un BOSS puissant et terrifiant!' : ''}
 
 ÉQUIPE ADVERSE:
-${aliveTeam.map((c, i) => `${i}. ${c.name} (${c.class}) - PV: ${c.hp}/${c.maxHp}, ATK: ${c.attack}, DEF: ${c.defense}`).join('\n')}
+${aliveTeam.map((c, i) => `${i}. ${c.name} (${c.class}) - PV: ${c.hp}/${c.maxHp}, CA: ${c.armorClass || 10}, Niv: ${c.level || 1}`).join('\n')}
 
 DERNIÈRES ACTIONS:
 ${combatLog.slice(-3).join('\n')}

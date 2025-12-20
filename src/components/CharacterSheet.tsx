@@ -78,11 +78,8 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
     portrait: entity.portrait || '❓',
     hp: entity.hp ?? 0,
     maxHp: entity.maxHp ?? 1,
-    attack: entity.attack ?? 0,
-    defense: entity.defense ?? 0,
-    speed: entity.speed ?? 0,
-    magicAttack: entity.magicAttack ?? 0,
-    magicDefense: entity.magicDefense ?? 0,
+    armorClass: entity.armorClass ?? 10,
+    proficiencyBonus: entity.proficiencyBonus ?? 2,
     abilities: entity.abilities || null,
     skills: entity.skills || [],
     ...entity

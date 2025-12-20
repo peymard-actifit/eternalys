@@ -212,7 +212,9 @@ export function performMonsterAttack(
   skill?: MonsterSkill
 ): MonsterAttackResult {
   const logs: string[] = [];
-  const attackDamage = skill?.damage || monster.attack;
+  // Dégâts basés sur le CR du monstre si pas de skill
+  const baseDamage = skill?.damage || Math.max(4, Math.floor((monster.challengeRating || 1) * 3));
+  const attackDamage = baseDamage;
   const damageType = skill?.damageType || 'physical';
   const isSpellAttack = skill?.isSpellAttack || false;
   

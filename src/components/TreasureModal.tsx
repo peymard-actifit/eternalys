@@ -100,11 +100,9 @@ export function TreasureModal({ treasure, team, onClose }: TreasureModalProps) {
                         </span>
                       </div>
                       <div className="choice-stats-grid">
-                        <span title="Attaque">⚔️ {character.attack}</span>
-                        <span title="Attaque Magique">✨ {character.magicAttack || 0}</span>
-                        <span title="Défense">🛡️ {character.defense}</span>
-                        <span title="Défense Magique">🔮 {character.magicDefense}</span>
-                        <span title="Vitesse">💨 {character.speed}</span>
+                        <span title="Classe d'Armure">🛡️ CA {character.armorClass || 10}</span>
+                        <span title="Niveau">📈 Niv. {character.level || 1}</span>
+                        <span title="Maîtrise">🎯 +{character.proficiencyBonus || 2}</span>
                       </div>
                     </div>
                     {selectedCharacter?.id === character.id && (

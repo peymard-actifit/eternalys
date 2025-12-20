@@ -421,14 +421,6 @@ export interface Monster {
   
   // === BUFFS ===
   buffs?: ActiveBuff[];
-  
-  // === COMPATIBILITÉ (DEPRECATED - sera supprimé) ===
-  // Ces propriétés sont ignorées par le système D&D, qui utilise les caractéristiques et le CR
-  attack?: number;
-  defense?: number;
-  magicDefense?: number;
-  magicAttack?: number;
-  monsterType?: 'demon' | 'undead' | 'beast' | 'humanoid' | 'elemental' | 'dragon';
 }
 
 export interface LegendaryAction {
@@ -685,17 +677,6 @@ export interface GameHistory {
 }
 
 // =============================================================================
-// STATS DE BASE (pour compatibilité, sera supprimé)
-// =============================================================================
-
-export interface BaseStats {
-  attack: number;
-  magicAttack: number;
-  defense: number;
-  magicDefense: number;
-  speed: number;
-}
-
 export interface StatModification {
   source: string;
   value: number;
