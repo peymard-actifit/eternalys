@@ -7385,11 +7385,47 @@ export function getRandomMonsterByCR(cr: number): Monster {
   return JSON.parse(JSON.stringify(monsters[index])); // Deep copy
 }
 
-// Obtenir un monstre aléatoire (pour compatibilité)
-export function getRandomMonster(): Monster {
-  // Choisir un CR aléatoire parmi les monstres normaux (CR 0-10)
-  const normalCRs = [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const randomCR = normalCRs[Math.floor(Math.random() * normalCRs.length)];
+// Obtenir un monstre aléatoire adapté au niveau de donjon (système D&D 50 niveaux)
+export function getRandomMonster(dungeonLevel: number = 1): Monster {
+  // Calculer le CR cible basé sur le niveau du donjon
+  // Utilise la configuration des niveaux de dndSystem.ts
+  let minCR: number, maxCR: number;
+  
+  if (dungeonLevel <= 5) {
+    minCR = dungeonLevel;
+    maxCR = dungeonLevel + 1;
+  } else if (dungeonLevel <= 10) {
+    minCR = dungeonLevel + 2;
+    maxCR = dungeonLevel + 5;
+  } else if (dungeonLevel <= 20) {
+    minCR = 10 + dungeonLevel;
+    maxCR = 15 + dungeonLevel;
+  } else if (dungeonLevel <= 30) {
+    minCR = 25 + dungeonLevel;
+    maxCR = 35 + dungeonLevel;
+  } else if (dungeonLevel <= 40) {
+    minCR = 40 + dungeonLevel;
+    maxCR = 55 + dungeonLevel;
+  } else {
+    minCR = 60 + dungeonLevel;
+    maxCR = Math.min(100, 75 + dungeonLevel);
+  }
+  
+  // Trouver des monstres dans cette plage de CR
+  const availableCRs = Object.keys(MONSTERS_BY_CR)
+    .map(Number)
+    .filter(cr => cr >= minCR && cr <= maxCR);
+  
+  // Si pas de monstres dans cette plage, prendre le CR le plus proche
+  if (availableCRs.length === 0) {
+    const allCRs = Object.keys(MONSTERS_BY_CR).map(Number).sort((a, b) => a - b);
+    const closestCR = allCRs.reduce((prev, curr) => 
+      Math.abs(curr - minCR) < Math.abs(prev - minCR) ? curr : prev
+    );
+    return getRandomMonsterByCR(closestCR);
+  }
+  
+  const randomCR = availableCRs[Math.floor(Math.random() * availableCRs.length)];
   return getRandomMonsterByCR(randomCR);
 }
 
@@ -7414,25 +7450,56 @@ export function getRandomEncounter(targetCR: number, count: number = 1): Monster
   return result;
 }
 
-// Obtenir un boss aléatoire adapté au niveau du donjon
+// Obtenir un boss aléatoire adapté au niveau du donjon (système D&D 50 niveaux)
 export function getRandomBoss(dungeonLevel: number = 1): Monster {
+  // Calculer le CR cible du boss basé sur le niveau du donjon
+  let targetBossCR: number;
+  
+  if (dungeonLevel <= 5) {
+    // Niveaux 1-5: CR 3-7
+    targetBossCR = dungeonLevel + 2;
+  } else if (dungeonLevel <= 10) {
+    // Niveaux 6-10: CR 8-17
+    targetBossCR = dungeonLevel + 7;
+  } else if (dungeonLevel <= 20) {
+    // Niveaux 11-20: CR 20-40
+    targetBossCR = 20 + dungeonLevel;
+  } else if (dungeonLevel <= 30) {
+    // Niveaux 21-30: CR 40-70
+    targetBossCR = 40 + dungeonLevel;
+  } else if (dungeonLevel <= 40) {
+    // Niveaux 31-40: CR 60-100
+    targetBossCR = 60 + dungeonLevel;
+  } else {
+    // Niveaux 41-50: CR 80-100 (divinités)
+    targetBossCR = Math.min(100, 80 + dungeonLevel);
+  }
+  
+  // Sélectionner les boss par tier basé sur le CR cible
   let bossList: Monster[];
   
-  // Sélectionner le tier de boss en fonction du niveau du donjon
-  if (dungeonLevel >= 5) {
-    // Niveau 5+ : tous les boss possibles (y compris divinités)
+  if (targetBossCR >= 90) {
+    // CR 90+: Divinités (Tiamat, Ao, etc.)
+    bossList = [...BOSSES_TIER_5, ...BOSSES_TIER_4].filter(b => (b.challengeRating || 0) >= 30);
+  } else if (targetBossCR >= 70) {
+    // CR 70-89: Archidiables majeurs et Dragons anciens
     bossList = [...BOSSES_TIER_4, ...BOSSES_TIER_5];
-  } else if (dungeonLevel === 4) {
-    // Niveau 4 : Archidiables et Seigneurs Démons
+  } else if (targetBossCR >= 50) {
+    // CR 50-69: Archidiables et puissants dragons
     bossList = [...BOSSES_TIER_3, ...BOSSES_TIER_4];
-  } else if (dungeonLevel === 3) {
-    // Niveau 3 : Dragons anciens et boss puissants
+  } else if (targetBossCR >= 30) {
+    // CR 30-49: Dragons anciens et démons majeurs
     bossList = [...BOSSES_TIER_2, ...BOSSES_TIER_3];
-  } else if (dungeonLevel === 2) {
-    // Niveau 2 : Dragons adultes et boss intermédiaires
+  } else if (targetBossCR >= 15) {
+    // CR 15-29: Dragons adultes et boss intermédiaires
     bossList = [...BOSSES_TIER_1, ...BOSSES_TIER_2];
   } else {
-    // Niveau 1 : boss tier 1 uniquement
+    // CR 1-14: Boss tier 1 (adapté aux débutants)
+    bossList = BOSSES_TIER_1;
+  }
+  
+  // Fallback si pas de boss dans le tier
+  if (!bossList || bossList.length === 0) {
     bossList = BOSSES_TIER_1;
   }
   

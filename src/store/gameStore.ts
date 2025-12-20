@@ -335,17 +335,15 @@ export const gameStore = {
         const monsters: Monster[] = [];
         
         for (let i = 0; i < monsterCount; i++) {
-          const monster = getRandomMonster();
-          // Appliquer le scaling des monstres selon le niveau
+          // Utiliser le niveau de donjon pour obtenir un monstre approprié
+          const monster = getRandomMonster(state.dungeonLevel);
+          // Appliquer le scaling aux PV et dégâts (système D&D simplifié)
           const scaledMonster: Monster = {
             ...monster,
             id: `${monster.id}_${i}_${Date.now()}`,
             hp: Math.floor(monster.hp * monsterMultiplier),
             maxHp: Math.floor(monster.maxHp * monsterMultiplier),
-            attack: Math.floor(monster.attack * monsterMultiplier),
-            magicAttack: monster.magicAttack ? Math.floor(monster.magicAttack * monsterMultiplier) : undefined,
-            defense: Math.floor(monster.defense * monsterMultiplier),
-            magicDefense: Math.floor(monster.magicDefense * monsterMultiplier),
+            armorClass: monster.armorClass || 10,
             skills: monster.skills?.map(s => ({
               ...s,
               damage: Math.floor(s.damage * monsterMultiplier)
