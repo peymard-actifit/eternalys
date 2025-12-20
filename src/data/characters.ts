@@ -1,101 +1,176 @@
-import { Character, AbilityScores } from '../types/game.types';
-import { CLASS_STARTER_EQUIPMENT } from './equipment';
+// =============================================================================
+// PERSONNAGES ETERNALYS - SYSTÈME D&D 5e ÉTENDU
+// =============================================================================
+// Tous les personnages commencent niveau 1
+// Stats basées à 100% sur les caractéristiques D&D
+// =============================================================================
 
-// Helper pour créer les caractéristiques D&D
-const createAbilities = (str: number, dex: number, con: number, int: number, wis: number, cha: number): AbilityScores => ({
-  strength: str, dexterity: dex, constitution: con, intelligence: int, wisdom: wis, charisma: cha
+import { Character, AbilityScores, Skill } from '../types/game.types';
+import { CLASS_STARTER_EQUIPMENT } from './equipment';
+import { 
+  getAbilityModifier, 
+  getProficiencyBonus, 
+  calculateMaxHP,
+  HIT_DICE,
+  SPELLCASTING_ABILITY
+} from '../config/dndSystem';
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+/**
+ * Crée un objet AbilityScores
+ */
+const createAbilities = (
+  str: number, 
+  dex: number, 
+  con: number, 
+  int: number, 
+  wis: number, 
+  cha: number
+): AbilityScores => ({
+  strength: str,
+  dexterity: dex,
+  constitution: con,
+  intelligence: int,
+  wisdom: wis,
+  charisma: cha
 });
 
-// ==============================================
-// SYSTÈME D'ÉQUILIBRAGE ETHERNALYS v3.0
-// PERSONNAGES NIVEAU 1 - D&D 5e STYLE
-// ==============================================
-// Stats niveau 1 D&D 5e:
-// - PV de base: Dé de vie max + mod CON
-// - Bonus de maîtrise: +2 au niveau 1
-// - Caractéristiques: Point buy standard (27 points)
-//   ou array standard [15, 14, 13, 12, 10, 8]
-// - CA de base: selon armure portée
-// ==============================================
+/**
+ * Crée un personnage niveau 1 avec le nouveau système
+ */
+function createCharacter(
+  id: string,
+  name: string,
+  className: string,
+  portrait: string,
+  abilities: AbilityScores,
+  savingThrowProficiencies: (keyof AbilityScores)[],
+  baseArmorClass: number,
+  speed: number,
+  skills: Skill[]
+): Character {
+  const level = 1;
+  const proficiencyBonus = getProficiencyBonus(level);
+  const maxHp = calculateMaxHP(className, level, abilities.constitution);
+  
+  return {
+    id,
+    name,
+    class: className,
+    portrait,
+    
+    // Niveau et XP
+    level,
+    xp: 0,
+    totalXP: 0,
+    
+    // Points de vie
+    hp: maxHp,
+    maxHp,
+    
+    // Caractéristiques D&D - BASE DU SYSTÈME
+    abilities,
+    
+    // Stats dérivées
+    armorClass: baseArmorClass,
+    speed,
+    proficiencyBonus,
+    
+    // Maîtrises
+    savingThrowProficiencies,
+    
+    // Compétences
+    skills,
+    
+    // Équipement de départ
+    equipment: CLASS_STARTER_EQUIPMENT[className],
+    
+    // Talents (vide au niveau 1)
+    talents: [],
+    pendingTalentChoice: false,
+    
+    // Pas de buffs/conditions au départ
+    buffs: [],
+    conditions: [],
+    
+    // Stats de partie
+    stats: {
+      totalDamageDealt: 0,
+      totalDamageTaken: 0,
+      totalHealingDone: 0,
+      monstersKilled: []
+    }
+  };
+}
 
-// Calcul des PV niveau 1: Dé de vie max + modificateur CON
-const calculateHP = (hitDie: number, conMod: number): number => hitDie + conMod;
-const getModifier = (score: number): number => Math.floor((score - 10) / 2);
+// =============================================================================
+// PERSONNAGES DISPONIBLES
+// =============================================================================
 
 export const AVAILABLE_CHARACTERS: Character[] = [
   // ============================================
   // GUERRIERS (d10)
   // ============================================
-  {
-    id: 'warrior',
-    name: 'Thorin',
-    class: 'Guerrier',
-    level: 1,
-    hp: 12, // d10 + 2 (CON 14)
-    maxHp: 12,
-    abilities: createAbilities(16, 13, 14, 10, 12, 8), // Standard array: STR > DEX > CON > WIS > INT > CHA
-    armorClass: 16, // Cotte de mailles (16) + bouclier (+2) = 18, mais level 1 = 16
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'constitution'],
-    attack: 5,      // FOR mod (3) + proficiency (2)
-    magicAttack: 0,
-    defense: 16,
-    magicDefense: 6,
-    speed: 30,
-    portrait: '⚔️',
-    equipment: CLASS_STARTER_EQUIPMENT['Guerrier'],
-    skills: [
+  createCharacter(
+    'warrior',
+    'Thorin',
+    'Guerrier',
+    '⚔️',
+    createAbilities(16, 13, 14, 10, 12, 8),
+    ['strength', 'constitution'],
+    16, // Cotte de mailles (16)
+    30,
+    [
       { 
         id: 'slash', 
         name: 'Tranche', 
-        damage: 8, // 1d8 + FOR (3) = ~8
+        damage: 0, // Calculé dynamiquement
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'slashing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 0,
-        description: 'Attaque à l\'épée longue. 1d8+3 tranchant.'
+        description: 'Attaque à l\'épée longue. 1d8 + FOR tranchant.'
       },
       { 
         id: 'second_wind', 
         name: 'Second souffle', 
-        damage: -6, // 1d10 + niveau = ~6 au niveau 1
+        damage: -6,
+        damageDice: '1d10',
         type: 'heal',
         targetType: 'self',
         cooldown: 4,
-        description: 'Se soigne de 1d10+1 PV. Repos court.'
+        description: 'Récupère 1d10 + niveau PV. Une fois par repos court.'
       }
     ]
-  },
-  {
-    id: 'berserker',
-    name: 'Ragnar',
-    class: 'Berserker',
-    level: 1,
-    hp: 14, // d12 + 2 (CON 14)
-    maxHp: 14,
-    abilities: createAbilities(17, 13, 14, 8, 10, 8), // FOR priorité absolue
-    armorClass: 13, // Armure de peaux, pas de bouclier
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'constitution'],
-    attack: 7,      // FOR mod (3) + rage (+2) + proficiency (2)
-    magicAttack: 0,
-    defense: 12,
-    magicDefense: 4,
-    speed: 30,
-    portrait: '🪓',
-    equipment: CLASS_STARTER_EQUIPMENT['Berserker'],
-    skills: [
+  ),
+
+  createCharacter(
+    'berserker',
+    'Ragnar',
+    'Berserker',
+    '🪓',
+    createAbilities(17, 13, 14, 8, 10, 8),
+    ['strength', 'constitution'],
+    13, // Armure de peaux
+    30,
+    [
       { 
         id: 'reckless_attack', 
         name: 'Attaque téméraire', 
-        damage: 12, // 1d12 + FOR (3) + rage (2) = ~12
+        damage: 0,
+        damageDice: '1d12',
         type: 'attack',
         damageType: 'slashing',
         targetType: 'enemy',
-        cooldown: 1,
-        description: 'Grande hache avec avantage. 1d12+5 tranchant.',
         requiresAttackRoll: true,
-        grantAdvantage: true  // Attaque téméraire donne l'avantage
+        grantAdvantage: true,
+        cooldown: 1,
+        description: 'Attaque avec avantage. Les ennemis ont avantage contre vous jusqu\'à votre prochain tour.'
       },
       { 
         id: 'rage', 
@@ -105,385 +180,326 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'attack', value: 2, turns: 4 },
         cooldown: 5,
-        description: 'Entre en rage: +2 dégâts, résistance contondant/perforant/tranchant.'
+        description: 'Entre en rage: +2 dégâts mêlée, résistance contondant/perforant/tranchant.'
       }
     ]
-  },
-  {
-    id: 'knight',
-    name: 'Gauvain',
-    class: 'Chevalier',
-    level: 1,
-    hp: 12, // d10 + 2
-    maxHp: 12,
-    abilities: createAbilities(15, 10, 14, 10, 13, 14), // CHA pour aura
-    armorClass: 18, // Cotte de mailles + bouclier
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 4,      // FOR mod (2) + proficiency (2)
-    magicAttack: 2, // CHA mod pour sorts
-    defense: 18,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '🛡️',
-    equipment: CLASS_STARTER_EQUIPMENT['Chevalier'],
-    skills: [
+  ),
+
+  createCharacter(
+    'knight',
+    'Gauvain',
+    'Chevalier',
+    '🛡️',
+    createAbilities(15, 10, 14, 10, 13, 14),
+    ['wisdom', 'charisma'],
+    18, // Cotte de mailles + bouclier
+    30,
+    [
       { 
         id: 'divine_smite', 
         name: 'Châtiment divin', 
-        damage: 9, // 1d8 arme + 2d8 radiant = ~13 mais niveau 1 = ~9
+        damage: 0,
+        damageDice: '2d8',
         type: 'attack',
         damageType: 'radiant',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         bonusVsDemon: 4,
         bonusVsUndead: 4,
         cooldown: 3,
-        description: 'Consomme un emplacement de sort. +2d8 radiants.'
+        description: 'Consomme un emplacement de sort. +2d8 dégâts radiants (+1d8 vs morts-vivants/fiélons).'
       },
       { 
         id: 'lay_on_hands', 
         name: 'Imposition des mains', 
-        damage: -5, // 5 PV au niveau 1 (niveau x 5)
+        damage: -5,
         type: 'heal',
-        damageType: 'radiant',
         targetType: 'ally',
         cooldown: 4,
-        description: 'Réserve de 5 PV de soins.'
+        description: 'Puise dans votre réserve de 5 × niveau PV pour soigner.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // MAGES (d6)
   // ============================================
-  {
-    id: 'mage',
-    name: 'Elara',
-    class: 'Mage',
-    level: 1,
-    hp: 7, // d6 + 1 (CON 12)
-    maxHp: 7,
-    abilities: createAbilities(8, 14, 12, 16, 13, 10), // INT priorité
-    armorClass: 12, // 10 + DEX (2), pas d'armure
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['intelligence', 'wisdom'],
-    attack: 0,
-    magicAttack: 5, // INT mod (3) + proficiency (2)
-    defense: 10,
-    magicDefense: 10,
-    speed: 30,
-    portrait: '🔮',
-    equipment: CLASS_STARTER_EQUIPMENT['Mage'],
-    skills: [
+  createCharacter(
+    'mage',
+    'Elara',
+    'Mage',
+    '🔮',
+    createAbilities(8, 14, 12, 16, 13, 10),
+    ['intelligence', 'wisdom'],
+    12, // 10 + DEX
+    30,
+    [
       { 
         id: 'fire_bolt', 
         name: 'Trait de feu', 
-        damage: 7, // 1d10 = ~5.5, + INT mod limité = ~7
+        damage: 0,
+        damageDice: '1d10',
         type: 'attack',
         damageType: 'fire',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d10 dégâts de feu.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 0,
+        description: 'Sort mineur. Jet d\'attaque à distance, 1d10 dégâts de feu.'
       },
       { 
         id: 'magic_missile', 
         name: 'Projectile magique', 
-        damage: 10, // 3d4+3 = 10.5
-        type: 'attack',
+        damage: 0,
+        damageDice: '3d4+3',
+        type: 'damage',
         damageType: 'force',
         targetType: 'enemy',
+        requiresAttackRoll: false, // Touche automatiquement
         cooldown: 2,
-        description: 'Touche automatique. 3d4+3 force.'
+        description: 'Trois projectiles qui touchent automatiquement. 1d4+1 force chacun.'
       }
     ]
-  },
-  {
-    id: 'necromancer',
-    name: 'Morrigan',
-    class: 'Nécromancien',
-    level: 1,
-    hp: 7, // d6 + 1
-    maxHp: 7,
-    abilities: createAbilities(8, 14, 12, 16, 12, 10), // INT priorité
-    armorClass: 12,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['intelligence', 'wisdom'],
-    attack: 0,
-    magicAttack: 5,
-    defense: 10,
-    magicDefense: 9,
-    speed: 30,
-    portrait: '💀',
-    equipment: CLASS_STARTER_EQUIPMENT['Nécromancien'],
-    skills: [
+  ),
+
+  createCharacter(
+    'necromancer',
+    'Morrigan',
+    'Nécromancien',
+    '💀',
+    createAbilities(8, 14, 12, 16, 12, 10),
+    ['intelligence', 'wisdom'],
+    12,
+    30,
+    [
       { 
         id: 'chill_touch', 
         name: 'Contact glacial', 
-        damage: 6, // 1d8 nécrotique
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'necrotic',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d8 nécrotique, empêche régénération.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 0,
+        description: 'Sort mineur. 1d8 nécrotique, empêche la régénération jusqu\'à votre prochain tour.'
       },
       { 
         id: 'false_life', 
         name: 'Simulacre de vie', 
-        damage: -6, // 1d4+4 PV temporaires
+        damage: -6,
+        damageDice: '1d4+4',
         type: 'heal',
         targetType: 'self',
         cooldown: 3,
-        description: 'Gagne 1d4+4 PV temporaires.'
+        description: 'Gagne 1d4+4 PV temporaires pendant 1 heure.'
       }
     ]
-  },
-  {
-    id: 'elementalist',
-    name: 'Zephyr',
-    class: 'Élémentaliste',
-    level: 1,
-    hp: 8, // d6 + 2 (CON 14)
-    maxHp: 8,
-    abilities: createAbilities(8, 14, 14, 16, 10, 12), // INT + CON
-    armorClass: 12,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['constitution', 'intelligence'],
-    attack: 0,
-    magicAttack: 5,
-    defense: 10,
-    magicDefense: 9,
-    speed: 30,
-    portrait: '🌪️',
-    equipment: CLASS_STARTER_EQUIPMENT['Élémentaliste'],
-    skills: [
+  ),
+
+  createCharacter(
+    'elementalist',
+    'Zephyr',
+    'Élémentaliste',
+    '🌪️',
+    createAbilities(8, 14, 14, 16, 10, 12),
+    ['constitution', 'intelligence'],
+    12,
+    30,
+    [
       { 
         id: 'shocking_grasp', 
         name: 'Poigne électrique', 
-        damage: 6, // 1d8 foudre
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'lightning',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d8 foudre, avantage vs armure métal.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 0,
+        description: 'Sort mineur au contact. 1d8 foudre, avantage contre cibles en armure métallique.'
       },
       { 
         id: 'chromatic_orb', 
         name: 'Orbe chromatique', 
-        damage: 13, // 3d8 élémentaire
+        damage: 0,
+        damageDice: '3d8',
         type: 'attack',
         damageType: 'lightning',
         targetType: 'enemy',
-        cooldown: 2,
-        description: 'Sort niveau 1. 3d8 dégâts élémentaires.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 2,
+        description: 'Sort niveau 1. 3d8 dégâts du type élémentaire choisi.'
       }
     ]
-  },
-  {
-    id: 'sorcerer',
-    name: 'Kael',
-    class: 'Ensorceleur',
-    level: 1,
-    hp: 7, // d6 + 1
-    maxHp: 7,
-    abilities: createAbilities(8, 14, 12, 10, 10, 17), // CHA priorité
-    armorClass: 12,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['constitution', 'charisma'],
-    attack: 0,
-    magicAttack: 5, // CHA mod (3) + proficiency (2)
-    defense: 10,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '⚡',
-    equipment: CLASS_STARTER_EQUIPMENT['Ensorceleur'],
-    skills: [
+  ),
+
+  createCharacter(
+    'sorcerer',
+    'Kael',
+    'Ensorceleur',
+    '⚡',
+    createAbilities(8, 14, 12, 10, 10, 17),
+    ['constitution', 'charisma'],
+    12,
+    30,
+    [
       { 
         id: 'ray_of_frost', 
         name: 'Rayon de givre', 
-        damage: 6, // 1d8 froid
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'cold',
         targetType: 'enemy',
+        isSpellAttack: true,
+        requiresAttackRoll: true,
         debuffStats: { stat: 'speed', value: 3, turns: 1 },
         cooldown: 0,
-        description: 'Sort mineur. 1d8 froid, -3m vitesse.',
-        isSpellAttack: true,
-        requiresAttackRoll: true
+        description: 'Sort mineur. 1d8 froid, réduit la vitesse de 3m jusqu\'à votre prochain tour.'
       },
       { 
         id: 'chaos_bolt', 
         name: 'Trait de chaos', 
-        damage: 12, // 2d8+1d6
+        damage: 0,
+        damageDice: '2d8+1d6',
         type: 'attack',
         damageType: 'force',
         targetType: 'enemy',
-        cooldown: 2,
-        description: 'Sort niveau 1. Dégâts aléatoires.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 2,
+        description: 'Sort niveau 1. 2d8+1d6 dégâts de type aléatoire. Peut rebondir sur doubles.'
       }
     ]
-  },
-  {
-    id: 'warlock',
-    name: 'Azrael',
-    class: 'Occultiste',
-    level: 1,
-    hp: 9, // d8 + 1
-    maxHp: 9,
-    abilities: createAbilities(8, 14, 12, 12, 10, 16), // CHA priorité
-    armorClass: 13, // Armure de cuir
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 0,
-    magicAttack: 5,
-    defense: 12,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '👁️‍🗨️',
-    equipment: CLASS_STARTER_EQUIPMENT['Occultiste'],
-    skills: [
+  ),
+
+  createCharacter(
+    'warlock',
+    'Azrael',
+    'Occultiste',
+    '👁️‍🗨️',
+    createAbilities(8, 14, 12, 12, 10, 16),
+    ['wisdom', 'charisma'],
+    13, // Armure de cuir
+    30,
+    [
       { 
         id: 'eldritch_blast', 
         name: 'Décharge occulte', 
-        damage: 8, // 1d10 + CHA (invocation)
+        damage: 0,
+        damageDice: '1d10',
         type: 'attack',
         damageType: 'force',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur signature. 1d10 force.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 0,
+        description: 'Sort mineur signature. 1d10 force. Rayons supplémentaires aux niveaux supérieurs.'
       },
       { 
         id: 'hex', 
         name: 'Maléfice', 
-        damage: 6, // 1d6 nécrotique bonus
+        damage: 0,
+        damageDice: '1d6',
         type: 'debuff',
         damageType: 'necrotic',
         targetType: 'enemy',
         debuffStats: { stat: 'attack', value: 2, turns: 3 },
         cooldown: 3,
-        description: 'Marque une cible. +1d6 nécrotique par attaque.'
+        description: 'Marque une cible. +1d6 nécrotique par attaque. Désavantage sur un type de jet.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // SOIGNEURS (d8)
   // ============================================
-  {
-    id: 'healer',
-    name: 'Liora',
-    class: 'Prêtresse',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(10, 12, 14, 10, 16, 13), // SAG priorité
-    armorClass: 16, // Chemise de mailles + bouclier
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 2,
-    magicAttack: 5, // SAG mod (3) + proficiency (2)
-    defense: 14,
-    magicDefense: 10,
-    speed: 30,
-    portrait: '✨',
-    equipment: CLASS_STARTER_EQUIPMENT['Prêtresse'],
-    skills: [
+  createCharacter(
+    'healer',
+    'Liora',
+    'Prêtresse',
+    '✨',
+    createAbilities(10, 12, 14, 10, 16, 13),
+    ['wisdom', 'charisma'],
+    16, // Chemise de mailles + bouclier
+    30,
+    [
       { 
         id: 'cure_wounds', 
         name: 'Soins des blessures', 
-        damage: -9, // 1d8 + SAG (3) = ~7.5, arrondi 9
+        damage: -9,
+        damageDice: '1d8',
         type: 'heal',
-        damageType: 'radiant',
         targetType: 'ally',
         cooldown: 2,
-        description: 'Sort niveau 1. Soigne 1d8+3 PV.'
+        description: 'Sort niveau 1. Soigne 1d8 + mod SAG PV au toucher.'
       },
       { 
         id: 'sacred_flame', 
         name: 'Flamme sacrée', 
-        damage: 6, // 1d8 radiant
-        type: 'attack',
+        damage: 0,
+        damageDice: '1d8',
+        type: 'damage',
         damageType: 'radiant',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d8 radiant, jet de DEX.',
+        requiresAttackRoll: false,
         savingThrow: { ability: 'dexterity', dc: 13 },
-        requiresAttackRoll: false
+        cooldown: 0,
+        description: 'Sort mineur. 1d8 radiant, jet de sauvegarde DEX pour annuler.'
       }
     ]
-  },
-  {
-    id: 'druid',
-    name: 'Sylvestre',
-    class: 'Druide',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(10, 14, 14, 12, 16, 8), // SAG + CON
-    armorClass: 14, // Armure de cuir + bouclier (bois)
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['intelligence', 'wisdom'],
-    attack: 2,
-    magicAttack: 5,
-    defense: 13,
-    magicDefense: 10,
-    speed: 30,
-    portrait: '🌿',
-    equipment: CLASS_STARTER_EQUIPMENT['Druide'],
-    skills: [
+  ),
+
+  createCharacter(
+    'druid',
+    'Sylvestre',
+    'Druide',
+    '🌿',
+    createAbilities(10, 14, 14, 12, 16, 8),
+    ['intelligence', 'wisdom'],
+    14, // Armure de cuir + bouclier bois
+    30,
+    [
       { 
         id: 'healing_word', 
         name: 'Mot de guérison', 
-        damage: -6, // 1d4 + SAG (3)
+        damage: -6,
+        damageDice: '1d4',
         type: 'heal',
         targetType: 'ally',
         cooldown: 2,
-        description: 'Sort niveau 1 bonus. Soigne 1d4+3 à distance.'
+        description: 'Sort niveau 1 bonus. Soigne 1d4 + mod SAG à distance.'
       },
       { 
         id: 'produce_flame', 
         name: 'Flammes', 
-        damage: 6, // 1d8 feu
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'fire',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d8 feu.',
         isSpellAttack: true,
-        requiresAttackRoll: true
+        requiresAttackRoll: true,
+        cooldown: 0,
+        description: 'Sort mineur. Crée une flamme, peut l\'attaquer pour 1d8 feu.'
       }
     ]
-  },
-  {
-    id: 'oracle',
-    name: 'Cassandre',
-    class: 'Oracle',
-    level: 1,
-    hp: 9, // d8 + 1
-    maxHp: 9,
-    abilities: createAbilities(8, 12, 12, 14, 17, 12), // SAG très haute
-    armorClass: 12,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 0,
-    magicAttack: 5,
-    defense: 11,
-    magicDefense: 11,
-    speed: 30,
-    portrait: '🔮',
-    equipment: CLASS_STARTER_EQUIPMENT['Oracle'],
-    skills: [
+  ),
+
+  createCharacter(
+    'oracle',
+    'Cassandre',
+    'Oracle',
+    '🔮',
+    createAbilities(8, 12, 12, 14, 17, 12),
+    ['wisdom', 'charisma'],
+    12,
+    30,
+    [
       { 
         id: 'guidance', 
         name: 'Assistance', 
@@ -492,94 +508,81 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'ally',
         buffStats: { stat: 'attack', value: 2, turns: 2 },
         cooldown: 2,
-        description: 'Sort mineur. +1d4 à un jet au choix.'
+        description: 'Sort mineur. La cible ajoute 1d4 à un jet de caractéristique.'
       },
       { 
         id: 'cure_wounds', 
         name: 'Soins', 
         damage: -9,
+        damageDice: '1d8',
         type: 'heal',
         targetType: 'ally',
         cooldown: 2,
-        description: 'Sort niveau 1. Soigne 1d8+3 PV.'
+        description: 'Sort niveau 1. Soigne 1d8 + mod SAG PV.'
       }
     ]
-  },
-  {
-    id: 'life_cleric',
-    name: 'Seraphina',
-    class: 'Clerc de Vie',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(14, 10, 14, 10, 16, 12), // FOR pour armure lourde
-    armorClass: 18, // Cotte de mailles + bouclier (domaine vie)
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 4, // FOR (2) + proficiency
-    magicAttack: 5,
-    defense: 16,
-    magicDefense: 10,
-    speed: 30,
-    portrait: '☀️',
-    equipment: CLASS_STARTER_EQUIPMENT['Clerc de Vie'],
-    skills: [
+  ),
+
+  createCharacter(
+    'life_cleric',
+    'Seraphina',
+    'Clerc de Vie',
+    '☀️',
+    createAbilities(14, 10, 14, 10, 16, 12),
+    ['wisdom', 'charisma'],
+    18, // Cotte de mailles + bouclier (domaine vie)
+    30,
+    [
       { 
         id: 'cure_wounds_blessed', 
         name: 'Soins bénis', 
-        damage: -12, // 1d8 + SAG (3) + 2 + 1 (domaine) = ~10-12
+        damage: -12,
+        damageDice: '1d8+3',
         type: 'heal',
-        damageType: 'radiant',
         targetType: 'ally',
         cooldown: 2,
-        description: 'Soins majorés. 1d8+6 PV (Disciple de la Vie).'
+        description: 'Soins majorés (Disciple de la Vie). 1d8 + mod SAG + 3 PV.'
       },
       { 
         id: 'toll_the_dead', 
         name: 'Glas funèbre', 
-        damage: 6, // 1d8 ou 1d12 si blessé
-        type: 'attack',
+        damage: 0,
+        damageDice: '1d8',
+        type: 'damage',
         damageType: 'necrotic',
         targetType: 'enemy',
-        cooldown: 0,
-        description: 'Sort mineur. 1d8 nécrotique (1d12 si cible blessée).',
+        requiresAttackRoll: false,
         savingThrow: { ability: 'wisdom', dc: 13 },
-        requiresAttackRoll: false
+        cooldown: 0,
+        description: 'Sort mineur. 1d8 nécrotique (1d12 si cible blessée), JS SAG pour annuler.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // ROUBLARDS (d8)
   // ============================================
-  {
-    id: 'rogue',
-    name: 'Ombre',
-    class: 'Roublard',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(10, 17, 14, 13, 12, 8), // DEX priorité
-    armorClass: 14, // Armure de cuir (11) + DEX (3)
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['dexterity', 'intelligence'],
-    attack: 5, // DEX (3) + proficiency (2)
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 7,
-    speed: 30,
-    portrait: '🗡️',
-    equipment: CLASS_STARTER_EQUIPMENT['Roublard'],
-    skills: [
+  createCharacter(
+    'rogue',
+    'Ombre',
+    'Roublard',
+    '🗡️',
+    createAbilities(10, 17, 14, 13, 12, 8),
+    ['dexterity', 'intelligence'],
+    14, // Armure de cuir + DEX
+    30,
+    [
       { 
         id: 'sneak_attack', 
         name: 'Attaque sournoise', 
-        damage: 10, // 1d6 (rapière) + 1d6 (sneak) + DEX = ~10
+        damage: 0,
+        damageDice: '2d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 1,
-        description: 'Si avantage ou allié adjacent. +1d6 dégâts.'
+        description: 'Si avantage ou allié adjacent. 1d6 + 1d6 (attaque sournoise) + DEX perforant.'
       },
       { 
         id: 'cunning_action', 
@@ -589,38 +592,32 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'speed', value: 5, turns: 1 },
         cooldown: 2,
-        description: 'Désengagement, Sprint ou Cachette en action bonus.'
+        description: 'Action bonus: Désengagement, Sprint ou Se cacher.'
       }
     ]
-  },
-  {
-    id: 'ninja',
-    name: 'Kaito',
-    class: 'Ninja',
-    level: 1,
-    hp: 10,
-    maxHp: 10,
-    abilities: createAbilities(10, 17, 14, 12, 14, 8), // DEX + SAG pour perception
-    armorClass: 14,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['dexterity', 'wisdom'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 8,
-    speed: 35, // Ninjas plus rapides
-    portrait: '🥷',
-    equipment: CLASS_STARTER_EQUIPMENT['Ninja'],
-    skills: [
+  ),
+
+  createCharacter(
+    'ninja',
+    'Kaito',
+    'Ninja',
+    '🥷',
+    createAbilities(10, 17, 14, 12, 14, 8),
+    ['dexterity', 'wisdom'],
+    14,
+    35, // Ninjas plus rapides
+    [
       { 
         id: 'shuriken', 
         name: 'Shuriken', 
-        damage: 7, // 1d4 + DEX x2 (deux shurikens)
+        damage: 0,
+        damageDice: '2d4',
         type: 'attack',
         damageType: 'slashing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 0,
-        description: 'Lance deux shurikens. 2x(1d4+3) tranchant.'
+        description: 'Lance deux shurikens. 2 × (1d4 + DEX) tranchant.'
       },
       { 
         id: 'smoke_bomb', 
@@ -630,39 +627,33 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'enemy',
         debuffStats: { stat: 'attack', value: 3, turns: 2 },
         cooldown: 3,
-        description: 'Aveugle la cible. -3 attaque pendant 2 tours.'
+        description: 'Aveugle la zone. Ennemis affectés: -3 aux attaques pendant 2 tours.'
       }
     ]
-  },
-  {
-    id: 'thief',
-    name: 'Filou',
-    class: 'Voleur',
-    level: 1,
-    hp: 10,
-    maxHp: 10,
-    abilities: createAbilities(8, 17, 14, 14, 10, 12), // DEX + INT
-    armorClass: 14,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['dexterity', 'charisma'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 6,
-    speed: 30,
-    portrait: '🎭',
-    equipment: CLASS_STARTER_EQUIPMENT['Voleur'],
-    skills: [
+  ),
+
+  createCharacter(
+    'thief',
+    'Filou',
+    'Voleur',
+    '🎭',
+    createAbilities(8, 17, 14, 14, 10, 12),
+    ['dexterity', 'charisma'],
+    14,
+    30,
+    [
       { 
         id: 'quick_fingers', 
         name: 'Doigts agiles', 
-        damage: 7, // Attaque rapide
+        damage: 0,
+        damageDice: '1d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         lifesteal: 25,
         cooldown: 2,
-        description: 'Attaque et vole 25% en PV.'
+        description: 'Attaque rapide et vole 25% des dégâts en PV.'
       },
       { 
         id: 'fast_hands', 
@@ -672,84 +663,73 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'speed', value: 4, turns: 2 },
         cooldown: 2,
-        description: 'Utiliser objet en action bonus. +4 vitesse.'
+        description: 'Utiliser objet, crocheter ou désamorcer en action bonus. +4 vitesse.'
       }
     ]
-  },
-  {
-    id: 'assassin',
-    name: 'Vex',
-    class: 'Assassin',
-    level: 1,
-    hp: 10,
-    maxHp: 10,
-    abilities: createAbilities(10, 17, 14, 14, 10, 8), // DEX + INT
-    armorClass: 14,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['dexterity', 'intelligence'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 6,
-    speed: 30,
-    portrait: '☠️',
-    equipment: CLASS_STARTER_EQUIPMENT['Assassin'],
-    skills: [
+  ),
+
+  createCharacter(
+    'assassin',
+    'Vex',
+    'Assassin',
+    '☠️',
+    createAbilities(10, 17, 14, 14, 10, 8),
+    ['dexterity', 'intelligence'],
+    14,
+    30,
+    [
       { 
         id: 'assassinate', 
         name: 'Assassinat', 
-        damage: 14, // Dégâts doublés sur cible surprise
+        damage: 0,
+        damageDice: '4d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 4,
-        description: 'Critique automatique si la cible est surprise.'
+        description: 'Critique automatique si la cible est surprise. Dégâts doublés.'
       },
       { 
         id: 'poison_blade', 
         name: 'Lame empoisonnée', 
-        damage: 6, 
+        damage: 0,
+        damageDice: '1d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         poison: { damage: 3, turns: 3 },
         cooldown: 3,
-        description: 'Applique du poison. 3 dégâts/tour pendant 3 tours.'
+        description: 'Applique du poison. 3 dégâts de poison par tour pendant 3 tours.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // ARCHERS / RÔDEURS (d10)
   // ============================================
-  {
-    id: 'archer',
-    name: 'Sylva',
-    class: 'Archère',
-    level: 1,
-    hp: 11, // d10 + 1
-    maxHp: 11,
-    abilities: createAbilities(12, 16, 12, 10, 14, 8), // DEX + SAG
-    armorClass: 14, // Armure de cuir + DEX
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'dexterity'],
-    attack: 5, // DEX (3) + proficiency (2)
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '🏹',
-    equipment: CLASS_STARTER_EQUIPMENT['Archère'],
-    skills: [
+  createCharacter(
+    'archer',
+    'Sylva',
+    'Archère',
+    '🏹',
+    createAbilities(12, 16, 12, 10, 14, 8),
+    ['strength', 'dexterity'],
+    14, // Armure de cuir + DEX
+    30,
+    [
       { 
         id: 'aimed_shot', 
         name: 'Tir visé', 
-        damage: 10, // 1d8 + DEX (3) + marque
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 1,
-        description: 'Tir précis à l\'arc long. 1d8+3 perforant.'
+        description: 'Tir précis à l\'arc long. 1d8 + DEX perforant.'
       },
       { 
         id: 'hunters_mark', 
@@ -759,169 +739,147 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'attack', value: 3, turns: 3 },
         cooldown: 4,
-        description: 'Marque une proie. +1d6 aux attaques.'
+        description: 'Sort niveau 1. Marque une proie: +1d6 dégâts par attaque contre elle.'
       }
     ]
-  },
-  {
-    id: 'ranger',
-    name: 'Artémis',
-    class: 'Rôdeur',
-    level: 1,
-    hp: 12, // d10 + 2
-    maxHp: 12,
-    abilities: createAbilities(12, 16, 14, 10, 14, 8), // DEX + SAG + CON
-    armorClass: 14,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'dexterity'],
-    attack: 5,
-    magicAttack: 4, // Quelques sorts de rôdeur
-    defense: 13,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '🌲',
-    equipment: CLASS_STARTER_EQUIPMENT['Rôdeur'],
-    skills: [
+  ),
+
+  createCharacter(
+    'ranger',
+    'Artémis',
+    'Rôdeur',
+    '🌲',
+    createAbilities(12, 16, 14, 10, 14, 8),
+    ['strength', 'dexterity'],
+    14,
+    30,
+    [
       { 
         id: 'favored_enemy', 
         name: 'Ennemi juré', 
-        damage: 9, // Bonus contre certains ennemis
+        damage: 0,
+        damageDice: '1d8+2',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 0,
-        description: 'Attaque avec bonus contre ennemi favori.'
+        description: 'Attaque avec bonus contre votre ennemi favori.'
       },
       { 
         id: 'ensnaring_strike', 
         name: 'Frappe piégeuse', 
-        damage: 6, 
+        damage: 0,
+        damageDice: '1d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         debuffStats: { stat: 'speed', value: 5, turns: 2 },
         cooldown: 2,
-        description: 'Sort niveau 1. Entrave la cible.'
+        description: 'Sort niveau 1. Lianes qui entrave la cible (JS FOR pour se libérer).'
       }
     ]
-  },
-  {
-    id: 'crossbowman',
-    name: 'Balthazar',
-    class: 'Arbalétrier',
-    level: 1,
-    hp: 11,
-    maxHp: 11,
-    abilities: createAbilities(14, 16, 12, 10, 12, 8), // DEX + FOR pour arbalète lourde
-    armorClass: 15, // Cuir clouté + DEX
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'constitution'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 14,
-    magicDefense: 6,
-    speed: 30,
-    portrait: '🎯',
-    equipment: CLASS_STARTER_EQUIPMENT['Arbalétrier'],
-    skills: [
+  ),
+
+  createCharacter(
+    'crossbowman',
+    'Balthazar',
+    'Arbalétrier',
+    '🎯',
+    createAbilities(14, 16, 12, 10, 12, 8),
+    ['strength', 'constitution'],
+    15, // Cuir clouté + DEX
+    30,
+    [
       { 
         id: 'heavy_bolt', 
         name: 'Carreau lourd', 
-        damage: 11, // 1d10 + DEX = ~8.5 + bonus
+        damage: 0,
+        damageDice: '1d10',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 1,
-        description: 'Tir d\'arbalète lourde. 1d10+3 perforant.'
+        description: 'Tir d\'arbalète lourde. 1d10 + DEX perforant.'
       },
       { 
         id: 'crossbow_expert', 
         name: 'Expert arbalète', 
-        damage: 7, // Tir rapide
+        damage: 0,
+        damageDice: '1d6',
         type: 'attack',
         damageType: 'piercing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 0,
-        description: 'Ignore le rechargement. Tir bonus.'
+        description: 'Ignore le rechargement. Tir bonus avec arbalète de poing.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // TANKS / PROTECTEURS (d10/d12)
   // ============================================
-  {
-    id: 'paladin',
-    name: 'Aldric',
-    class: 'Paladin',
-    level: 1,
-    hp: 12, // d10 + 2
-    maxHp: 12,
-    abilities: createAbilities(16, 10, 14, 8, 12, 14), // FOR + CHA
-    armorClass: 18, // Cotte de mailles + bouclier
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['wisdom', 'charisma'],
-    attack: 5, // FOR (3) + proficiency (2)
-    magicAttack: 4, // CHA (2) + proficiency
-    defense: 16,
-    magicDefense: 9,
-    speed: 30,
-    portrait: '⚜️',
-    equipment: CLASS_STARTER_EQUIPMENT['Paladin'],
-    skills: [
+  createCharacter(
+    'paladin',
+    'Aldric',
+    'Paladin',
+    '⚜️',
+    createAbilities(16, 10, 14, 8, 12, 14),
+    ['wisdom', 'charisma'],
+    18, // Cotte de mailles + bouclier
+    30,
+    [
       { 
         id: 'divine_smite', 
         name: 'Châtiment divin', 
-        damage: 12, // Arme + 2d8 radiant
+        damage: 0,
+        damageDice: '2d8',
         type: 'attack',
         damageType: 'radiant',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         bonusVsDemon: 4,
         bonusVsUndead: 4,
         cooldown: 3,
-        description: 'Consomme un emplacement. +2d8 radiants.'
+        description: 'Consomme un emplacement de sort. +2d8 dégâts radiants.'
       },
       { 
         id: 'lay_on_hands', 
         name: 'Imposition des mains', 
-        damage: -5, // 5 PV au niveau 1
+        damage: -5,
         type: 'heal',
-        damageType: 'radiant',
         targetType: 'ally',
         cooldown: 4,
-        description: 'Réserve de 5 PV de soins.'
+        description: 'Puise dans votre réserve de 5 × niveau PV pour soigner.'
       }
     ]
-  },
-  {
-    id: 'guardian',
-    name: 'Goliath',
-    class: 'Gardien',
-    level: 1,
-    hp: 14, // d12 + 2 (barbare tank)
-    maxHp: 14,
-    abilities: createAbilities(17, 10, 14, 8, 12, 8), // FOR + CON
-    armorClass: 17, // Cotte de mailles + bouclier
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'constitution'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 18,
-    magicDefense: 6,
-    speed: 30,
-    portrait: '🏰',
-    equipment: CLASS_STARTER_EQUIPMENT['Gardien'],
-    skills: [
+  ),
+
+  createCharacter(
+    'guardian',
+    'Goliath',
+    'Gardien',
+    '🏰',
+    createAbilities(17, 10, 14, 8, 12, 8),
+    ['strength', 'constitution'],
+    17, // Cotte de mailles + bouclier
+    30,
+    [
       { 
         id: 'shield_bash', 
         name: 'Coup de bouclier', 
-        damage: 6, // 1d4 + FOR
+        damage: 0,
+        damageDice: '1d4',
         type: 'attack',
         damageType: 'bludgeoning',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         debuffStats: { stat: 'attack', value: 2, turns: 1 },
         cooldown: 1,
-        description: 'Repousse l\'ennemi. Réduit son attaque.'
+        description: 'Repousse l\'ennemi et réduit ses attaques.'
       },
       { 
         id: 'protection', 
@@ -931,36 +889,30 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'ally',
         buffStats: { stat: 'defense', value: 3, turns: 2 },
         cooldown: 2,
-        description: 'Impose désavantage aux attaques contre un allié.'
+        description: 'Réaction: impose désavantage aux attaques contre un allié adjacent.'
       }
     ]
-  },
-  {
-    id: 'warlord',
-    name: 'Marcus',
-    class: 'Seigneur de guerre',
-    level: 1,
-    hp: 12,
-    maxHp: 12,
-    abilities: createAbilities(16, 12, 14, 10, 10, 14), // FOR + CHA
-    armorClass: 18,
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'charisma'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 16,
-    magicDefense: 7,
-    speed: 30,
-    portrait: '👑',
-    equipment: CLASS_STARTER_EQUIPMENT['Seigneur de guerre'],
-    skills: [
+  ),
+
+  createCharacter(
+    'warlord',
+    'Marcus',
+    'Seigneur de guerre',
+    '👑',
+    createAbilities(16, 12, 14, 10, 10, 14),
+    ['strength', 'charisma'],
+    18,
+    30,
+    [
       { 
         id: 'commanding_strike', 
         name: 'Frappe de commandement', 
-        damage: 8, // 1d8 + FOR
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'slashing',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 0,
         description: 'Attaque qui permet à un allié de riposter.'
       },
@@ -972,42 +924,35 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'all_allies',
         buffStats: { stat: 'attack', value: 1, turns: 2 },
         cooldown: 3,
-        description: 'Inspire l\'équipe. +1 attaque pour tous.'
+        description: 'Inspire l\'équipe. +1 aux jets d\'attaque pour tous les alliés.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // MOINES (d8)
   // ============================================
-  {
-    id: 'monk',
-    name: 'Li Wei',
-    class: 'Moine',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(10, 17, 14, 10, 14, 8), // DEX + SAG
-    armorClass: 15, // 10 + DEX (3) + SAG (2) = 15 (Défense sans armure)
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'dexterity'],
-    attack: 5, // DEX (3) + proficiency (2)
-    magicAttack: 0,
-    defense: 14,
-    magicDefense: 8,
-    speed: 30, // +10 pieds au niveau 2
-    portrait: '🥋',
-    equipment: CLASS_STARTER_EQUIPMENT['Moine'],
-    skills: [
+  createCharacter(
+    'monk',
+    'Li Wei',
+    'Moine',
+    '🥋',
+    createAbilities(10, 17, 14, 10, 14, 8),
+    ['strength', 'dexterity'],
+    15, // 10 + DEX (3) + SAG (2) = Défense sans armure
+    30,
+    [
       { 
         id: 'flurry_of_blows', 
         name: 'Déluge de coups', 
-        damage: 10, // 2 attaques bonus = 2x(1d4+3)
+        damage: 0,
+        damageDice: '2d4',
         type: 'attack',
         damageType: 'bludgeoning',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 2,
-        description: 'Dépense 1 ki. Deux frappes bonus.'
+        description: 'Dépense 1 ki. Deux frappes bonus. 2 × (1d4 + DEX) contondant.'
       },
       { 
         id: 'patient_defense', 
@@ -1017,38 +962,32 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'defense', value: 3, turns: 1 },
         cooldown: 2,
-        description: 'Dépense 1 ki. Esquive en action bonus.'
+        description: 'Dépense 1 ki. Esquive en action bonus (désavantage aux attaques contre vous).'
       }
     ]
-  },
-  {
-    id: 'pugilist',
-    name: 'Brutus',
-    class: 'Pugiliste',
-    level: 1,
-    hp: 12, // d10 + 2 (variante combattant)
-    maxHp: 12,
-    abilities: createAbilities(17, 14, 14, 8, 10, 8), // FOR + CON
-    armorClass: 13, // 10 + DEX (2) + bonus
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['strength', 'constitution'],
-    attack: 5,
-    magicAttack: 0,
-    defense: 13,
-    magicDefense: 5,
-    speed: 30,
-    portrait: '👊',
-    equipment: CLASS_STARTER_EQUIPMENT['Pugiliste'],
-    skills: [
+  ),
+
+  createCharacter(
+    'pugilist',
+    'Brutus',
+    'Pugiliste',
+    '👊',
+    createAbilities(17, 14, 14, 8, 10, 8),
+    ['strength', 'constitution'],
+    13, // 10 + DEX (2) + bonus
+    30,
+    [
       { 
         id: 'haymaker', 
         name: 'Uppercut', 
-        damage: 9, // Coup puissant
+        damage: 0,
+        damageDice: '1d8',
         type: 'attack',
         damageType: 'bludgeoning',
         targetType: 'enemy',
+        requiresAttackRoll: true,
         cooldown: 2,
-        description: 'Coup dévastateur au corps à corps.'
+        description: 'Coup dévastateur. 1d8 + FOR contondant.'
       },
       { 
         id: 'brace', 
@@ -1058,43 +997,37 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'self',
         buffStats: { stat: 'defense', value: 2, turns: 2 },
         cooldown: 2,
-        description: 'Se met en garde. +2 défense.'
+        description: 'Se met en garde. +2 à la CA pendant 2 tours.'
       }
     ]
-  },
-  
+  ),
+
   // ============================================
   // BARDES (d8)
   // ============================================
-  {
-    id: 'bard',
-    name: 'Orphée',
-    class: 'Barde',
-    level: 1,
-    hp: 10, // d8 + 2
-    maxHp: 10,
-    abilities: createAbilities(10, 14, 14, 12, 10, 16), // CHA priorité
-    armorClass: 13, // Armure de cuir + DEX
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['dexterity', 'charisma'],
-    attack: 4, // DEX (2) + proficiency
-    magicAttack: 5, // CHA (3) + proficiency
-    defense: 12,
-    magicDefense: 8,
-    speed: 30,
-    portrait: '🎵',
-    equipment: CLASS_STARTER_EQUIPMENT['Barde'],
-    skills: [
+  createCharacter(
+    'bard',
+    'Orphée',
+    'Barde',
+    '🎵',
+    createAbilities(10, 14, 14, 12, 10, 16),
+    ['dexterity', 'charisma'],
+    13, // Armure de cuir + DEX
+    30,
+    [
       { 
         id: 'vicious_mockery', 
         name: 'Moquerie cruelle', 
-        damage: 5, // 1d4 psychique
-        type: 'attack',
+        damage: 0,
+        damageDice: '1d4',
+        type: 'damage',
         damageType: 'psychic',
         targetType: 'enemy',
+        requiresAttackRoll: false,
+        savingThrow: { ability: 'wisdom', dc: 14 },
         debuffStats: { stat: 'attack', value: 2, turns: 1 },
         cooldown: 0,
-        description: 'Sort mineur. 1d4 psychique, désavantage.'
+        description: 'Sort mineur. 1d4 psychique et désavantage à la prochaine attaque (JS SAG).'
       },
       { 
         id: 'bardic_inspiration', 
@@ -1104,48 +1037,108 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'ally',
         buffStats: { stat: 'attack', value: 3, turns: 2 },
         cooldown: 3,
-        description: 'Donne 1d6 inspiration à un allié.'
+        description: 'Action bonus. Donne un dé d\'inspiration (1d6) à un allié.'
       }
     ]
-  },
-  {
-    id: 'skald',
-    name: 'Sigurd',
-    class: 'Scalde',
-    level: 1,
-    hp: 11, // d8 + 3 (hybride barde/barbare)
-    maxHp: 11,
-    abilities: createAbilities(14, 12, 16, 8, 10, 14), // CHA + CON + FOR
-    armorClass: 15, // Chemise de mailles
-    proficiencyBonus: 2,
-    savingThrowProficiencies: ['constitution', 'charisma'],
-    attack: 4,
-    magicAttack: 4,
-    defense: 14,
-    magicDefense: 7,
-    speed: 30,
-    portrait: '🎸',
-    equipment: CLASS_STARTER_EQUIPMENT['Scalde'],
-    skills: [
+  ),
+
+  createCharacter(
+    'skald',
+    'Sigurd',
+    'Scalde',
+    '🎸',
+    createAbilities(14, 12, 16, 8, 10, 14),
+    ['constitution', 'charisma'],
+    15, // Chemise de mailles
+    30,
+    [
       { 
         id: 'thunderwave', 
         name: 'Vague tonnante', 
-        damage: 9, // 2d8 tonnerre
-        type: 'attack',
+        damage: 0,
+        damageDice: '2d8',
+        type: 'damage',
         damageType: 'thunder',
-        targetType: 'enemy',
+        targetType: 'all_enemies',
+        requiresAttackRoll: false,
+        savingThrow: { ability: 'constitution', dc: 14 },
         cooldown: 2,
-        description: 'Sort niveau 1. 2d8 tonnerre, repousse.'
+        description: 'Sort niveau 1. 2d8 tonnerre en zone, repousse de 3m (JS CON pour demi-dégâts).'
       },
       { 
         id: 'song_of_rest', 
         name: 'Chant de repos', 
-        damage: -4, // 1d6 soins
+        damage: -4,
+        damageDice: '1d6',
         type: 'heal',
         targetType: 'all_allies',
         cooldown: 5,
-        description: 'Soigne 1d6 PV à toute l\'équipe.'
+        description: 'Pendant un repos court, alliés récupèrent 1d6 PV supplémentaires.'
       }
     ]
-  }
+  )
 ];
+
+// =============================================================================
+// HELPERS POUR LE LEVEL UP
+// =============================================================================
+
+/**
+ * Augmente le niveau d'un personnage et recalcule ses stats
+ */
+export function levelUpCharacter(character: Character): Character {
+  const newLevel = character.level + 1;
+  const newProfBonus = getProficiencyBonus(newLevel);
+  const newMaxHp = calculateMaxHP(character.class, newLevel, character.abilities.constitution);
+  const hpGain = newMaxHp - character.maxHp;
+  
+  return {
+    ...character,
+    level: newLevel,
+    proficiencyBonus: newProfBonus,
+    maxHp: newMaxHp,
+    hp: Math.min(character.hp + hpGain, newMaxHp), // Gagne les PV du level up
+    pendingTalentChoice: [5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100].includes(newLevel)
+  };
+}
+
+/**
+ * Ajoute de l'XP à un personnage et gère le level up
+ */
+export function addXPToCharacter(character: Character, xp: number): Character {
+  const newTotalXP = character.totalXP + xp;
+  const newXP = character.xp + xp;
+  
+  // Vérifier si level up
+  const xpForNextLevel = getXPForNextLevel(character.level);
+  
+  let updatedCharacter = {
+    ...character,
+    xp: newXP,
+    totalXP: newTotalXP
+  };
+  
+  // Level up si assez d'XP
+  if (newXP >= xpForNextLevel && character.level < 100) {
+    updatedCharacter.xp = newXP - xpForNextLevel;
+    updatedCharacter = levelUpCharacter(updatedCharacter);
+  }
+  
+  return updatedCharacter;
+}
+
+/**
+ * Retourne l'XP nécessaire pour le prochain niveau
+ */
+function getXPForNextLevel(level: number): number {
+  // Import depuis dndSystem
+  const { XP_THRESHOLDS } = require('../config/dndSystem');
+  if (level >= 100) return Infinity;
+  return XP_THRESHOLDS[level] - XP_THRESHOLDS[level - 1];
+}
+
+// =============================================================================
+// EXPORT
+// =============================================================================
+
+export { createAbilities, createCharacter, getXPForNextLevel };

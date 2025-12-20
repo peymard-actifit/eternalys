@@ -1,25 +1,37 @@
-// Types pour le jeu Ethernalys - Système inspiré de D&D 5e
+// =============================================================================
+// TYPES ETERNALYS - SYSTÈME D&D 5e ÉTENDU
+// =============================================================================
+// Système 100% basé sur les caractéristiques D&D
+// Niveaux personnages: 1-100 | CR monstres: 1-100 | Niveaux donjon: 50
+// =============================================================================
 
-// ============================================
+// =============================================================================
 // SYSTÈME D&D - CARACTÉRISTIQUES
-// ============================================
+// =============================================================================
 
-// Les 6 caractéristiques de D&D
+/**
+ * Les 6 caractéristiques D&D
+ */
 export interface AbilityScores {
-  strength: number;     // Force - attaques au corps à corps, dégâts physiques
-  dexterity: number;    // Dextérité - CA, initiative, attaques à distance
-  constitution: number; // Constitution - points de vie
-  intelligence: number; // Intelligence - sorts arcanes
-  wisdom: number;       // Sagesse - perception, sorts divins
-  charisma: number;     // Charisme - sorts, intimidation
+  strength: number;     // Force - attaques mêlée, dégâts physiques, jets de sauvegarde
+  dexterity: number;    // Dextérité - CA, initiative, attaques à distance, finesse
+  constitution: number; // Constitution - points de vie, concentration
+  intelligence: number; // Intelligence - sorts arcanes (Mage, Nécromancien)
+  wisdom: number;       // Sagesse - perception, sorts divins (Clerc, Druide)
+  charisma: number;     // Charisme - sorts (Ensorceleur, Occultiste, Barde, Paladin)
 }
 
-// Calcul du modificateur D&D
+/**
+ * Calcul du modificateur D&D - FONCTION CENTRALE
+ */
 export function getModifier(score: number): number {
   return Math.floor((score - 10) / 2);
 }
 
-// Types de dégâts D&D
+// =============================================================================
+// TYPES DE DÉGÂTS D&D
+// =============================================================================
+
 export type DamageType = 
   // Physiques
   | 'bludgeoning'   // Contondant
@@ -34,11 +46,14 @@ export type DamageType =
   // Autres
   | 'necrotic'      // Nécrotique
   | 'radiant'       // Radiant
-  | 'force'         // Force
+  | 'force'         // Force (magique pure)
   | 'psychic'       // Psychique
   | 'thunder';      // Tonnerre
 
-// Types de créatures D&D
+// =============================================================================
+// TYPES DE CRÉATURES D&D
+// =============================================================================
+
 export type CreatureType = 
   | 'aberration'    // Aberration
   | 'beast'         // Bête
@@ -55,67 +70,12 @@ export type CreatureType =
   | 'plant'         // Plante
   | 'undead';       // Mort-vivant
 
-// Taille des créatures
 export type CreatureSize = 'tiny' | 'small' | 'medium' | 'large' | 'huge' | 'gargantuan';
 
-// ============================================
-// PERSONNAGES
-// ============================================
-export interface Character {
-  id: string;
-  name: string;
-  class: string;
-  level: number;
-  hp: number;
-  maxHp: number;
-  tempHp?: number; // Points de vie temporaires
-  // Caractéristiques D&D
-  abilities: AbilityScores;
-  // Stats dérivées
-  armorClass: number; // Classe d'armure
-  speed: number; // Vitesse de déplacement
-  proficiencyBonus: number; // Bonus de maîtrise
-  // Jets de sauvegarde maîtrisés
-  savingThrowProficiencies: (keyof AbilityScores)[];
-  // Combat simplifié (pour compatibilité)
-  attack: number;
-  magicAttack: number;
-  defense: number;
-  magicDefense: number;
-  // Compétences
-  skills: Skill[];
-  portrait: string;
-  // Buffs/Debuffs
-  buffs?: ActiveBuff[];
-  conditions?: Condition[];
-  // Résistances
-  resistances?: DamageType[];
-  immunities?: DamageType[];
-  vulnerabilities?: DamageType[];
-  // Inventaire et Équipement
-  inventory?: InventoryItem[];
-  equipment?: CharacterEquipment;
-  stats?: CharacterStats;
-  // Stats de base pour tracking
-  baseAttack?: number;
-  baseMagicAttack?: number;
-  baseDefense?: number;
-  baseMagicDefense?: number;
-  baseSpeed?: number;
-  // Effets passifs (provenant des objets/trésors)
-  passiveEffects?: {
-    lifesteal?: number;      // % des dégâts récupérés en PV
-    critical?: number;       // % chance de coup critique
-    thorns?: number;         // % des dégâts renvoyés à l'attaquant
-    regeneration?: number;   // PV régénérés par tour
-    evasion?: number;        // % chance d'esquiver
-    damageReduction?: Record<string, number>; // % réduction par type de dégâts (fire: 50, cold: 30, etc.)
-  };
-  // PV temporaires (Simulacre de vie, etc.)
-  temporaryHp?: number;
-}
+// =============================================================================
+// CONDITIONS D&D
+// =============================================================================
 
-// Conditions D&D
 export type Condition = 
   | 'blinded'       // Aveuglé
   | 'charmed'       // Charmé
@@ -133,16 +93,126 @@ export type Condition =
   | 'stunned'       // Étourdi
   | 'unconscious';  // Inconscient
 
+// =============================================================================
+// SYSTÈME DE TALENTS
+// =============================================================================
+
+export interface CharacterTalent {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  tier: number; // Niveau où le talent est débloqué (5, 10, 15...)
+  branch: string; // Branche de spécialisation
+  effects: TalentEffect[];
+}
+
+export interface TalentEffect {
+  type: 'ability_bonus' | 'skill_unlock' | 'passive' | 'resistance' | 'hp_bonus' | 'damage_bonus';
+  ability?: keyof AbilityScores;
+  value?: number;
+  damageType?: DamageType;
+  skillId?: string;
+  passiveType?: 'critical' | 'lifesteal' | 'thorns' | 'regeneration' | 'evasion';
+}
+
+// =============================================================================
+// PERSONNAGES
+// =============================================================================
+
+export interface Character {
+  id: string;
+  name: string;
+  class: string;
+  portrait: string;
+  
+  // === NIVEAU ET PROGRESSION ===
+  level: number;          // Niveau actuel (1-100)
+  xp: number;             // XP actuel vers le prochain niveau
+  totalXP: number;        // XP total gagné
+  
+  // === POINTS DE VIE ===
+  hp: number;             // PV actuels
+  maxHp: number;          // PV maximum
+  tempHp?: number;        // Points de vie temporaires
+  temporaryHp?: number;   // Alias pour compatibilité
+  
+  // === CARACTÉRISTIQUES D&D (BASE DU SYSTÈME) ===
+  abilities: AbilityScores;
+  
+  // === STATS DÉRIVÉES (calculées depuis abilities) ===
+  armorClass: number;     // CA = 10 + mod(DEX) + armure
+  speed: number;          // Vitesse de déplacement en pieds
+  proficiencyBonus: number; // Bonus de maîtrise (basé sur niveau)
+  initiative?: number;    // mod(DEX) + bonus
+  
+  // === MAÎTRISES ===
+  savingThrowProficiencies: (keyof AbilityScores)[]; // Jets de sauvegarde maîtrisés
+  
+  // === COMPÉTENCES ===
+  skills: Skill[];
+  
+  // === TALENTS CHOISIS ===
+  talents?: CharacterTalent[];
+  pendingTalentChoice?: boolean; // true si le personnage doit choisir un talent
+  
+  // === BUFFS/CONDITIONS ===
+  buffs?: ActiveBuff[];
+  conditions?: Condition[];
+  
+  // === RÉSISTANCES ===
+  resistances?: DamageType[];
+  immunities?: DamageType[];
+  vulnerabilities?: DamageType[];
+  
+  // === INVENTAIRE ET ÉQUIPEMENT ===
+  inventory?: InventoryItem[];
+  equipment?: CharacterEquipment;
+  
+  // === EFFETS PASSIFS (objets/talents) ===
+  passiveEffects?: {
+    lifesteal?: number;
+    critical?: number;
+    thorns?: number;
+    regeneration?: number;
+    evasion?: number;
+    damageReduction?: Record<string, number>;
+  };
+  
+  // === STATISTIQUES DE PARTIE ===
+  stats?: CharacterStats;
+  
+  // === COMPATIBILITÉ (sera supprimé progressivement) ===
+  attack?: number;        // DEPRECATED - utiliser getAttackBonus()
+  magicAttack?: number;   // DEPRECATED - utiliser getSpellAttackBonus()
+  defense?: number;       // DEPRECATED - utiliser armorClass
+  magicDefense?: number;  // DEPRECATED
+  baseAttack?: number;
+  baseMagicAttack?: number;
+  baseDefense?: number;
+  baseMagicDefense?: number;
+  baseSpeed?: number;
+}
+
+// =============================================================================
+// BUFFS ET EFFETS
+// =============================================================================
+
 export interface ActiveBuff {
   id: string;
   name: string;
-  type: 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'damage_reflect' | 'regen' | 'poison' | 'speed';
+  type: 'ability' | 'ac' | 'damage' | 'healing' | 'speed' | 'resistance' | 'advantage' | 'regen' | 'poison' | 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'damage_reflect';
+  abilityAffected?: keyof AbilityScores;
   value: number;
   turnsRemaining: number;
   ownerId: string;
   icon: string;
   isApplied?: boolean;
 }
+
+// =============================================================================
+// INVENTAIRE
+// =============================================================================
 
 export interface InventoryItem {
   id: string;
@@ -153,47 +223,19 @@ export interface InventoryItem {
   obtainedAt: number;
 }
 
-// ============================================
-// SYSTÈME D'ÉQUIPEMENT (Pathfinder/BG3 style)
-// ============================================
+// =============================================================================
+// ÉQUIPEMENT (Style Pathfinder/BG3)
+// =============================================================================
 
-// Types d'emplacements d'équipement
 export type EquipmentSlotType = 
-  | 'head'           // Casque
-  | 'armor'          // Armure/Torse
-  | 'cloak'          // Cape
-  | 'gloves'         // Gants
-  | 'bracers'        // Avant-bras/Bracelets
-  | 'belt'           // Ceinture
-  | 'boots'          // Bottes/Jambières
-  | 'necklace'       // Collier/Amulette
-  | 'ring1'          // Anneau 1
-  | 'ring2'          // Anneau 2
-  | 'mainHand'       // Main principale (arme)
-  | 'offHand'        // Main secondaire (bouclier/arme légère)
-  | 'ranged'         // Arme à distance
-  | 'trinket1'       // Breloque 1
-  | 'trinket2'       // Breloque 2
-  | 'trinket3'       // Breloque 3
-  | 'trinket4'       // Breloque 4
-  | 'trinket5'       // Breloque 5
-  | 'consumable1'    // Emplacement consommable 1
-  | 'consumable2'    // Emplacement consommable 2
-  | 'consumable3';   // Emplacement consommable 3
+  | 'head' | 'armor' | 'cloak' | 'gloves' | 'bracers' | 'belt' | 'boots'
+  | 'necklace' | 'ring1' | 'ring2' | 'mainHand' | 'offHand' | 'ranged'
+  | 'trinket1' | 'trinket2' | 'trinket3' | 'trinket4' | 'trinket5'
+  | 'consumable1' | 'consumable2' | 'consumable3';
 
-// Catégorie d'arme
-export type WeaponCategory = 
-  | 'simple_melee'   // Armes simples de mêlée
-  | 'martial_melee'  // Armes de guerre de mêlée
-  | 'simple_ranged'  // Armes simples à distance
-  | 'martial_ranged' // Armes de guerre à distance
-  | 'shield'         // Bouclier
-  | 'focus';         // Focus arcanique
-
-// Catégorie d'armure
+export type WeaponCategory = 'simple_melee' | 'martial_melee' | 'simple_ranged' | 'martial_ranged' | 'shield' | 'focus';
 export type ArmorCategory = 'light' | 'medium' | 'heavy' | 'shield' | 'clothing';
 
-// Pièce d'équipement
 export interface Equipment {
   id: string;
   name: string;
@@ -201,46 +243,51 @@ export interface Equipment {
   slotType: EquipmentSlotType;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   description: string;
-  // Stats bonus
+  
+  // Bonus aux caractéristiques (nouveau système)
   bonuses?: {
-    attack?: number;
-    magicAttack?: number;
-    defense?: number;
-    magicDefense?: number;
-    speed?: number;
-    maxHp?: number;
-    armorClass?: number;
-    // Bonus de caractéristiques
     strength?: number;
     dexterity?: number;
     constitution?: number;
     intelligence?: number;
     wisdom?: number;
     charisma?: number;
+    armorClass?: number;
+    speed?: number;
+    maxHp?: number;
+    // DEPRECATED - pour compatibilité
+    attack?: number;
+    magicAttack?: number;
+    defense?: number;
+    magicDefense?: number;
   };
+  
   // Pour les armes
   weaponCategory?: WeaponCategory;
-  damage?: string;        // Ex: "1d8", "2d6"
+  damage?: string;        // Notation de dé: "1d8", "2d6+3"
   damageType?: DamageType;
   twoHanded?: boolean;
-  finesse?: boolean;      // Utilise DEX ou FOR
+  finesse?: boolean;      // Peut utiliser DEX au lieu de FOR
+  
   // Pour les armures
   armorCategory?: ArmorCategory;
   baseAC?: number;
-  maxDexBonus?: number;   // Bonus DEX max pour armures moyennes/lourdes
+  maxDexBonus?: number;   // Limite de bonus DEX (null = pas de limite)
   stealthDisadvantage?: boolean;
+  
   // Effets spéciaux
   effects?: EquipmentEffect[];
+  
   // Prérequis
   requirements?: {
     strength?: number;
     classes?: string[];
+    level?: number;
   };
-  // Prix en pièces d'or
+  
   value?: number;
 }
 
-// Effet d'équipement
 export interface EquipmentEffect {
   type: 'resistance' | 'immunity' | 'skill' | 'passive' | 'onHit';
   damageType?: DamageType;
@@ -251,7 +298,6 @@ export interface EquipmentEffect {
   };
 }
 
-// Emplacements d'équipement du personnage
 export interface CharacterEquipment {
   head?: Equipment;
   armor?: Equipment;
@@ -284,32 +330,47 @@ export interface CharacterStats {
   strongestMonsterKilled?: Monster;
 }
 
+// =============================================================================
+// COMPÉTENCES
+// =============================================================================
+
 export interface Skill {
   id: string;
   name: string;
-  damage: number;
-  type: 'attack' | 'heal' | 'buff' | 'debuff' | 'damage';
-  damageType?: DamageType | 'physical' | 'magical' | 'holy';
   description?: string;
-  effects?: SkillEffect[];
+  type: 'attack' | 'heal' | 'buff' | 'debuff' | 'damage';
+  
+  // === DÉGÂTS/SOINS ===
+  damage: number;         // Valeur de base (positif = dégâts, négatif = soins)
+  damageType?: DamageType | 'physical' | 'magical' | 'holy';
+  damageDice?: string;    // Notation de dé: "2d6", "1d8+3"
+  
+  // === CIBLAGE ===
   targetType?: 'enemy' | 'ally' | 'self' | 'all_allies' | 'all_enemies';
-  bonusVsDemon?: number;
-  bonusVsUndead?: number;
-  lifesteal?: number;
-  damageReflect?: number;
+  areaOfEffect?: { type: 'cone' | 'sphere' | 'line' | 'cube'; size: number };
+  
+  // === JETS D'ATTAQUE ===
+  requiresAttackRoll?: boolean;
+  isSpellAttack?: boolean; // Utilise caractéristique de lancement de sorts
+  grantAdvantage?: boolean;
+  
+  // === JETS DE SAUVEGARDE ===
+  savingThrow?: { ability: keyof AbilityScores; dc: number };
+  
+  // === COOLDOWN ===
+  cooldown?: number;
+  currentCooldown?: number;
+  
+  // === EFFETS ADDITIONNELS ===
+  effects?: SkillEffect[];
   buffStats?: { stat: 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'speed'; value: number; turns: number };
   debuffStats?: { stat: 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'speed'; value: number; turns: number };
   healOverTime?: { value: number; turns: number };
   poison?: { damage: number; turns: number };
-  cooldown?: number;
-  currentCooldown?: number;
-  // D&D spécifique
-  savingThrow?: { ability: keyof AbilityScores; dc: number };
-  areaOfEffect?: { type: 'cone' | 'sphere' | 'line' | 'cube'; size: number };
-  // Jet de touche
-  requiresAttackRoll?: boolean; // true pour les spell attacks ou attaques physiques
-  isSpellAttack?: boolean; // true si utilise INT/WIS/CHA au lieu de FOR/DEX
-  grantAdvantage?: boolean; // true si la compétence donne l'avantage (ex: Attaque téméraire)
+  lifesteal?: number;
+  damageReflect?: number;
+  bonusVsDemon?: number;
+  bonusVsUndead?: number;
 }
 
 export interface SkillEffect {
@@ -319,70 +380,81 @@ export interface SkillEffect {
   targetType?: string;
 }
 
-// ============================================
-// MONSTRES D&D
-// ============================================
+// =============================================================================
+// MONSTRES
+// =============================================================================
+
 export interface Monster {
   id: string;
   name: string;
-  // Stats de base
-  hp: number;
-  maxHp: number;
-  armorClass: number;
-  // Caractéristiques D&D
-  abilities: AbilityScores;
-  // Combat simplifié
-  attack: number;
-  magicAttack?: number;
-  defense: number;
-  magicDefense: number;
-  speed: number;
-  // Infos D&D
-  challengeRating: number; // CR (indice de dangerosité)
-  xpReward: number;
+  portrait: string;
+  description?: string;
+  
+  // === INFOS D&D ===
   creatureType: CreatureType;
   size: CreatureSize;
   alignment?: string;
-  // Affichage
-  portrait: string;
-  description?: string;
-  // Boss
-  isBoss: boolean;
-  isLegendary?: boolean;
-  isHostileNpc?: boolean; // Pour les personnages hostiles nommés (Strahd, Zariel, etc.)
-  // Résistances D&D
+  
+  // === CR ET XP (nouvelle échelle 1-100) ===
+  challengeRating: number;  // CR 1-100
+  xpReward: number;         // XP donné à la victoire
+  
+  // === POINTS DE VIE ===
+  hp: number;
+  maxHp: number;
+  
+  // === CARACTÉRISTIQUES D&D ===
+  abilities: AbilityScores;
+  armorClass: number;
+  speed: number;
+  
+  // === RÉSISTANCES ===
   resistances?: DamageType[];
   immunities?: DamageType[];
   vulnerabilities?: DamageType[];
   conditionImmunities?: Condition[];
-  // Compétences
+  
+  // === COMPÉTENCES ===
   skills?: MonsterSkill[];
-  // Actions légendaires (X fois par tour pour les légendaires)
+  
+  // === BOSS ===
+  isBoss: boolean;
+  isLegendary?: boolean;
+  isHostileNpc?: boolean; // Personnages hostiles nommés (Strahd, Zariel...)
+  
+  // Actions légendaires
   legendaryActions?: LegendaryAction[];
-  legendaryActionsPerTurn?: number; // Nombre d'actions légendaires par tour
-  legendaryActionsRemaining?: number; // Actions restantes ce tour
-  // Ultime (pour les boss)
+  legendaryActionsPerTurn?: number;
+  legendaryActionsRemaining?: number;
+  
+  // Ultime
   ultimateSkill?: MonsterSkill;
   ultimateUsed?: boolean;
   ultimateTurnTrigger?: number;
-  // Accompagnateurs
+  
+  // Sbires
   minions?: string[];
-  // Stats de base pour tracking
+  
+  // === BUFFS ===
+  buffs?: ActiveBuff[];
+  
+  // === COMPATIBILITÉ (DEPRECATED) ===
+  attack?: number;
+  magicAttack?: number;
+  defense?: number;
+  magicDefense?: number;
   baseAttack?: number;
   baseMagicAttack?: number;
   baseDefense?: number;
   baseMagicDefense?: number;
   baseSpeed?: number;
-  // Buffs actifs
-  buffs?: ActiveBuff[];
-  // Compatibilité ancien système
   monsterType?: 'demon' | 'undead' | 'beast' | 'humanoid' | 'elemental' | 'dragon';
 }
 
 export interface LegendaryAction {
   id: string;
   name: string;
-  cost: number; // Coût en actions légendaires (1-3)
+  cost: number;
   damage?: number;
   damageType?: DamageType;
   description: string;
@@ -390,7 +462,7 @@ export interface LegendaryAction {
     type: 'damage' | 'heal' | 'buff_self' | 'debuff_target' | 'move' | 'special' | 'lifesteal';
     value?: number;
     stat?: string;
-    turns?: number; // Durée de l'effet en tours
+    turns?: number;
     condition?: Condition;
   };
 }
@@ -398,13 +470,30 @@ export interface LegendaryAction {
 export interface MonsterSkill {
   id: string;
   name: string;
+  description: string;
+  type: 'attack' | 'special' | 'buff' | 'debuff' | 'multiattack';
+  
+  // === DÉGÂTS ===
   damage: number;
   damageType: DamageType | 'physical' | 'magical';
-  type: 'attack' | 'special' | 'buff' | 'debuff' | 'multiattack';
-  description: string;
-  // Attaques multiples
+  damageDice?: string;
+  
+  // === MULTIATTAQUE ===
   attackCount?: number;
-  // Effets
+  
+  // === JETS ===
+  requiresAttackRoll?: boolean;
+  isSpellAttack?: boolean;
+  savingThrow?: { ability: keyof AbilityScores; dc: number };
+  areaOfEffect?: boolean;
+  
+  // === RECHARGE ===
+  recharge?: { min: number; max?: number };
+  isRecharged?: boolean;
+  cooldown?: number;
+  currentCooldown?: number;
+  
+  // === EFFETS ===
   effect?: {
     type: 'damage' | 'heal' | 'buff_self' | 'debuff_target' | 'lifesteal' | 'grapple' | 'frighten' | 'poison'
       | 'debuff_attack' | 'debuff_defense' | 'debuff_speed' | 'debuff_magic_attack' | 'debuff_magic_defense';
@@ -413,24 +502,12 @@ export interface MonsterSkill {
     turns?: number;
     condition?: Condition;
   };
-  // Recharge (comme les souffles de dragon)
-  recharge?: { min: number; max?: number }; // Recharge sur 5-6 par exemple (max optionnel, défaut: 6)
-  isRecharged?: boolean;
-  // Jet de sauvegarde
-  savingThrow?: { ability: keyof AbilityScores; dc: number };
-  // Zone d'effet
-  areaOfEffect?: boolean;
-  // Jet de touche requis (par défaut: true pour attack/special/multiattack)
-  requiresAttackRoll?: boolean; // false pour les effets de zone ou saves uniquement
-  // Attaque de sort (utilise INT/WIS/CHA au lieu de FOR/DEX)
-  isSpellAttack?: boolean;
-  cooldown?: number;
-  currentCooldown?: number;
 }
 
-// ============================================
+// =============================================================================
 // ÉVÉNEMENTS
-// ============================================
+// =============================================================================
+
 export interface GameEvent {
   id: string;
   name: string;
@@ -440,14 +517,15 @@ export interface GameEvent {
 }
 
 export interface EventEffect {
-  type: 'heal' | 'damage' | 'buff_attack' | 'buff_magic_attack' | 'buff_defense' | 'debuff_attack' | 'debuff_magic_attack' | 'debuff_defense';
+  type: 'heal' | 'damage' | 'buff_attack' | 'buff_magic_attack' | 'buff_defense' | 'debuff_attack' | 'debuff_magic_attack' | 'debuff_defense' | 'xp_bonus';
   value: number;
   target: 'all' | 'random' | 'weakest' | 'strongest';
 }
 
-// ============================================
+// =============================================================================
 // PLATEAU DE JEU
-// ============================================
+// =============================================================================
+
 export interface Room {
   x: number;
   y: number;
@@ -462,17 +540,18 @@ export interface TreasureLegacy {
   name: string;
   description: string;
   effect: {
-    type: 'heal_all' | 'buff_permanent' | 'revive';
+    type: 'heal_all' | 'buff_permanent' | 'revive' | 'xp_bonus';
     value: number;
   };
 }
 
-// ============================================
+// =============================================================================
 // HISTORIQUE
-// ============================================
+// =============================================================================
+
 export interface HistoryEntry {
   turn: number;
-  type: 'combat' | 'event' | 'treasure' | 'boss';
+  type: 'combat' | 'event' | 'treasure' | 'boss' | 'level_up';
   title: string;
   description: string;
   icon: string;
@@ -495,12 +574,14 @@ export interface CombatHistoryEntry {
   isPlayerAction: boolean;
   damageType?: DamageType | 'physical' | 'magical' | 'holy';
   timestamp: number;
+  diceRoll?: { roll: number; modifier: number; total: number; advantage?: boolean };
 }
 
-// ============================================
+// =============================================================================
 // ÉTAT DU JEU
-// ============================================
-export type GamePhase = 'menu' | 'character_select' | 'dungeon' | 'combat' | 'event' | 'treasure' | 'victory' | 'defeat' | 'summary';
+// =============================================================================
+
+export type GamePhase = 'welcome' | 'menu' | 'character_select' | 'dungeon' | 'combat' | 'event' | 'treasure' | 'level_up' | 'victory' | 'defeat' | 'summary';
 
 export interface GameState {
   phase: GamePhase;
@@ -527,26 +608,19 @@ export interface GameState {
   showInventory?: boolean;
   showPauseMenu?: boolean;
   inventoryCharacterIndex?: number;
-  // Système de niveaux
-  dungeonLevel: number; // Niveau actuel du donjon (1, 2, 3...)
-  roomsPerLevel: number; // Nombre de salles avant le boss pour ce niveau
-  previousBossId?: string; // ID du dernier boss vaincu (pour éviter les répétitions)
-  monsterScaling: number; // % d'augmentation des stats des monstres
-  bossScalingMultiplier: number; // % d'augmentation des stats du boss
-}
-
-export interface BaseStats {
-  attack: number;
-  magicAttack: number;
-  defense: number;
-  magicDefense: number;
-  speed: number;
-}
-
-export interface StatModification {
-  source: string;
-  value: number;
-  type: 'buff' | 'debuff' | 'item' | 'event';
+  
+  // === SYSTÈME DE DONJON (50 niveaux) ===
+  dungeonLevel: number;       // Niveau actuel du donjon (1-50)
+  roomsPerLevel: number;      // Salles avant le boss
+  roomsExploredThisLevel: number; // Salles explorées dans ce niveau
+  previousBossId?: string;
+  
+  // === SCALING (pour compatibilité) ===
+  monsterScaling: number;
+  bossScalingMultiplier: number;
+  
+  // === LEVEL UP EN ATTENTE ===
+  pendingLevelUps?: string[]; // IDs des personnages qui doivent level up
 }
 
 export interface PendingTreasureData {
@@ -560,9 +634,10 @@ export interface PendingTreasureData {
   effects: string[];
 }
 
-// ============================================
+// =============================================================================
 // COMBAT
-// ============================================
+// =============================================================================
+
 export interface CombatAction {
   type: 'attack' | 'skill' | 'defend';
   source: Character | Monster;
@@ -571,42 +646,54 @@ export interface CombatAction {
   damage?: number;
 }
 
-// ============================================
+export interface AttackRollResult {
+  roll: number;           // Résultat du d20
+  modifier: number;       // Modificateur total
+  total: number;          // Roll + modifier
+  isCritical: boolean;    // Natural 20
+  isCriticalMiss: boolean; // Natural 1
+  hasAdvantage: boolean;
+  hasDisadvantage: boolean;
+  secondRoll?: number;    // Pour avantage/désavantage
+}
+
+export interface SavingThrowResult {
+  success: boolean;
+  roll: number;
+  total: number;
+  dc: number;
+  ability: keyof AbilityScores;
+}
+
+// =============================================================================
 // HISTORIQUE DES PARTIES
-// ============================================
+// =============================================================================
+
 export interface GameHistory {
   id: string;
   date: string;
   version: string;
   result: 'victory' | 'defeat' | 'abandoned';
   roomsExplored: number;
-  dungeonLevel: number; // Niveau atteint dans le donjon
+  dungeonLevel: number;
   team: {
     name: string;
     class: string;
     portrait: string;
     finalHp: number;
     maxHp: number;
-    // Statistiques de combat
-    attack: number;
-    magicAttack: number;
-    defense: number;
-    magicDefense: number;
-    speed: number;
-    // Stats de performance
+    level: number;
+    totalXP: number;
     damageDealt: number;
     damageTaken: number;
     healingDone: number;
     monstersKilled: number;
-    // Monstre le plus puissant vaincu
     strongestMonsterKilled?: {
       name: string;
       portrait: string;
-      attack: number;
-      defense: number;
+      challengeRating: number;
       isBoss: boolean;
     };
-    // Objets portés
     inventory: {
       name: string;
       icon: string;
@@ -615,4 +702,22 @@ export interface GameHistory {
   }[];
   bossDefeated?: string;
   duration: number;
+}
+
+// =============================================================================
+// STATS DE BASE (pour compatibilité, sera supprimé)
+// =============================================================================
+
+export interface BaseStats {
+  attack: number;
+  magicAttack: number;
+  defense: number;
+  magicDefense: number;
+  speed: number;
+}
+
+export interface StatModification {
+  source: string;
+  value: number;
+  type: 'buff' | 'debuff' | 'item' | 'event';
 }
