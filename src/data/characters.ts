@@ -190,7 +190,7 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damage: 0, 
         type: 'buff',
         targetType: 'self',
-        buffStats: { stat: 'attack', value: 2, turns: 4 },
+        buffStats: { stat: 'ability', ability: 'strength', value: 2, turns: 4 },
         cooldown: 5,
         description: 'Entre en rage: +2 dégâts mêlée, résistance contondant/perforant/tranchant.'
       }

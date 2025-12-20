@@ -18,7 +18,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d4',
     damageType: 'bludgeoning',
-    bonuses: { attack: 1 },
+    bonuses: { strength: 1 },
     value: 1
   },
   {
@@ -32,7 +32,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     damage: '1d4',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { attack: 2, speed: 1 },
+    bonuses: { dexterity: 2, speed: 1 },
     value: 2
   },
   {
@@ -45,7 +45,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'slashing',
-    bonuses: { attack: 3 },
+    bonuses: { strength: 3 },
     value: 5
   },
   {
@@ -58,7 +58,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'bludgeoning',
-    bonuses: { attack: 3 },
+    bonuses: { strength: 3 },
     value: 5
   },
   {
@@ -71,7 +71,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'bludgeoning',
-    bonuses: { attack: 2, defense: 1 },
+    bonuses: { strength: 2, armorClass: 1 },
     value: 2
   },
   {
@@ -84,7 +84,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'piercing',
-    bonuses: { attack: 3 },
+    bonuses: { strength: 3 },
     value: 1
   }
 ];
@@ -103,7 +103,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'slashing',
-    bonuses: { attack: 5 },
+    bonuses: { strength: 5 },
     value: 15
   },
   {
@@ -116,7 +116,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'slashing',
-    bonuses: { attack: 6 },
+    bonuses: { strength: 6 },
     value: 10
   },
   {
@@ -129,7 +129,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'bludgeoning',
-    bonuses: { attack: 5 },
+    bonuses: { strength: 5 },
     value: 15
   },
   {
@@ -143,7 +143,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { attack: 5, speed: 2 },
+    bonuses: { dexterity: 5, speed: 2 },
     value: 25
   },
   {
@@ -157,7 +157,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d6',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { attack: 4, speed: 2 },
+    bonuses: { dexterity: 4, speed: 2 },
     value: 10
   },
   {
@@ -171,7 +171,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d6',
     damageType: 'slashing',
     finesse: true,
-    bonuses: { attack: 4, speed: 2 },
+    bonuses: { dexterity: 4, speed: 2 },
     value: 25
   },
   {
@@ -185,7 +185,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d12',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { attack: 8 },
+    bonuses: { strength: 8 },
     value: 30
   },
   {
@@ -199,7 +199,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '2d6',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { attack: 8 },
+    bonuses: { strength: 8 },
     value: 50
   },
   {
@@ -213,7 +213,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d10',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { attack: 7 },
+    bonuses: { strength: 7 },
     value: 20
   },
   {
@@ -226,7 +226,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'bludgeoning',
-    bonuses: { attack: 5 },
+    bonuses: { strength: 5 },
     value: 10
   }
 ];
@@ -246,7 +246,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d6',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { attack: 4 },
+    bonuses: { strength: 4 },
     value: 25
   },
   {
@@ -260,7 +260,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { attack: 6 },
+    bonuses: { strength: 6 },
     value: 50
   },
   {
@@ -274,7 +274,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { attack: 5 },
+    bonuses: { strength: 5 },
     value: 25
   },
   {
@@ -288,7 +288,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d10',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { attack: 7 },
+    bonuses: { strength: 7 },
     value: 50
   }
 ];
@@ -305,7 +305,7 @@ export const SHIELDS: Equipment[] = [
     rarity: 'common',
     description: 'Un petit bouclier léger. +1 CA.',
     armorCategory: 'shield',
-    bonuses: { defense: 2, armorClass: 1 },
+    bonuses: { armorClass: 2, armorClass: 1 },
     value: 5
   },
   {
@@ -316,7 +316,7 @@ export const SHIELDS: Equipment[] = [
     rarity: 'common',
     description: 'Un bouclier standard. +2 CA.',
     armorCategory: 'shield',
-    bonuses: { defense: 4, armorClass: 2 },
+    bonuses: { armorClass: 4, armorClass: 2 },
     value: 10
   },
   {
@@ -327,7 +327,7 @@ export const SHIELDS: Equipment[] = [
     rarity: 'uncommon',
     description: 'Un immense bouclier de tour. +3 CA, -2 vitesse.',
     armorCategory: 'shield',
-    bonuses: { defense: 6, armorClass: 3, speed: -2 },
+    bonuses: { armorClass: 6, armorClass: 3, speed: -2 },
     requirements: { strength: 15 },
     value: 30
   }
@@ -347,7 +347,7 @@ export const ARMOR_LIGHT: Equipment[] = [
     armorCategory: 'light',
     baseAC: 11,
     stealthDisadvantage: true,
-    bonuses: { defense: 2 },
+    bonuses: { armorClass: 2 },
     value: 5
   },
   {
@@ -359,7 +359,7 @@ export const ARMOR_LIGHT: Equipment[] = [
     description: 'Cuir tanné souple. CA 11 + DEX.',
     armorCategory: 'light',
     baseAC: 11,
-    bonuses: { defense: 3 },
+    bonuses: { armorClass: 3 },
     value: 10
   },
   {
@@ -371,7 +371,7 @@ export const ARMOR_LIGHT: Equipment[] = [
     description: 'Cuir renforcé de rivets. CA 12 + DEX.',
     armorCategory: 'light',
     baseAC: 12,
-    bonuses: { defense: 4 },
+    bonuses: { armorClass: 4 },
     value: 45
   }
 ];
@@ -390,7 +390,7 @@ export const ARMOR_MEDIUM: Equipment[] = [
     armorCategory: 'medium',
     baseAC: 12,
     maxDexBonus: 2,
-    bonuses: { defense: 5 },
+    bonuses: { armorClass: 5 },
     value: 10
   },
   {
@@ -403,7 +403,7 @@ export const ARMOR_MEDIUM: Equipment[] = [
     armorCategory: 'medium',
     baseAC: 13,
     maxDexBonus: 2,
-    bonuses: { defense: 6 },
+    bonuses: { armorClass: 6 },
     value: 50
   },
   {
@@ -417,7 +417,7 @@ export const ARMOR_MEDIUM: Equipment[] = [
     baseAC: 14,
     maxDexBonus: 2,
     stealthDisadvantage: true,
-    bonuses: { defense: 7 },
+    bonuses: { armorClass: 7 },
     value: 50
   },
   {
@@ -430,7 +430,7 @@ export const ARMOR_MEDIUM: Equipment[] = [
     armorCategory: 'medium',
     baseAC: 14,
     maxDexBonus: 2,
-    bonuses: { defense: 8 },
+    bonuses: { armorClass: 8 },
     value: 400
   },
   {
@@ -444,7 +444,7 @@ export const ARMOR_MEDIUM: Equipment[] = [
     baseAC: 15,
     maxDexBonus: 2,
     stealthDisadvantage: true,
-    bonuses: { defense: 9 },
+    bonuses: { armorClass: 9 },
     value: 750
   }
 ];
@@ -463,7 +463,7 @@ export const ARMOR_HEAVY: Equipment[] = [
     armorCategory: 'heavy',
     baseAC: 14,
     stealthDisadvantage: true,
-    bonuses: { defense: 8 },
+    bonuses: { armorClass: 8 },
     value: 30
   },
   {
@@ -476,7 +476,7 @@ export const ARMOR_HEAVY: Equipment[] = [
     armorCategory: 'heavy',
     baseAC: 16,
     stealthDisadvantage: true,
-    bonuses: { defense: 10 },
+    bonuses: { armorClass: 10 },
     requirements: { strength: 13 },
     value: 75
   },
@@ -490,7 +490,7 @@ export const ARMOR_HEAVY: Equipment[] = [
     armorCategory: 'heavy',
     baseAC: 17,
     stealthDisadvantage: true,
-    bonuses: { defense: 11 },
+    bonuses: { armorClass: 11 },
     requirements: { strength: 15 },
     value: 200
   },
@@ -504,7 +504,7 @@ export const ARMOR_HEAVY: Equipment[] = [
     armorCategory: 'heavy',
     baseAC: 18,
     stealthDisadvantage: true,
-    bonuses: { defense: 14 },
+    bonuses: { armorClass: 14 },
     requirements: { strength: 15 },
     value: 1500
   }
@@ -544,7 +544,7 @@ export const CLOTHING: Equipment[] = [
     rarity: 'common',
     description: 'Une robe traditionnelle de lanceur de sorts.',
     armorCategory: 'clothing',
-    bonuses: { magicAttack: 2, magicDefense: 2 },
+    bonuses: { magicAttack: 2, magicarmorClass: 2 },
     value: 10
   },
   {
@@ -555,7 +555,7 @@ export const CLOTHING: Equipment[] = [
     rarity: 'common',
     description: 'Les vêtements cérémoniels d\'un prêtre.',
     armorCategory: 'clothing',
-    bonuses: { magicDefense: 3 },
+    bonuses: { magicarmorClass: 3 },
     value: 15
   }
 ];
@@ -571,7 +571,7 @@ export const HELMETS: Equipment[] = [
     slotType: 'head',
     rarity: 'common',
     description: 'Une simple protection en cuir pour la tête.',
-    bonuses: { defense: 1 },
+    bonuses: { armorClass: 1 },
     value: 5
   },
   {
@@ -581,7 +581,7 @@ export const HELMETS: Equipment[] = [
     slotType: 'head',
     rarity: 'common',
     description: 'Un casque en fer basique.',
-    bonuses: { defense: 2 },
+    bonuses: { armorClass: 2 },
     value: 15
   },
   {
@@ -591,7 +591,7 @@ export const HELMETS: Equipment[] = [
     slotType: 'head',
     rarity: 'uncommon',
     description: 'Un heaume couvrant tout le visage.',
-    bonuses: { defense: 3, armorClass: 1 },
+    bonuses: { armorClass: 3, armorClass: 1 },
     value: 30
   },
   {
@@ -601,7 +601,7 @@ export const HELMETS: Equipment[] = [
     slotType: 'head',
     rarity: 'common',
     description: 'Un fin diadème métallique.',
-    bonuses: { magicAttack: 1, magicDefense: 1 },
+    bonuses: { magicAttack: 1, magicarmorClass: 1 },
     value: 20
   },
   {
@@ -627,7 +627,7 @@ export const GLOVES: Equipment[] = [
     slotType: 'gloves',
     rarity: 'common',
     description: 'De simples gants en cuir.',
-    bonuses: { attack: 1 },
+    bonuses: { strength: 1 },
     value: 2
   },
   {
@@ -637,7 +637,7 @@ export const GLOVES: Equipment[] = [
     slotType: 'gloves',
     rarity: 'common',
     description: 'Des gantelets métalliques.',
-    bonuses: { attack: 2, defense: 1 },
+    bonuses: { strength: 2, armorClass: 1 },
     value: 10
   },
   {
@@ -663,7 +663,7 @@ export const BRACERS: Equipment[] = [
     slotType: 'bracers',
     rarity: 'common',
     description: 'Des protections en cuir pour les avant-bras.',
-    bonuses: { defense: 1 },
+    bonuses: { armorClass: 1 },
     value: 5
   },
   {
@@ -673,7 +673,7 @@ export const BRACERS: Equipment[] = [
     slotType: 'bracers',
     rarity: 'common',
     description: 'Des brassards métalliques solides.',
-    bonuses: { defense: 2 },
+    bonuses: { armorClass: 2 },
     value: 15
   },
   {
@@ -683,7 +683,7 @@ export const BRACERS: Equipment[] = [
     slotType: 'bracers',
     rarity: 'common',
     description: 'Protègent les avant-bras lors du tir.',
-    bonuses: { attack: 2 },
+    bonuses: { strength: 2 },
     value: 20
   }
 ];
@@ -719,7 +719,7 @@ export const BELTS: Equipment[] = [
     slotType: 'belt',
     rarity: 'uncommon',
     description: 'Un ceinturon robuste pour porter des armes.',
-    bonuses: { attack: 1, defense: 1 },
+    bonuses: { strength: 1, armorClass: 1 },
     value: 15
   }
 ];
@@ -745,7 +745,7 @@ export const BOOTS: Equipment[] = [
     slotType: 'boots',
     rarity: 'common',
     description: 'Des bottes renforcées de métal.',
-    bonuses: { defense: 1 },
+    bonuses: { armorClass: 1 },
     value: 10
   },
   {
@@ -781,7 +781,7 @@ export const CLOAKS: Equipment[] = [
     slotType: 'cloak',
     rarity: 'uncommon',
     description: 'Une cape enchantée offrant une protection.',
-    bonuses: { defense: 1, magicDefense: 2 },
+    bonuses: { armorClass: 1, magicarmorClass: 2 },
     value: 50
   }
 ];
@@ -807,7 +807,7 @@ export const NECKLACES: Equipment[] = [
     slotType: 'necklace',
     rarity: 'common',
     description: 'Le symbole d\'une divinité.',
-    bonuses: { magicDefense: 2 },
+    bonuses: { magicarmorClass: 2 },
     value: 25
   },
   {
@@ -883,7 +883,7 @@ export const ARCANE_FOCUS: Equipment[] = [
     description: 'Un bâton enchanté pour les mages.',
     weaponCategory: 'focus',
     twoHanded: true,
-    bonuses: { magicAttack: 4, magicDefense: 1 },
+    bonuses: { magicAttack: 4, magicarmorClass: 1 },
     value: 30
   }
 ];
@@ -1153,37 +1153,43 @@ export const CLASS_STARTER_EQUIPMENT: Record<string, CharacterEquipment> = {
   'Scalde': BARD_STARTER
 };
 
-// Calculer les bonus totaux d'un équipement
+// Calculer les bonus totaux d'un équipement (système D&D)
 export function calculateEquipmentBonuses(equipment: CharacterEquipment): {
-  attack: number;
-  magicAttack: number;
-  defense: number;
-  magicDefense: number;
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+  armorClass: number;
   speed: number;
   maxHp: number;
-  armorClass: number;
 } {
   let bonuses = {
-    attack: 0,
-    magicAttack: 0,
-    defense: 0,
-    magicDefense: 0,
+    strength: 0,
+    dexterity: 0,
+    constitution: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0,
+    armorClass: 0,
     speed: 0,
-    maxHp: 0,
-    armorClass: 0
+    maxHp: 0
   };
 
   const slots = Object.values(equipment) as (Equipment | undefined)[];
   
   for (const item of slots) {
     if (item?.bonuses) {
-      bonuses.attack += item.bonuses.attack || 0;
-      bonuses.magicAttack += item.bonuses.magicAttack || 0;
-      bonuses.defense += item.bonuses.defense || 0;
-      bonuses.magicDefense += item.bonuses.magicDefense || 0;
+      bonuses.strength += item.bonuses.strength || 0;
+      bonuses.dexterity += item.bonuses.dexterity || 0;
+      bonuses.constitution += item.bonuses.constitution || 0;
+      bonuses.intelligence += item.bonuses.intelligence || 0;
+      bonuses.wisdom += item.bonuses.wisdom || 0;
+      bonuses.charisma += item.bonuses.charisma || 0;
+      bonuses.armorClass += item.bonuses.armorClass || 0;
       bonuses.speed += item.bonuses.speed || 0;
       bonuses.maxHp += item.bonuses.maxHp || 0;
-      bonuses.armorClass += item.bonuses.armorClass || 0;
     }
   }
 

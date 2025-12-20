@@ -44,28 +44,28 @@ export const POSITIVE_EVENTS: GameEvent[] = [
     name: 'Bénédiction ancienne',
     description: 'Un esprit bienveillant bénit votre équipe. L\'attaque physique de tous les membres augmente !',
     type: 'positive',
-    effect: { type: 'buff_attack', value: 5, target: 'all' }
+    effect: { type: 'buff_strength', value: 5, target: 'all' }
   },
   {
     id: 'hero_spirit',
     name: 'Esprit du héros',
     description: 'L\'esprit d\'un ancien héros vous transmet sa force. Le plus fort devient encore plus puissant !',
     type: 'positive',
-    effect: { type: 'buff_attack', value: 12, target: 'strongest' }
+    effect: { type: 'buff_strength', value: 12, target: 'strongest' }
   },
   {
     id: 'forge_divine',
     name: 'Forge divine',
     description: 'Vous découvrez une forge ancienne qui renforce vos armes.',
     type: 'positive',
-    effect: { type: 'buff_attack', value: 4, target: 'all' }
+    effect: { type: 'buff_strength', value: 4, target: 'all' }
   },
   {
     id: 'rage_bataille',
     name: 'Rage de bataille',
     description: 'Une fureur ancestrale s\'empare de vos guerriers !',
     type: 'positive',
-    effect: { type: 'buff_attack', value: 8, target: 'random' }
+    effect: { type: 'buff_strength', value: 8, target: 'random' }
   },
   
   // Buffs Attaque Magique
@@ -74,42 +74,42 @@ export const POSITIVE_EVENTS: GameEvent[] = [
     name: 'Savoir arcanique',
     description: 'Vous découvrez d\'anciens grimoires qui renforcent les pouvoirs magiques de toute l\'équipe !',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 5, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 5, target: 'all' }
   },
   {
     id: 'mana_crystal',
     name: 'Cristal de mana',
     description: 'Un cristal brillant infuse votre équipe d\'énergie arcanique. La puissance magique augmente !',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 8, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 8, target: 'all' }
   },
   {
     id: 'archmage_blessing',
     name: 'Bénédiction de l\'archimage',
     description: 'Le fantôme d\'un archimage vous bénit. Un membre aléatoire gagne en puissance magique !',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 10, target: 'random' }
+    effect: { type: 'buff_intelligence', value: 10, target: 'random' }
   },
   {
     id: 'elemental_surge',
     name: 'Surge élémentaire',
     description: 'Les éléments se déchaînent en votre faveur. La magie de votre équipe s\'intensifie !',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 6, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 6, target: 'all' }
   },
   {
     id: 'fontaine_arcane',
     name: 'Fontaine arcanique',
     description: 'Une fontaine de mana pure renforce les pouvoirs de vos mages.',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 7, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 7, target: 'all' }
   },
   {
     id: 'resonance_mystique',
     name: 'Résonance mystique',
     description: 'Les énergies du donjon amplifient vos sorts !',
     type: 'positive',
-    effect: { type: 'buff_magic_attack', value: 12, target: 'strongest' }
+    effect: { type: 'buff_intelligence', value: 12, target: 'strongest' }
   },
   
   // Buffs Défense
@@ -118,28 +118,28 @@ export const POSITIVE_EVENTS: GameEvent[] = [
     name: 'Esprit gardien',
     description: 'Un esprit protecteur renforce vos défenses. Vous vous sentez plus résistants.',
     type: 'positive',
-    effect: { type: 'buff_defense', value: 5, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 5, target: 'all' }
   },
   {
     id: 'fairy_dust',
     name: 'Poussière de fée',
     description: 'Des fées bienveillantes répandent leur poussière magique sur votre équipe.',
     type: 'positive',
-    effect: { type: 'buff_defense', value: 8, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 8, target: 'all' }
   },
   {
     id: 'benediction_acier',
     name: 'Bénédiction d\'acier',
     description: 'Vos armures brillent d\'une lueur protectrice.',
     type: 'positive',
-    effect: { type: 'buff_defense', value: 6, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 6, target: 'all' }
   },
   {
     id: 'protection_ancestrale',
     name: 'Protection ancestrale',
     description: 'Les esprits de vos ancêtres veillent sur vous.',
     type: 'positive',
-    effect: { type: 'buff_defense', value: 10, target: 'weakest' }
+    effect: { type: 'buff_armorClass', value: 10, target: 'weakest' }
   }
 ];
 
@@ -201,21 +201,21 @@ export const NEGATIVE_EVENTS: GameEvent[] = [
     name: 'Salle maudite',
     description: 'Une malédiction pèse sur cette salle. L\'attaque de tous les membres diminue.',
     type: 'negative',
-    effect: { type: 'debuff_attack', value: 3, target: 'all' }
+    effect: { type: 'debuff_strength', value: 3, target: 'all' }
   },
   {
     id: 'cursed_artifact',
     name: 'Artefact maudit',
     description: 'Vous touchez un artefact maudit. Votre force s\'affaiblit temporairement.',
     type: 'negative',
-    effect: { type: 'debuff_attack', value: 5, target: 'all' }
+    effect: { type: 'debuff_strength', value: 5, target: 'all' }
   },
   {
     id: 'fatigue_combat',
     name: 'Fatigue de combat',
     description: 'L\'épuisement vous gagne et affaiblit vos coups.',
     type: 'negative',
-    effect: { type: 'debuff_attack', value: 4, target: 'all' }
+    effect: { type: 'debuff_strength', value: 4, target: 'all' }
   },
   
   // Debuffs Attaque Magique
@@ -224,35 +224,35 @@ export const NEGATIVE_EVENTS: GameEvent[] = [
     name: 'Drainage de mana',
     description: 'Un sortilège ancien aspire l\'énergie magique de votre équipe. Dégâts magiques réduits !',
     type: 'negative',
-    effect: { type: 'debuff_magic_attack', value: 4, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 4, target: 'all' }
   },
   {
     id: 'antimagic_field',
     name: 'Champ antimagie',
     description: 'Un champ antimagie supprime une partie de vos pouvoirs arcaniques. Magie affaiblie !',
     type: 'negative',
-    effect: { type: 'debuff_magic_attack', value: 6, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 6, target: 'all' }
   },
   {
     id: 'void_touch',
     name: 'Toucher du vide',
     description: 'Une entité du vide effleure votre mage le plus puissant. Sa magie s\'en trouve diminuée.',
     type: 'negative',
-    effect: { type: 'debuff_magic_attack', value: 8, target: 'strongest' }
+    effect: { type: 'debuff_intelligence', value: 8, target: 'strongest' }
   },
   {
     id: 'silence_magique',
     name: 'Silence magique',
     description: 'Une aura de silence étouffe partiellement vos pouvoirs.',
     type: 'negative',
-    effect: { type: 'debuff_magic_attack', value: 5, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 5, target: 'all' }
   },
   {
     id: 'parasites_mana',
     name: 'Parasites de mana',
     description: 'De petites créatures invisibles se nourrissent de votre mana.',
     type: 'negative',
-    effect: { type: 'debuff_magic_attack', value: 3, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 3, target: 'all' }
   },
   
   // Debuffs Défense
@@ -261,21 +261,21 @@ export const NEGATIVE_EVENTS: GameEvent[] = [
     name: 'Aura d\'affaiblissement',
     description: 'Une aura maléfique émane des murs. La défense de votre équipe diminue.',
     type: 'negative',
-    effect: { type: 'debuff_defense', value: 3, target: 'all' }
+    effect: { type: 'debuff_armorClass', value: 3, target: 'all' }
   },
   {
     id: 'corrosion_armure',
     name: 'Corrosion d\'armure',
     description: 'Un acide ronge vos équipements protecteurs.',
     type: 'negative',
-    effect: { type: 'debuff_defense', value: 4, target: 'all' }
+    effect: { type: 'debuff_armorClass', value: 4, target: 'all' }
   },
   {
     id: 'malefice_fragilite',
     name: 'Maléfice de fragilité',
     description: 'Un sortilège vous rend vulnérables aux attaques.',
     type: 'negative',
-    effect: { type: 'debuff_defense', value: 6, target: 'random' }
+    effect: { type: 'debuff_armorClass', value: 6, target: 'random' }
   }
 ];
 

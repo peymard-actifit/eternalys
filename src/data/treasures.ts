@@ -13,7 +13,7 @@ export interface Treasure {
 
 export interface TreasureEffect {
   type: 'stat_boost' | 'heal' | 'skill' | 'buff' | 'resurrect' | 'passive';
-  stat?: 'hp' | 'maxHp' | 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'speed';
+  stat?: 'hp' | 'maxHp' | 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma' | 'armorClass' | 'speed' | 'attack' | 'magicAttack' | 'defense' | 'magicDefense';
   value?: number;
   percentage?: number;
   skillName?: string;
@@ -83,7 +83,7 @@ const commonTreasures: Treasure[] = [
     icon: '💎',
     rarity: 'common',
     description: '+2 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 2, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -92,7 +92,7 @@ const commonTreasures: Treasure[] = [
     icon: '📿',
     rarity: 'common',
     description: '+2 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 2, duration: 'permanent' },
     equipmentSlot: 'necklace'
   },
   {
@@ -111,7 +111,7 @@ const commonTreasures: Treasure[] = [
     icon: '🔮',
     rarity: 'common',
     description: '+2 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 2, duration: 'permanent' },
     equipmentSlot: 'trinket2'
   },
   {
@@ -120,7 +120,7 @@ const commonTreasures: Treasure[] = [
     icon: '✨',
     rarity: 'common',
     description: '+2 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 2, duration: 'permanent' },
     equipmentSlot: 'trinket3'
   },
   // PV
@@ -156,7 +156,7 @@ const rareTreasures: Treasure[] = [
     icon: '🧤',
     rarity: 'rare',
     description: '+5 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 5, duration: 'permanent' },
     equipmentSlot: 'gloves'
   },
   {
@@ -165,7 +165,7 @@ const rareTreasures: Treasure[] = [
     icon: '🛡️',
     rarity: 'rare',
     description: '+5 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 5, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -184,7 +184,7 @@ const rareTreasures: Treasure[] = [
     icon: '💠',
     rarity: 'rare',
     description: '+5 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 5, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -193,7 +193,7 @@ const rareTreasures: Treasure[] = [
     icon: '🧙',
     rarity: 'rare',
     description: '+5 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 5, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   // PV
@@ -266,7 +266,7 @@ const epicTreasures: Treasure[] = [
     icon: '⚔️',
     rarity: 'epic',
     description: '+9 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 9, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -275,7 +275,7 @@ const epicTreasures: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+9 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 9, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   {
@@ -294,7 +294,7 @@ const epicTreasures: Treasure[] = [
     icon: '🪄',
     rarity: 'epic',
     description: '+10 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 10, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -303,7 +303,7 @@ const epicTreasures: Treasure[] = [
     icon: '🌑',
     rarity: 'epic',
     description: '+9 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 9, duration: 'permanent' },
     equipmentSlot: 'cloak'
   },
   // PV + bonus
@@ -386,7 +386,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '⚔️',
     rarity: 'legendary',
     description: '+14 Attaque permanente',
-    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 14, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -395,7 +395,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '🛡️',
     rarity: 'legendary',
     description: '+14 Défense permanente',
-    effect: { type: 'stat_boost', stat: 'defense', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 14, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   // Stats magiques
@@ -405,7 +405,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '📖',
     rarity: 'legendary',
     description: '+15 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 15, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 15, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -414,7 +414,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '🧙',
     rarity: 'legendary',
     description: '+14 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 14, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   // Multi-stats
@@ -433,7 +433,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '⚜️',
     rarity: 'legendary',
     description: '+30 PV max, +10 Défense, +8 Rés. Magique',
-    effect: { type: 'buff', stat: 'defense', value: 10 },
+    effect: { type: 'buff', stat: 'armorClass', value: 10 },
     equipmentSlot: 'armor'
   },
   {
@@ -442,7 +442,7 @@ const legendaryTreasures: Treasure[] = [
     icon: '🌌',
     rarity: 'legendary',
     description: '+12 Attaque Magique et +10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 12, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   // Résurrection
@@ -504,7 +504,7 @@ const dndCommonItems: Treasure[] = [
     icon: '🗡️',
     rarity: 'common',
     description: '+2 Attaque, efficace contre lycanthropes',
-    effect: { type: 'stat_boost', stat: 'attack', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 2, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -513,7 +513,7 @@ const dndCommonItems: Treasure[] = [
     icon: '✝️',
     rarity: 'common',
     description: '+2 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 2, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -522,7 +522,7 @@ const dndCommonItems: Treasure[] = [
     icon: '🔦',
     rarity: 'common',
     description: '+2 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 2, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -546,7 +546,7 @@ const dndRareItems: Treasure[] = [
     icon: '🧥',
     rarity: 'rare',
     description: '+4 Défense et +4 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 4, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 4, duration: 'permanent' },
     equipmentSlot: 'cloak'
   },
   {
@@ -564,7 +564,7 @@ const dndRareItems: Treasure[] = [
     icon: '🧤',
     rarity: 'rare',
     description: '+6 Attaque (Force 19)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 6, duration: 'permanent' },
     equipmentSlot: 'gloves'
   },
   {
@@ -573,7 +573,7 @@ const dndRareItems: Treasure[] = [
     icon: '👑',
     rarity: 'rare',
     description: '+6 Attaque Magique (Intelligence 19)',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 6, duration: 'permanent' },
     equipmentSlot: 'head'
   },
   {
@@ -591,7 +591,7 @@ const dndRareItems: Treasure[] = [
     icon: '🪄',
     rarity: 'rare',
     description: '+5 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 5, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -600,7 +600,7 @@ const dndRareItems: Treasure[] = [
     icon: '🛡️',
     rarity: 'rare',
     description: '+6 Défense, légère comme l\'air',
-    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 6, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   {
@@ -624,7 +624,7 @@ const dndEpicItems: Treasure[] = [
     icon: '🥋',
     rarity: 'epic',
     description: '+10 Attaque (Force 21)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 10, duration: 'permanent' },
     equipmentSlot: 'belt'
   },
   {
@@ -633,7 +633,7 @@ const dndEpicItems: Treasure[] = [
     icon: '🧣',
     rarity: 'epic',
     description: '+9 Défense (désavantage aux attaques ennemies)',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 9, duration: 'permanent' },
     equipmentSlot: 'cloak'
   },
   {
@@ -642,7 +642,7 @@ const dndEpicItems: Treasure[] = [
     icon: '⚔️',
     rarity: 'epic',
     description: '+9 Attaque, coups critiques améliorés',
-    effect: { type: 'stat_boost', stat: 'attack', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 9, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -651,7 +651,7 @@ const dndEpicItems: Treasure[] = [
     icon: '🪄',
     rarity: 'epic',
     description: '+10 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 10, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -660,7 +660,7 @@ const dndEpicItems: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+10 Défense, résistance au poison',
-    effect: { type: 'stat_boost', stat: 'defense', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 10, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   {
@@ -669,7 +669,7 @@ const dndEpicItems: Treasure[] = [
     icon: '💍',
     rarity: 'epic',
     description: '+6 Défense et +6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 6, duration: 'permanent' },
     equipmentSlot: 'ring1'
   },
   {
@@ -687,7 +687,7 @@ const dndEpicItems: Treasure[] = [
     icon: '💠',
     rarity: 'epic',
     description: '+8 Attaque',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 8, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -696,7 +696,7 @@ const dndEpicItems: Treasure[] = [
     icon: '🔷',
     rarity: 'epic',
     description: '+8 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 8, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 8, duration: 'permanent' },
     equipmentSlot: 'trinket2'
   }
 ];
@@ -711,7 +711,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '🔥',
     rarity: 'legendary',
     description: '+14 Attaque (Force 25)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 14, duration: 'permanent' },
     equipmentSlot: 'belt'
   },
   {
@@ -720,7 +720,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '⛈️',
     rarity: 'legendary',
     description: '+15 Attaque (Force 29)',
-    effect: { type: 'stat_boost', stat: 'attack', value: 15, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 15, duration: 'permanent' },
     equipmentSlot: 'belt'
   },
   {
@@ -729,7 +729,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '🪄',
     rarity: 'legendary',
     description: '+14 Attaque Magique et +8 Rés. Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 14, duration: 'permanent' },
     equipmentSlot: 'mainHand'
   },
   {
@@ -747,7 +747,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '✋',
     rarity: 'legendary',
     description: '+12 Attaque Magique, drain de vie',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 12, duration: 'permanent' },
     equipmentSlot: 'gloves'
   },
   {
@@ -756,7 +756,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '👁️',
     rarity: 'legendary',
     description: '+12 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 12, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 12, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -765,7 +765,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📘',
     rarity: 'legendary',
     description: '+12 PV max et +10 Attaque permanents',
-    effect: { type: 'stat_boost', stat: 'attack', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 10, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -774,7 +774,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📗',
     rarity: 'legendary',
     description: '+12 Résistance Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 12, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 12, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -783,7 +783,7 @@ const dndLegendaryItems: Treasure[] = [
     icon: '📙',
     rarity: 'legendary',
     description: '+13 Attaque Magique permanente',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 13, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 13, duration: 'permanent' },
     equipmentSlot: 'offHand'
   }
 ];
@@ -799,7 +799,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '📿',
     rarity: 'common',
     description: '+3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 3, duration: 'permanent' },
     equipmentSlot: 'necklace'
   },
   {
@@ -808,7 +808,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🔷',
     rarity: 'common',
     description: '+2 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 2, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 2, duration: 'permanent' },
     equipmentSlot: 'trinket1'
   },
   {
@@ -817,7 +817,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '💎',
     rarity: 'common',
     description: '+3 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 3, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 3, duration: 'permanent' },
     equipmentSlot: 'trinket2'
   },
   // Rares (+4-6)
@@ -827,7 +827,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🧥',
     rarity: 'rare',
     description: '+6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 6, duration: 'permanent' },
     equipmentSlot: 'cloak'
   },
   {
@@ -836,7 +836,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '💠',
     rarity: 'rare',
     description: '+5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 5, duration: 'permanent' },
     equipmentSlot: 'trinket3'
   },
   {
@@ -845,7 +845,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '💍',
     rarity: 'rare',
     description: '+6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 6, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 6, duration: 'permanent' },
     equipmentSlot: 'ring2'
   },
   {
@@ -854,7 +854,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🧣',
     rarity: 'rare',
     description: '+5 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 5, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 5, duration: 'permanent' },
     equipmentSlot: 'cloak'
   },
   // Épiques (+8-10)
@@ -864,7 +864,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🦾',
     rarity: 'epic',
     description: '+10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 10, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   {
@@ -873,7 +873,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '📿',
     rarity: 'epic',
     description: '+10 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 10, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 10, duration: 'permanent' },
     equipmentSlot: 'necklace'
   },
   {
@@ -882,7 +882,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🪞',
     rarity: 'epic',
     description: '+8 Résistance Magique et +5 Défense',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 8, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 8, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -891,7 +891,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '👻',
     rarity: 'epic',
     description: '+9 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 9, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   // Légendaires (+12-15)
@@ -901,7 +901,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '⚜️',
     rarity: 'legendary',
     description: '+15 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 15, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 15, duration: 'permanent' },
     equipmentSlot: 'armor'
   },
   {
@@ -910,7 +910,7 @@ const magicResistanceItems: Treasure[] = [
     icon: '🖤',
     rarity: 'legendary',
     description: '+13 Résistance Magique et +8 Att. Magique',
-    effect: { type: 'stat_boost', stat: 'magicDefense', value: 13, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'wisdom', value: 13, duration: 'permanent' },
     equipmentSlot: 'cloak'
   }
 ];
@@ -1201,7 +1201,7 @@ const iconicDndItems: Treasure[] = [
     icon: '🛡️',
     rarity: 'epic',
     description: '+9 Défense et +6 Résistance Magique',
-    effect: { type: 'stat_boost', stat: 'defense', value: 9, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'armorClass', value: 9, duration: 'permanent' },
     equipmentSlot: 'offHand'
   },
   {
@@ -1252,7 +1252,7 @@ const iconicDndItems: Treasure[] = [
     icon: '👑',
     rarity: 'legendary',
     description: '+14 Attaque Magique',
-    effect: { type: 'stat_boost', stat: 'magicAttack', value: 14, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'intelligence', value: 14, duration: 'permanent' },
     equipmentSlot: 'head'
   },
   {
@@ -1261,7 +1261,7 @@ const iconicDndItems: Treasure[] = [
     icon: '💍',
     rarity: 'epic',
     description: '+8 Attaque et +6 Défense',
-    effect: { type: 'stat_boost', stat: 'attack', value: 8, duration: 'permanent' },
+    effect: { type: 'stat_boost', stat: 'strength', value: 8, duration: 'permanent' },
     equipmentSlot: 'ring1'
   }
 ];
