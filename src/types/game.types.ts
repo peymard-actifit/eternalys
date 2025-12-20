@@ -581,7 +581,7 @@ export interface CombatHistoryEntry {
 // ÉTAT DU JEU
 // =============================================================================
 
-export type GamePhase = 'welcome' | 'menu' | 'character_select' | 'dungeon' | 'combat' | 'event' | 'treasure' | 'victory' | 'defeat' | 'summary';
+export type GamePhase = 'welcome' | 'menu' | 'character_select' | 'dungeon' | 'combat' | 'event' | 'treasure' | 'level_up' | 'victory' | 'defeat' | 'summary';
 
 export interface GameState {
   phase: GamePhase;
