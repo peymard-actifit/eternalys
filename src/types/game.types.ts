@@ -128,8 +128,8 @@ export interface Character {
   
   // === NIVEAU ET PROGRESSION ===
   level: number;          // Niveau actuel (1-100)
-  xp: number;             // XP actuel vers le prochain niveau
-  totalXP: number;        // XP total gagné
+  xp?: number;            // XP actuel vers le prochain niveau
+  totalXP?: number;       // XP total gagné
   
   // === POINTS DE VIE ===
   hp: number;             // PV actuels
