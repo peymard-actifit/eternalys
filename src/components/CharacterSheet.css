@@ -139,6 +139,53 @@
 }
 
 /* Niveau et XP */
+.entity-level-info {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.level-badge {
+  background: linear-gradient(135deg, #4a6a9a, #3a4a6a);
+  color: #e0e8f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid #5a7aaa;
+}
+
+.proficiency-badge {
+  background: linear-gradient(135deg, #6a5a9a, #4a3a6a);
+  color: #e0d8f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: 1px solid #7a6aaa;
+}
+
+.sheet-xp-bar {
+  margin-top: 0.5rem;
+  max-width: 280px;
+}
+
+/* Stats de combat améliorées */
+.combat-stat.highlight {
+  background: linear-gradient(135deg, rgba(201, 166, 107, 0.2), rgba(139, 115, 85, 0.2));
+  border-color: #c9a66b;
+}
+
+.combat-stat.wide {
+  grid-column: span 2;
+}
+
+.saving-throws {
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em;
+}
+
+/* Niveau et XP */
 .character-level-xp {
   display: flex;
   flex-direction: column;

@@ -88,6 +88,29 @@ export function CombatPage() {
     attacker?: Character;
   } | null>(null);
   
+  // Résultat du dernier jet de dégâts (pour affichage animé)
+  const [lastDamageResult, setLastDamageResult] = useState<{
+    rolls: number[];
+    total: number;
+    bonus: number;
+    damageType: string;
+    isCritical: boolean;
+    targetName: string;
+    attackerName: string;
+    waitForClick?: boolean;
+    onDismiss?: () => void;
+  } | null>(null);
+  
+  // Helper pour les icônes de types de dégâts
+  const getDamageTypeIcon = (damageType: string): string => {
+    const icons: Record<string, string> = {
+      fire: '🔥', cold: '❄️', lightning: '⚡', acid: '🧪', poison: '☠️',
+      necrotic: '💀', radiant: '✨', force: '💫', psychic: '🧠', thunder: '🌩️',
+      bludgeoning: '🔨', piercing: '🗡️', slashing: '⚔️', physical: '⚔️', magical: '✨'
+    };
+    return icons[damageType] || '💥';
+  };
+  
   useEffect(() => {
     return gameStore.subscribe(() => setState(gameStore.getState()));
   }, []);
@@ -148,6 +171,23 @@ export function CombatPage() {
       }
     }
   }, [lastAttackResult, autoMode]);
+  
+  // Auto-fermer l'indicateur de jet de dégâts
+  useEffect(() => {
+    if (lastDamageResult) {
+      const delay = autoMode ? 1000 : (!lastDamageResult.waitForClick ? 1500 : 0);
+      
+      if (delay > 0) {
+        const timer = setTimeout(() => {
+          if (lastDamageResult.onDismiss) {
+            lastDamageResult.onDismiss();
+          }
+          setLastDamageResult(null);
+        }, delay);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [lastDamageResult, autoMode]);
 
   // Auto-fermer le dice roll en mode auto (1.5s)
   useEffect(() => {
@@ -1682,20 +1722,43 @@ export function CombatPage() {
       return;
     }
     
-    // === CALCUL DES DÉGÂTS ===
+    // === CALCUL DES DÉGÂTS D&D ===
     const isCritical = attackResult.isCriticalHit;
     
-    // Jet de dégâts avec les dés
-    const damageResult = rollDamage(attacker.attack, 'physical', isCritical, 0);
-    let damage = damageResult.totalDamage;
+    // Bonus de dégâts basé sur les caractéristiques D&D (FOR ou DEX)
+    const strMod = Math.floor((attacker.abilities?.strength || 10) - 10) / 2;
+    const dexMod = Math.floor((attacker.abilities?.dexterity || 10) - 10) / 2;
+    const damageBonus = Math.max(strMod, dexMod);
     
-    // Appliquer la défense
-    const defense = target.defense;
-    damage = Math.max(1, damage - defense);
+    // Jet de dégâts avec les dés (baseDamage pour déterminer le type de dé)
+    const baseDamage = 5 + Math.floor(attacker.level / 2); // Dégâts évoluent avec le niveau
+    const damageResult = rollDamage(baseDamage, 'physical', isCritical, damageBonus);
+    let damage = damageResult.totalDamage;
     
     if (isCritical) {
       logs.push(`💥 COUP CRITIQUE ! ${attacker.name} frappe avec puissance !`);
     }
+    
+    // Afficher le jet de dégâts visuellement
+    await new Promise<void>(resolve => {
+      setLastDamageResult({
+        rolls: damageResult.damageRoll.rolls,
+        total: damage,
+        bonus: damageBonus,
+        damageType: 'physical',
+        isCritical,
+        targetName: target.name,
+        attackerName: attacker.name,
+        waitForClick: !autoMode,
+        onDismiss: resolve
+      });
+      
+      // En mode auto, continuer après un délai
+      if (autoMode) {
+        setTimeout(resolve, 1000);
+      }
+    });
+    setLastDamageResult(null);
     
     target.hp = Math.max(0, target.hp - damage);
     trackDamageDealt(attacker.id, damage);
@@ -3145,6 +3208,60 @@ export function CombatPage() {
              lastAttackResult.hit ? '✓ TOUCHÉ !' : '✗ RATÉ !'}
           </div>
           {lastAttackResult.waitForClick && (
+            <div className="click-to-continue">
+              👆 Cliquez pour continuer
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Indicateur de jet de dégâts D&D */}
+      {lastDamageResult && (
+        <div 
+          className={`damage-roll-indicator ${lastDamageResult.isCritical ? 'critical' : ''} ${lastDamageResult.waitForClick ? 'clickable' : ''}`}
+          onClick={() => {
+            if (lastDamageResult.onDismiss) {
+              lastDamageResult.onDismiss();
+            }
+            setLastDamageResult(null);
+          }}
+        >
+          <div className="damage-header">
+            <span className="damage-attacker">{lastDamageResult.attackerName}</span>
+            <span className="damage-arrow">💥</span>
+            <span className="damage-target">{lastDamageResult.targetName}</span>
+          </div>
+          
+          <div className="damage-dice-container">
+            {lastDamageResult.isCritical && (
+              <div className="critical-damage-label">🎲🎲 DÉGÂTS CRITIQUES !</div>
+            )}
+            
+            <div className="damage-dice">
+              {lastDamageResult.rolls.map((roll, idx) => (
+                <div key={idx} className={`die-3d damage-die ${lastDamageResult.damageType}`}>
+                  <span className="die-value">{roll}</span>
+                </div>
+              ))}
+              {lastDamageResult.bonus !== 0 && (
+                <span className="damage-bonus">
+                  {lastDamageResult.bonus >= 0 ? '+' : ''}{lastDamageResult.bonus}
+                </span>
+              )}
+            </div>
+            
+            <div className="damage-total">
+              <span className="damage-equal">=</span>
+              <span className={`damage-value ${lastDamageResult.damageType}`}>
+                {lastDamageResult.total}
+              </span>
+              <span className="damage-type-label">
+                {getDamageTypeIcon(lastDamageResult.damageType)} {lastDamageResult.damageType}
+              </span>
+            </div>
+          </div>
+          
+          {lastDamageResult.waitForClick && (
             <div className="click-to-continue">
               👆 Cliquez pour continuer
             </div>

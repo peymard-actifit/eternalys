@@ -452,6 +452,19 @@
   padding: 0.2rem 0.4rem;
 }
 
+/* XP Bar dans le menu */
+.menu-xp-bar {
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+/* XP Bar dans les slots */
+.slot-xp {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0 0.25rem;
+}
+
 /* Bouton sélectionner */
 .select-character-btn {
   margin-top: auto;

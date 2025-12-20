@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Character, getModifier } from '../types/game.types';
 import { AVAILABLE_CHARACTERS } from '../data/characters';
 import { gameStore } from '../store/gameStore';
+import { XPBar } from './XPBar';
 import './CharacterSelectPage.css';
 
 interface SelectedCharacter extends Character {
@@ -167,10 +168,13 @@ export function CharacterSelectPage() {
                       <span className="edit-icon">✏️</span>
                     </span>
                   )}
-                  <span className="slot-class">{char.class}</span>
+                  <span className="slot-class">{char.class} Niv.{char.level}</span>
                   <div className="slot-stats">
                     <span title="PV">❤️ {char.hp}</span>
                     <span title="CA">🛡️ {char.armorClass}</span>
+                  </div>
+                  <div className="slot-xp">
+                    <XPBar character={char} compact />
                   </div>
                   {/* Cliquer pour changer */}
                   <button 
@@ -237,7 +241,7 @@ export function CharacterSelectPage() {
                       </div>
                     </div>
 
-                    {/* Stats principales */}
+                    {/* Stats D&D principales */}
                     <div className="menu-stats-row">
                       <div className="menu-stat">
                         <span className="ms-icon">❤️</span>
@@ -251,14 +255,19 @@ export function CharacterSelectPage() {
                       </div>
                       <div className="menu-stat">
                         <span className="ms-icon">⚔️</span>
-                        <span className="ms-value">{character.attack}</span>
+                        <span className="ms-value">{getModifierString(Math.max(character.abilities.strength, character.abilities.dexterity) + character.proficiencyBonus - 10)}</span>
                         <span className="ms-label">ATT</span>
                       </div>
                       <div className="menu-stat">
-                        <span className="ms-icon">🔮</span>
-                        <span className="ms-value">{character.magicAttack}</span>
-                        <span className="ms-label">MAG</span>
+                        <span className="ms-icon">🎯</span>
+                        <span className="ms-value">+{character.proficiencyBonus}</span>
+                        <span className="ms-label">MAÎT</span>
                       </div>
+                    </div>
+                    
+                    {/* Barre d'XP */}
+                    <div className="menu-xp-bar">
+                      <XPBar character={character} compact />
                     </div>
 
                     {/* Caractéristiques D&D */}

@@ -586,6 +586,288 @@
   }
 }
 
+/* =============================================================================
+   INDICATEUR DE JET DE DÉGÂTS
+   ============================================================================= */
+
+.damage-roll-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, rgba(50, 20, 20, 0.98), rgba(20, 5, 5, 0.98));
+  border: 3px solid #e74c3c;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  z-index: 1550;
+  text-align: center;
+  animation: damageRollAppear 0.3s ease-out;
+  box-shadow: 0 0 50px rgba(231, 76, 60, 0.5);
+}
+
+@keyframes damageRollAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0);
+  }
+}
+
+.damage-roll-indicator.critical {
+  border-color: #ff6600;
+  box-shadow: 0 0 60px rgba(255, 102, 0, 0.7), 0 0 100px rgba(255, 0, 0, 0.3);
+  animation: damageRollAppear 0.3s ease-out, criticalDamageShine 0.4s ease infinite alternate;
+}
+
+@keyframes criticalDamageShine {
+  from { box-shadow: 0 0 40px rgba(255, 102, 0, 0.5); }
+  to { box-shadow: 0 0 80px rgba(255, 0, 0, 0.9); }
+}
+
+.damage-roll-indicator.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.damage-roll-indicator.clickable:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.damage-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  color: #c0b0a0;
+  margin-bottom: 1rem;
+}
+
+.damage-attacker {
+  color: #9b59b6;
+}
+
+.damage-arrow {
+  font-size: 1.5rem;
+  animation: damageArrowPulse 0.5s ease infinite;
+}
+
+@keyframes damageArrowPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.damage-target {
+  color: #e74c3c;
+}
+
+.damage-dice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.critical-damage-label {
+  background: linear-gradient(90deg, rgba(255, 102, 0, 0.4), rgba(255, 0, 0, 0.3));
+  color: #ff6600;
+  padding: 0.3rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  animation: criticalLabelPulse 0.5s ease infinite alternate;
+}
+
+@keyframes criticalLabelPulse {
+  from { opacity: 0.8; text-shadow: 0 0 5px #ff0000; }
+  to { opacity: 1; text-shadow: 0 0 15px #ff6600; }
+}
+
+.damage-dice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.damage-die {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  animation: dieAppear 0.3s ease-out backwards;
+}
+
+.damage-die:nth-child(1) { animation-delay: 0s; }
+.damage-die:nth-child(2) { animation-delay: 0.1s; }
+.damage-die:nth-child(3) { animation-delay: 0.2s; }
+.damage-die:nth-child(4) { animation-delay: 0.3s; }
+.damage-die:nth-child(5) { animation-delay: 0.4s; }
+.damage-die:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes dieAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) rotate(180deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+/* Couleurs par type de dégâts */
+.damage-die.physical, .damage-die.slashing, .damage-die.piercing, .damage-die.bludgeoning {
+  background: linear-gradient(135deg, #8b4513, #5a2d0a);
+  border: 2px solid #cd853f;
+}
+
+.damage-die.fire {
+  background: linear-gradient(135deg, #ff4500, #8b0000);
+  border: 2px solid #ff6600;
+}
+
+.damage-die.cold {
+  background: linear-gradient(135deg, #00bfff, #1e90ff);
+  border: 2px solid #87ceeb;
+}
+
+.damage-die.lightning {
+  background: linear-gradient(135deg, #ffd700, #daa520);
+  border: 2px solid #ffff00;
+}
+
+.damage-die.acid {
+  background: linear-gradient(135deg, #32cd32, #006400);
+  border: 2px solid #7cfc00;
+}
+
+.damage-die.poison {
+  background: linear-gradient(135deg, #9400d3, #4b0082);
+  border: 2px solid #da70d6;
+}
+
+.damage-die.necrotic {
+  background: linear-gradient(135deg, #2f4f4f, #000000);
+  border: 2px solid #556b2f;
+}
+
+.damage-die.radiant, .damage-die.holy {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  border: 2px solid #ffff00;
+  color: #3d3d00;
+}
+
+.damage-die.force, .damage-die.magical {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  border: 2px solid #e0b0ff;
+}
+
+.damage-die.psychic {
+  background: linear-gradient(135deg, #ff69b4, #c71585);
+  border: 2px solid #ffb6c1;
+}
+
+.damage-die.thunder {
+  background: linear-gradient(135deg, #4169e1, #191970);
+  border: 2px solid #87ceeb;
+}
+
+.damage-bonus {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #c0b0a0;
+}
+
+.damage-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.damage-equal {
+  font-size: 1.5rem;
+  color: #808080;
+}
+
+.damage-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  animation: damageValuePop 0.3s ease-out 0.5s backwards;
+}
+
+@keyframes damageValuePop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.damage-value.physical, .damage-value.slashing, .damage-value.piercing, .damage-value.bludgeoning {
+  color: #cd853f;
+  text-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+}
+
+.damage-value.fire {
+  color: #ff4500;
+  text-shadow: 0 0 15px rgba(255, 69, 0, 0.7);
+}
+
+.damage-value.cold {
+  color: #00bfff;
+  text-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+}
+
+.damage-value.lightning {
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+}
+
+.damage-value.poison {
+  color: #9400d3;
+  text-shadow: 0 0 15px rgba(148, 0, 211, 0.7);
+}
+
+.damage-value.necrotic {
+  color: #556b2f;
+  text-shadow: 0 0 15px rgba(85, 107, 47, 0.7);
+}
+
+.damage-value.radiant, .damage-value.holy {
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+}
+
+.damage-value.magical, .damage-value.force {
+  color: #e0b0ff;
+  text-shadow: 0 0 15px rgba(155, 89, 182, 0.7);
+}
+
+.damage-type-label {
+  font-size: 0.85rem;
+  color: #a09080;
+  text-transform: capitalize;
+}
+
 .enemy-hp-bar .hp-text,
 .fighter-hp-bar .hp-text {
   position: absolute;

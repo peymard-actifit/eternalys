@@ -1,5 +1,6 @@
 import { Character, Monster } from '../types/game.types';
 import { getXPForNextLevel } from '../store/progressionStore';
+import { XPBar } from './XPBar';
 import './CharacterSheet.css';
 
 interface CharacterSheetProps {
@@ -119,11 +120,10 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
                 <span className="entity-class">{(entity as Character).class}</span>
                 <div className="entity-level-info">
                   <span className="level-badge">Niv. {(entity as Character).level || 1}</span>
-                  {(entity as Character).xp !== undefined && (
-                    <span className="xp-info">
-                      XP: {(entity as Character).xp || 0} / {getXPForNextLevel((entity as Character).level || 1)}
-                    </span>
-                  )}
+                  <span className="proficiency-badge">+{(entity as Character).proficiencyBonus || 2} Maîtrise</span>
+                </div>
+                <div className="sheet-xp-bar">
+                  <XPBar character={entity as Character} showDetails />
                 </div>
               </>
             )}
@@ -184,39 +184,47 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
           </div>
         )}
 
-        {/* Stats de combat */}
+        {/* Stats de combat D&D */}
         <div className="combat-stats-section">
           <h3>⚔️ Combat</h3>
           <div className="combat-stats-grid">
+            <div className="combat-stat highlight">
+              <span className="stat-icon">🛡️</span>
+              <span className="stat-label">Classe d'Armure</span>
+              <span className="stat-value">{entity.armorClass || 10}</span>
+            </div>
             <div className="combat-stat">
               <span className="stat-icon">⚔️</span>
-              <span className="stat-label">Attaque</span>
-              <span className="stat-value">{entity.attack}</span>
+              <span className="stat-label">Bonus d'Attaque</span>
+              <span className="stat-value">
+                {formatModifier(getModifier(Math.max(entity.abilities?.strength || 10, entity.abilities?.dexterity || 10)) + (isCharacter ? (entity as Character).proficiencyBonus || 2 : Math.floor(((entity as Monster).challengeRating || 1) / 4) + 2))}
+              </span>
             </div>
-            {(entity.magicAttack !== undefined && entity.magicAttack > 0) && (
+            {isCharacter && (
               <div className="combat-stat">
                 <span className="stat-icon">✨</span>
-                <span className="stat-label">Att. Magique</span>
-                <span className="stat-value">{entity.magicAttack}</span>
-              </div>
-            )}
-            <div className="combat-stat">
-              <span className="stat-icon">🛡️</span>
-              <span className="stat-label">Défense</span>
-              <span className="stat-value">{entity.defense}</span>
-            </div>
-            {(entity.magicDefense !== undefined && entity.magicDefense > 0) && (
-              <div className="combat-stat">
-                <span className="stat-icon">🔮</span>
-                <span className="stat-label">Rés. Magique</span>
-                <span className="stat-value">{entity.magicDefense}</span>
+                <span className="stat-label">DD de Sort</span>
+                <span className="stat-value">
+                  {8 + ((entity as Character).proficiencyBonus || 2) + getModifier(Math.max(entity.abilities?.intelligence || 10, entity.abilities?.wisdom || 10, entity.abilities?.charisma || 10))}
+                </span>
               </div>
             )}
             <div className="combat-stat">
               <span className="stat-icon">💨</span>
               <span className="stat-label">Vitesse</span>
-              <span className="stat-value">{entity.speed}</span>
+              <span className="stat-value">{entity.speed || 30} pi</span>
             </div>
+            {isCharacter && (entity as Character).savingThrowProficiencies && (entity as Character).savingThrowProficiencies.length > 0 && (
+              <div className="combat-stat wide">
+                <span className="stat-icon">🎯</span>
+                <span className="stat-label">JS Maîtrisés</span>
+                <span className="stat-value saving-throws">
+                  {(entity as Character).savingThrowProficiencies.map(st => 
+                    st.substring(0, 3).toUpperCase()
+                  ).join(', ')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
