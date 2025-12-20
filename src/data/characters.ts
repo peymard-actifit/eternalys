@@ -1,20 +1,31 @@
 // =============================================================================
-// PERSONNAGES ETERNALYS - SYSTÈME D&D 5e ÉTENDU
-// =============================================================================
-// Tous les personnages commencent niveau 1
-// Stats basées à 100% sur les caractéristiques D&D
+// PERSONNAGES ETERNALYS - SYSTÈME D&D 5e
 // =============================================================================
 
 import { Character, AbilityScores, Skill } from '../types/game.types';
 import { CLASS_STARTER_EQUIPMENT } from './equipment';
-import { 
-  getAbilityModifier, 
-  getProficiencyBonus, 
-  calculateMaxHP,
-  HIT_DICE,
-  SPELLCASTING_ABILITY,
-  XP_THRESHOLDS
-} from '../config/dndSystem';
+
+// Fonctions D&D locales
+const getAbilityModifier = (score: number): number => Math.floor((score - 10) / 2);
+const getProficiencyBonus = (level: number): number => Math.floor((level - 1) / 4) + 2;
+
+const HIT_DICE: Record<string, number> = {
+  'Mage': 6, 'Nécromancien': 6, 'Élémentaliste': 6, 'Ensorceleur': 6,
+  'Occultiste': 8, 'Prêtresse': 8, 'Druide': 8, 'Oracle': 8, 'Clerc de Vie': 8,
+  'Barde': 8, 'Scalde': 8, 'Roublard': 8, 'Ninja': 8, 'Voleur': 8, 'Assassin': 8,
+  'Moine': 8, 'Pugiliste': 8, 'Guerrier': 10, 'Chevalier': 10, 'Paladin': 10,
+  'Archère': 10, 'Rôdeur': 10, 'Arbalétrier': 10, 'Seigneur de guerre': 10,
+  'Berserker': 12, 'Gardien': 12,
+};
+
+const calculateMaxHP = (className: string, level: number, conScore: number): number => {
+  const hitDie = HIT_DICE[className] || 8;
+  const conMod = getAbilityModifier(conScore);
+  const level1HP = hitDie + conMod;
+  const averageHitDie = Math.ceil(hitDie / 2) + 1;
+  const additionalHP = (level - 1) * (averageHitDie + conMod);
+  return Math.max(1, level1HP + additionalHP);
+};
 
 // =============================================================================
 // HELPERS
