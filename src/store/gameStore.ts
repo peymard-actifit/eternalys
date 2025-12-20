@@ -127,7 +127,7 @@ const saveToLocalStorage = (gameState: GameState) => {
   try {
     // Ne sauvegarder que si on est dans une phase de jeu actif
     if (PERSISTABLE_PHASES.includes(gameState.phase)) {
-      // Créer une copie minimale pour la sauvegarde (éviter les données circulaires)
+      // Créer une copie complète pour la sauvegarde
       const stateToSave = {
         phase: gameState.phase,
         team: gameState.team,
@@ -137,17 +137,22 @@ const saveToLocalStorage = (gameState: GameState) => {
         combatCount: gameState.combatCount,
         bossScaling: gameState.bossScaling,
         currentEnemies: gameState.currentEnemies,
+        currentEnemy: gameState.currentEnemy,
         combatTurn: gameState.combatTurn,
         turnOrder: gameState.turnOrder,
         currentTurnIndex: gameState.currentTurnIndex,
         history: gameState.history,
+        combatLog: gameState.combatLog,
+        combatHistory: gameState.combatHistory,
         pendingTreasures: gameState.pendingTreasures,
         selectedEnemyIndex: gameState.selectedEnemyIndex,
         dungeonLevel: gameState.dungeonLevel,
         roomsPerLevel: gameState.roomsPerLevel,
         previousBossId: gameState.previousBossId,
         monsterScaling: gameState.monsterScaling,
-        bossScalingMultiplier: gameState.bossScalingMultiplier
+        bossScalingMultiplier: gameState.bossScalingMultiplier,
+        // Timestamp pour debug
+        savedAt: Date.now()
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
@@ -162,13 +167,16 @@ const loadFromLocalStorage = (): Partial<GameState> | null => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Vérifier que la phase est valide
-      if (parsed && PERSISTABLE_PHASES.includes(parsed.phase)) {
+      // Vérifier que la phase est valide et que l'équipe existe
+      if (parsed && PERSISTABLE_PHASES.includes(parsed.phase) && parsed.team && parsed.team.length > 0) {
+        console.log('[GameStore] État restauré depuis localStorage, phase:', parsed.phase);
         return parsed;
       }
     }
   } catch (e) {
     console.warn('Impossible de charger l\'état du jeu:', e);
+    // En cas d'erreur, effacer la sauvegarde corrompue
+    clearLocalStorage();
   }
   return null;
 };
