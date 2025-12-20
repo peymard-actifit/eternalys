@@ -12,7 +12,8 @@ import {
   getProficiencyBonus, 
   calculateMaxHP,
   HIT_DICE,
-  SPELLCASTING_ABILITY
+  SPELLCASTING_ABILITY,
+  XP_THRESHOLDS
 } from '../config/dndSystem';
 
 // =============================================================================
@@ -1131,10 +1132,9 @@ export function addXPToCharacter(character: Character, xp: number): Character {
  * Retourne l'XP nécessaire pour le prochain niveau
  */
 function getXPForNextLevel(level: number): number {
-  // Import depuis dndSystem
-  const { XP_THRESHOLDS } = require('../config/dndSystem');
   if (level >= 100) return Infinity;
-  return XP_THRESHOLDS[level] - XP_THRESHOLDS[level - 1];
+  if (level < 1) return XP_THRESHOLDS[0];
+  return XP_THRESHOLDS[level] - (XP_THRESHOLDS[level - 1] || 0);
 }
 
 // =============================================================================

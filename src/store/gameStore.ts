@@ -1,7 +1,7 @@
 import { Character, Monster, GameEvent, Room, GameState, HistoryEntry, TreasureLegacy, PendingTreasureData } from '../types/game.types';
 import { getRandomMonster, getRandomBoss, MONSTERS, resetLegendaryActions } from '../data/monsters';
 import { getRandomEvent } from '../data/events';
-import { getRandomTreasure, Treasure } from '../data/treasures';
+import { getRandomTreasure, Treasure, allTreasures } from '../data/treasures';
 
 // Calculer le modificateur D&D à partir d'une caractéristique
 const getModifier = (score: number): number => Math.floor((score - 10) / 2);
@@ -916,7 +916,6 @@ export const gameStore = {
   
   // Récupérer les infos d'un trésor par son ID
   getTreasureInfo: (treasureId: string): Treasure | null => {
-    const { allTreasures } = require('../data/treasures');
     return allTreasures.find((t: Treasure) => t.id === treasureId) || null;
   },
   
