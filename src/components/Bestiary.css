@@ -592,3 +592,77 @@
   }
 }
 
+/* ============================================
+   FILTRES DE DANGEROSITÉ (CR)
+   ============================================ */
+
+.danger-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, rgba(139, 115, 85, 0.15), transparent);
+  border-bottom: 1px solid rgba(139, 115, 85, 0.3);
+  align-items: center;
+}
+
+.danger-filters .filter-label {
+  color: #c9a66b;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.danger-filter-btn {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(139, 115, 85, 0.4);
+  border-radius: 6px;
+  background: rgba(30, 25, 20, 0.8);
+  color: #a89070;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.danger-filter-btn:hover {
+  background: rgba(139, 115, 85, 0.3);
+  border-color: #c9a66b;
+  color: #fff;
+}
+
+.danger-filter-btn.active {
+  background: linear-gradient(135deg, #8b5a00, #c9a66b);
+  border-color: #ffd700;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Couleurs par niveau de danger */
+.danger-filter-btn[title*="1-5"] { border-left: 3px solid #4ade80; }
+.danger-filter-btn[title*="6-15"] { border-left: 3px solid #60a5fa; }
+.danger-filter-btn[title*="16-30"] { border-left: 3px solid #a855f7; }
+.danger-filter-btn[title*="31-50"] { border-left: 3px solid #f97316; }
+.danger-filter-btn[title*="51-70"] { border-left: 3px solid #ef4444; }
+.danger-filter-btn[title*="71-85"] { border-left: 3px solid #ec4899; }
+.danger-filter-btn[title*="86-95"] { border-left: 3px solid #8b5cf6; }
+.danger-filter-btn[title*="96-100"] { border-left: 3px solid #fbbf24; }
+
+@media (max-width: 768px) {
+  .danger-filters {
+    padding: 0.5rem;
+    gap: 0.25rem;
+  }
+  
+  .danger-filter-btn {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.65rem;
+  }
+  
+  .danger-filters .filter-label {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+}
+

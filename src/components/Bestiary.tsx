@@ -66,11 +66,26 @@ const formatCR = (cr: number): string => {
 // Types de tri
 type SortMode = 'type' | 'cr' | 'name';
 type FilterMode = CreatureType | 'all' | 'hostileNpc' | 'boss';
+type DangerLevel = 'all' | 'local' | 'community' | 'regional' | 'continental' | 'global' | 'planar' | 'cosmic' | 'divine';
+
+// Paliers de dangerosité CR (basé sur dndSystem.ts)
+const DANGER_LEVELS: Record<DangerLevel, { min: number; max: number; name: string; icon: string }> = {
+  all: { min: 0, max: 100, name: 'Tous', icon: '🌐' },
+  local: { min: 1, max: 5, name: 'Locale', icon: '🏠' },
+  community: { min: 6, max: 15, name: 'Communauté', icon: '🏘️' },
+  regional: { min: 16, max: 30, name: 'Régionale', icon: '🏰' },
+  continental: { min: 31, max: 50, name: 'Continentale', icon: '🌍' },
+  global: { min: 51, max: 70, name: 'Mondiale', icon: '🌐' },
+  planar: { min: 71, max: 85, name: 'Planaire', icon: '✨' },
+  cosmic: { min: 86, max: 95, name: 'Cosmique', icon: '🌌' },
+  divine: { min: 96, max: 100, name: 'Divine', icon: '⚡' }
+};
 
 export function Bestiary({ isOpen, onClose }: BestiaryProps) {
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('type');
   const [filterType, setFilterType] = useState<FilterMode>('all');
+  const [dangerFilter, setDangerFilter] = useState<DangerLevel>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fermer avec Échap
@@ -92,6 +107,7 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
   // Filtrer les monstres
   let filteredMonsters = [...ALL_MONSTERS];
   
+  // Filtre par type de créature
   if (filterType === 'hostileNpc') {
     filteredMonsters = filteredMonsters.filter(m => m.isHostileNpc === true);
   } else if (filterType === 'boss') {
@@ -100,6 +116,16 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
     filteredMonsters = filteredMonsters.filter(m => m.creatureType === filterType);
   }
   
+  // Filtre par niveau de dangerosité (CR)
+  if (dangerFilter !== 'all') {
+    const { min, max } = DANGER_LEVELS[dangerFilter];
+    filteredMonsters = filteredMonsters.filter(m => {
+      const cr = m.challengeRating || 0;
+      return cr >= min && cr <= max;
+    });
+  }
+  
+  // Filtre par recherche textuelle
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
     filteredMonsters = filteredMonsters.filter(m => 
@@ -194,6 +220,28 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
               Nom
             </button>
           </div>
+        </div>
+
+        {/* Filtres par niveau de dangerosité */}
+        <div className="danger-filters">
+          <span className="filter-label">⚠️ Dangerosité:</span>
+          {(Object.keys(DANGER_LEVELS) as DangerLevel[]).map(level => {
+            const { name, icon, min, max } = DANGER_LEVELS[level];
+            const count = level === 'all' 
+              ? ALL_MONSTERS.length 
+              : ALL_MONSTERS.filter(m => (m.challengeRating || 0) >= min && (m.challengeRating || 0) <= max).length;
+            if (count === 0 && level !== 'all') return null;
+            return (
+              <button 
+                key={level}
+                className={`danger-filter-btn ${dangerFilter === level ? 'active' : ''}`}
+                onClick={() => setDangerFilter(level)}
+                title={level === 'all' ? 'Tous les niveaux' : `CR ${min}-${max}`}
+              >
+                {icon} {name} {level !== 'all' && `(${count})`}
+              </button>
+            );
+          })}
         </div>
 
         {/* Filtres par type */}
