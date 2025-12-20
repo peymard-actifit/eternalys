@@ -182,8 +182,16 @@ export function CombatPage() {
   // Long press pour mobile - ouvrir la fiche
   const handleTouchStart = (entity: Character | Monster) => {
     longPressTimerRef.current = setTimeout(() => {
-      setSelectedEntity(entity);
-      setShowCharacterSheet(true);
+      // Récupérer la version à jour de l'entité depuis le state global
+      let entityToShow: Character | Monster = entity;
+      if ('class' in entity) {
+        const updatedChar = gameStore.getState().team.find(c => c.id === entity.id);
+        if (updatedChar) entityToShow = updatedChar;
+      } else {
+        const updatedMonster = gameStore.getState().currentEnemies.find(e => e.id === entity.id);
+        if (updatedMonster) entityToShow = updatedMonster;
+      }
+      setShowCharacterSheet(entityToShow);
     }, 500);
   };
 
