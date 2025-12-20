@@ -103,9 +103,10 @@ const initialState: GameState = {
   history: [],
   pendingTreasures: [],
   selectedEnemyIndex: 0,
-  // Système de niveaux
+  // Système de niveaux (50 niveaux de donjon)
   dungeonLevel: 1,
   roomsPerLevel: 10, // 10 salles au niveau 1
+  roomsExploredThisLevel: 0, // Compteur de salles explorées
   previousBossId: undefined,
   monsterScaling: 0, // Pas de scaling au niveau 1
   bossScalingMultiplier: 0 // Pas de scaling au niveau 1
