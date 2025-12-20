@@ -13,6 +13,31 @@ import {
   calculateArmorClass 
 } from '../config/dndSystem';
 
+// Appliquer les bonus de caractéristiques D&D à un personnage
+const applyAbilityBonuses = (character: Character): Character => {
+  if (!character.abilities) return character;
+  
+  const dexMod = getAbilityModifier(character.abilities.dexterity);
+  const conMod = getAbilityModifier(character.abilities.constitution);
+  
+  // Calculer la CA si non définie
+  const baseAC = 10 + dexMod;
+  const armorClass = character.armorClass || baseAC;
+  
+  // Calculer le bonus de maîtrise basé sur le niveau
+  const proficiencyBonus = getProficiencyBonus(character.level || 1);
+  
+  // Calculer l'initiative (basée sur DEX)
+  const initiative = dexMod;
+  
+  return {
+    ...character,
+    armorClass,
+    proficiencyBonus,
+    initiative
+  };
+};
+
 // Récupérer les monstres accompagnateurs d'un boss
 const getBossMinions = (boss: Monster): Monster[] => {
   if (!boss.minions || boss.minions.length === 0) return [];
