@@ -1237,3 +1237,60 @@
   font-size: 0.7rem;
   color: #ddd;
 }
+
+/* Styles pour le tooltip D&D */
+.stats-grid-tooltip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.stat-box-tooltip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 0.4rem;
+}
+
+.stat-icon-tooltip {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.stat-abbr {
+  font-size: 0.65rem;
+  color: #9b9b9b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-val {
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.combat-stats-tooltip {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.5rem;
+}
+
+.combat-stat-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.8rem;
+}
+
+.combat-stat-line .stat-name {
+  flex: 1;
+  color: #bbb;
+}
+
+.combat-stat-line .stat-val {
+  color: #c9a66b;
+}

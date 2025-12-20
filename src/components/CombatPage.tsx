@@ -2918,14 +2918,26 @@ export function CombatPage() {
                 >
                   <span>{skill.name}</span>
                   <span className="damage-preview">
-                    {skill.type === 'heal' ? `+${skill.healing} PV` : `${skill.damage} dégâts`}
+                    {skill.type === 'heal' 
+                      ? `+${skill.healing || Math.abs(skill.damage)} PV` 
+                      : skill.damageDice 
+                        ? `🎲 ${skill.damageDice}` 
+                        : skill.type === 'buff' 
+                          ? '⬆️' 
+                          : `${skill.damage} dégâts`}
                   </span>
                 </button>
                 <div className="skill-tooltip">
                   <div className="tooltip-header">{skill.name}</div>
-                  <p className="tooltip-desc">{skill.description}</p>
+                  <p className="tooltip-desc">{skill.description || 'Aucune description disponible.'}</p>
                   <div className="tooltip-stats">
-                    {skill.damage > 0 && (
+                    {skill.damageDice && (
+                      <div className="tooltip-stat">
+                        <span className="stat-name">Dégâts</span>
+                        <span className="stat-value dice">🎲 {skill.damageDice}</span>
+                      </div>
+                    )}
+                    {!skill.damageDice && skill.damage > 0 && (
                       <div className="tooltip-stat">
                         <span className="stat-name">Dégâts</span>
                         <span className="stat-value">{skill.damage}</span>

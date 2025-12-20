@@ -27,57 +27,63 @@ export function DungeonPage() {
     return '#27ae60'; // Vert
   };
 
-  // Calcul des modifications de stats pour le tooltip
-  const getStatModifiers = (entity: Character) => {
-    const mods: { stat: string; base: number; current: number; diff: number }[] = [];
+  // Calcul du modificateur D&D
+  const getModifier = (score: number): number => Math.floor((score - 10) / 2);
+  const formatMod = (mod: number): string => mod >= 0 ? `+${mod}` : `${mod}`;
+  
+  // Calcul des stats D&D pour le tooltip
+  const getDnDStats = (entity: Character) => {
+    const stats: { stat: string; value: string; icon: string }[] = [];
     
-    // Utiliser baseStats si disponibles, sinon utiliser les stats actuelles comme base
-    const baseAttack = entity.baseAttack !== undefined ? entity.baseAttack : entity.attack;
-    const baseMagicAttack = entity.baseMagicAttack !== undefined ? entity.baseMagicAttack : (entity.magicAttack || 0);
-    const baseDefense = entity.baseDefense !== undefined ? entity.baseDefense : entity.defense;
-    const baseMagicDefense = entity.baseMagicDefense !== undefined ? entity.baseMagicDefense : entity.magicDefense;
-    const baseSpeed = entity.baseSpeed !== undefined ? entity.baseSpeed : entity.speed;
+    // Caractéristiques principales avec modificateurs
+    if (entity.abilities) {
+      stats.push({ stat: 'FOR', value: `${entity.abilities.strength} (${formatMod(getModifier(entity.abilities.strength))})`, icon: '💪' });
+      stats.push({ stat: 'DEX', value: `${entity.abilities.dexterity} (${formatMod(getModifier(entity.abilities.dexterity))})`, icon: '🏃' });
+      stats.push({ stat: 'CON', value: `${entity.abilities.constitution} (${formatMod(getModifier(entity.abilities.constitution))})`, icon: '❤️' });
+      stats.push({ stat: 'INT', value: `${entity.abilities.intelligence} (${formatMod(getModifier(entity.abilities.intelligence))})`, icon: '📚' });
+      stats.push({ stat: 'SAG', value: `${entity.abilities.wisdom} (${formatMod(getModifier(entity.abilities.wisdom))})`, icon: '👁️' });
+      stats.push({ stat: 'CHA', value: `${entity.abilities.charisma} (${formatMod(getModifier(entity.abilities.charisma))})`, icon: '💬' });
+    }
     
-    mods.push({ stat: 'Attaque', base: baseAttack, current: entity.attack, diff: entity.attack - baseAttack });
-    mods.push({ stat: 'Att. Magique', base: baseMagicAttack, current: entity.magicAttack || 0, diff: (entity.magicAttack || 0) - baseMagicAttack });
-    mods.push({ stat: 'Défense', base: baseDefense, current: entity.defense, diff: entity.defense - baseDefense });
-    mods.push({ stat: 'Déf. Magique', base: baseMagicDefense, current: entity.magicDefense, diff: entity.magicDefense - baseMagicDefense });
-    mods.push({ stat: 'Vitesse', base: baseSpeed, current: entity.speed, diff: entity.speed - baseSpeed });
+    // Stats de combat
+    stats.push({ stat: 'Classe d\'Armure', value: `${entity.armorClass}`, icon: '🛡️' });
+    stats.push({ stat: 'Bonus de Maîtrise', value: `+${entity.proficiencyBonus || 2}`, icon: '🎯' });
+    stats.push({ stat: 'Vitesse', value: `${entity.speed} pi`, icon: '💨' });
     
-    return mods;
+    return stats;
   };
 
-  // Rendu du tooltip de stats
+  // Rendu du tooltip de stats D&D
   const renderStatsTooltip = (character: Character) => {
-    const mods = getStatModifiers(character);
-    const hasModifiers = mods.some(m => m.diff !== 0);
+    const stats = getDnDStats(character);
     
     return (
       <div className="stats-tooltip">
-        <div className="tooltip-header">📊 Statistiques détaillées</div>
-        {mods.map((m, i) => (
-          <div key={i} className={`stat-line ${m.diff > 0 ? 'buff' : m.diff < 0 ? 'debuff' : ''}`}>
-            <span className="stat-name">{m.stat}</span>
-            <span className="stat-values">
-              <span className="base-value">{m.base}</span>
-              {m.diff !== 0 && (
-                <>
-                  <span className="arrow">→</span>
-                  <span className="current-value">{m.current}</span>
-                  <span className={`diff ${m.diff > 0 ? 'positive' : 'negative'}`}>
-                    ({m.diff > 0 ? '+' : ''}{m.diff})
-                  </span>
-                </>
-              )}
-            </span>
-          </div>
-        ))}
-        {hasModifiers && character.buffs && character.buffs.length > 0 && (
+        <div className="tooltip-header">📊 Caractéristiques D&D</div>
+        <div className="stats-grid-tooltip">
+          {stats.slice(0, 6).map((s, i) => (
+            <div key={i} className="stat-box-tooltip">
+              <span className="stat-icon-tooltip">{s.icon}</span>
+              <span className="stat-abbr">{s.stat}</span>
+              <span className="stat-val">{s.value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="combat-stats-tooltip">
+          {stats.slice(6).map((s, i) => (
+            <div key={i} className="combat-stat-line">
+              <span className="stat-icon-tooltip">{s.icon}</span>
+              <span className="stat-name">{s.stat}</span>
+              <span className="stat-val">{s.value}</span>
+            </div>
+          ))}
+        </div>
+        {character.buffs && character.buffs.length > 0 && (
           <div className="active-effects">
             <div className="effects-header">Effets actifs:</div>
             {character.buffs.map((buff, i) => (
               <span key={i} className="effect-badge" title={`${buff.value} pendant ${buff.turnsRemaining} tours`}>
-                {buff.icon} {buff.type} {buff.turnsRemaining}t
+                {buff.icon} {buff.name} {buff.turnsRemaining}t
               </span>
             ))}
           </div>
@@ -271,11 +277,9 @@ export function DungeonPage() {
                   <span className="ability-tag cha" title="Charisme">{character.abilities.charisma}</span>
                 </div>
                 <div className="member-all-stats stats-with-tooltip">
-                  <span title="Classe d'armure">🔰{character.armorClass}</span>
-                  <span title="Attaque">⚔️{character.attack}</span>
-                  <span title="Attaque magique">✨{character.magicAttack || 0}</span>
-                  <span title="Défense">🛡️{character.defense}</span>
-                  <span title="Défense magique">🔮{character.magicDefense}</span>
+                  <span title="Classe d'armure">🛡️ CA {character.armorClass}</span>
+                  <span title="Bonus de maîtrise">🎯 +{character.proficiencyBonus || 2}</span>
+                  <span title="Niveau">⭐ Niv.{character.level}</span>
                   {renderStatsTooltip(character)}
                 </div>
               </div>
