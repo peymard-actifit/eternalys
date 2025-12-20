@@ -138,6 +138,35 @@
   border: 1px solid #5c4a3a;
 }
 
+/* Niveau et XP */
+.character-level-xp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid #5c4a3a;
+}
+
+.level-display {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.xp-display {
+  font-size: 0.85rem;
+  color: #b0a090;
+}
+
+.total-xp-display {
+  font-size: 0.75rem;
+  color: #8a8070;
+  font-style: italic;
+}
+
 .monster-tags {
   display: flex;
   gap: 0.5rem;

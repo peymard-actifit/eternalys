@@ -1,4 +1,5 @@
 import { Character, Monster } from '../types/game.types';
+import { getXPForNextLevel } from '../store/progressionStore';
 import './CharacterSheet.css';
 
 interface CharacterSheetProps {
@@ -114,7 +115,17 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
           <div className="entity-info">
             <h2 className="entity-name">{entity.name}</h2>
             {isCharacter && (
-              <span className="entity-class">{(entity as Character).class}</span>
+              <>
+                <span className="entity-class">{(entity as Character).class}</span>
+                <div className="entity-level-info">
+                  <span className="level-badge">Niv. {(entity as Character).level || 1}</span>
+                  {(entity as Character).xp !== undefined && (
+                    <span className="xp-info">
+                      XP: {(entity as Character).xp || 0} / {getXPForNextLevel((entity as Character).level || 1)}
+                    </span>
+                  )}
+                </div>
+              </>
             )}
             {isMonster && (
               <div className="monster-tags">
@@ -123,6 +134,9 @@ export function CharacterSheet({ entity, onClose }: CharacterSheetProps) {
                 )}
                 {(entity as Monster).size && (
                   <span className="creature-size">{(entity as Monster).size}</span>
+                )}
+                {(entity as Monster).challengeRating !== undefined && (
+                  <span className="cr-tag">CR {(entity as Monster).challengeRating}</span>
                 )}
                 {(entity as Monster).isBoss && (
                   <span className="boss-tag">Boss</span>

@@ -1,0 +1,366 @@
+/* =============================================================================
+   LEVEL UP MODAL - ETERNALYS
+   ============================================================================= */
+
+.level-up-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.level-up-modal {
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 2px solid #ffd700;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.4),
+              0 0 100px rgba(255, 215, 0, 0.2),
+              inset 0 0 30px rgba(255, 215, 0, 0.1);
+  animation: levelUpAppear 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes levelUpAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* En-tête */
+.level-up-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.level-up-fanfare {
+  font-size: 4rem;
+  animation: bounce 0.5s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+.level-up-header h2 {
+  color: #ffd700;
+  font-size: 2rem;
+  margin: 0.5rem 0;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  font-family: 'Georgia', serif;
+}
+
+.level-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.old-level {
+  font-size: 1.5rem;
+  color: #888;
+}
+
+.arrow {
+  color: #ffd700;
+  font-size: 1.5rem;
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(1.2); opacity: 1; }
+}
+
+.new-level {
+  font-size: 2.5rem;
+  color: #ffd700;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Infos personnage */
+.character-level-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 215, 0, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.char-portrait {
+  font-size: 3rem;
+}
+
+.char-details h3 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.char-class {
+  color: #ffd700;
+  font-size: 0.9rem;
+}
+
+/* Améliorations automatiques */
+.auto-improvements {
+  background: rgba(0, 255, 100, 0.1);
+  border: 1px solid rgba(0, 255, 100, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.auto-improvements h4 {
+  color: #00ff64;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.improvement-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.improvement-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.improvement-icon {
+  font-size: 1.2rem;
+}
+
+.improvement-label {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.improvement-value {
+  color: #00ff64;
+  font-weight: bold;
+}
+
+/* Sélection de talent */
+.talent-selection {
+  margin-bottom: 1.5rem;
+}
+
+.talent-selection h4 {
+  color: #9b59b6;
+  margin: 0 0 1rem 0;
+}
+
+.talents-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.talent-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(155, 89, 182, 0.1);
+  border: 2px solid rgba(155, 89, 182, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.talent-card:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.6);
+  transform: translateX(5px);
+}
+
+.talent-card.selected {
+  background: rgba(155, 89, 182, 0.3);
+  border-color: #9b59b6;
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+}
+
+.talent-icon {
+  font-size: 2rem;
+  min-width: 50px;
+  text-align: center;
+}
+
+.talent-info {
+  flex: 1;
+}
+
+.talent-info h5 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.talent-branch {
+  color: #9b59b6;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.talent-description {
+  color: #bbb;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.talent-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.talent-effect {
+  background: rgba(155, 89, 182, 0.3);
+  color: #e0b0ff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Stats actuelles */
+.current-stats {
+  margin-bottom: 1.5rem;
+}
+
+.current-stats h4 {
+  color: #3498db;
+  margin: 0 0 0.75rem 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(52, 152, 219, 0.1);
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.stat-name {
+  color: #3498db;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.stat-value {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.stat-mod {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+/* Boutons */
+.level-up-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.confirm-btn {
+  background: linear-gradient(180deg, #ffd700 0%, #ffaa00 100%);
+  border: none;
+  color: #000;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.confirm-btn:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+}
+
+.confirm-btn.disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .level-up-modal {
+    padding: 1rem;
+    max-height: 95vh;
+  }
+  
+  .level-up-fanfare {
+    font-size: 2.5rem;
+  }
+  
+  .level-up-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .talent-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .talent-effects {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+

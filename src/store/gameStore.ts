@@ -733,23 +733,86 @@ export const gameStore = {
     gameStore.setState({ team });
   },
   
-  // Fin du combat - nettoyer les buffs
+  // Fin du combat - nettoyer les buffs et distribuer l'XP
   endCombat: (victory: boolean) => {
     gameStore.clearAllBuffs();
     
     if (victory) {
+      // Calculer l'XP gagné
+      const totalXP = state.currentEnemies.reduce((sum, enemy) => sum + (enemy.xpReward || 0), 0);
+      const xpPerCharacter = Math.floor(totalXP / state.team.length);
+      
+      // Distribuer l'XP à chaque personnage vivant
+      const updatedTeam = state.team.map(character => {
+        if (character.hp <= 0) return character;
+        
+        const newXP = (character.xp || 0) + xpPerCharacter;
+        const newTotalXP = (character.totalXP || 0) + xpPerCharacter;
+        
+        // Vérifier le level up
+        const xpNeeded = gameStore.getXPForNextLevel(character.level);
+        if (newXP >= xpNeeded && character.level < 100) {
+          // Level up !
+          const newLevel = character.level + 1;
+          const newMaxHP = gameStore.calculateMaxHP(character.class, newLevel, character.abilities.constitution);
+          const hpGain = newMaxHP - character.maxHp;
+          
+          return {
+            ...character,
+            level: newLevel,
+            xp: newXP - xpNeeded,
+            totalXP: newTotalXP,
+            maxHp: newMaxHP,
+            hp: Math.min(character.hp + hpGain, newMaxHP),
+            proficiencyBonus: gameStore.getProficiencyBonus(newLevel),
+            pendingTalentChoice: [5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100].includes(newLevel)
+          };
+        }
+        
+        return {
+          ...character,
+          xp: newXP,
+          totalXP: newTotalXP
+        };
+      });
+      
+      // Vérifier si des personnages ont level up avec choix de talent
+      const leveledUp = updatedTeam.some(c => c.pendingTalentChoice);
+      
       const isBossFight = state.currentEnemies.some(e => e.isBoss);
-      if (isBossFight) {
+      
+      // Log XP gagné
+      console.log(`[Combat] Victoire! XP gagné: ${totalXP} (${xpPerCharacter}/personnage)`);
+      if (leveledUp) {
+        console.log('[Combat] Des personnages ont gagné un niveau et doivent choisir un talent !');
+      }
+      
+      // Si des personnages doivent choisir un talent, passer à la phase level_up
+      if (leveledUp) {
         gameStore.setState({ 
-          phase: 'victory', 
+          phase: 'level_up',
+          team: updatedTeam,
           currentEnemies: [],
-          currentEnemy: undefined 
+          currentEnemy: undefined,
+        });
+      } else if (isBossFight) {
+        // Après un boss, passer au niveau de donjon suivant
+        const newDungeonLevel = Math.min(50, state.dungeonLevel + 1);
+        gameStore.setState({ 
+          phase: 'victory',
+          team: updatedTeam,
+          currentEnemies: [],
+          currentEnemy: undefined,
+          dungeonLevel: newDungeonLevel,
+          roomsExploredThisLevel: 0
         });
       } else {
         gameStore.setState({ 
-          phase: 'dungeon', 
+          phase: 'dungeon',
+          team: updatedTeam, 
           currentEnemies: [],
-          currentEnemy: undefined 
+          currentEnemy: undefined,
+          roomsExploredThisLevel: (state.roomsExploredThisLevel || 0) + 1
         });
       }
     } else {
@@ -759,6 +822,35 @@ export const gameStore = {
         currentEnemy: undefined 
       });
     }
+  },
+  
+  // Fonctions utilitaires D&D
+  getXPForNextLevel: (level: number): number => {
+    const thresholds: Record<number, number> = {
+      1: 300, 2: 600, 3: 1800, 4: 3800, 5: 7500, 6: 9000, 7: 11000, 8: 14000, 9: 16000, 10: 21000,
+      11: 15000, 12: 20000, 13: 20000, 14: 25000, 15: 30000, 16: 30000, 17: 40000, 18: 40000, 19: 50000, 20: 50000
+    };
+    if (level <= 20 && thresholds[level]) return thresholds[level];
+    return Math.floor(50000 * (1 + (level - 20) * 0.1));
+  },
+  
+  getProficiencyBonus: (level: number): number => Math.floor((level - 1) / 4) + 2,
+  
+  calculateMaxHP: (className: string, level: number, conScore: number): number => {
+    const HIT_DICE: Record<string, number> = {
+      'Mage': 6, 'Nécromancien': 6, 'Élémentaliste': 6, 'Ensorceleur': 6,
+      'Occultiste': 8, 'Prêtresse': 8, 'Druide': 8, 'Oracle': 8, 'Clerc de Vie': 8,
+      'Barde': 8, 'Scalde': 8, 'Roublard': 8, 'Ninja': 8, 'Voleur': 8, 'Assassin': 8,
+      'Moine': 8, 'Pugiliste': 8, 'Guerrier': 10, 'Chevalier': 10, 'Paladin': 10,
+      'Archère': 10, 'Rôdeur': 10, 'Arbalétrier': 10, 'Seigneur de guerre': 10,
+      'Berserker': 12, 'Gardien': 12,
+    };
+    const hitDie = HIT_DICE[className] || 8;
+    const conMod = Math.floor((conScore - 10) / 2);
+    const level1HP = hitDie + conMod;
+    const averageHitDie = Math.ceil(hitDie / 2) + 1;
+    const additionalHP = (level - 1) * (averageHitDie + conMod);
+    return Math.max(1, level1HP + additionalHP);
   },
   
   performAttack: (attacker: Character | Monster, target: Character | Monster, damage: number) => {

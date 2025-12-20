@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { gameStore } from './store/gameStore';
 import { authStore } from './store/authStore';
-import { GameState } from './types/game.types';
+import { GameState, Character, CharacterTalent } from './types/game.types';
 import { WelcomePage } from './components/WelcomePage';
 import { MenuPage } from './components/MenuPage';
 import { CharacterSelectPage } from './components/CharacterSelectPage';
@@ -13,6 +13,7 @@ import { InventoryModal } from './components/InventoryModal';
 import { SummaryScreen } from './components/SummaryScreen';
 import { PauseMenu } from './components/PauseMenu';
 import { Bestiary } from './components/Bestiary';
+import { LevelUpModal } from './components/LevelUpModal';
 import { useDeviceClass } from './hooks/useDeviceDetection';
 import './App.css';
 import './styles/responsive.css';
@@ -26,6 +27,7 @@ function App() {
   const [hasEnteredGame, setHasEnteredGame] = useState(false);
   const [authState, setAuthState] = useState(authStore.getState());
   const [isRestoring, setIsRestoring] = useState(true);
+  const [levelUpCharacterIndex, setLevelUpCharacterIndex] = useState(0);
   
   // Restaurer l'état du jeu au chargement
   useEffect(() => {
@@ -132,6 +134,84 @@ function App() {
     setHasEnteredGame(true);
   }, []);
 
+  // Gestion du level up
+  const handleTalentSelect = useCallback((updatedCharacter: Character, _talent: CharacterTalent) => {
+    // Mettre à jour le personnage dans l'équipe
+    const updatedTeam = state.team.map(char => 
+      char.id === updatedCharacter.id ? updatedCharacter : char
+    );
+    
+    // Trouver le prochain personnage qui doit level up
+    const nextLevelUpIndex = updatedTeam.findIndex((char, idx) => 
+      idx > levelUpCharacterIndex && char.pendingTalentChoice
+    );
+    
+    if (nextLevelUpIndex >= 0) {
+      // Passer au prochain personnage
+      setLevelUpCharacterIndex(nextLevelUpIndex);
+      gameStore.setState({ team: updatedTeam });
+    } else {
+      // Tous les level ups sont terminés, retourner au donjon
+      setLevelUpCharacterIndex(0);
+      gameStore.setState({ 
+        team: updatedTeam, 
+        phase: 'dungeon' 
+      });
+    }
+  }, [state.team, levelUpCharacterIndex]);
+
+  const handleSkipLevelUp = useCallback(() => {
+    // Marquer le personnage comme ayant fait son choix (même s'il n'a pas choisi de talent)
+    const currentChar = state.team[levelUpCharacterIndex];
+    if (!currentChar) return;
+    
+    const updatedTeam = state.team.map(char => 
+      char.id === currentChar.id ? { ...char, pendingTalentChoice: false } : char
+    );
+    
+    // Trouver le prochain personnage qui doit level up
+    const nextLevelUpIndex = updatedTeam.findIndex((char, idx) => 
+      idx > levelUpCharacterIndex && char.pendingTalentChoice
+    );
+    
+    if (nextLevelUpIndex >= 0) {
+      setLevelUpCharacterIndex(nextLevelUpIndex);
+      gameStore.setState({ team: updatedTeam });
+    } else {
+      setLevelUpCharacterIndex(0);
+      gameStore.setState({ 
+        team: updatedTeam, 
+        phase: 'dungeon' 
+      });
+    }
+  }, [state.team, levelUpCharacterIndex]);
+
+  const renderLevelUp = () => {
+    // Trouver le premier personnage avec un level up en attente
+    const charIndex = state.team.findIndex((char, idx) => 
+      idx >= levelUpCharacterIndex && char.pendingTalentChoice
+    );
+    
+    if (charIndex < 0) {
+      // Pas de level up en attente, retourner au donjon
+      gameStore.setState({ phase: 'dungeon' });
+      return <DungeonPage />;
+    }
+    
+    const character = state.team[charIndex];
+    
+    return (
+      <>
+        <DungeonPage />
+        <LevelUpModal 
+          character={character}
+          onSelectTalent={handleTalentSelect}
+          onSkip={handleSkipLevelUp}
+        />
+      </>
+    );
+  };
+
   // Afficher un écran de chargement pendant la restauration
   if (isRestoring) {
     return (
@@ -174,6 +254,8 @@ function App() {
         return <GameOverScreen isVictory={true} />;
       case 'defeat':
         return <GameOverScreen isVictory={false} />;
+      case 'level_up':
+        return renderLevelUp();
       default:
         return <MenuPage />;
     }
