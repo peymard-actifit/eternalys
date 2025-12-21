@@ -347,8 +347,19 @@ export interface Skill {
   
   // === EFFETS ADDITIONNELS ===
   effects?: SkillEffect[];
-  buffStats?: { stat: 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'speed'; value: number; turns: number };
-  debuffStats?: { stat: 'attack' | 'magicAttack' | 'defense' | 'magicDefense' | 'speed'; value: number; turns: number };
+  // Système D&D : buffs/debuffs affectent les caractéristiques ou la CA
+  buffStats?: { 
+    stat: 'ability' | 'ac' | 'speed' | 'damage' | 'healing';
+    ability?: keyof AbilityScores; // Si stat='ability', quelle caractéristique
+    value: number; 
+    turns: number 
+  };
+  debuffStats?: { 
+    stat: 'ability' | 'ac' | 'speed' | 'damage';
+    ability?: keyof AbilityScores;
+    value: number; 
+    turns: number 
+  };
   healOverTime?: { value: number; turns: number };
   poison?: { damage: number; turns: number };
   lifesteal?: number;

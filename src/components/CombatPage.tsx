@@ -469,24 +469,28 @@ export function CombatPage() {
           const newTurns = buff.turnsRemaining - 1;
           
           if (newTurns <= 0) {
-            // Buff expiré - noter son nom pour le log
-            if (buff.type === 'attack') {
-              expiredBuffNames.push('attaque');
-            } else if (buff.type === 'magicAttack') {
-              expiredBuffNames.push('attaque magique');
-            } else if (buff.type === 'defense') {
-              expiredBuffNames.push('défense');
-            } else if (buff.type === 'magicDefense') {
-              expiredBuffNames.push('résistance magique');
-            } else if (buff.type === 'speed') {
-              expiredBuffNames.push('vitesse');
-            } else if (buff.type === 'damage_reflect') {
-              expiredBuffNames.push('renvoi de dégâts');
-            } else if (buff.type === 'regen') {
-              expiredBuffNames.push('régénération');
-            } else if (buff.type === 'poison') {
-              expiredBuffNames.push('poison');
-            }
+            // Buff expiré - noter son nom pour le log (système D&D)
+            const buffLabels: Record<string, string> = {
+              'ability': buff.abilityAffected ? 
+                { strength: 'Force', dexterity: 'Dextérité', constitution: 'Constitution',
+                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[buff.abilityAffected] || 'caractéristique'
+                : 'caractéristique',
+              'ac': 'Classe d\'Armure',
+              'speed': 'vitesse',
+              'damage': 'dégâts',
+              'healing': 'soins',
+              'resistance': 'résistance',
+              'advantage': 'avantage',
+              'damage_reflect': 'renvoi de dégâts',
+              'regen': 'régénération',
+              'poison': 'poison',
+              // Legacy support
+              'attack': 'attaque',
+              'magicAttack': 'attaque magique',
+              'defense': 'défense',
+              'magicDefense': 'résistance magique'
+            };
+            expiredBuffNames.push(buffLabels[buff.type] || buff.name || 'buff');
             // NE PAS ajouter aux buffs (supprimé de la liste)
           } else {
             // Buff toujours actif, on le garde avec la durée décrémentée
@@ -2094,13 +2098,28 @@ export function CombatPage() {
       targetIndices.forEach(idx => {
         const t = updatedTeam[idx];
         if (skill.buffStats) {
-          const getBuffIcon = (stat: string) => {
+          const getBuffIcon = (stat: string, ability?: string) => {
             switch (stat) {
-              case 'attack': return '⚔️';
-              case 'magicAttack': return '✨';
-              case 'defense': return '🛡️';
-              case 'magicDefense': return '🔮';
+              case 'ability':
+                // Icônes par caractéristique D&D
+                switch (ability) {
+                  case 'strength': return '💪';
+                  case 'dexterity': return '🏃';
+                  case 'constitution': return '❤️';
+                  case 'intelligence': return '📚';
+                  case 'wisdom': return '🧠';
+                  case 'charisma': return '✨';
+                  default: return '📈';
+                }
+              case 'ac': return '🛡️';
               case 'speed': return '💨';
+              case 'damage': return '⚔️';
+              case 'healing': return '💚';
+              // Legacy support
+              case 'attack': return '💪';
+              case 'magicAttack': return '📚';
+              case 'defense': return '🛡️';
+              case 'magicDefense': return '🧠';
               default: return '📈';
             }
           };

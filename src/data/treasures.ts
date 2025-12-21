@@ -13,7 +13,8 @@ export interface Treasure {
 
 export interface TreasureEffect {
   type: 'stat_boost' | 'heal' | 'skill' | 'buff' | 'resurrect' | 'passive';
-  stat?: 'hp' | 'maxHp' | 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma' | 'armorClass' | 'speed' | 'attack' | 'magicAttack' | 'defense' | 'magicDefense';
+  // Système D&D : stats basées sur les caractéristiques
+  stat?: 'hp' | 'maxHp' | 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma' | 'armorClass' | 'speed';
   value?: number;
   percentage?: number;
   skillName?: string;

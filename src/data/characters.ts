@@ -899,7 +899,7 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damage: 0, 
         type: 'buff',
         targetType: 'ally',
-        buffStats: { stat: 'defense', value: 3, turns: 2 },
+        buffStats: { stat: 'ac', value: 3, turns: 2 },
         cooldown: 2,
         description: 'Réaction: impose désavantage aux attaques contre un allié adjacent.'
       }
@@ -972,7 +972,7 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damage: 0, 
         type: 'buff',
         targetType: 'self',
-        buffStats: { stat: 'defense', value: 3, turns: 1 },
+        buffStats: { stat: 'ac', value: 3, turns: 1 },
         cooldown: 2,
         description: 'Dépense 1 ki. Esquive en action bonus (désavantage aux attaques contre vous).'
       }
@@ -1007,7 +1007,7 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         damage: 0, 
         type: 'buff',
         targetType: 'self',
-        buffStats: { stat: 'defense', value: 2, turns: 2 },
+        buffStats: { stat: 'ac', value: 2, turns: 2 },
         cooldown: 2,
         description: 'Se met en garde. +2 à la CA pendant 2 tours.'
       }

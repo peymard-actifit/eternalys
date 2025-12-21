@@ -544,7 +544,7 @@ export const CLOTHING: Equipment[] = [
     rarity: 'common',
     description: 'Une robe traditionnelle de lanceur de sorts.',
     armorCategory: 'clothing',
-    bonuses: { magicAttack: 2, magicarmorClass: 2 },
+    bonuses: { intelligence: 2, armorClass: 2 },
     value: 10
   },
   {
@@ -555,7 +555,7 @@ export const CLOTHING: Equipment[] = [
     rarity: 'common',
     description: 'Les vêtements cérémoniels d\'un prêtre.',
     armorCategory: 'clothing',
-    bonuses: { magicarmorClass: 3 },
+    bonuses: { armorClass: 3, wisdom: 1 },
     value: 15
   }
 ];
@@ -601,7 +601,7 @@ export const HELMETS: Equipment[] = [
     slotType: 'head',
     rarity: 'common',
     description: 'Un fin diadème métallique.',
-    bonuses: { magicAttack: 1, magicarmorClass: 1 },
+    bonuses: { intelligence: 1, armorClass: 1 },
     value: 20
   },
   {
@@ -647,7 +647,7 @@ export const GLOVES: Equipment[] = [
     slotType: 'gloves',
     rarity: 'uncommon',
     description: 'Des gants imprégnés de magie.',
-    bonuses: { magicAttack: 2 },
+    bonuses: { intelligence: 2 },
     value: 25
   }
 ];
@@ -781,7 +781,7 @@ export const CLOAKS: Equipment[] = [
     slotType: 'cloak',
     rarity: 'uncommon',
     description: 'Une cape enchantée offrant une protection.',
-    bonuses: { armorClass: 1, magicarmorClass: 2 },
+    bonuses: { armorClass: 2, wisdom: 1 },
     value: 50
   }
 ];
@@ -807,7 +807,7 @@ export const NECKLACES: Equipment[] = [
     slotType: 'necklace',
     rarity: 'common',
     description: 'Le symbole d\'une divinité.',
-    bonuses: { magicarmorClass: 2 },
+    bonuses: { armorClass: 1, wisdom: 1 },
     value: 25
   },
   {
@@ -817,7 +817,7 @@ export const NECKLACES: Equipment[] = [
     slotType: 'necklace',
     rarity: 'common',
     description: 'Un cristal pour canaliser la magie.',
-    bonuses: { magicAttack: 2 },
+    bonuses: { intelligence: 2 },
     value: 25
   }
 ];
@@ -860,7 +860,7 @@ export const ARCANE_FOCUS: Equipment[] = [
     rarity: 'common',
     description: 'Un orbe pour canaliser la magie.',
     weaponCategory: 'focus',
-    bonuses: { magicAttack: 3 },
+    bonuses: { intelligence: 3 },
     value: 20
   },
   {
@@ -871,7 +871,7 @@ export const ARCANE_FOCUS: Equipment[] = [
     rarity: 'common',
     description: 'Une baguette magique basique.',
     weaponCategory: 'focus',
-    bonuses: { magicAttack: 2 },
+    bonuses: { intelligence: 2 },
     value: 10
   },
   {
@@ -883,7 +883,7 @@ export const ARCANE_FOCUS: Equipment[] = [
     description: 'Un bâton enchanté pour les mages.',
     weaponCategory: 'focus',
     twoHanded: true,
-    bonuses: { magicAttack: 4, magicarmorClass: 1 },
+    bonuses: { intelligence: 4, armorClass: 1 },
     value: 30
   }
 ];
