@@ -4,6 +4,7 @@
 // ============================================
 
 import { Monster, CreatureType, AbilityScores, LegendaryAction, MonsterSkill } from '../types/game.types';
+import { convertAllMonstersToEternalysScale } from '../utils/monsterScaling';
 
 // Helper pour créer les caractéristiques
 const createAbilities = (str: number, dex: number, con: number, int: number, wis: number, cha: number): AbilityScores => ({
@@ -7346,11 +7347,23 @@ export const ALL_MONSTERS: Monster[] = [
   TARRASQUE, ASMODEUS, TIAMAT, BAHAMUT
 ];
 
-// Alias pour compatibilité avec l'ancien code
-export const MONSTERS = ALL_MONSTERS;
+// ============================================
+// CONVERSION VERS L'ÉCHELLE ETERNALYS (CR 1-100)
+// ============================================
+// Convertit automatiquement tous les monstres de l'échelle D&D (CR 0-30)
+// vers l'échelle Eternalys (CR 1-100) pour un meilleur équilibrage
 
-// PERSONNAGES HOSTILES NOMMÉS (pour le bestiaire)
-export const HOSTILE_NPCS: Monster[] = [
+// Version brute (CR D&D original) - pour référence
+export const ALL_MONSTERS_DND_SCALE = ALL_MONSTERS;
+
+// Version convertie (CR Eternalys) - utilisée en jeu
+export const ALL_MONSTERS_ETERNALYS: Monster[] = convertAllMonstersToEternalysScale(ALL_MONSTERS);
+
+// Alias pour compatibilité - UTILISE L'ÉCHELLE ETERNALYS
+export const MONSTERS = ALL_MONSTERS_ETERNALYS;
+
+// PERSONNAGES HOSTILES NOMMÉS (pour le bestiaire) - version D&D
+const HOSTILE_NPCS_DND: Monster[] = [
   // Archidiables
   ZARIEL, ASMODEUS, MEPHISTOPHELES, DISPATER, MAMMON, BELIAL, LEVISTUS, GLASYA, BAALZEBUL,
   // Seigneurs Démons
@@ -7363,6 +7376,9 @@ export const HOSTILE_NPCS: Monster[] = [
   DROW_MATRON, GITHYANKI_SUPREME_COMMANDER, ARCHMAGE
 ];
 
+// Version convertie Eternalys
+export const HOSTILE_NPCS: Monster[] = convertAllMonstersToEternalysScale(HOSTILE_NPCS_DND);
+
 // Boss organisés par tier de difficulté
 export const BOSSES_TIER_1: Monster[] = [BEHOLDER, VAMPIRE, ADULT_WHITE_DRAGON, STORM_GIANT]; // Niveau 1 du donjon
 export const BOSSES_TIER_2: Monster[] = [ADULT_RED_DRAGON, DEATH_KNIGHT, LICH, ADULT_BLACK_DRAGON, ADULT_BLUE_DRAGON, ADULT_GREEN_DRAGON, ADULT_GOLD_DRAGON, ADULT_SILVER_DRAGON, STRAHD_VON_ZAROVICH, PURPLE_WORM, DROW_MATRON, PLANETAR, PHOENIX, SKULL_LORD, ELDER_BRAIN, DEMILICH]; // Niveau 2 du donjon
@@ -7370,63 +7386,77 @@ export const BOSSES_TIER_3: Monster[] = [ANCIENT_RED_DRAGON, ANCIENT_WHITE_DRAGO
 export const BOSSES_TIER_4: Monster[] = [ZARIEL, MEPHISTOPHELES, DISPATER, DEMOGORGON, ORCUS, GRAZZT, YEENOGHU, BAPHOMET, VECNA, MAMMON, BELIAL, LEVISTUS, GLASYA, BAALZEBUL, ZUGGTMOY, JUIBLEX, FRAZURBLUU]; // Niveau 4 du donjon (Archidiables et Seigneurs Démons)
 export const BOSSES_TIER_5: Monster[] = [TARRASQUE, ASMODEUS, TIAMAT, BAHAMUT]; // Niveau 5+ (Divinités et Tarrasque)
 
-export const BOSSES: Monster[] = [
+// Boss avec CR D&D original
+const BOSSES_DND_SCALE: Monster[] = [
   ...BOSSES_TIER_1, ...BOSSES_TIER_2, ...BOSSES_TIER_3, ...BOSSES_TIER_4, ...BOSSES_TIER_5
 ];
+
+// Boss convertis vers l'échelle Eternalys
+export const BOSSES: Monster[] = convertAllMonstersToEternalysScale(BOSSES_DND_SCALE);
 
 // ============================================
 // FONCTIONS UTILITAIRES
 // ============================================
 
-// Obtenir un monstre aléatoire par CR
-export function getRandomMonsterByCR(cr: number): Monster {
-  const monsters = MONSTERS_BY_CR[cr] || MONSTERS_BY_CR[0.25];
-  const index = Math.floor(Math.random() * monsters.length);
-  return JSON.parse(JSON.stringify(monsters[index])); // Deep copy
+// Obtenir un monstre aléatoire par CR Eternalys
+// Cherche dans les monstres convertis
+export function getRandomMonsterByCR(crEternalys: number): Monster {
+  // Trouver les monstres dont le CR converti est proche du CR demandé
+  const tolerance = Math.max(5, crEternalys * 0.2); // Tolérance de 20%
+  const candidates = ALL_MONSTERS_ETERNALYS.filter(m => 
+    m.challengeRating >= crEternalys - tolerance && 
+    m.challengeRating <= crEternalys + tolerance &&
+    !m.isBoss
+  );
+  
+  if (candidates.length === 0) {
+    // Fallback: prendre n'importe quel monstre non-boss
+    const nonBosses = ALL_MONSTERS_ETERNALYS.filter(m => !m.isBoss);
+    const index = Math.floor(Math.random() * nonBosses.length);
+    return JSON.parse(JSON.stringify(nonBosses[index]));
+  }
+  
+  const index = Math.floor(Math.random() * candidates.length);
+  return JSON.parse(JSON.stringify(candidates[index])); // Deep copy
 }
 
-// Obtenir un monstre aléatoire adapté au niveau de donjon (système D&D 50 niveaux)
+// Obtenir un monstre aléatoire adapté au niveau de donjon (échelle Eternalys CR 1-100)
 export function getRandomMonster(dungeonLevel: number = 1): Monster {
   // Calculer le CR cible basé sur le niveau du donjon
-  // Utilise la configuration des niveaux de dndSystem.ts
-  let minCR: number, maxCR: number;
+  // Progression linéaire : niveau 1 = CR ~3, niveau 50 = CR ~100
+  const baseCR = Math.floor(dungeonLevel * 2);
+  const minCR = Math.max(1, baseCR - 5);
+  const maxCR = Math.min(100, baseCR + 5);
   
-  if (dungeonLevel <= 5) {
-    minCR = dungeonLevel;
-    maxCR = dungeonLevel + 1;
-  } else if (dungeonLevel <= 10) {
-    minCR = dungeonLevel + 2;
-    maxCR = dungeonLevel + 5;
-  } else if (dungeonLevel <= 20) {
-    minCR = 10 + dungeonLevel;
-    maxCR = 15 + dungeonLevel;
-  } else if (dungeonLevel <= 30) {
-    minCR = 25 + dungeonLevel;
-    maxCR = 35 + dungeonLevel;
-  } else if (dungeonLevel <= 40) {
-    minCR = 40 + dungeonLevel;
-    maxCR = 55 + dungeonLevel;
-  } else {
-    minCR = 60 + dungeonLevel;
-    maxCR = Math.min(100, 75 + dungeonLevel);
-  }
+  // Trouver des monstres non-boss dans cette plage de CR
+  const candidates = ALL_MONSTERS_ETERNALYS.filter(m => 
+    m.challengeRating >= minCR && 
+    m.challengeRating <= maxCR &&
+    !m.isBoss
+  );
   
-  // Trouver des monstres dans cette plage de CR
-  const availableCRs = Object.keys(MONSTERS_BY_CR)
-    .map(Number)
-    .filter(cr => cr >= minCR && cr <= maxCR);
-  
-  // Si pas de monstres dans cette plage, prendre le CR le plus proche
-  if (availableCRs.length === 0) {
-    const allCRs = Object.keys(MONSTERS_BY_CR).map(Number).sort((a, b) => a - b);
-    const closestCR = allCRs.reduce((prev, curr) => 
-      Math.abs(curr - minCR) < Math.abs(prev - minCR) ? curr : prev
+  // Si pas assez de candidats, élargir la recherche
+  if (candidates.length < 3) {
+    const extendedCandidates = ALL_MONSTERS_ETERNALYS.filter(m => 
+      m.challengeRating >= minCR - 10 && 
+      m.challengeRating <= maxCR + 10 &&
+      !m.isBoss
     );
-    return getRandomMonsterByCR(closestCR);
+    if (extendedCandidates.length > 0) {
+      const index = Math.floor(Math.random() * extendedCandidates.length);
+      return JSON.parse(JSON.stringify(extendedCandidates[index]));
+    }
   }
   
-  const randomCR = availableCRs[Math.floor(Math.random() * availableCRs.length)];
-  return getRandomMonsterByCR(randomCR);
+  if (candidates.length === 0) {
+    // Dernier fallback: n'importe quel monstre non-boss
+    const nonBosses = ALL_MONSTERS_ETERNALYS.filter(m => !m.isBoss);
+    const index = Math.floor(Math.random() * nonBosses.length);
+    return JSON.parse(JSON.stringify(nonBosses[index]));
+  }
+  
+  const index = Math.floor(Math.random() * candidates.length);
+  return JSON.parse(JSON.stringify(candidates[index])); // Deep copy
 }
 
 // Obtenir des monstres aléatoires pour une rencontre
@@ -7450,57 +7480,34 @@ export function getRandomEncounter(targetCR: number, count: number = 1): Monster
   return result;
 }
 
-// Obtenir un boss aléatoire adapté au niveau du donjon (système D&D 50 niveaux)
+// Obtenir un boss aléatoire adapté au niveau du donjon (échelle Eternalys CR 1-100)
 export function getRandomBoss(dungeonLevel: number = 1): Monster {
   // Calculer le CR cible du boss basé sur le niveau du donjon
-  let targetBossCR: number;
+  // Boss = niveau * 2.5 (plus difficile que les monstres normaux)
+  const targetBossCR = Math.min(100, Math.floor(dungeonLevel * 2.5) + 5);
   
-  if (dungeonLevel <= 5) {
-    // Niveaux 1-5: CR 3-7
-    targetBossCR = dungeonLevel + 2;
-  } else if (dungeonLevel <= 10) {
-    // Niveaux 6-10: CR 8-17
-    targetBossCR = dungeonLevel + 7;
-  } else if (dungeonLevel <= 20) {
-    // Niveaux 11-20: CR 20-40
-    targetBossCR = 20 + dungeonLevel;
-  } else if (dungeonLevel <= 30) {
-    // Niveaux 21-30: CR 40-70
-    targetBossCR = 40 + dungeonLevel;
-  } else if (dungeonLevel <= 40) {
-    // Niveaux 31-40: CR 60-100
-    targetBossCR = 60 + dungeonLevel;
-  } else {
-    // Niveaux 41-50: CR 80-100 (divinités)
-    targetBossCR = Math.min(100, 80 + dungeonLevel);
+  // Chercher des boss dont le CR est proche du CR cible
+  const tolerance = Math.max(10, targetBossCR * 0.25); // Tolérance de 25%
+  
+  let bossList = BOSSES.filter(b => 
+    b.challengeRating >= targetBossCR - tolerance && 
+    b.challengeRating <= targetBossCR + tolerance
+  );
+  
+  // Si pas assez de candidats, élargir la recherche
+  if (bossList.length < 2) {
+    bossList = BOSSES.filter(b => 
+      b.challengeRating >= targetBossCR - tolerance * 2 && 
+      b.challengeRating <= targetBossCR + tolerance * 2
+    );
   }
   
-  // Sélectionner les boss par tier basé sur le CR cible
-  let bossList: Monster[];
-  
-  if (targetBossCR >= 90) {
-    // CR 90+: Divinités (Tiamat, Ao, etc.)
-    bossList = [...BOSSES_TIER_5, ...BOSSES_TIER_4].filter(b => (b.challengeRating || 0) >= 30);
-  } else if (targetBossCR >= 70) {
-    // CR 70-89: Archidiables majeurs et Dragons anciens
-    bossList = [...BOSSES_TIER_4, ...BOSSES_TIER_5];
-  } else if (targetBossCR >= 50) {
-    // CR 50-69: Archidiables et puissants dragons
-    bossList = [...BOSSES_TIER_3, ...BOSSES_TIER_4];
-  } else if (targetBossCR >= 30) {
-    // CR 30-49: Dragons anciens et démons majeurs
-    bossList = [...BOSSES_TIER_2, ...BOSSES_TIER_3];
-  } else if (targetBossCR >= 15) {
-    // CR 15-29: Dragons adultes et boss intermédiaires
-    bossList = [...BOSSES_TIER_1, ...BOSSES_TIER_2];
-  } else {
-    // CR 1-14: Boss tier 1 (adapté aux débutants)
-    bossList = BOSSES_TIER_1;
-  }
-  
-  // Fallback si pas de boss dans le tier
+  // Fallback si toujours pas de boss
   if (!bossList || bossList.length === 0) {
-    bossList = BOSSES_TIER_1;
+    // Prendre les boss les plus proches du CR cible
+    bossList = [...BOSSES].sort((a, b) => 
+      Math.abs(a.challengeRating - targetBossCR) - Math.abs(b.challengeRating - targetBossCR)
+    ).slice(0, 4);
   }
   
   const index = Math.floor(Math.random() * bossList.length);

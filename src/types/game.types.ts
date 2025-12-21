@@ -468,7 +468,9 @@ export interface MonsterSkill {
   // === EFFETS ===
   effect?: {
     type: 'damage' | 'heal' | 'buff_self' | 'debuff_target' | 'lifesteal' | 'grapple' | 'frighten' | 'poison'
-      | 'debuff_strength' | 'debuff_dexterity' | 'debuff_constitution' | 'debuff_wisdom';
+      | 'debuff_strength' | 'debuff_dexterity' | 'debuff_constitution' | 'debuff_wisdom'
+      // Compatibilité legacy - sera converti en D&D par le système de combat
+      | 'debuff_attack' | 'debuff_defense' | 'debuff_speed' | 'debuff_magic_attack' | 'debuff_magic_defense';
     value?: number;
     stat?: string;
     turns?: number;
