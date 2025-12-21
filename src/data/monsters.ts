@@ -41,10 +41,50 @@ function localConvertDnDCRToEternalys(dndCR: number): number {
   return Math.round(lowerVal + (upperVal - lowerVal) * ratio);
 }
 
-function localGetMonsterStatsForCR(cr: number): { hp: number; ac: number } {
+// =============================================================================
+// FORMULE HP PAR PALIERS (Changement 2) - Équilibrage v2.29
+// Zone 1 (CR 1-15)  : Progression douce - Apprentissage
+// Zone 2 (CR 16-40) : Progression modérée - Challenge
+// Zone 3 (CR 41-70) : Progression soutenue - Difficile
+// Zone 4 (CR 71+)   : Progression explosive - Boss épiques
+// =============================================================================
+function localGetMonsterStatsForCR(cr: number, isBoss: boolean = false): { hp: number; ac: number } {
   if (cr <= 0) cr = 1;
-  const hp = Math.floor(10 + (cr * 4) + Math.pow(cr, 1.6) * 0.15);
+  
+  let hp: number;
+  
+  if (isBoss) {
+    // BOSS : Stats très élevées pour combats épiques (8-15 tours)
+    if (cr <= 40) {
+      hp = Math.floor(80 + (cr * 6));
+    } else if (cr <= 70) {
+      hp = Math.floor(320 + ((cr - 40) * 12));
+    } else if (cr <= 95) {
+      hp = Math.floor(680 + ((cr - 70) * 20) + Math.pow(cr - 70, 1.5) * 2);
+    } else {
+      // Boss ultimes (Tiamat, Asmodeus, etc.)
+      hp = Math.floor(2500 + ((cr - 95) * 300));
+    }
+  } else {
+    // MONSTRES NORMAUX : Progression par paliers (3-4 tours pour les tuer)
+    if (cr <= 15) {
+      // Zone 1 : Douce
+      hp = Math.floor(6 + (cr * 1.2));
+    } else if (cr <= 40) {
+      // Zone 2 : Modérée
+      hp = Math.floor(24 + ((cr - 15) * 2.5));
+    } else if (cr <= 70) {
+      // Zone 3 : Soutenue
+      hp = Math.floor(86 + ((cr - 40) * 4));
+    } else {
+      // Zone 4 : Explosive
+      hp = Math.floor(206 + ((cr - 70) * 6) + Math.pow(cr - 70, 1.5) * 1.2);
+    }
+  }
+  
+  // AC : Progression plus lente (10 → 28 sur CR 1-100)
   const ac = Math.floor(10 + Math.min(cr * 0.18, 18));
+  
   return { hp, ac };
 }
 
@@ -73,7 +113,12 @@ function localScaleAbilities(abilities: AbilityScores, ratio: number): AbilitySc
   };
 }
 
-function localConvertMonsterToEternalysScale(monster: Monster): Monster {
+// Convertir un monstre vers l'échelle Eternalys avec équilibrage v2.29
+function localConvertMonsterToEternalysScale(
+  monster: Monster, 
+  dungeonLevel: number = 50, // Par défaut, pas de cap
+  isBoss: boolean = false
+): Monster {
   const monsterId = monster.id.toLowerCase().replace(/[^a-z0-9]/g, '_');
   let newCR: number;
   
@@ -83,14 +128,29 @@ function localConvertMonsterToEternalysScale(monster: Monster): Monster {
     newCR = localConvertDnDCRToEternalys(monster.challengeRating);
   }
   
-  const scaledStats = localGetMonsterStatsForCR(newCR);
+  // Appliquer le cap CR Eternalys pour les monstres normaux (Changement 3)
+  // Les Boss ne sont PAS capés - ils gardent leur puissance maximale
+  if (!isBoss && !monster.isBoss) {
+    const crCap = getCRCapForDungeonLevel(dungeonLevel);
+    newCR = Math.min(newCR, crCap);
+  }
+  
+  // Calculer les stats avec la formule par paliers (Changement 2)
+  const isBossMonster = isBoss || monster.isBoss || false;
+  const scaledStats = localGetMonsterStatsForCR(newCR, isBossMonster);
+  
   const originalCR = monster.challengeRating;
   const scalingRatio = newCR / Math.max(1, originalCR);
   const scaledAbilities = localScaleAbilities(monster.abilities, scalingRatio);
   const newXP = localGetXPFromCR(newCR);
   const conMod = localGetAbilityModifier(scaledAbilities.constitution);
   const baseHP = scaledStats.hp;
-  const finalHP = Math.max(1, baseHP + (conMod * Math.floor(newCR / 2)));
+  
+  // Bonus HP basé sur Constitution et CR
+  const hpBonus = isBossMonster 
+    ? conMod * Math.floor(newCR / 1.5)  // Boss : bonus CON plus important
+    : conMod * Math.floor(newCR / 3);    // Normal : bonus CON modéré
+  const finalHP = Math.max(1, baseHP + hpBonus);
   
   return {
     ...monster,
@@ -7478,34 +7538,62 @@ export const BOSSES: Monster[] = [
 // FONCTIONS UTILITAIRES
 // ============================================
 
-// Obtenir un monstre aléatoire par CR
+// Obtenir un monstre aléatoire par CR D&D
 // Note: Applique automatiquement la conversion vers l'échelle Eternalys (CR 1-100)
-export function getRandomMonsterByCR(cr: number): Monster {
+// Le dungeonLevel permet d'appliquer le cap CR approprié
+export function getRandomMonsterByCR(cr: number, dungeonLevel: number = 50): Monster {
   const monsters = MONSTERS_BY_CR[cr] || MONSTERS_BY_CR[0.25];
   const index = Math.floor(Math.random() * monsters.length);
   const rawMonster = JSON.parse(JSON.stringify(monsters[index])); // Deep copy
   
-  // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
-  return localConvertMonsterToEternalysScale(rawMonster);
+  // Convertir vers l'échelle Eternalys avec cap CR basé sur le niveau de donjon
+  return localConvertMonsterToEternalysScale(rawMonster, dungeonLevel, false);
+}
+
+// =============================================================================
+// ÉQUILIBRAGE v2.29 - Plages CR D&D par niveau de donjon
+// Objectif : Personnages niveau 1→100 sur donjons 1→50
+// =============================================================================
+
+// Cap CR Eternalys par niveau de donjon (Changement 3)
+const CR_ETERNALYS_CAP: Record<number, number> = {
+  2: 3, 5: 5, 8: 8, 12: 12, 18: 20, 25: 32, 32: 48, 40: 64, 45: 82, 50: 100
+};
+
+function getCRCapForDungeonLevel(dungeonLevel: number): number {
+  const levels = Object.keys(CR_ETERNALYS_CAP).map(Number).sort((a, b) => a - b);
+  for (const level of levels) {
+    if (dungeonLevel <= level) return CR_ETERNALYS_CAP[level];
+  }
+  return 100; // Pas de cap après niveau 50
 }
 
 // Obtenir un monstre aléatoire adapté au niveau de donjon
 export function getRandomMonster(dungeonLevel: number = 1): Monster {
-  // Calculer le CR cible basé sur le niveau du donjon
+  // Calculer le CR D&D cible basé sur le niveau du donjon (Changement 1)
+  // Progression calibrée pour personnages niveau 1→100 sur donjons 1→50
   let minCR: number, maxCR: number;
   
-  if (dungeonLevel <= 5) {
-    minCR = 0; maxCR = 2;
-  } else if (dungeonLevel <= 10) {
-    minCR = 1; maxCR = 5;
-  } else if (dungeonLevel <= 20) {
-    minCR = 3; maxCR = 10;
-  } else if (dungeonLevel <= 30) {
-    minCR = 6; maxCR = 15;
+  if (dungeonLevel <= 2) {
+    minCR = 0; maxCR = 0.25;        // Rats, Kobolds, Gobelins
+  } else if (dungeonLevel <= 5) {
+    minCR = 0.25; maxCR = 0.5;      // Gobelins, Squelettes, Loups
+  } else if (dungeonLevel <= 8) {
+    minCR = 0.5; maxCR = 1;         // Orcs, Hobgobelins, Goules
+  } else if (dungeonLevel <= 12) {
+    minCR = 1; maxCR = 2;           // Bugbears, Ogres, Gargouilles
+  } else if (dungeonLevel <= 18) {
+    minCR = 2; maxCR = 4;           // Ogres, Minotaures, Basilics
+  } else if (dungeonLevel <= 25) {
+    minCR = 4; maxCR = 7;           // Trolls, Élémentaires, Chimères
+  } else if (dungeonLevel <= 32) {
+    minCR = 7; maxCR = 11;          // Mind Flayers, Géants, Dragons jeunes
   } else if (dungeonLevel <= 40) {
-    minCR = 10; maxCR = 20;
+    minCR = 11; maxCR = 16;         // Dragons adultes, Démons majeurs
+  } else if (dungeonLevel <= 45) {
+    minCR = 16; maxCR = 22;         // Dragons anciens, Liches
   } else {
-    minCR = 15; maxCR = 30;
+    minCR = 22; maxCR = 30;         // Archidiables, Seigneurs démons
   }
   
   // Trouver des monstres dans cette plage de CR
@@ -7519,15 +7607,15 @@ export function getRandomMonster(dungeonLevel: number = 1): Monster {
     const closestCR = allCRs.reduce((prev, curr) => 
       Math.abs(curr - minCR) < Math.abs(prev - minCR) ? curr : prev
     );
-    return getRandomMonsterByCR(closestCR);
+    return getRandomMonsterByCR(closestCR, dungeonLevel);
   }
   
   const randomCR = availableCRs[Math.floor(Math.random() * availableCRs.length)];
-  return getRandomMonsterByCR(randomCR);
+  return getRandomMonsterByCR(randomCR, dungeonLevel);
 }
 
 // Obtenir des monstres aléatoires pour une rencontre
-export function getRandomEncounter(targetCR: number, count: number = 1): Monster[] {
+export function getRandomEncounter(targetCR: number, count: number = 1, dungeonLevel: number = 50): Monster[] {
   const result: Monster[] = [];
   const availableCRs = Object.keys(MONSTERS_BY_CR)
     .map(Number)
@@ -7541,29 +7629,37 @@ export function getRandomEncounter(targetCR: number, count: number = 1): Monster
       availableCRs.length - 1
     );
     const selectedCR = availableCRs[crIndex] || 0.25;
-    result.push(getRandomMonsterByCR(selectedCR));
+    result.push(getRandomMonsterByCR(selectedCR, dungeonLevel));
   }
   
   return result;
 }
 
 // Obtenir un boss aléatoire adapté au niveau du donjon
-// Note: Applique automatiquement la conversion vers l'échelle Eternalys (CR 1-100)
+// Note: Les Boss utilisent la formule HP élevée (combats de 8-15 tours)
+// Note: Les Boss ne sont PAS affectés par le cap CR
 export function getRandomBoss(dungeonLevel: number = 1): Monster {
-  // Sélectionner les boss par tier basé sur le niveau du donjon
+  // Sélectionner les boss par tier basé sur le niveau du donjon (Équilibrage v2.29)
+  // Tiers réajustés pour progression niveau 1→100 sur donjons 1→50
   let bossList: Monster[];
   
-  if (dungeonLevel >= 41) {
+  if (dungeonLevel >= 46) {
+    // Donjon 46-50 : Boss ultimes (Tiamat, Asmodeus, Tarrasque, Bahamut)
     bossList = BOSSES_TIER_5;
-  } else if (dungeonLevel >= 31) {
+  } else if (dungeonLevel >= 36) {
+    // Donjon 36-45 : Archidiables et Seigneurs Démons
     bossList = [...BOSSES_TIER_4, ...BOSSES_TIER_5];
-  } else if (dungeonLevel >= 21) {
+  } else if (dungeonLevel >= 26) {
+    // Donjon 26-35 : Dragons anciens, Liches
     bossList = [...BOSSES_TIER_3, ...BOSSES_TIER_4];
-  } else if (dungeonLevel >= 11) {
+  } else if (dungeonLevel >= 16) {
+    // Donjon 16-25 : Dragons adultes, Démons majeurs
     bossList = [...BOSSES_TIER_2, ...BOSSES_TIER_3];
-  } else if (dungeonLevel >= 6) {
+  } else if (dungeonLevel >= 8) {
+    // Donjon 8-15 : Dragons jeunes, Vampires
     bossList = [...BOSSES_TIER_1, ...BOSSES_TIER_2];
   } else {
+    // Donjon 1-7 : Boss d'introduction
     bossList = BOSSES_TIER_1;
   }
   
@@ -7575,8 +7671,8 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   const index = Math.floor(Math.random() * bossList.length);
   const rawBoss = JSON.parse(JSON.stringify(bossList[index])); // Deep copy
   
-  // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
-  const boss = localConvertMonsterToEternalysScale(rawBoss);
+  // Convertir vers l'échelle Eternalys avec stats BOSS (pas de cap, HP élevés)
+  const boss = localConvertMonsterToEternalysScale(rawBoss, dungeonLevel, true);
   
   // Réinitialiser les actions légendaires
   if (boss.legendaryActionsPerTurn) {
