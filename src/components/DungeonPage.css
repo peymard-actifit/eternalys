@@ -66,7 +66,8 @@
   border: 1px solid rgba(155, 89, 182, 0.3);
   border-radius: 12px;
   padding: 1rem;
-  overflow-y: auto;
+  /* Ne pas couper les tooltips */
+  overflow: visible;
 }
 
 /* Boutons d'action au-dessus du titre */
@@ -147,6 +148,17 @@
 .team-member.dead {
   opacity: 0.4;
   filter: grayscale(0.8);
+}
+
+.team-member.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.team-member.clickable:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.4);
+  transform: translateX(3px);
 }
 
 .member-portrait {
@@ -1125,7 +1137,7 @@
   border-radius: 12px;
   padding: 1rem;
   min-width: 220px;
-  z-index: 1000;
+  z-index: 9999;
   box-shadow: 0 4px 20px rgba(142, 68, 173, 0.5);
   animation: tooltipAppear 0.2s ease;
 }

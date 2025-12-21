@@ -237,12 +237,7 @@ export function DungeonPage() {
         {/* Panel équipe */}
         <div className="team-panel">
           <div className="panel-action-buttons">
-            <button 
-              className="panel-btn inventory"
-              onClick={() => gameStore.setState({ showInventory: true })}
-            >
-              🎒 Inventaire
-            </button>
+            {/* Bouton inventaire supprimé - clic sur personnage pour ouvrir */}
             <button 
               className="panel-btn menu"
               onClick={() => gameStore.setState({ showPauseMenu: true })}
@@ -251,8 +246,13 @@ export function DungeonPage() {
             </button>
           </div>
           <h3>👥 Équipe - Niveau {state.dungeonLevel}</h3>
-          {team.map(character => (
-            <div key={character.id} className={`team-member ${character.hp <= 0 ? 'dead' : ''}`}>
+          {team.map((character, index) => (
+            <div 
+              key={character.id} 
+              className={`team-member ${character.hp <= 0 ? 'dead' : ''} clickable`}
+              onClick={() => gameStore.setState({ showInventory: true, inventoryCharacterIndex: index })}
+              title="Cliquer pour ouvrir l'inventaire"
+            >
               <span className="member-portrait">{character.portrait}</span>
               <div className="member-info">
                 <span className="member-name">{character.name}</span>

@@ -66,7 +66,16 @@ export function InventoryModal() {
     return gameStore.subscribe(() => setState(gameStore.getState()));
   }, []);
 
-  const { team, showInventory } = state;
+  const { team, showInventory, inventoryCharacterIndex } = state;
+  
+  // Si inventoryCharacterIndex est défini, l'utiliser pour sélectionner le personnage
+  useEffect(() => {
+    if (showInventory && inventoryCharacterIndex !== undefined && inventoryCharacterIndex >= 0 && inventoryCharacterIndex < team.length) {
+      setCurrentIndex(inventoryCharacterIndex);
+      // Reset l'index après utilisation
+      gameStore.setState({ inventoryCharacterIndex: undefined });
+    }
+  }, [showInventory, inventoryCharacterIndex, team.length]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!showInventory) return;

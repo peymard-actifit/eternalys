@@ -25,7 +25,10 @@ import './CombatPage.css';
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
-  const { autoMode, toggleAutoMode } = useAnimationPreferences();
+  const { animationMode, setAnimationMode, isManual, isAuto, isSkip } = useAnimationPreferences();
+  const [centralDisplay, setCentralDisplay] = useState<{ type: 'attack' | 'damage'; result: string; details?: string; isHit?: boolean; isCritical?: boolean } | null>(null);
+  // Compatibilité legacy pour les timers
+  const autoMode = isAuto || isSkip;
   const [monsterDialogue, setMonsterDialogue] = useState<string>('');
   const [showDialogue, setShowDialogue] = useState(false);
   const [selectingTarget, setSelectingTarget] = useState<'ally' | 'enemy' | null>(null);
@@ -155,11 +158,23 @@ export function CombatPage() {
   }, [showCharacterSheet, contextMenu, lastAttackResult]);
   
   // Auto-fermer l'indicateur de jet d'attaque
-  // - Mode normal: après 2 secondes si pas waitForClick
-  // - Mode auto: après 1.2s même si waitForClick
+  // - Mode manuel: attendre le clic (waitForClick)
+  // - Mode auto: après 800ms
+  // - Mode skip: après 100ms
   useEffect(() => {
     if (lastAttackResult) {
-      const delay = autoMode ? 1200 : (!lastAttackResult.waitForClick ? 2000 : 0);
+      const delay = isSkip ? 100 : isAuto ? 800 : (!lastAttackResult.waitForClick ? 2000 : 0);
+      
+      // En mode skip, afficher dans la zone centrale
+      if (isSkip && lastAttackResult) {
+        setCentralDisplay({
+          type: 'attack',
+          result: lastAttackResult.hit ? `${lastAttackResult.total} → TOUCHÉ !` : `${lastAttackResult.total} → RATÉ`,
+          details: `🎲 ${lastAttackResult.roll}+${lastAttackResult.modifier} vs CA ${lastAttackResult.targetAC}`,
+          isHit: lastAttackResult.hit,
+          isCritical: lastAttackResult.isCritical
+        });
+      }
       
       if (delay > 0) {
         const timer = setTimeout(() => {
@@ -167,16 +182,26 @@ export function CombatPage() {
             lastAttackResult.onDismiss();
           }
           setLastAttackResult(null);
+          if (isSkip) setCentralDisplay(null);
         }, delay);
         return () => clearTimeout(timer);
       }
     }
-  }, [lastAttackResult, autoMode]);
+  }, [lastAttackResult, isAuto, isSkip]);
   
   // Auto-fermer l'indicateur de jet de dégâts
   useEffect(() => {
     if (lastDamageResult) {
-      const delay = autoMode ? 1000 : (!lastDamageResult.waitForClick ? 1500 : 0);
+      const delay = isSkip ? 100 : isAuto ? 600 : (!lastDamageResult.waitForClick ? 1500 : 0);
+      
+      // En mode skip, afficher dans la zone centrale
+      if (isSkip && lastDamageResult) {
+        setCentralDisplay({
+          type: 'damage',
+          result: `${lastDamageResult.totalDamage} DÉGÂTS`,
+          details: `🎲 ${lastDamageResult.rolls.join('+')}${lastDamageResult.modifier !== 0 ? (lastDamageResult.modifier > 0 ? '+' : '') + lastDamageResult.modifier : ''}`
+        });
+      }
       
       if (delay > 0) {
         const timer = setTimeout(() => {
@@ -184,24 +209,28 @@ export function CombatPage() {
             lastDamageResult.onDismiss();
           }
           setLastDamageResult(null);
+          if (isSkip) setCentralDisplay(null);
         }, delay);
         return () => clearTimeout(timer);
       }
     }
-  }, [lastDamageResult, autoMode]);
+  }, [lastDamageResult, isAuto, isSkip]);
 
-  // Auto-fermer le dice roll en mode auto (1.5s)
+  // Auto-fermer le dice roll
+  // - Mode auto: 1s
+  // - Mode skip: 50ms (quasi instantané)
   useEffect(() => {
-    if (activeDiceRoll && autoMode && activeDiceRoll.waitForClick) {
+    if (activeDiceRoll && (isAuto || isSkip) && activeDiceRoll.waitForClick) {
+      const delay = isSkip ? 50 : 1000;
       const timer = setTimeout(() => {
         if (activeDiceRoll.onDismiss) {
           activeDiceRoll.onDismiss();
         }
         setActiveDiceRoll(null);
-      }, 1500);
+      }, delay);
       return () => clearTimeout(timer);
     }
-  }, [activeDiceRoll, autoMode]);
+  }, [activeDiceRoll, isAuto, isSkip]);
 
   // Auto-confirmer les actions en mode auto (0.8s)
   useEffect(() => {
@@ -1752,6 +1781,74 @@ export function CombatPage() {
   const cancelPendingAction = () => {
     setPendingAction(null);
   };
+
+  // Passer son tour (le personnage ne fait rien ce tour)
+  const passTurn = () => {
+    if (!isPlayerTurn || isAnimating) return;
+    
+    const logs = [...combatLog, `⏭️ ${(currentTurn as Character).name} passe son tour.`];
+    addCombatHistoryEntry({
+      turn: combatTurn,
+      actor: (currentTurn as Character).name,
+      actorPortrait: (currentTurn as Character).portrait,
+      action: 'Passe son tour',
+      isPlayerAction: true
+    });
+    
+    // Passer au tour suivant
+    let nextIndex = (currentTurnIndex + 1) % turnOrder.length;
+    let attempts = 0;
+    while (turnOrder[nextIndex].hp <= 0 && attempts < turnOrder.length) {
+      nextIndex = (nextIndex + 1) % turnOrder.length;
+      attempts++;
+    }
+    
+    // Si on revient au début, incrémenter le compteur de tours
+    if (nextIndex <= currentTurnIndex) {
+      setCombatTurn(prev => prev + 1);
+    }
+    
+    gameStore.setState({ currentTurnIndex: nextIndex, combatLog: logs });
+  };
+
+  // Retarder son tour (le personnage passe en fin d'initiative pour ce tour)
+  const delayTurn = () => {
+    if (!isPlayerTurn || isAnimating) return;
+    
+    const currentChar = currentTurn as Character;
+    const currentIndex = currentTurnIndex;
+    
+    // Trouver la dernière position dans l'ordre d'initiative
+    const newTurnOrder = [...turnOrder];
+    const [delayed] = newTurnOrder.splice(currentIndex, 1);
+    newTurnOrder.push(delayed);
+    
+    const logs = [...combatLog, `⏳ ${currentChar.name} retarde son tour.`];
+    addCombatHistoryEntry({
+      turn: combatTurn,
+      actor: currentChar.name,
+      actorPortrait: currentChar.portrait,
+      action: 'Retarde son tour',
+      isPlayerAction: true
+    });
+    
+    // Le prochain index reste le même car on a retiré l'élément courant
+    // Mais il faut s'assurer qu'on ne dépasse pas la longueur
+    let nextIndex = currentIndex;
+    if (nextIndex >= newTurnOrder.length) {
+      nextIndex = 0;
+      setCombatTurn(prev => prev + 1);
+    }
+    
+    // Sauter les morts
+    let attempts = 0;
+    while (newTurnOrder[nextIndex].hp <= 0 && attempts < newTurnOrder.length) {
+      nextIndex = (nextIndex + 1) % newTurnOrder.length;
+      attempts++;
+    }
+    
+    gameStore.setState({ turnOrder: newTurnOrder, currentTurnIndex: nextIndex, combatLog: logs });
+  };
   
   // Exécuter l'attaque après confirmation
   const executeAttack = async () => {
@@ -2708,6 +2805,7 @@ export function CombatPage() {
     <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
       <div className="combat-header">
         <h2>⚔️ COMBAT ⚔️</h2>
+        <span className="turn-counter">Tour {combatTurn}</span>
         {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
         {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
       </div>
@@ -2935,7 +3033,17 @@ export function CombatPage() {
             </div>
           </div>
 
-          <div className="versus">VS</div>
+          {/* Zone centrale : VS ou résultats des jets */}
+          <div className="versus-area">
+            {centralDisplay ? (
+              <div className={`central-roll-display ${centralDisplay.type} ${centralDisplay.isHit ? 'hit' : 'miss'} ${centralDisplay.isCritical ? 'critical' : ''}`}>
+                <div className="roll-result">{centralDisplay.result}</div>
+                {centralDisplay.details && <div className="roll-details">{centralDisplay.details}</div>}
+              </div>
+            ) : (
+              <div className="versus">VS</div>
+            )}
+          </div>
 
           <div className="team-section">
             {team.map(character => {
@@ -3035,13 +3143,30 @@ export function CombatPage() {
               >
                 ⚙️
               </button>
-              <button 
-                className={`animation-toggle-btn ${autoMode ? 'auto-on' : 'auto-off'}`}
-                onClick={toggleAutoMode}
-                title={autoMode ? 'Mode Auto activé' : 'Mode Auto désactivé'}
-              >
-                <span className="toggle-icon">{autoMode ? '🔓' : '🔒'}</span>
-              </button>
+              {/* 3 boutons de mode : Off / On / Skip */}
+              <div className="animation-mode-buttons">
+                <button 
+                  className={`mode-btn ${animationMode === 'off' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('off')}
+                  title="Mode Manuel - Cliquez pour valider chaque jet"
+                >
+                  🔒
+                </button>
+                <button 
+                  className={`mode-btn ${animationMode === 'on' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('on')}
+                  title="Mode Auto - Validation automatique avec animations"
+                >
+                  🔓
+                </button>
+                <button 
+                  className={`mode-btn ${animationMode === 'skip' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('skip')}
+                  title="Mode Skip - Pas d'animations, résultats directs"
+                >
+                  ⏩
+                </button>
+              </div>
               {/* Bouton minimize visible UNIQUEMENT sur mobile/tablette */}
               <button 
                 className="minimize-actions-btn mobile-only"
@@ -3121,6 +3246,25 @@ export function CombatPage() {
                 </button>
               </div>
             ))}
+            {/* Boutons tactiques : Passer / Retarder */}
+            <div className="tactical-buttons">
+              <button
+                className="action-btn tactical pass"
+                onClick={passTurn}
+                title="Ne rien faire ce tour"
+              >
+                <span className="action-icon">⏭️</span>
+                <span>Passer</span>
+              </button>
+              <button
+                className="action-btn tactical delay"
+                onClick={delayTurn}
+                title="Jouer en fin d'initiative"
+              >
+                <span className="action-icon">⏳</span>
+                <span>Retarder</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

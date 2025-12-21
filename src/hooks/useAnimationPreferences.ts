@@ -2,63 +2,97 @@ import { useState, useEffect, useCallback } from 'react';
 
 const STORAGE_KEY = 'eternalys_auto_mode';
 
+// 3 modes d'animation
+// 'off' = animations normales, attente validation manuelle
+// 'on' = auto-validation avec animations (vitesse accélérée)
+// 'skip' = pas d'animations, résultat direct affiché au centre
+export type AnimationMode = 'off' | 'on' | 'skip';
+
 interface AnimationPreferences {
+  animationMode: AnimationMode;
+  setAnimationMode: (mode: AnimationMode) => void;
+  cycleMode: () => void;
+  // Helpers
+  isManual: boolean;      // Mode 'off' - validation manuelle
+  isAuto: boolean;        // Mode 'on' - auto avec animations
+  isSkip: boolean;        // Mode 'skip' - pas d'animations
+  // Compatibilité legacy
   autoMode: boolean;
   toggleAutoMode: () => void;
   setAutoMode: (enabled: boolean) => void;
-  // Alias pour compatibilité
   animationsEnabled: boolean;
   toggleAnimations: () => void;
   setAnimations: (enabled: boolean) => void;
 }
 
 export function useAnimationPreferences(): AnimationPreferences {
-  const [autoMode, setAutoModeState] = useState<boolean>(() => {
-    // Charger la préférence depuis localStorage
+  const [animationMode, setAnimationModeState] = useState<AnimationMode>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored !== null) {
-        return stored === 'true';
+      if (stored === 'on' || stored === 'off' || stored === 'skip') {
+        return stored as AnimationMode;
       }
+      // Migration depuis l'ancien format boolean
+      if (stored === 'true') return 'on';
     } catch {}
-    return false; // Par défaut, mode auto désactivé
+    return 'off'; // Par défaut, mode manuel
   });
 
-  // Sauvegarder dans localStorage quand la préférence change
+  // Sauvegarder dans localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, String(autoMode));
+      localStorage.setItem(STORAGE_KEY, animationMode);
     } catch {}
     
-    // Appliquer la classe au body pour désactiver les animations globalement
-    if (autoMode) {
-      document.body.classList.add('no-animations');
+    // Classes CSS
+    document.body.classList.remove('no-animations', 'auto-mode', 'skip-mode');
+    if (animationMode === 'on') {
       document.body.classList.add('auto-mode');
-    } else {
-      document.body.classList.remove('no-animations');
-      document.body.classList.remove('auto-mode');
+    } else if (animationMode === 'skip') {
+      document.body.classList.add('no-animations', 'skip-mode');
     }
-  }, [autoMode]);
+  }, [animationMode]);
 
-  const toggleAutoMode = useCallback(() => {
-    setAutoModeState(prev => !prev);
+  const setAnimationMode = useCallback((mode: AnimationMode) => {
+    setAnimationModeState(mode);
   }, []);
 
+  // Cycle entre les 3 modes: off -> on -> skip -> off
+  const cycleMode = useCallback(() => {
+    setAnimationModeState(prev => {
+      if (prev === 'off') return 'on';
+      if (prev === 'on') return 'skip';
+      return 'off';
+    });
+  }, []);
+
+  // Helpers
+  const isManual = animationMode === 'off';
+  const isAuto = animationMode === 'on';
+  const isSkip = animationMode === 'skip';
+
+  // Compatibilité legacy
+  const autoMode = animationMode !== 'off';
+  const toggleAutoMode = cycleMode;
   const setAutoMode = useCallback((enabled: boolean) => {
-    setAutoModeState(enabled);
+    setAnimationModeState(enabled ? 'on' : 'off');
   }, []);
 
-  // Alias pour compatibilité
   return {
+    animationMode,
+    setAnimationMode,
+    cycleMode,
+    isManual,
+    isAuto,
+    isSkip,
+    // Legacy
     autoMode,
     toggleAutoMode,
     setAutoMode,
-    // Compatibilité avec l'ancien nom
-    animationsEnabled: !autoMode,
-    toggleAnimations: toggleAutoMode,
-    setAnimations: (enabled: boolean) => setAutoMode(!enabled)
+    animationsEnabled: !isSkip,
+    toggleAnimations: cycleMode,
+    setAnimations: (enabled: boolean) => setAnimationModeState(enabled ? 'off' : 'skip')
   };
 }
 
 export default useAnimationPreferences;
-

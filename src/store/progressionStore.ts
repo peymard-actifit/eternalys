@@ -124,23 +124,38 @@ export function addXP(character: Character, xpGained: number): {
  * Retourne l'XP nécessaire pour passer au niveau suivant
  */
 export function getXPForNextLevel(currentLevel: number): number {
-  // Seuils XP simplifiés pour les 100 niveaux
+  // Seuils XP IDENTIQUES à gameStore.ts - progression rapide (2-4 combats par niveau)
   if (currentLevel >= 100) return Infinity;
   
-  // Niveaux 1-20: progression D&D standard
-  const baseThresholds: Record<number, number> = {
-    1: 300, 2: 600, 3: 1800, 4: 3800, 5: 7500,
-    6: 9000, 7: 11000, 8: 14000, 9: 16000, 10: 21000,
-    11: 15000, 12: 20000, 13: 20000, 14: 25000, 15: 30000,
-    16: 30000, 17: 40000, 18: 40000, 19: 50000, 20: 50000,
+  const thresholds: Record<number, number> = {
+    1: 50,     // ~2 combats (monstres CR 1-3 donnent ~25 XP)
+    2: 100,    // ~3-4 combats
+    3: 175,    // ~4 combats
+    4: 275,    // ~4-5 combats
+    5: 400,    // ~5 combats
+    6: 550,    // Progression modérée
+    7: 750,
+    8: 1000,
+    9: 1300,
+    10: 1700,  // Niveau 10 = milestone
+    11: 2200,
+    12: 2800,
+    13: 3500,
+    14: 4300,
+    15: 5200,
+    16: 6200,
+    17: 7400,
+    18: 8800,
+    19: 10500,
+    20: 12500
   };
   
-  if (currentLevel <= 20 && baseThresholds[currentLevel]) {
-    return baseThresholds[currentLevel];
+  if (currentLevel <= 20 && thresholds[currentLevel]) {
+    return thresholds[currentLevel];
   }
   
-  // Niveaux 21-100: progression étendue
-  return Math.floor(50000 * (1 + (currentLevel - 20) * 0.1));
+  // Après niveau 20: +12% par niveau
+  return Math.floor(12500 * Math.pow(1.12, currentLevel - 20));
 }
 
 /**

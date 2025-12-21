@@ -109,6 +109,11 @@
 .combat-header {
   text-align: center;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .combat-header h2 {
@@ -120,10 +125,60 @@
   animation: combatPulse 1s ease-in-out infinite;
 }
 
+/* Compteur de tours */
+.turn-counter {
+  background: rgba(155, 89, 182, 0.3);
+  border: 1px solid #9b59b6;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: #e0b0ff;
+}
 
 @keyframes combatPulse {
   0%, 100% { text-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
   50% { text-shadow: 0 0 30px rgba(231, 76, 60, 0.8); }
+}
+
+/* Boutons tactiques (Passer/Retarder) */
+.tactical-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.action-btn.tactical {
+  flex: 1;
+  background: rgba(100, 100, 100, 0.3) !important;
+  border: 1px solid rgba(150, 150, 150, 0.3) !important;
+  padding: 0.6rem !important;
+}
+
+.action-btn.tactical:hover {
+  background: rgba(100, 100, 100, 0.5) !important;
+  border-color: rgba(200, 200, 200, 0.4) !important;
+}
+
+.action-btn.tactical.pass {
+  background: rgba(46, 204, 113, 0.2) !important;
+  border-color: rgba(46, 204, 113, 0.3) !important;
+}
+
+.action-btn.tactical.pass:hover {
+  background: rgba(46, 204, 113, 0.4) !important;
+}
+
+.action-btn.tactical.delay {
+  background: rgba(241, 196, 15, 0.2) !important;
+  border-color: rgba(241, 196, 15, 0.3) !important;
+}
+
+.action-btn.tactical.delay:hover {
+  background: rgba(241, 196, 15, 0.4) !important;
 }
 
 .boss-label {
@@ -893,6 +948,102 @@
   font-size: 2rem;
   color: #e74c3c;
   text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+/* Zone centrale avec VS ou résultats */
+.versus-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  min-height: 80px;
+}
+
+/* Affichage central des jets (mode Skip) */
+.central-roll-display {
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #9b59b6;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  animation: centralFadeIn 0.3s ease;
+}
+
+.central-roll-display.attack.hit {
+  border-color: #27ae60;
+  box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+}
+
+.central-roll-display.attack.miss {
+  border-color: #e74c3c;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+}
+
+.central-roll-display.critical {
+  border-color: #f1c40f;
+  box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
+  animation: centralFadeIn 0.3s ease, criticalPulse 0.5s ease infinite alternate;
+}
+
+.central-roll-display.damage {
+  border-color: #e74c3c;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+}
+
+.central-roll-display .roll-result {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.central-roll-display .roll-details {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-top: 0.5rem;
+}
+
+@keyframes centralFadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes criticalPulse {
+  from { box-shadow: 0 0 30px rgba(241, 196, 15, 0.7); }
+  to { box-shadow: 0 0 50px rgba(241, 196, 15, 0.9), 0 0 80px rgba(255, 0, 0, 0.3); }
+}
+
+/* Boutons de mode d'animation */
+.animation-mode-buttons {
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.animation-mode-buttons .mode-btn {
+  padding: 0.4rem 0.6rem;
+  background: rgba(100, 100, 100, 0.3);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+}
+
+.animation-mode-buttons .mode-btn:hover {
+  opacity: 0.8;
+  background: rgba(100, 100, 100, 0.5);
+}
+
+.animation-mode-buttons .mode-btn.active {
+  opacity: 1;
+  background: rgba(155, 89, 182, 0.5);
+  border-color: #9b59b6;
+  box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
 }
 
 .team-section {
