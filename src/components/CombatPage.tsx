@@ -1477,19 +1477,78 @@ export function CombatPage() {
       // Récupérer TOUS les drops accumulés (ref est synchrone)
       const allDrops = [...accumulatedDropsRef.current];
       
+      // Calculer et distribuer l'XP AVANT de changer de phase
+      const totalXP = currentEnemiesList.reduce((sum, enemy) => sum + (enemy.xpReward || 0), 0);
+      const aliveTeam = cleanTeam.filter(c => c.hp > 0);
+      const xpPerCharacter = aliveTeam.length > 0 ? Math.floor(totalXP / aliveTeam.length) : 0;
+      
+      logs.push(`🌟 XP gagné: ${totalXP} (${xpPerCharacter} par personnage)`);
+      
+      // Distribuer l'XP et vérifier les level-ups
+      let hasLevelUp = false;
+      const teamWithXP = cleanTeam.map(character => {
+        if (character.hp <= 0) return character;
+        
+        const newXP = (character.xp || 0) + xpPerCharacter;
+        const newTotalXP = (character.totalXP || 0) + xpPerCharacter;
+        
+        // Vérifier le level up
+        const xpNeeded = gameStore.getXPForNextLevel(character.level);
+        if (newXP >= xpNeeded && character.level < 100) {
+          // Level up !
+          hasLevelUp = true;
+          const newLevel = character.level + 1;
+          const newMaxHP = gameStore.calculateMaxHP(character.class, newLevel, character.abilities.constitution);
+          const hpGain = newMaxHP - character.maxHp;
+          
+          logs.push(`🎉 ${character.name} passe niveau ${newLevel} !`);
+          
+          return {
+            ...character,
+            level: newLevel,
+            xp: newXP - xpNeeded,
+            totalXP: newTotalXP,
+            maxHp: newMaxHP,
+            hp: Math.min(character.hp + hpGain, newMaxHP),
+            proficiencyBonus: gameStore.getProficiencyBonus(newLevel),
+            pendingTalentChoice: [5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100].includes(newLevel)
+          };
+        }
+        
+        return {
+          ...character,
+          xp: newXP,
+          totalXP: newTotalXP
+        };
+      });
+      
       // S'il y a des drops à distribuer, afficher le modal
       if (allDrops.length > 0) {
         setPendingDrops({ drops: allDrops });
-        gameStore.setState({ combatLog: [...logs, 'Victoire ! Récupération du butin...'], team: cleanTeam });
+        gameStore.setState({ combatLog: logs, team: teamWithXP });
       } else {
-        // Pas de drops, terminer le combat directement
-        if (isBossFight) {
+        // Pas de drops, vérifier si level-up avec choix de talent
+        const needsTalentChoice = teamWithXP.some(c => c.pendingTalentChoice);
+        
+        if (needsTalentChoice) {
+          gameStore.setState({ 
+            phase: 'level_up', 
+            combatLog: logs,
+            currentEnemies: [],
+            currentEnemy: undefined,
+            team: teamWithXP
+          });
+        } else if (isBossFight) {
+          // Après un boss, passer au niveau de donjon suivant
+          const newDungeonLevel = Math.min(50, state.dungeonLevel + 1);
           gameStore.setState({ 
             phase: 'summary', 
             combatLog: [...logs, 'VICTOIRE ! Le boss est vaincu !'],
             currentEnemies: [],
             currentEnemy: undefined,
-            team: cleanTeam
+            team: teamWithXP,
+            dungeonLevel: newDungeonLevel,
+            roomsExploredThisLevel: 0
           });
         } else {
           gameStore.setState({ 
@@ -1497,7 +1556,7 @@ export function CombatPage() {
             combatLog: [...logs, 'Victoire ! Tous les ennemis sont vaincus !'],
             currentEnemies: [],
             currentEnemy: undefined,
-            team: cleanTeam
+            team: teamWithXP
           });
         }
       }
@@ -1776,15 +1835,15 @@ export function CombatPage() {
     // === CALCUL DES DÉGÂTS D&D ===
     const isCritical = attackResult.isCriticalHit;
     
-    // Bonus de dégâts basé sur les caractéristiques D&D (FOR ou DEX)
-    const strMod = Math.floor((attacker.abilities?.strength || 10) - 10) / 2;
-    const dexMod = Math.floor((attacker.abilities?.dexterity || 10) - 10) / 2;
-    const damageBonus = Math.max(strMod, dexMod);
-    
-    // Jet de dégâts avec les dés (baseDamage pour déterminer le type de dé)
-    const baseDamage = 5 + Math.floor(attacker.level / 2); // Dégâts évoluent avec le niveau
-    const damageResult = rollDamage(baseDamage, 'physical', isCritical, damageBonus);
+    // Jet de dégâts D&D : utilise FOR ou DEX + niveau pour bonus
+    // skill = null pour une attaque de base
+    const damageResult = rollDamage(attacker, null, isCritical, false);
     let damage = damageResult.totalDamage;
+    
+    // Bonus pour le message de log
+    const strMod = Math.floor(((attacker.abilities?.strength || 10) - 10) / 2);
+    const dexMod = Math.floor(((attacker.abilities?.dexterity || 10) - 10) / 2);
+    const damageBonus = Math.max(strMod, dexMod);
     
     if (isCritical) {
       logs.push(`💥 COUP CRITIQUE ! ${attacker.name} frappe avec puissance !`);
@@ -2021,9 +2080,22 @@ export function CombatPage() {
           
           logs.push(`✨ ${t.name} gagne ${tempHpAmount} PV temporaires (🎲 ${tempHpRoll.rolls[0]}+4) !`);
         } else {
-          // Soin normal
-          const healAmount = Math.min(Math.abs(skill.damage), t.maxHp - t.hp);
-          t.hp = Math.min(t.maxHp, t.hp + Math.abs(skill.damage));
+          // Soin normal avec dés D&D
+          let healValue: number;
+          if (skill.damageDice) {
+            // Utiliser les dés de soin D&D (ex: 1d8, 1d4+4)
+            const healRoll = rollDice(skill.damageDice.includes('d') ? skill.damageDice.split('d')[1].split('+')[0] as any : 'd8', 
+              parseInt(skill.damageDice.split('d')[0]) || 1,
+              parseInt(skill.damageDice.split('+')[1]) || 0);
+            // Ajouter le modificateur de Sagesse pour les soins
+            const wisMod = Math.floor(((attacker.abilities?.wisdom || 10) - 10) / 2);
+            healValue = healRoll.total + Math.max(0, wisMod);
+            logs.push(`🎲 Soins: ${healRoll.rolls.join('+')}${healRoll.modifier !== 0 ? (healRoll.modifier > 0 ? '+' : '') + healRoll.modifier : ''}${wisMod > 0 ? '+' + wisMod + '(SAG)' : ''} = ${healValue}`);
+          } else {
+            healValue = Math.abs(skill.damage || 0);
+          }
+          const healAmount = Math.min(healValue, t.maxHp - t.hp);
+          t.hp = Math.min(t.maxHp, t.hp + healValue);
           totalHealing += healAmount;
         }
         
@@ -2050,7 +2122,8 @@ export function CombatPage() {
         if (isTempHpSkill) {
           logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe !`);
         } else {
-          logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe ! (+${Math.abs(skill.damage)} PV chacun)`);
+          const avgHeal = targetIndices.length > 0 ? Math.floor(totalHealing / targetIndices.length) : 0;
+          logs.push(`${attacker.name} utilise ${skill.name} sur toute l'équipe ! (+${avgHeal} PV chacun)`);
         }
         if (skill.healOverTime) {
           logs.push(`Toute l'équipe régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
@@ -2058,7 +2131,7 @@ export function CombatPage() {
       } else if (targetIndices.length === 1) {
         const t = updatedTeam[targetIndices[0]];
         if (!isTempHpSkill) {
-          logs.push(`${attacker.name} utilise ${skill.name} sur ${t.name} ! (+${Math.abs(skill.damage)} PV)`);
+          logs.push(`${attacker.name} utilise ${skill.name} sur ${t.name} ! (+${totalHealing} PV)`);
         }
         if (skill.healOverTime) {
           logs.push(`${t.name} régénère ${skill.healOverTime.value} PV/tour pendant ${skill.healOverTime.turns} tours`);
@@ -2194,10 +2267,12 @@ export function CombatPage() {
         effect: skill.buffStats ? `+${skill.buffStats.value} ${skill.buffStats.stat} (${skill.buffStats.turns}t)` : skill.damageReflect ? `Renvoi ${skill.damageReflect}%` : '',
         isPlayerAction: true
       });
-    } else if ((skill.type === 'debuff' || skill.type === 'attack' || skill.type === 'damage') && target && 'isBoss' in target) {
-      let damage = skill.damage;
+    } else if ((skill.type === 'debuff' || skill.type === 'attack' || skill.type === 'damage') && target && 'challengeRating' in target) {
+      // Calculer les dégâts avec le système D&D (damageDice ou damage de base)
+      let damage = skill.damage || 0;
+      const hasDamageDice = !!skill.damageDice;
       
-      if (damage > 0) {
+      if (damage > 0 || hasDamageDice) {
         // Déterminer si la compétence nécessite un jet de touche
         // Pas de jet pour: effets de zone, jets de sauvegarde, ou explicitement désactivé (requiresAttackRoll: false)
         const needsAttackRoll = skill.requiresAttackRoll === true && 
@@ -2303,8 +2378,18 @@ export function CombatPage() {
           isCritical = critCheck.isCritical;
         }
         
-        // TOUCHÉ ! Calcul des dégâts
-        const actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
+        // TOUCHÉ ! Calcul des dégâts D&D
+        let actualDamage: number;
+        if (hasDamageDice) {
+          // Utiliser les dés de dégâts D&D (ex: 1d8, 2d6+3)
+          const isSpell = skill.isSpellAttack || skill.damageType === 'magical';
+          const damageResult = rollDamage(attacker, skill, isCritical, isSpell);
+          actualDamage = damageResult.totalDamage;
+          logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${actualDamage}`);
+        } else {
+          // Dégâts fixes
+          actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
+        }
         
         target.hp = Math.max(0, target.hp - actualDamage);
         trackDamageDealt(attacker.id, actualDamage);

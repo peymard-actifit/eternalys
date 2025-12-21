@@ -128,16 +128,21 @@ function localConvertMonsterToEternalysScale(
     newCR = localConvertDnDCRToEternalys(monster.challengeRating);
   }
   
-  // Appliquer le cap CR Eternalys pour les monstres normaux (Changement 3)
-  // Les Boss ne sont PAS capés - ils gardent leur puissance maximale
-  if (!isBoss && !monster.isBoss) {
+  // Appliquer le cap CR Eternalys (Changement 3)
+  // Les boss ont un cap plus élevé mais sont toujours limités aux niveaux bas
+  const isBossMonsterFlag = isBoss || monster.isBoss || false;
+  if (isBossMonsterFlag) {
+    // Boss : cap plus généreux mais toujours présent
+    const bossCRCap = getBossCRCapForDungeonLevel(dungeonLevel);
+    newCR = Math.min(newCR, bossCRCap);
+  } else {
+    // Monstres normaux : cap strict
     const crCap = getCRCapForDungeonLevel(dungeonLevel);
     newCR = Math.min(newCR, crCap);
   }
   
   // Calculer les stats avec la formule par paliers (Changement 2)
-  const isBossMonster = isBoss || monster.isBoss || false;
-  const scaledStats = localGetMonsterStatsForCR(newCR, isBossMonster);
+  const scaledStats = localGetMonsterStatsForCR(newCR, isBossMonsterFlag);
   
   const originalCR = monster.challengeRating;
   const scalingRatio = newCR / Math.max(1, originalCR);
@@ -147,7 +152,7 @@ function localConvertMonsterToEternalysScale(
   const baseHP = scaledStats.hp;
   
   // Bonus HP basé sur Constitution et CR
-  const hpBonus = isBossMonster 
+  const hpBonus = isBossMonsterFlag 
     ? conMod * Math.floor(newCR / 1.5)  // Boss : bonus CON plus important
     : conMod * Math.floor(newCR / 3);    // Normal : bonus CON modéré
   const finalHP = Math.max(1, baseHP + hpBonus);
@@ -7556,14 +7561,38 @@ export function getRandomMonsterByCR(cr: number, dungeonLevel: number = 50): Mon
 // =============================================================================
 
 // Cap CR Eternalys par niveau de donjon (Changement 3)
+// Monstres normaux : progression lente pour éviter les combats trop difficiles
 const CR_ETERNALYS_CAP: Record<number, number> = {
   2: 3, 5: 5, 8: 8, 12: 12, 18: 20, 25: 32, 32: 48, 40: 64, 45: 82, 50: 100
+};
+
+// Cap CR pour les BOSS : plus élevé que les monstres normaux mais toujours limité
+// Les boss restent un défi significatif mais pas impossible
+const BOSS_CR_ETERNALYS_CAP: Record<number, number> = {
+  2: 8,    // Donjon 1-2 : Boss CR 8 max (combats épiques mais possibles)
+  5: 15,   // Donjon 3-5 : Boss CR 15 max
+  8: 20,   // Donjon 6-8 : Boss CR 20 max
+  12: 28,  // Donjon 9-12 : Boss CR 28 max
+  18: 40,  // Donjon 13-18 : Boss CR 40 max
+  25: 55,  // Donjon 19-25 : Boss CR 55 max
+  32: 70,  // Donjon 26-32 : Boss CR 70 max
+  40: 85,  // Donjon 33-40 : Boss CR 85 max
+  45: 95,  // Donjon 41-45 : Boss CR 95 max
+  50: 100  // Donjon 46-50 : Boss légendaires (Tiamat, etc.)
 };
 
 function getCRCapForDungeonLevel(dungeonLevel: number): number {
   const levels = Object.keys(CR_ETERNALYS_CAP).map(Number).sort((a, b) => a - b);
   for (const level of levels) {
     if (dungeonLevel <= level) return CR_ETERNALYS_CAP[level];
+  }
+  return 100; // Pas de cap après niveau 50
+}
+
+function getBossCRCapForDungeonLevel(dungeonLevel: number): number {
+  const levels = Object.keys(BOSS_CR_ETERNALYS_CAP).map(Number).sort((a, b) => a - b);
+  for (const level of levels) {
+    if (dungeonLevel <= level) return BOSS_CR_ETERNALYS_CAP[level];
   }
   return 100; // Pas de cap après niveau 50
 }

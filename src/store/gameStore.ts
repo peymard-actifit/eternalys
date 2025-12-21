@@ -2,6 +2,7 @@ import { Character, Monster, GameEvent, Room, GameState, HistoryEntry, TreasureL
 import { getRandomMonster, getRandomBoss, getMonsterById, resetLegendaryActions } from '../data/monsters';
 import { getRandomEvent } from '../data/events';
 import { getRandomTreasure, Treasure, allTreasures } from '../data/treasures';
+import { calculateEquipmentBonuses } from '../data/equipment';
 
 // Calculer le modificateur D&D à partir d'une caractéristique
 const getModifier = (score: number): number => Math.floor((score - 10) / 2);
@@ -618,30 +619,22 @@ export const gameStore = {
     // Bonus de maîtrise basé sur le niveau
     const proficiencyBonus = getProficiencyBonus(character.level || 1);
     
-    // Calcul de la CA (10 + DEX + armure)
-    let baseAC = 10;
-    let acBonus = 0;
+    // Récupérer les bonus d'équipement
+    const equipBonuses = character.equipment 
+      ? calculateEquipmentBonuses(character.equipment)
+      : { strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0, armorClass: 0, speed: 0, maxHp: 0 };
     
-    // Appliquer les buffs à la CA
-    if (character.buffs) {
-      character.buffs.forEach(buff => {
-        if (buff.type === 'ac') acBonus += buff.value;
-      });
-    }
+    // Appliquer les buffs aux caractéristiques D&D + bonus d'équipement
+    let updatedAbilities = { 
+      strength: abilities.strength + equipBonuses.strength,
+      dexterity: abilities.dexterity + equipBonuses.dexterity,
+      constitution: abilities.constitution + equipBonuses.constitution,
+      intelligence: abilities.intelligence + equipBonuses.intelligence,
+      wisdom: abilities.wisdom + equipBonuses.wisdom,
+      charisma: abilities.charisma + equipBonuses.charisma
+    };
     
-    const armorClass = baseAC + getAbilityModifier(abilities.dexterity) + acBonus;
-    
-    // Calcul de la vitesse
-    let speedBonus = 0;
-    if (character.buffs) {
-      character.buffs.forEach(buff => {
-        if (buff.type === 'speed') speedBonus += buff.value;
-      });
-    }
-    const speed = Math.max(1, (character.speed || 30) + speedBonus);
-    
-    // Appliquer les buffs aux caractéristiques
-    let updatedAbilities = { ...abilities };
+    // Appliquer les buffs temporaires
     if (character.buffs) {
       character.buffs.forEach(buff => {
         if (buff.type === 'ability' && buff.abilityAffected) {
@@ -650,13 +643,38 @@ export const gameStore = {
       });
     }
     
+    // Calcul de la CA (10 + DEX + armure + buffs)
+    let baseAC = 10;
+    let acBonus = equipBonuses.armorClass;
+    
+    if (character.buffs) {
+      character.buffs.forEach(buff => {
+        if (buff.type === 'ac') acBonus += buff.value;
+      });
+    }
+    
+    const armorClass = baseAC + getAbilityModifier(updatedAbilities.dexterity) + acBonus;
+    
+    // Calcul de la vitesse
+    let speedBonus = equipBonuses.speed;
+    if (character.buffs) {
+      character.buffs.forEach(buff => {
+        if (buff.type === 'speed') speedBonus += buff.value;
+      });
+    }
+    const speed = Math.max(1, (character.speed || 30) + speedBonus);
+    
+    // Bonus de PV max de l'équipement
+    const maxHpBonus = equipBonuses.maxHp;
+    
     return {
       ...character,
       abilities: updatedAbilities,
       armorClass,
       speed,
       proficiencyBonus,
-      initiative: getAbilityModifier(updatedAbilities.dexterity)
+      initiative: getAbilityModifier(updatedAbilities.dexterity),
+      maxHp: (character.maxHp || 10) + maxHpBonus
     };
   },
   

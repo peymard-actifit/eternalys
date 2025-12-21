@@ -1,281 +1,334 @@
 import { GameEvent } from '../types/game.types';
 
+// =============================================================================
+// ÉVÉNEMENTS ÉQUILIBRÉS D&D 5e - v2.30
+// =============================================================================
+// Valeurs calibrées pour être significatives mais pas écrasantes :
+// - Soins : 5-15 PV (niveau bas), correspond à des sorts de niveau 1
+// - Buffs caractéristiques : +1 à +2 (comme D&D 5e, très significatif)
+// - Buffs CA : +1 à +2 (très puissant en D&D)
+// - Dégâts : 3-12 PV (pièges dangereux mais survivables)
+// =============================================================================
+
 export const POSITIVE_EVENTS: GameEvent[] = [
-  // Soins
+  // === SOINS ===
   {
     id: 'healing_spring',
     name: 'Source de guérison',
     description: 'Vous découvrez une source magique aux eaux cristallines. Toute l\'équipe récupère des points de vie !',
     type: 'positive',
-    effect: { type: 'heal', value: 30, target: 'all' }
+    effect: { type: 'heal', value: 8, target: 'all' }
   },
   {
     id: 'wandering_healer',
     name: 'Guérisseur errant',
     description: 'Un mystérieux guérisseur apparaît et soigne le membre le plus faible de votre équipe.',
     type: 'positive',
-    effect: { type: 'heal', value: 50, target: 'weakest' }
+    effect: { type: 'heal', value: 12, target: 'weakest' }
   },
   {
     id: 'sacred_altar',
     name: 'Autel sacré',
     description: 'Vous priez devant un autel ancien. Une lumière divine restaure vos forces.',
     type: 'positive',
-    effect: { type: 'heal', value: 40, target: 'all' }
+    effect: { type: 'heal', value: 10, target: 'all' }
   },
   {
     id: 'oasis_cachee',
     name: 'Oasis cachée',
     description: 'Une oasis secrète offre repos et réconfort à vos héros fatigués.',
     type: 'positive',
-    effect: { type: 'heal', value: 35, target: 'all' }
+    effect: { type: 'heal', value: 6, target: 'all' }
   },
   {
     id: 'esprit_guerisseur',
     name: 'Esprit guérisseur',
     description: 'Un esprit bienveillant soigne vos blessures les plus graves.',
     type: 'positive',
-    effect: { type: 'heal', value: 60, target: 'weakest' }
+    effect: { type: 'heal', value: 15, target: 'weakest' }
   },
   
-  // Buffs Attaque Physique
+  // === BUFFS FORCE (Attaque physique) ===
   {
     id: 'ancient_blessing',
     name: 'Bénédiction ancienne',
-    description: 'Un esprit bienveillant bénit votre équipe. L\'attaque physique de tous les membres augmente !',
+    description: 'Un esprit bienveillant bénit votre équipe. La Force de tous augmente de +1 !',
     type: 'positive',
-    effect: { type: 'buff_strength', value: 5, target: 'all' }
+    effect: { type: 'buff_strength', value: 1, target: 'all' }
   },
   {
     id: 'hero_spirit',
     name: 'Esprit du héros',
-    description: 'L\'esprit d\'un ancien héros vous transmet sa force. Le plus fort devient encore plus puissant !',
+    description: 'L\'esprit d\'un ancien héros vous transmet sa force. Le plus fort gagne +2 Force !',
     type: 'positive',
-    effect: { type: 'buff_strength', value: 12, target: 'strongest' }
+    effect: { type: 'buff_strength', value: 2, target: 'strongest' }
   },
   {
     id: 'forge_divine',
     name: 'Forge divine',
-    description: 'Vous découvrez une forge ancienne qui renforce vos armes.',
+    description: 'Vous découvrez une forge ancienne qui renforce vos muscles.',
     type: 'positive',
-    effect: { type: 'buff_strength', value: 4, target: 'all' }
+    effect: { type: 'buff_strength', value: 1, target: 'all' }
   },
   {
     id: 'rage_bataille',
     name: 'Rage de bataille',
-    description: 'Une fureur ancestrale s\'empare de vos guerriers !',
+    description: 'Une fureur ancestrale s\'empare d\'un de vos guerriers ! +2 Force !',
     type: 'positive',
-    effect: { type: 'buff_strength', value: 8, target: 'random' }
+    effect: { type: 'buff_strength', value: 2, target: 'random' }
   },
   
-  // Buffs Attaque Magique
+  // === BUFFS INTELLIGENCE (Attaque magique) ===
   {
     id: 'arcane_knowledge',
     name: 'Savoir arcanique',
-    description: 'Vous découvrez d\'anciens grimoires qui renforcent les pouvoirs magiques de toute l\'équipe !',
+    description: 'Vous découvrez d\'anciens grimoires. L\'Intelligence de tous augmente de +1 !',
     type: 'positive',
-    effect: { type: 'buff_intelligence', value: 5, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 1, target: 'all' }
   },
   {
     id: 'mana_crystal',
     name: 'Cristal de mana',
-    description: 'Un cristal brillant infuse votre équipe d\'énergie arcanique. La puissance magique augmente !',
+    description: 'Un cristal brillant infuse votre équipe d\'énergie arcanique. +1 Intelligence !',
     type: 'positive',
-    effect: { type: 'buff_intelligence', value: 8, target: 'all' }
+    effect: { type: 'buff_intelligence', value: 1, target: 'all' }
   },
   {
     id: 'archmage_blessing',
     name: 'Bénédiction de l\'archimage',
-    description: 'Le fantôme d\'un archimage vous bénit. Un membre aléatoire gagne en puissance magique !',
+    description: 'Le fantôme d\'un archimage vous bénit. Un membre gagne +2 Intelligence !',
     type: 'positive',
-    effect: { type: 'buff_intelligence', value: 10, target: 'random' }
+    effect: { type: 'buff_intelligence', value: 2, target: 'random' }
   },
   {
     id: 'elemental_surge',
     name: 'Surge élémentaire',
-    description: 'Les éléments se déchaînent en votre faveur. La magie de votre équipe s\'intensifie !',
+    description: 'Les éléments se déchaînent en votre faveur. +1 Intelligence pour tous !',
     type: 'positive',
-    effect: { type: 'buff_intelligence', value: 6, target: 'all' }
-  },
-  {
-    id: 'fontaine_arcane',
-    name: 'Fontaine arcanique',
-    description: 'Une fontaine de mana pure renforce les pouvoirs de vos mages.',
-    type: 'positive',
-    effect: { type: 'buff_intelligence', value: 7, target: 'all' }
-  },
-  {
-    id: 'resonance_mystique',
-    name: 'Résonance mystique',
-    description: 'Les énergies du donjon amplifient vos sorts !',
-    type: 'positive',
-    effect: { type: 'buff_intelligence', value: 12, target: 'strongest' }
+    effect: { type: 'buff_intelligence', value: 1, target: 'all' }
   },
   
-  // Buffs Défense
+  // === BUFFS SAGESSE ===
+  {
+    id: 'meditation_profonde',
+    name: 'Méditation profonde',
+    description: 'Un lieu de sérénité vous permet de méditer. +1 Sagesse pour tous !',
+    type: 'positive',
+    effect: { type: 'buff_wisdom', value: 1, target: 'all' }
+  },
+  {
+    id: 'vision_divine',
+    name: 'Vision divine',
+    description: 'Une vision mystique éclaire votre esprit. +2 Sagesse !',
+    type: 'positive',
+    effect: { type: 'buff_wisdom', value: 2, target: 'random' }
+  },
+  
+  // === BUFFS CONSTITUTION ===
+  {
+    id: 'vitalite_ancienne',
+    name: 'Vitalité ancienne',
+    description: 'Une énergie vitale ancestrale renforce votre corps. +1 Constitution !',
+    type: 'positive',
+    effect: { type: 'buff_constitution', value: 1, target: 'all' }
+  },
+  {
+    id: 'endurance_heroique',
+    name: 'Endurance héroïque',
+    description: 'Le membre le plus faible reçoit une bénédiction de vigueur. +2 Constitution !',
+    type: 'positive',
+    effect: { type: 'buff_constitution', value: 2, target: 'weakest' }
+  },
+  
+  // === BUFFS DEXTÉRITÉ ===
+  {
+    id: 'grace_elfique',
+    name: 'Grâce elfique',
+    description: 'Un enchantement ancien améliore vos réflexes. +1 Dextérité !',
+    type: 'positive',
+    effect: { type: 'buff_dexterity', value: 1, target: 'all' }
+  },
+  {
+    id: 'agilite_feline',
+    name: 'Agilité féline',
+    description: 'Vous vous sentez léger comme une plume. +2 Dextérité !',
+    type: 'positive',
+    effect: { type: 'buff_dexterity', value: 2, target: 'random' }
+  },
+  
+  // === BUFFS CLASSE D'ARMURE ===
   {
     id: 'guardian_spirit',
     name: 'Esprit gardien',
-    description: 'Un esprit protecteur renforce vos défenses. Vous vous sentez plus résistants.',
+    description: 'Un esprit protecteur renforce vos défenses. +1 CA pour tous !',
     type: 'positive',
-    effect: { type: 'buff_armorClass', value: 5, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 1, target: 'all' }
   },
   {
     id: 'fairy_dust',
     name: 'Poussière de fée',
-    description: 'Des fées bienveillantes répandent leur poussière magique sur votre équipe.',
+    description: 'Des fées répandent leur poussière magique. +2 CA pour tous !',
     type: 'positive',
-    effect: { type: 'buff_armorClass', value: 8, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 2, target: 'all' }
   },
   {
     id: 'benediction_acier',
     name: 'Bénédiction d\'acier',
-    description: 'Vos armures brillent d\'une lueur protectrice.',
+    description: 'Vos armures brillent d\'une lueur protectrice. +1 CA !',
     type: 'positive',
-    effect: { type: 'buff_armorClass', value: 6, target: 'all' }
+    effect: { type: 'buff_armorClass', value: 1, target: 'all' }
   },
   {
     id: 'protection_ancestrale',
     name: 'Protection ancestrale',
-    description: 'Les esprits de vos ancêtres veillent sur vous.',
+    description: 'Les esprits de vos ancêtres veillent sur le plus vulnérable. +2 CA !',
     type: 'positive',
-    effect: { type: 'buff_armorClass', value: 10, target: 'weakest' }
+    effect: { type: 'buff_armorClass', value: 2, target: 'weakest' }
   }
 ];
 
 export const NEGATIVE_EVENTS: GameEvent[] = [
-  // Dégâts
+  // === DÉGÂTS ===
   {
     id: 'poison_trap',
     name: 'Piège empoisonné',
-    description: 'Vous déclenchez un piège ! Du gaz toxique envahit la salle et blesse toute l\'équipe.',
+    description: 'Vous déclenchez un piège ! Du gaz toxique blesse légèrement toute l\'équipe.',
     type: 'negative',
-    effect: { type: 'damage', value: 15, target: 'all' }
+    effect: { type: 'damage', value: 4, target: 'all' }
   },
   {
     id: 'dark_magic',
     name: 'Magie noire',
-    description: 'Des runes sombres s\'activent soudainement et blessent un membre au hasard.',
+    description: 'Des runes sombres s\'activent et blessent un membre au hasard.',
     type: 'negative',
-    effect: { type: 'damage', value: 25, target: 'random' }
+    effect: { type: 'damage', value: 8, target: 'random' }
   },
   {
     id: 'shadow_attack',
     name: 'Attaque de l\'ombre',
-    description: 'Une ombre surgit des ténèbres et frappe le membre le plus fort de votre équipe !',
+    description: 'Une ombre surgit et frappe le membre le plus fort !',
     type: 'negative',
-    effect: { type: 'damage', value: 30, target: 'strongest' }
+    effect: { type: 'damage', value: 10, target: 'strongest' }
   },
   {
     id: 'falling_rocks',
     name: 'Éboulement',
-    description: 'Le plafond s\'effondre partiellement ! Des rochers tombent sur votre équipe.',
+    description: 'Le plafond s\'effondre partiellement ! Des rochers tombent.',
     type: 'negative',
-    effect: { type: 'damage', value: 20, target: 'all' }
+    effect: { type: 'damage', value: 6, target: 'all' }
   },
   {
     id: 'phantom_strike',
     name: 'Frappe spectrale',
-    description: 'Un fantôme traverse la pièce et attaque le membre le plus faible.',
+    description: 'Un fantôme attaque le membre le plus faible.',
     type: 'negative',
-    effect: { type: 'damage', value: 35, target: 'weakest' }
+    effect: { type: 'damage', value: 12, target: 'weakest' }
   },
   {
     id: 'explosion_arcane',
     name: 'Explosion arcanique',
-    description: 'Une gemme instable explose et blesse tout le monde !',
+    description: 'Une gemme instable explose !',
     type: 'negative',
-    effect: { type: 'damage', value: 18, target: 'all' }
+    effect: { type: 'damage', value: 5, target: 'all' }
   },
   {
     id: 'fleches_poison',
     name: 'Flèches empoisonnées',
-    description: 'Des flèches surgissent des murs et touchent un membre de votre groupe.',
+    description: 'Des flèches surgissent des murs.',
     type: 'negative',
-    effect: { type: 'damage', value: 28, target: 'random' }
+    effect: { type: 'damage', value: 7, target: 'random' }
   },
   
-  // Debuffs Attaque Physique
+  // === DEBUFFS FORCE ===
   {
     id: 'cursed_room',
     name: 'Salle maudite',
-    description: 'Une malédiction pèse sur cette salle. L\'attaque de tous les membres diminue.',
+    description: 'Une malédiction affaiblit votre Force. -1 Force pour tous.',
     type: 'negative',
-    effect: { type: 'debuff_strength', value: 3, target: 'all' }
+    effect: { type: 'debuff_strength', value: 1, target: 'all' }
   },
   {
     id: 'cursed_artifact',
     name: 'Artefact maudit',
-    description: 'Vous touchez un artefact maudit. Votre force s\'affaiblit temporairement.',
+    description: 'Vous touchez un artefact maudit. -2 Force pour tous.',
     type: 'negative',
-    effect: { type: 'debuff_strength', value: 5, target: 'all' }
+    effect: { type: 'debuff_strength', value: 2, target: 'all' }
   },
   {
     id: 'fatigue_combat',
     name: 'Fatigue de combat',
-    description: 'L\'épuisement vous gagne et affaiblit vos coups.',
+    description: 'L\'épuisement vous gagne. -1 Force.',
     type: 'negative',
-    effect: { type: 'debuff_strength', value: 4, target: 'all' }
+    effect: { type: 'debuff_strength', value: 1, target: 'all' }
   },
   
-  // Debuffs Attaque Magique
+  // === DEBUFFS INTELLIGENCE ===
   {
     id: 'mana_drain',
     name: 'Drainage de mana',
-    description: 'Un sortilège ancien aspire l\'énergie magique de votre équipe. Dégâts magiques réduits !',
+    description: 'Un sortilège aspire votre énergie magique. -1 Intelligence.',
     type: 'negative',
-    effect: { type: 'debuff_intelligence', value: 4, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 1, target: 'all' }
   },
   {
     id: 'antimagic_field',
     name: 'Champ antimagie',
-    description: 'Un champ antimagie supprime une partie de vos pouvoirs arcaniques. Magie affaiblie !',
+    description: 'Un champ supprime une partie de vos pouvoirs. -2 Intelligence.',
     type: 'negative',
-    effect: { type: 'debuff_intelligence', value: 6, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 2, target: 'all' }
   },
   {
     id: 'void_touch',
     name: 'Toucher du vide',
-    description: 'Une entité du vide effleure votre mage le plus puissant. Sa magie s\'en trouve diminuée.',
+    description: 'Une entité du vide touche votre mage le plus puissant. -2 Intelligence.',
     type: 'negative',
-    effect: { type: 'debuff_intelligence', value: 8, target: 'strongest' }
+    effect: { type: 'debuff_intelligence', value: 2, target: 'strongest' }
   },
   {
     id: 'silence_magique',
     name: 'Silence magique',
-    description: 'Une aura de silence étouffe partiellement vos pouvoirs.',
+    description: 'Une aura de silence étouffe vos pouvoirs. -1 Intelligence.',
     type: 'negative',
-    effect: { type: 'debuff_intelligence', value: 5, target: 'all' }
-  },
-  {
-    id: 'parasites_mana',
-    name: 'Parasites de mana',
-    description: 'De petites créatures invisibles se nourrissent de votre mana.',
-    type: 'negative',
-    effect: { type: 'debuff_intelligence', value: 3, target: 'all' }
+    effect: { type: 'debuff_intelligence', value: 1, target: 'all' }
   },
   
-  // Debuffs Défense
+  // === DEBUFFS SAGESSE ===
+  {
+    id: 'confusion_mentale',
+    name: 'Confusion mentale',
+    description: 'Un brouillard mental obscurcit vos pensées. -1 Sagesse.',
+    type: 'negative',
+    effect: { type: 'debuff_wisdom', value: 1, target: 'all' }
+  },
+  {
+    id: 'cauchemar_eveille',
+    name: 'Cauchemar éveillé',
+    description: 'Des visions horrifiques troublent votre esprit. -2 Sagesse.',
+    type: 'negative',
+    effect: { type: 'debuff_wisdom', value: 2, target: 'random' }
+  },
+  
+  // === DEBUFFS CLASSE D'ARMURE ===
   {
     id: 'weakening_aura',
     name: 'Aura d\'affaiblissement',
-    description: 'Une aura maléfique émane des murs. La défense de votre équipe diminue.',
+    description: 'Une aura maléfique fragilise vos défenses. -1 CA.',
     type: 'negative',
-    effect: { type: 'debuff_armorClass', value: 3, target: 'all' }
+    effect: { type: 'debuff_armorClass', value: 1, target: 'all' }
   },
   {
     id: 'corrosion_armure',
     name: 'Corrosion d\'armure',
-    description: 'Un acide ronge vos équipements protecteurs.',
+    description: 'Un acide ronge vos équipements. -2 CA.',
     type: 'negative',
-    effect: { type: 'debuff_armorClass', value: 4, target: 'all' }
+    effect: { type: 'debuff_armorClass', value: 2, target: 'all' }
   },
   {
     id: 'malefice_fragilite',
     name: 'Maléfice de fragilité',
-    description: 'Un sortilège vous rend vulnérables aux attaques.',
+    description: 'Un sortilège vous rend vulnérable. -2 CA.',
     type: 'negative',
-    effect: { type: 'debuff_armorClass', value: 6, target: 'random' }
+    effect: { type: 'debuff_armorClass', value: 2, target: 'random' }
   }
 ];
 
