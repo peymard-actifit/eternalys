@@ -40,12 +40,13 @@ export function EventModal() {
           <span className={`effect-value ${isPositive ? 'positive' : 'negative'}`}>
             {currentEvent.effect.type === 'heal' && `+${currentEvent.effect.value} PV`}
             {currentEvent.effect.type === 'damage' && `-${currentEvent.effect.value} PV`}
-            {currentEvent.effect.type === 'buff_attack' && `+${currentEvent.effect.value} ⚔️ Attaque`}
-            {currentEvent.effect.type === 'buff_magic_attack' && `+${currentEvent.effect.value} ✨ Attaque Magique`}
-            {currentEvent.effect.type === 'buff_defense' && `+${currentEvent.effect.value} 🛡️ Défense`}
-            {currentEvent.effect.type === 'debuff_attack' && `-${currentEvent.effect.value} ⚔️ Attaque`}
-            {currentEvent.effect.type === 'debuff_magic_attack' && `-${currentEvent.effect.value} ✨ Attaque Magique`}
-            {currentEvent.effect.type === 'debuff_defense' && `-${currentEvent.effect.value} 🛡️ Défense`}
+            {currentEvent.effect.type === 'buff_strength' && `+${currentEvent.effect.value} 💪 Force`}
+            {currentEvent.effect.type === 'buff_dexterity' && `+${currentEvent.effect.value} 🏃 Dextérité`}
+            {currentEvent.effect.type === 'buff_constitution' && `+${currentEvent.effect.value} ❤️ Constitution`}
+            {currentEvent.effect.type === 'debuff_strength' && `-${currentEvent.effect.value} 💪 Force`}
+            {currentEvent.effect.type === 'debuff_dexterity' && `-${currentEvent.effect.value} 🏃 Dextérité`}
+            {currentEvent.effect.type === 'debuff_constitution' && `-${currentEvent.effect.value} ❤️ Constitution`}
+            {currentEvent.effect.type === 'xp_bonus' && `+${currentEvent.effect.value} ✨ XP`}
           </span>
           <span className="effect-target">
             ({currentEvent.effect.target === 'all' ? 'Toute l\'équipe' :

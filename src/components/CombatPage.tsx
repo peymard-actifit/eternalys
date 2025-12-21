@@ -2777,8 +2777,8 @@ export function CombatPage() {
                     
                     <h3 className="enemy-name">{enemy.name}</h3>
                     {enemy.isBoss && <span className="boss-badge">👑 BOSS</span>}
-                    {enemy.monsterType && (
-                      <span className="monster-type">{enemy.monsterType}</span>
+                    {enemy.creatureType && (
+                      <span className="monster-type">{enemy.creatureType}</span>
                     )}
                     {renderMonsterBuffs(enemy)}
                     <div className="enemy-hp-bar">

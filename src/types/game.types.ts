@@ -468,7 +468,7 @@ export interface MonsterSkill {
   // === EFFETS ===
   effect?: {
     type: 'damage' | 'heal' | 'buff_self' | 'debuff_target' | 'lifesteal' | 'grapple' | 'frighten' | 'poison'
-      | 'debuff_attack' | 'debuff_defense' | 'debuff_speed' | 'debuff_magic_attack' | 'debuff_magic_defense';
+      | 'debuff_strength' | 'debuff_dexterity' | 'debuff_constitution' | 'debuff_wisdom';
     value?: number;
     stat?: string;
     turns?: number;
@@ -489,7 +489,7 @@ export interface GameEvent {
 }
 
 export interface EventEffect {
-  type: 'heal' | 'damage' | 'buff_attack' | 'buff_magic_attack' | 'buff_defense' | 'debuff_attack' | 'debuff_magic_attack' | 'debuff_defense' | 'xp_bonus';
+  type: 'heal' | 'damage' | 'buff_strength' | 'buff_dexterity' | 'buff_constitution' | 'debuff_strength' | 'debuff_dexterity' | 'debuff_constitution' | 'xp_bonus';
   value: number;
   target: 'all' | 'random' | 'weakest' | 'strongest';
 }

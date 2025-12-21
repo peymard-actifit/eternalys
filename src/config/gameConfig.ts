@@ -133,11 +133,17 @@ export const PASSIVE_EFFECTS = {
 // ============================================
 
 export const BUFF_TYPES = {
-  ATTACK: 'attack',
-  MAGIC_ATTACK: 'magicAttack',
-  DEFENSE: 'defense',
-  MAGIC_DEFENSE: 'magicDefense',
+  // Stats D&D - Caractéristiques
+  STRENGTH: 'strength',
+  DEXTERITY: 'dexterity',
+  CONSTITUTION: 'constitution',
+  INTELLIGENCE: 'intelligence',
+  WISDOM: 'wisdom',
+  CHARISMA: 'charisma',
+  // Stats dérivées
+  ARMOR_CLASS: 'armorClass',
   SPEED: 'speed',
+  // Effets spéciaux
   DAMAGE_REFLECT: 'damage_reflect',
   REGEN: 'regen',
   POISON: 'poison',
