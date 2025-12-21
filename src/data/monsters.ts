@@ -4,7 +4,104 @@
 // ============================================
 
 import { Monster, CreatureType, AbilityScores, LegendaryAction, MonsterSkill } from '../types/game.types';
-import { convertMonsterToEternalysScale } from '../utils/monsterScaling';
+
+// =============================================================================
+// CONVERSION LOCALE VERS ÉCHELLE ETERNALYS
+// =============================================================================
+// Ces fonctions sont dupliquées depuis monsterScaling.ts pour éviter les
+// dépendances circulaires lors du build. Maintenir synchronisé avec l'original.
+// =============================================================================
+
+const LOCAL_CR_CONVERSION_TABLE: Record<number, number> = {
+  0: 1, 0.125: 2, 0.25: 3, 0.5: 5, 1: 8, 2: 12, 3: 16, 4: 20, 5: 24, 6: 28,
+  7: 32, 8: 36, 9: 40, 10: 44, 11: 48, 12: 52, 13: 55, 14: 58, 15: 61, 16: 64,
+  17: 67, 18: 70, 19: 73, 20: 76, 21: 79, 22: 82, 23: 85, 24: 88, 25: 91,
+  26: 93, 27: 95, 28: 97, 29: 99, 30: 100,
+};
+
+const LOCAL_SPECIAL_CR_CREATURES: Record<string, number> = {
+  'tiamat': 100, 'asmodeus': 100, 'tarrasque': 95, 'bahamut': 98,
+  'demogorgon': 93, 'orcus': 93, 'vecna': 93, 'zariel': 90,
+};
+
+function localConvertDnDCRToEternalys(dndCR: number): number {
+  if (LOCAL_CR_CONVERSION_TABLE[dndCR] !== undefined) {
+    return LOCAL_CR_CONVERSION_TABLE[dndCR];
+  }
+  const sortedCRs = Object.keys(LOCAL_CR_CONVERSION_TABLE).map(Number).sort((a, b) => a - b);
+  let lowerCR = 0, upperCR = 30;
+  for (const cr of sortedCRs) {
+    if (cr <= dndCR) lowerCR = cr;
+    if (cr >= dndCR) { upperCR = cr; break; }
+  }
+  if (lowerCR === upperCR) return LOCAL_CR_CONVERSION_TABLE[lowerCR];
+  const lowerVal = LOCAL_CR_CONVERSION_TABLE[lowerCR];
+  const upperVal = LOCAL_CR_CONVERSION_TABLE[upperCR];
+  const ratio = (dndCR - lowerCR) / (upperCR - lowerCR);
+  return Math.round(lowerVal + (upperVal - lowerVal) * ratio);
+}
+
+function localGetMonsterStatsForCR(cr: number): { hp: number; ac: number } {
+  if (cr <= 0) cr = 1;
+  const hp = Math.floor(10 + (cr * 4) + Math.pow(cr, 1.6) * 0.15);
+  const ac = Math.floor(10 + Math.min(cr * 0.18, 18));
+  return { hp, ac };
+}
+
+function localGetXPFromCR(cr: number): number {
+  if (cr <= 0) return 10;
+  return Math.floor(25 * Math.pow(cr, 1.8));
+}
+
+function localGetAbilityModifier(score: number): number {
+  return Math.floor((score - 10) / 2);
+}
+
+function localScaleAbilities(abilities: AbilityScores, ratio: number): AbilityScores {
+  const scaleScore = (score: number): number => {
+    if (ratio <= 1) return score;
+    const increase = Math.floor(Math.log2(ratio) * 2);
+    return Math.min(30, score + increase);
+  };
+  return {
+    strength: scaleScore(abilities.strength),
+    dexterity: scaleScore(abilities.dexterity),
+    constitution: scaleScore(abilities.constitution),
+    intelligence: scaleScore(abilities.intelligence),
+    wisdom: scaleScore(abilities.wisdom),
+    charisma: scaleScore(abilities.charisma),
+  };
+}
+
+function localConvertMonsterToEternalysScale(monster: Monster): Monster {
+  const monsterId = monster.id.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  let newCR: number;
+  
+  if (LOCAL_SPECIAL_CR_CREATURES[monsterId]) {
+    newCR = LOCAL_SPECIAL_CR_CREATURES[monsterId];
+  } else {
+    newCR = localConvertDnDCRToEternalys(monster.challengeRating);
+  }
+  
+  const scaledStats = localGetMonsterStatsForCR(newCR);
+  const originalCR = monster.challengeRating;
+  const scalingRatio = newCR / Math.max(1, originalCR);
+  const scaledAbilities = localScaleAbilities(monster.abilities, scalingRatio);
+  const newXP = localGetXPFromCR(newCR);
+  const conMod = localGetAbilityModifier(scaledAbilities.constitution);
+  const baseHP = scaledStats.hp;
+  const finalHP = Math.max(1, baseHP + (conMod * Math.floor(newCR / 2)));
+  
+  return {
+    ...monster,
+    challengeRating: newCR,
+    xpReward: newXP,
+    hp: finalHP,
+    maxHp: finalHP,
+    armorClass: scaledStats.ac,
+    abilities: scaledAbilities,
+  };
+}
 
 // Helper pour créer les caractéristiques
 const createAbilities = (str: number, dex: number, con: number, int: number, wis: number, cha: number): AbilityScores => ({
@@ -7389,7 +7486,7 @@ export function getRandomMonsterByCR(cr: number): Monster {
   const rawMonster = JSON.parse(JSON.stringify(monsters[index])); // Deep copy
   
   // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
-  return convertMonsterToEternalysScale(rawMonster);
+  return localConvertMonsterToEternalysScale(rawMonster);
 }
 
 // Obtenir un monstre aléatoire adapté au niveau de donjon
@@ -7479,7 +7576,7 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   const rawBoss = JSON.parse(JSON.stringify(bossList[index])); // Deep copy
   
   // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
-  const boss = convertMonsterToEternalysScale(rawBoss);
+  const boss = localConvertMonsterToEternalysScale(rawBoss);
   
   // Réinitialiser les actions légendaires
   if (boss.legendaryActionsPerTurn) {
