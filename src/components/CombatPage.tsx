@@ -6,6 +6,7 @@ import { getMonsterDrops, applyDropEffect } from '../data/monsterDrops';
 import { CharacterSheet } from './CharacterSheet';
 import { DiceRoller, rollDice } from './DiceRoller';
 import { useAnimationPreferences } from '../hooks/useAnimationPreferences';
+import { getXPForNextLevel } from '../store/progressionStore';
 import { 
   makeAttackRoll, 
   rollDamage, 
@@ -2996,6 +2997,18 @@ export function CombatPage() {
                         {character.buffs?.find(b => b.type === 'speed') && <span className="stat-mod-indicator">⬆</span>}
                       </span>
                       {renderStatsTooltip(character)}
+                    </div>
+                    {/* Barre XP compacte */}
+                    <div className="fighter-xp-bar">
+                      <div 
+                        className="xp-fill" 
+                        style={{ 
+                          width: `${Math.min(100, ((character.xp || 0) / getXPForNextLevel(character.level || 1)) * 100)}%`
+                        }}
+                      ></div>
+                      <span className="xp-text">
+                        ✨ {character.xp || 0}/{getXPForNextLevel(character.level || 1)} XP
+                      </span>
                     </div>
                   </div>
                   {isCurrent && <span className="turn-indicator">⚡</span>}

@@ -479,8 +479,8 @@ const BROWN_BEAR: Monster = {
   portrait: '🐻',
   isBoss: false,
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', description: 'Griffes' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }
   ]
 };
 
@@ -520,7 +520,7 @@ const GHAST: Monster = {
   immunities: ['poison'],
   conditionImmunities: ['poisoned', 'charmed'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
     { id: 'claws', name: 'Griffes paralysantes', damage: 10, damageType: 'slashing', type: 'special', description: 'Peut paralyser' }
   ]
 };
@@ -540,8 +540,8 @@ const GARGOYLE: Monster = {
   immunities: ['poison'],
   conditionImmunities: ['poisoned', 'petrified'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 5, damageType: 'piercing', type: 'attack', description: 'Morsure de pierre' },
-    { id: 'claws', name: 'Griffes', damage: 5, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' }
+    { id: 'bite', name: 'Morsure', damage: 5, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure de pierre' },
+    { id: 'claws', name: 'Griffes', damage: 5, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' }
   ]
 };
 
@@ -618,7 +618,7 @@ const HELL_HOUND: Monster = {
   isBoss: false,
   immunities: ['fire'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'attack', description: 'Morsure + feu' },
+    { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure + feu' },
     {
       id: 'fire_breath', name: 'Souffle de feu', damage: 21,
       damageType: 'fire', type: 'special',
@@ -641,7 +641,7 @@ const MINOTAUR: Monster = {
   portrait: '🐂',
   isBoss: false,
   skills: [
-    { id: 'greataxe', name: 'Grande hache', damage: 17, damageType: 'slashing', type: 'attack', description: 'Coup puissant' },
+    { id: 'greataxe', name: 'Grande hache', damage: 17, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Coup puissant' },
     {
       id: 'gore', name: 'Encornage', damage: 13,
       damageType: 'piercing', type: 'special',
@@ -662,8 +662,8 @@ const OWLBEAR: Monster = {
   portrait: '🦉',
   isBoss: false,
   skills: [
-    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Coup de bec' },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes lacérantes' }
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de bec' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes lacérantes' }
   ]
 };
 
@@ -688,7 +688,7 @@ const WIGHT: Monster = {
       description: 'Drain vital',
       effect: { type: 'lifesteal', value: 100 }
     },
-    { id: 'longsword', name: 'Épée longue', damage: 11, damageType: 'slashing', type: 'attack', description: 'Attaque maudite' }
+    { id: 'longsword', name: 'Épée longue', damage: 11, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque maudite' }
   ]
 };
 
@@ -770,8 +770,8 @@ const TROLL: Monster = {
   vulnerabilities: ['acid', 'fire'],
   description: 'Régénère 10 PV par tour sauf feu/acide.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', description: 'Deux attaques de griffes' },
+    { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Deux attaques de griffes' },
     {
       id: 'regeneration', name: 'Régénération', damage: 0,
       damageType: 'physical', type: 'buff',
@@ -844,8 +844,8 @@ const YOUNG_WHITE_DRAGON: Monster = {
   isBoss: false,
   immunities: ['cold'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 15, damageType: 'piercing', type: 'attack', description: 'Morsure gelée' },
-    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'bite', name: 'Morsure', damage: 15, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure gelée' },
+    { id: 'claws', name: 'Griffes', damage: 11, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     {
       id: 'cold_breath', name: 'Souffle de givre', damage: 45,
       damageType: 'cold', type: 'special',
@@ -881,7 +881,7 @@ const MEDUSA: Monster = {
       description: 'Morsure venimeuse + poison',
       effect: { type: 'poison', value: 14 }
     },
-    { id: 'shortsword', name: 'Épée courte', damage: 5, damageType: 'slashing', type: 'attack', description: 'Attaque rapide' }
+    { id: 'shortsword', name: 'Épée courte', damage: 5, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque rapide' }
   ]
 };
 
@@ -1025,8 +1025,8 @@ const YOUNG_RED_DRAGON: Monster = {
   isBoss: false,
   immunities: ['fire'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 17, damageType: 'piercing', type: 'attack', description: 'Morsure + feu' },
-    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'bite', name: 'Morsure', damage: 17, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure + feu' },
+    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     {
       id: 'fire_breath', name: 'Souffle de feu', damage: 56,
       damageType: 'fire', type: 'special',
@@ -1093,7 +1093,7 @@ const BEHOLDER: Monster = {
   conditionImmunities: ['prone'],
   description: 'Sphère flottante de chair avec une grande gueule pleine de dents et un œil central géant, surmonté de dix tentacules oculaires. Chaque œil projette un rayon magique différent : désintégration, pétrification, charme, mort... Le tyrannœil est paranoïaque, cruel et se considère comme la forme de vie parfaite. Son œil central génère un cône antimagie.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
     {
       id: 'eye_rays', name: 'Rayons oculaires', damage: 28,
       damageType: 'force', type: 'special',
@@ -1134,8 +1134,8 @@ const ADULT_RED_DRAGON: Monster = {
   legendaryActionsPerTurn: 2,
   immunities: ['fire'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure + feu' },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' },
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure + feu' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' },
     {
       id: 'fire_breath', name: 'Souffle de feu', damage: 45,
       damageType: 'fire', type: 'special',
@@ -1261,8 +1261,8 @@ const ANCIENT_RED_DRAGON: Monster = {
   legendaryActionsPerTurn: 3,
   immunities: ['fire'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure dévastatrice' },
-    { id: 'claws', name: 'Griffes', damage: 18, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure dévastatrice' },
+    { id: 'claws', name: 'Griffes', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     {
       id: 'fire_breath', name: 'Souffle de feu', damage: 55,
       damageType: 'fire', type: 'special',
@@ -1381,8 +1381,8 @@ const PIT_FIEND: Monster = {
   immunities: ['fire', 'poison'],
   conditionImmunities: ['poisoned'],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure infernale' },
-    { id: 'claws', name: 'Griffes', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure infernale' },
+    { id: 'claws', name: 'Griffes', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     {
       id: 'fireball', name: 'Boule de feu', damage: 32,
       damageType: 'fire', type: 'special',
@@ -1471,9 +1471,9 @@ const TARRASQUE: Monster = {
   conditionImmunities: ['charmed', 'frightened', 'paralyzed', 'poisoned'],
   description: 'La créature la plus dévastatrice connue.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure titanesque' },
-    { id: 'claws', name: 'Griffes', damage: 24, damageType: 'slashing', type: 'attack', description: 'Griffes géantes' },
-    { id: 'tail', name: 'Queue', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Coup de queue' }
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure titanesque' },
+    { id: 'claws', name: 'Griffes', damage: 24, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes géantes' },
+    { id: 'tail', name: 'Queue', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de queue' }
   ],
   legendaryActions: [
     { id: 'attack', name: 'Attaque', cost: 1, damage: 22, damageType: 'slashing', description: 'Attaque de griffe' },
@@ -1547,7 +1547,7 @@ const PSEUDODRAGON: Monster = {
   isBoss: false,
   description: 'Petit dragon intelligent et loyal.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 4, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'bite', name: 'Morsure', damage: 4, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
     { id: 'sting', name: 'Dard', damage: 4, damageType: 'piercing', type: 'special', description: 'Peut endormir', effect: { type: 'debuff_attack', value: 5 } }
   ]
 };
@@ -1606,7 +1606,7 @@ const DARKMANTLE: Monster = {
   isBoss: false,
   description: 'Créature des cavernes qui s\'accroche.',
   skills: [
-    { id: 'crush', name: 'Écrasement', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Étreinte' },
+    { id: 'crush', name: 'Écrasement', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Étreinte' },
     { id: 'darkness_aura', name: 'Aura de ténèbres', damage: 0, damageType: 'necrotic', type: 'special', description: 'Crée des ténèbres', effect: { type: 'debuff_attack', value: 5 } }
   ]
 };
@@ -1665,7 +1665,7 @@ const DEATH_DOG: Monster = {
   isBoss: false,
   description: 'Chien à deux têtes porteur de maladies.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 9, damageType: 'piercing', type: 'attack', description: 'Double morsure' },
+    { id: 'bite', name: 'Morsure', damage: 9, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Double morsure' },
     { id: 'disease', name: 'Maladie', damage: 0, damageType: 'necrotic', type: 'special', description: 'Infecte la cible', effect: { type: 'poison', value: 5 } }
   ]
 };
@@ -1683,7 +1683,7 @@ const DRYAD: Monster = {
   isBoss: false,
   description: 'Esprit protecteur de la forêt.',
   skills: [
-    { id: 'club', name: 'Bâton', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Attaque de bois' },
+    { id: 'club', name: 'Bâton', damage: 6, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Attaque de bois' },
     { id: 'charm', name: 'Charme', damage: 0, damageType: 'psychic', type: 'special', description: 'Enchante l\'ennemi', effect: { type: 'debuff_attack', value: 8 } }
   ]
 };
@@ -1701,7 +1701,7 @@ const HARPY: Monster = {
   isBoss: false,
   description: 'Créature ailée au chant envoûtant.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', description: 'Attaque aérienne' },
+    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque aérienne' },
     { id: 'luring_song', name: 'Chant séducteur', damage: 0, damageType: 'psychic', type: 'special', description: 'Attire les ennemis', effect: { type: 'debuff_speed', value: 8 } }
   ]
 };
@@ -1718,8 +1718,8 @@ const HIPPOGRIFF: Monster = {
   portrait: '🦅',
   isBoss: false,
   skills: [
-    { id: 'beak', name: 'Bec', damage: 8, damageType: 'piercing', type: 'attack', description: 'Coup de bec' },
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' }
+    { id: 'beak', name: 'Bec', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de bec' },
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' }
   ]
 };
 
@@ -1737,7 +1737,7 @@ const ANKHEG: Monster = {
   isBoss: false,
   description: 'Insecte géant souterrain.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'slashing', type: 'attack', description: 'Mâchoires puissantes' },
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Mâchoires puissantes' },
     { id: 'acid_spray', name: 'Jet d\'acide', damage: 15, damageType: 'acid', type: 'special', description: 'Ligne d\'acide (30 pieds)', recharge: { min: 6 } }
   ]
 };
@@ -1755,9 +1755,9 @@ const CENTAUR: Monster = {
   isBoss: false,
   description: 'Mi-homme, mi-cheval, guerrier noble.',
   skills: [
-    { id: 'pike', name: 'Pique', damage: 11, damageType: 'piercing', type: 'attack', description: 'Attaque de lance' },
-    { id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Charge + piétinement' },
-    { id: 'longbow', name: 'Arc long', damage: 9, damageType: 'piercing', type: 'attack', description: 'Tir précis' }
+    { id: 'pike', name: 'Pique', damage: 11, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Attaque de lance' },
+    { id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Charge + piétinement' },
+    { id: 'longbow', name: 'Arc long', damage: 9, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tir précis' }
   ]
 };
 
@@ -1775,7 +1775,7 @@ const ETTERCAP: Monster = {
   description: 'Maître des araignées.',
   skills: [
     { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'special', description: 'Morsure venimeuse', effect: { type: 'poison', value: 6 } },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Attaque double' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque double' },
     { id: 'web', name: 'Toile', damage: 0, damageType: 'physical', type: 'special', description: 'Immobilise', effect: { type: 'debuff_speed', value: 15 } }
   ]
 };
@@ -1815,8 +1815,8 @@ const GRIFFON: Monster = {
   isBoss: false,
   description: 'Créature majestueuse mi-aigle mi-lion.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Coup de bec' },
-    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', description: 'Attaque multiple' }
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de bec' },
+    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque multiple' }
   ]
 };
 
@@ -1833,7 +1833,7 @@ const NOTHIC: Monster = {
   isBoss: false,
   description: 'Ancien mage maudit à l\'œil unique.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', description: 'Attaque double' },
+    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque double' },
     { id: 'rotting_gaze', name: 'Regard pourrissant', damage: 10, damageType: 'necrotic', type: 'special', description: 'Drain magique' }
   ]
 };
@@ -1852,7 +1852,7 @@ const BASILISK: Monster = {
   isBoss: false,
   description: 'Son regard pétrifie.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 13, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'bite', name: 'Morsure', damage: 13, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
     { id: 'petrifying_gaze', name: 'Regard pétrifiant', damage: 0, damageType: 'force', type: 'special', description: 'Peut pétrifier', effect: { type: 'debuff_speed', value: 25 } }
   ]
 };
@@ -1871,7 +1871,7 @@ const DOPPELGANGER: Monster = {
   conditionImmunities: ['charmed'],
   description: 'Changeforme maléfique.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 11, damageType: 'bludgeoning', type: 'attack', description: 'Frappe' },
+    { id: 'slam', name: 'Coup', damage: 11, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe' },
     { id: 'read_thoughts', name: 'Lire pensées', damage: 0, damageType: 'psychic', type: 'special', description: 'Lit l\'esprit', effect: { type: 'debuff_defense', value: 5 } }
   ]
 };
@@ -1889,7 +1889,7 @@ const GREEN_HAG: Monster = {
   isBoss: false,
   description: 'Sorcière des marais maléfique.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 15, damageType: 'slashing', type: 'attack', description: 'Griffes empoisonnées' },
+    { id: 'claws', name: 'Griffes', damage: 15, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes empoisonnées' },
     { id: 'illusory_appearance', name: 'Illusion', damage: 0, damageType: 'psychic', type: 'special', description: 'Crée des illusions', effect: { type: 'debuff_attack', value: 8 } }
   ]
 };
@@ -1907,9 +1907,9 @@ const MANTICORE: Monster = {
   isBoss: false,
   description: 'Lion ailé à queue de scorpion.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure de lion' },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Attaque double' },
-    { id: 'tail_spike', name: 'Piques', damage: 11, damageType: 'piercing', type: 'attack', description: 'Lancer de piques' }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure de lion' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Attaque double' },
+    { id: 'tail_spike', name: 'Piques', damage: 11, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer de piques' }
   ]
 };
 
@@ -1947,7 +1947,7 @@ const YETI: Monster = {
   immunities: ['cold'],
   description: 'Créature des neiges terrifiante.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes gelées' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes gelées' },
     { id: 'chilling_gaze', name: 'Regard glacial', damage: 0, damageType: 'cold', type: 'special', description: 'Paralyse de froid', effect: { type: 'debuff_speed', value: 15 } }
   ]
 };
@@ -1968,7 +1968,7 @@ const CHUUL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Crustacé aberrant serviteur des aboleths.',
   skills: [
-    { id: 'pincer', name: 'Pince', damage: 15, damageType: 'bludgeoning', type: 'attack', description: 'Pince broyeuse' },
+    { id: 'pincer', name: 'Pince', damage: 15, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Pince broyeuse' },
     { id: 'tentacles', name: 'Tentacules', damage: 0, damageType: 'physical', type: 'special', description: 'Paralysie', effect: { type: 'poison', value: 10 } }
   ]
 };
@@ -1987,8 +1987,8 @@ const COUATL: Monster = {
   immunities: ['psychic', 'radiant'],
   description: 'Serpent ailé céleste bienveillant.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure sacrée' },
-    { id: 'constrict', name: 'Constriction', damage: 17, damageType: 'bludgeoning', type: 'attack', description: 'Étreinte' },
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure sacrée' },
+    { id: 'constrict', name: 'Constriction', damage: 17, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Étreinte' },
     { id: 'heal', name: 'Guérison', damage: 0, damageType: 'radiant', type: 'buff', description: 'Se soigne', effect: { type: 'heal', value: 20 } }
   ]
 };
@@ -2009,7 +2009,7 @@ const GHOST: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
   description: 'Esprit tourmenté lié au monde des vivants.',
   skills: [
-    { id: 'withering_touch', name: 'Toucher flétrissant', damage: 17, damageType: 'necrotic', type: 'attack', description: 'Vieillit la cible' },
+    { id: 'withering_touch', name: 'Toucher flétrissant', damage: 17, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Vieillit la cible' },
     { id: 'horrifying_visage', name: 'Apparition horrifiante', damage: 0, damageType: 'psychic', type: 'special', description: 'Effraye', effect: { type: 'debuff_attack', value: 10 } },
     { id: 'possession', name: 'Possession', damage: 0, damageType: 'psychic', type: 'special', description: 'Peut posséder', effect: { type: 'debuff_defense', value: 15 } }
   ]
@@ -2029,7 +2029,7 @@ const SUCCUBUS: Monster = {
   resistances: ['cold', 'fire', 'lightning', 'poison'],
   description: 'Démone séductrice drainant la force vitale.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' },
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' },
     { id: 'draining_kiss', name: 'Baiser drainant', damage: 32, damageType: 'psychic', type: 'special', description: 'Draine l\'énergie vitale', effect: { type: 'lifesteal', value: 50 } },
     { id: 'charm', name: 'Charme', damage: 0, damageType: 'psychic', type: 'special', description: 'Charme magique', effect: { type: 'debuff_attack', value: 12 } }
   ]
@@ -2052,7 +2052,7 @@ const AIR_ELEMENTAL: Monster = {
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Tourbillon de vent vivant.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Frappe aérienne' },
+    { id: 'slam', name: 'Coup', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe aérienne' },
     { id: 'whirlwind', name: 'Tourbillon', damage: 15, damageType: 'bludgeoning', type: 'special', description: 'Projette les ennemis', recharge: { min: 4 } }
   ]
 };
@@ -2074,7 +2074,7 @@ const EARTH_ELEMENTAL: Monster = {
   conditionImmunities: ['exhaustion', 'paralyzed', 'petrified', 'poisoned', 'unconscious'],
   description: 'Masse rocheuse animée.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 17, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de roche' }
+    { id: 'slam', name: 'Coup', damage: 17, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de roche' }
   ]
 };
 
@@ -2094,7 +2094,7 @@ const FIRE_ELEMENTAL: Monster = {
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Colonne de flammes vivantes.',
   skills: [
-    { id: 'touch', name: 'Toucher', damage: 15, damageType: 'fire', type: 'attack', description: 'Toucher brûlant' },
+    { id: 'touch', name: 'Toucher', damage: 15, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Toucher brûlant' },
     { id: 'fire_form', name: 'Forme de feu', damage: 5, damageType: 'fire', type: 'special', description: 'Brûle au contact' }
   ]
 };
@@ -2115,7 +2115,7 @@ const WATER_ELEMENTAL: Monster = {
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Vague déferlante consciente.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Frappe d\'eau' },
+    { id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe d\'eau' },
     { id: 'whelm', name: 'Submersion', damage: 13, damageType: 'bludgeoning', type: 'special', description: 'Engloutit', recharge: { min: 4 } }
   ]
 };
@@ -2136,7 +2136,7 @@ const SHAMBLING_MOUND: Monster = {
   conditionImmunities: ['blinded', 'deafened', 'exhaustion'],
   description: 'Masse végétale animée par la foudre.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 15, damageType: 'bludgeoning', type: 'attack', description: 'Frappe végétale' },
+    { id: 'slam', name: 'Coup', damage: 15, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe végétale' },
     { id: 'engulf', name: 'Engloutissement', damage: 13, damageType: 'bludgeoning', type: 'special', description: 'Étouffe la cible', effect: { type: 'debuff_speed', value: 20 } }
   ]
 };
@@ -2156,8 +2156,8 @@ const UNICORN: Monster = {
   conditionImmunities: ['charmed', 'paralyzed', 'poisoned'],
   description: 'Créature céleste pure et protectrice.',
   skills: [
-    { id: 'hooves', name: 'Sabots', damage: 11, damageType: 'bludgeoning', type: 'attack', description: 'Frappe puissante' },
-    { id: 'horn', name: 'Corne', damage: 12, damageType: 'piercing', type: 'attack', description: 'Charge de corne' },
+    { id: 'hooves', name: 'Sabots', damage: 11, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe puissante' },
+    { id: 'horn', name: 'Corne', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Charge de corne' },
     { id: 'healing_touch', name: 'Toucher guérisseur', damage: 0, damageType: 'radiant', type: 'buff', description: 'Guérit un allié', effect: { type: 'heal', value: 18 } }
   ]
 };
@@ -2176,9 +2176,9 @@ const CHIMERA: Monster = {
   isBoss: false,
   description: 'Triple bête: lion, chèvre, dragon.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 13, damageType: 'piercing', type: 'attack', description: 'Tête de lion' },
-    { id: 'horns', name: 'Cornes', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Tête de chèvre' },
-    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', description: 'Griffes de lion' },
+    { id: 'bite', name: 'Morsure', damage: 13, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tête de lion' },
+    { id: 'horns', name: 'Cornes', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Tête de chèvre' },
+    { id: 'claws', name: 'Griffes', damage: 13, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes de lion' },
     { id: 'fire_breath', name: 'Souffle de feu', damage: 31, damageType: 'fire', type: 'special', description: 'Cône de feu (15 pieds)', recharge: { min: 5 } }
   ]
 };
@@ -2197,7 +2197,7 @@ const DRIDER: Monster = {
   description: 'Drow maudit mi-elfe mi-araignée.',
   skills: [
     { id: 'bite', name: 'Morsure', damage: 7, damageType: 'piercing', type: 'special', description: 'Morsure venimeuse', effect: { type: 'poison', value: 9 } },
-    { id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', description: 'Lame elfique' },
+    { id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Lame elfique' },
     { id: 'web', name: 'Toile', damage: 0, damageType: 'physical', type: 'special', description: 'Immobilise', effect: { type: 'debuff_speed', value: 20 } }
   ]
 };
@@ -2218,7 +2218,7 @@ const INVISIBLE_STALKER: Monster = {
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Élémentaire d\'air invisible et implacable.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 15, damageType: 'bludgeoning', type: 'attack', description: 'Frappe invisible' }
+    { id: 'slam', name: 'Coup', damage: 15, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe invisible' }
   ]
 };
 
@@ -2250,8 +2250,8 @@ const ZARIEL: Monster = {
     { id: 'fireball', name: 'Boule de feu infernale', cost: 2, damage: 45, damageType: 'fire', description: 'Boule de feu touchant tous les ennemis' }
   ],
   skills: [
-    { id: 'longsword', name: 'Épée longue de Zariel', damage: 40, damageType: 'slashing', type: 'attack', description: 'Triple attaque à l\'épée', attackCount: 3 },
-    { id: 'javelin', name: 'Javelot de feu', damage: 35, damageType: 'fire', type: 'attack', description: 'Javelot enflammé' }
+    { id: 'longsword', name: 'Épée longue de Zariel', damage: 40, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Triple attaque à l\'épée', attackCount: 3 },
+    { id: 'javelin', name: 'Javelot de feu', damage: 35, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Javelot enflammé' }
   ],
   ultimateSkill: {
     id: 'horrid_touch', name: 'Toucher Horrifique', damage: 60, damageType: 'necrotic', type: 'special',
@@ -2281,7 +2281,7 @@ const ASMODEUS: Monster = {
     { id: 'hellfire', name: 'Feu infernal', cost: 3, damage: 70, damageType: 'fire', description: 'Déchaîne les flammes de Nessus' }
   ],
   skills: [
-    { id: 'ruby_rod_strike', name: 'Sceptre de Rubis', damage: 55, damageType: 'force', type: 'attack', description: 'Frappe dévastatrice' },
+    { id: 'ruby_rod_strike', name: 'Sceptre de Rubis', damage: 55, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Frappe dévastatrice' },
     { id: 'dominate', name: 'Domination', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Tente de dominer l\'esprit' }
   ],
   ultimateSkill: {
@@ -2311,8 +2311,8 @@ const MEPHISTOPHELES: Monster = {
     { id: 'cone_cold', name: 'Cône de froid', cost: 2, damage: 50, damageType: 'cold', description: 'Souffle glacial de Cania' }
   ],
   skills: [
-    { id: 'trident', name: 'Trident de Cania', damage: 38, damageType: 'piercing', type: 'attack', description: 'Attaque au trident', attackCount: 2 },
-    { id: 'hellfire', name: 'Feu infernal', damage: 45, damageType: 'fire', type: 'attack', description: 'Flammes des Enfers' }
+    { id: 'trident', name: 'Trident de Cania', damage: 38, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Attaque au trident', attackCount: 2 },
+    { id: 'hellfire', name: 'Feu infernal', damage: 45, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Flammes des Enfers' }
   ],
   ultimateSkill: {
     id: 'cania_winter', name: 'Hiver de Cania', damage: 70, damageType: 'cold', type: 'special',
@@ -2336,7 +2336,7 @@ const DISPATER: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
   description: 'Dispater, Archidiable de Dis, deuxième couche des Enfers. Le Père de la Tromperie, rusé et paranoïaque.',
   skills: [
-    { id: 'iron_staff', name: 'Bâton de fer', damage: 40, damageType: 'bludgeoning', type: 'attack', description: 'Frappe avec son bâton enchanté' }
+    { id: 'iron_staff', name: 'Bâton de fer', damage: 40, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe avec son bâton enchanté' }
   ],
   ultimateSkill: {
     id: 'iron_prison', name: 'Prison de Fer', damage: 55, damageType: 'bludgeoning', type: 'special',
@@ -2359,7 +2359,7 @@ const MAMMON: Monster = {
   immunities: ['fire', 'poison'],
   description: 'Mammon, Archidiable de Minauros, troisième couche. Seigneur de l\'avarice et de la cupidité.',
   skills: [
-    { id: 'golden_claws', name: 'Griffes dorées', damage: 35, damageType: 'slashing', type: 'attack', description: 'Griffes recouvertes d\'or maudit' }
+    { id: 'golden_claws', name: 'Griffes dorées', damage: 35, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes recouvertes d\'or maudit' }
   ]
 };
 
@@ -2378,7 +2378,7 @@ const BELIAL: Monster = {
   immunities: ['fire', 'poison'],
   description: 'Bélial, Archidiable de Phlegethos, quatrième couche. Maître de la séduction et du feu.',
   skills: [
-    { id: 'ranseur', name: 'Ranseur enflammé', damage: 40, damageType: 'piercing', type: 'attack', description: 'Arme d\'hast enflammée' }
+    { id: 'ranseur', name: 'Ranseur enflammé', damage: 40, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Arme d\'hast enflammée' }
   ]
 };
 
@@ -2397,7 +2397,7 @@ const LEVISTUS: Monster = {
   immunities: ['cold', 'poison'],
   description: 'Lévistus, Archidiable de Stygia, cinquième couche. Prisonnier éternel dans un bloc de glace par Asmodeus.',
   skills: [
-    { id: 'ice_rapier', name: 'Rapière de glace', damage: 38, damageType: 'cold', type: 'attack', description: 'Lame de glace éternelle' }
+    { id: 'ice_rapier', name: 'Rapière de glace', damage: 38, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Lame de glace éternelle' }
   ]
 };
 
@@ -2416,7 +2416,7 @@ const GLASYA: Monster = {
   immunities: ['fire', 'poison'],
   description: 'Glasya, Archidiablesse de Malbolge, sixième couche. Fille d\'Asmodeus, Princesse des Enfers.',
   skills: [
-    { id: 'scourge', name: 'Fléau de Malbolge', damage: 36, damageType: 'slashing', type: 'attack', description: 'Fouet démoniaque' }
+    { id: 'scourge', name: 'Fléau de Malbolge', damage: 36, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Fouet démoniaque' }
   ]
 };
 
@@ -2435,7 +2435,7 @@ const BAALZEBUL: Monster = {
   immunities: ['fire', 'poison'],
   description: 'Baalzébul, Archidiable de Maladomini, septième couche. Le Seigneur des Mouches, autrefois bel ange.',
   skills: [
-    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 42, damageType: 'piercing', type: 'attack', description: 'Nuée d\'insectes démoniaques', areaOfEffect: true }
+    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 42, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Nuée d\'insectes démoniaques', areaOfEffect: true }
   ]
 };
 
@@ -2462,8 +2462,8 @@ const DEMOGORGON: Monster = {
     { id: 'maddening_gaze', name: 'Regard fou', cost: 2, damage: 0, damageType: 'psychic', description: 'Regard rendant fou' }
   ],
   skills: [
-    { id: 'tentacle', name: 'Tentacules', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Double attaque tentaculaire', attackCount: 2 },
-    { id: 'gaze', name: 'Regard hypnotique', damage: 25, damageType: 'psychic', type: 'attack', description: 'Regard de folie' }
+    { id: 'tentacle', name: 'Tentacules', damage: 35, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Double attaque tentaculaire', attackCount: 2 },
+    { id: 'gaze', name: 'Regard hypnotique', damage: 25, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Regard de folie' }
   ],
   ultimateSkill: {
     id: 'primal_scream', name: 'Hurlement Primordial', damage: 80, damageType: 'psychic', type: 'special',
@@ -2493,8 +2493,8 @@ const ORCUS: Monster = {
     { id: 'wand', name: 'Baguette d\'Orcus', cost: 2, damage: 45, damageType: 'necrotic', description: 'Pouvoir nécrotique' }
   ],
   skills: [
-    { id: 'wand_strike', name: 'Baguette d\'Orcus', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Frappe avec l\'artefact légendaire' },
-    { id: 'tail_attack', name: 'Queue', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Frappe caudale' }
+    { id: 'wand_strike', name: 'Baguette d\'Orcus', damage: 45, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Frappe avec l\'artefact légendaire' },
+    { id: 'tail_attack', name: 'Queue', damage: 28, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe caudale' }
   ],
   ultimateSkill: {
     id: 'undead_army', name: 'Armée des Morts', damage: 60, damageType: 'necrotic', type: 'special',
@@ -2518,7 +2518,7 @@ const GRAZZT: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Graz\'zt, le Prince Sombre, Seigneur Démon de l\'indulgence. Le plus séduisant et rusé des princes démons.',
   skills: [
-    { id: 'wave_of_sorrow', name: 'Vague de Chagrin', damage: 40, damageType: 'slashing', type: 'attack', description: 'Épée légendaire' },
+    { id: 'wave_of_sorrow', name: 'Vague de Chagrin', damage: 40, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée légendaire' },
     { id: 'charm', name: 'Charme', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Tentative de charme' }
   ]
 };
@@ -2539,7 +2539,7 @@ const YEENOGHU: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Yeenoghu, le Seigneur des Gnolls, Prince de la Sauvagerie. Il erre dans l\'Abysse avec sa horde de démons.',
   skills: [
-    { id: 'flail', name: 'Fléau de Butchery', damage: 42, damageType: 'bludgeoning', type: 'attack', description: 'Triple attaque au fléau', attackCount: 3 }
+    { id: 'flail', name: 'Fléau de Butchery', damage: 42, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Triple attaque au fléau', attackCount: 3 }
   ]
 };
 
@@ -2559,7 +2559,7 @@ const JUIBLEX: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Juiblex, le Seigneur Sans Visage, Prince des Vases. Une masse de corruption et de décomposition.',
   skills: [
-    { id: 'acid_splash', name: 'Éclaboussure acide', damage: 40, damageType: 'acid', type: 'attack', description: 'Projection d\'acide', areaOfEffect: true }
+    { id: 'acid_splash', name: 'Éclaboussure acide', damage: 40, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Projection d\'acide', areaOfEffect: true }
   ]
 };
 
@@ -2579,7 +2579,7 @@ const ZUGGTMOY: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Zuggtmoy, la Reine des Champignons, Dame de la Décomposition. Elle règne sur Shedaklah dans l\'Abysse.',
   skills: [
-    { id: 'spore_burst', name: 'Explosion de spores', damage: 35, damageType: 'poison', type: 'attack', description: 'Nuage de spores toxiques', areaOfEffect: true }
+    { id: 'spore_burst', name: 'Explosion de spores', damage: 35, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Nuage de spores toxiques', areaOfEffect: true }
   ]
 };
 
@@ -2599,8 +2599,8 @@ const BAPHOMET: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Baphomet, le Prince des Bêtes, Seigneur du Labyrinthe Sans Fin. Le patron des minotaures.',
   skills: [
-    { id: 'heartcleaver', name: 'Fendeur de Cœurs', damage: 45, damageType: 'slashing', type: 'attack', description: 'Grande hache démoniaque' },
-    { id: 'charge', name: 'Charge', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Charge brutale avec cornes' }
+    { id: 'heartcleaver', name: 'Fendeur de Cœurs', damage: 45, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Grande hache démoniaque' },
+    { id: 'charge', name: 'Charge', damage: 35, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Charge brutale avec cornes' }
   ]
 };
 
@@ -2620,7 +2620,7 @@ const FRAZURBLUU: Monster = {
   resistances: ['cold', 'fire', 'lightning'],
   description: 'Fraz-Urb\'luu, le Prince de la Tromperie. Maître des illusions et de la manipulation.',
   skills: [
-    { id: 'phantasmal_killer', name: 'Assassin fantomatique', damage: 40, damageType: 'psychic', type: 'attack', description: 'Illusion mortelle' }
+    { id: 'phantasmal_killer', name: 'Assassin fantomatique', damage: 40, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Illusion mortelle' }
   ]
 };
 
@@ -2648,8 +2648,8 @@ const STRAHD_VON_ZAROVICH: Monster = {
     { id: 'bite', name: 'Morsure', cost: 2, damage: 18, damageType: 'necrotic', description: 'Morsure vampirique drainante' }
   ],
   skills: [
-    { id: 'unarmed', name: 'Frappe vampirique', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Attaque à mains nues', attackCount: 2 },
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'necrotic', type: 'attack', description: 'Morsure drainant la vie' },
+    { id: 'unarmed', name: 'Frappe vampirique', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Attaque à mains nues', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Morsure drainant la vie' },
     { id: 'charm', name: 'Charme vampirique', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Charme une cible' }
   ],
   ultimateSkill: {
@@ -2679,9 +2679,9 @@ const ACERERAK: Monster = {
     { id: 'disrupt', name: 'Perturbation', cost: 2, damage: 35, damageType: 'necrotic', description: 'Explosion nécrotique' }
   ],
   skills: [
-    { id: 'staff', name: 'Bâton de l\'Archimage', damage: 15, damageType: 'bludgeoning', type: 'attack', description: 'Frappe au bâton' },
-    { id: 'ray_of_sickness', name: 'Rayon de maladie', damage: 25, damageType: 'necrotic', type: 'attack', description: 'Rayon nécrotique' },
-    { id: 'finger_of_death', name: 'Doigt de mort', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Sort dévastateur', savingThrow: { ability: 'constitution', dc: 20 } }
+    { id: 'staff', name: 'Bâton de l\'Archimage', damage: 15, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe au bâton' },
+    { id: 'ray_of_sickness', name: 'Rayon de maladie', damage: 25, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Rayon nécrotique' },
+    { id: 'finger_of_death', name: 'Doigt de mort', damage: 45, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Sort dévastateur', savingThrow: { ability: 'constitution', dc: 20 } }
   ],
   ultimateSkill: {
     id: 'sphere_annihilation', name: 'Sphère d\'Annihilation', damage: 100, damageType: 'force', type: 'special',
@@ -2705,8 +2705,8 @@ const VECNA: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
   description: 'Vecna, le Chuchoteur, Dieu de la Magie Sombre et des Secrets. La liche qui devint dieu.',
   skills: [
-    { id: 'dagger', name: 'Dague de Vecna', damage: 20, damageType: 'piercing', type: 'attack', description: 'Dague maudite' },
-    { id: 'deadly_ray', name: 'Rayon mortel', damage: 50, damageType: 'necrotic', type: 'attack', description: 'Rayon d\'énergie nécrotique' }
+    { id: 'dagger', name: 'Dague de Vecna', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague maudite' },
+    { id: 'deadly_ray', name: 'Rayon mortel', damage: 50, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Rayon d\'énergie nécrotique' }
   ],
   ultimateSkill: {
     id: 'rotten_fate', name: 'Destin Pourri', damage: 90, damageType: 'necrotic', type: 'special',
@@ -2739,7 +2739,7 @@ const TIAMAT: Monster = {
     { id: 'breath_poison', name: 'Souffle de poison', cost: 2, damage: 50, damageType: 'poison', description: 'Tête verte' }
   ],
   skills: [
-    { id: 'multiattack', name: 'Attaques multiples', damage: 35, damageType: 'slashing', type: 'attack', description: 'Griffes et morsures', attackCount: 5 },
+    { id: 'multiattack', name: 'Attaques multiples', damage: 35, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes et morsures', attackCount: 5 },
     { id: 'frightful_presence', name: 'Présence terrifiante', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Terreur divine' }
   ],
   ultimateSkill: {
@@ -2769,8 +2769,8 @@ const BAHAMUT: Monster = {
     { id: 'divine_word', name: 'Mot divin', cost: 3, damage: 60, damageType: 'radiant', description: 'Parole divine' }
   ],
   skills: [
-    { id: 'breath_weapon', name: 'Souffle de froid', damage: 60, damageType: 'cold', type: 'attack', description: 'Souffle glacial', areaOfEffect: true },
-    { id: 'divine_radiance', name: 'Radiance divine', damage: 50, damageType: 'radiant', type: 'attack', description: 'Lumière purificatrice' }
+    { id: 'breath_weapon', name: 'Souffle de froid', damage: 60, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Souffle glacial', areaOfEffect: true },
+    { id: 'divine_radiance', name: 'Radiance divine', damage: 50, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Lumière purificatrice' }
   ],
   ultimateSkill: {
     id: 'platinum_judgment', name: 'Jugement de Platine', damage: 100, damageType: 'radiant', type: 'special',
@@ -2797,8 +2797,8 @@ const YOUNG_BLACK_DRAGON: Monster = {
   immunities: ['acid'],
   description: 'Dragon noir sadique vivant dans les marécages. Son souffle d\'acide dissout tout.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 45, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 14 } }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 45, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Ligne d\'acide 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 14 } }
   ]
 };
 
@@ -2816,8 +2816,8 @@ const YOUNG_BLUE_DRAGON: Monster = {
   immunities: ['lightning'],
   description: 'Dragon bleu territorial du désert. Son souffle de foudre est dévastateur.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
-    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 55, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 55, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
   ]
 };
 
@@ -2835,8 +2835,8 @@ const YOUNG_GREEN_DRAGON: Monster = {
   immunities: ['poison'],
   description: 'Dragon vert manipulateur des forêts. Son souffle empoisonné est mortel.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
-    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 42, damageType: 'poison', type: 'attack', description: 'Cône de poison 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 42, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Cône de poison 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
   ]
 };
 
@@ -2861,8 +2861,8 @@ const ADULT_BLACK_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 16, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 25, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 54, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 18 } }
+    { id: 'bite', name: 'Morsure', damage: 25, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 54, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Ligne d\'acide 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 18 } }
   ],
   ultimateSkill: {
     id: 'acid_torrent', name: 'Torrent d\'Acide', damage: 70, damageType: 'acid', type: 'special',
@@ -2890,8 +2890,8 @@ const ADULT_BLUE_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
-    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 66, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 19 } }
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 66, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 19 } }
   ],
   ultimateSkill: {
     id: 'storm_fury', name: 'Furie de la Tempête', damage: 80, damageType: 'lightning', type: 'special',
@@ -2919,8 +2919,8 @@ const ADULT_GREEN_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 16, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 26, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
-    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 56, damageType: 'poison', type: 'attack', description: 'Cône de poison 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 18 } }
+    { id: 'bite', name: 'Morsure', damage: 26, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 56, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Cône de poison 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 18 } }
   ],
   ultimateSkill: {
     id: 'toxic_cloud', name: 'Nuage Toxique', damage: 70, damageType: 'poison', type: 'special',
@@ -2948,8 +2948,8 @@ const ADULT_WHITE_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 14, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 19 } }
+    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 19 } }
   ],
   ultimateSkill: {
     id: 'glacial_storm', name: 'Tempête Glaciaire', damage: 65, damageType: 'cold', type: 'special',
@@ -2978,8 +2978,8 @@ const ANCIENT_BLACK_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 20, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 34, damageType: 'piercing', type: 'attack', description: 'Morsure acide' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 67, damageType: 'acid', type: 'attack', description: 'Ligne d\'acide 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 22 } }
+    { id: 'bite', name: 'Morsure', damage: 34, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure acide' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 67, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Ligne d\'acide 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 22 } }
   ],
   ultimateSkill: {
     id: 'acid_apocalypse', name: 'Apocalypse Acide', damage: 90, damageType: 'acid', type: 'special',
@@ -3007,8 +3007,8 @@ const ANCIENT_BLUE_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure électrique' },
-    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 88, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 120 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 23 } }
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure électrique' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 88, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre 120 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 23 } }
   ],
   ultimateSkill: {
     id: 'thunderstorm', name: 'Tempête de Tonnerre', damage: 100, damageType: 'lightning', type: 'special',
@@ -3036,8 +3036,8 @@ const ANCIENT_GREEN_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 20, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
-    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 77, damageType: 'poison', type: 'attack', description: 'Cône de poison 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
+    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure venimeuse' },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 77, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Cône de poison 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
   ],
   ultimateSkill: {
     id: 'venomous_doom', name: 'Doom Venimeux', damage: 95, damageType: 'poison', type: 'special',
@@ -3065,8 +3065,8 @@ const ANCIENT_WHITE_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 72, damageType: 'cold', type: 'attack', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
+    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 72, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 22 } }
   ],
   ultimateSkill: {
     id: 'ice_age', name: 'Ère Glaciaire', damage: 85, damageType: 'cold', type: 'special',
@@ -3089,8 +3089,8 @@ const YOUNG_GOLD_DRAGON: Monster = {
   immunities: ['fire'],
   description: 'Dragon d\'or majestueux. Noble et juste, il protège les innocents.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 55, damageType: 'fire', type: 'attack', description: 'Cône de feu 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 17 } },
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 55, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 17 } },
     { id: 'weakening_breath', name: 'Souffle affaiblissant', damage: 0, damageType: 'force', type: 'debuff', description: 'Affaiblit les ennemis', recharge: { min: 5 }, savingThrow: { ability: 'strength', dc: 17 } }
   ]
 };
@@ -3115,8 +3115,8 @@ const ADULT_GOLD_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 30, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 66, damageType: 'fire', type: 'attack', description: 'Cône de feu 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 21 } }
+    { id: 'bite', name: 'Morsure', damage: 30, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 66, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 21 } }
   ],
   ultimateSkill: {
     id: 'divine_fire', name: 'Feu Divin', damage: 80, damageType: 'fire', type: 'special',
@@ -3144,8 +3144,8 @@ const ANCIENT_GOLD_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 40, damageType: 'piercing', type: 'attack', description: 'Morsure divine' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 91, damageType: 'fire', type: 'attack', description: 'Cône de feu 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 24 } }
+    { id: 'bite', name: 'Morsure', damage: 40, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure divine' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 91, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 24 } }
   ],
   ultimateSkill: {
     id: 'solar_judgment', name: 'Jugement Solaire', damage: 110, damageType: 'fire', type: 'special',
@@ -3167,8 +3167,8 @@ const YOUNG_SILVER_DRAGON: Monster = {
   immunities: ['cold'],
   description: 'Dragon d\'argent amical et protecteur. Aime la compagnie des humanoïdes.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', description: 'Cône de froid 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 17 } }
+    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 54, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône de froid 30 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 17 } }
   ]
 };
 
@@ -3192,8 +3192,8 @@ const ADULT_SILVER_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 18, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 67, damageType: 'cold', type: 'attack', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 20 } }
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 67, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône de froid 60 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 20 } }
   ],
   ultimateSkill: {
     id: 'winter_blessing', name: 'Bénédiction de l\'Hiver', damage: 75, damageType: 'cold', type: 'special',
@@ -3221,8 +3221,8 @@ const ANCIENT_SILVER_DRAGON: Monster = {
     { id: 'wing', name: 'Ailes', cost: 2, damage: 22, damageType: 'bludgeoning', description: 'Battement d\'ailes' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 90, damageType: 'cold', type: 'attack', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 24 } }
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 90, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône de froid 90 pieds', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 24 } }
   ],
   ultimateSkill: {
     id: 'eternal_frost', name: 'Givre Éternel', damage: 100, damageType: 'cold', type: 'special',
@@ -3255,8 +3255,8 @@ const DEMILICH: Monster = {
     { id: 'dust_cloud', name: 'Nuage de poussière', cost: 2, damage: 25, damageType: 'necrotic', description: 'Nuage nécrotique' }
   ],
   skills: [
-    { id: 'life_drain', name: 'Drain de vie', damage: 28, damageType: 'necrotic', type: 'attack', description: 'Aspire l\'essence vitale' },
-    { id: 'howl', name: 'Hurlement', damage: 35, damageType: 'psychic', type: 'attack', description: 'Hurlement psychique dévastateur', areaOfEffect: true }
+    { id: 'life_drain', name: 'Drain de vie', damage: 28, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Aspire l\'essence vitale' },
+    { id: 'howl', name: 'Hurlement', damage: 35, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Hurlement psychique dévastateur', areaOfEffect: true }
   ],
   ultimateSkill: {
     id: 'soul_trap', name: 'Piège à Âmes', damage: 50, damageType: 'necrotic', type: 'special',
@@ -3280,8 +3280,8 @@ const NIGHTWALKER: Monster = {
   conditionImmunities: ['exhaustion', 'frightened', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
   description: 'Une entité de pur néant des Royaumes des Ombres. Sa présence tue la lumière et la vie.',
   skills: [
-    { id: 'enervating_focus', name: 'Focus énervant', damage: 35, damageType: 'necrotic', type: 'attack', description: 'Drain de vie dévastateur' },
-    { id: 'finger_of_doom', name: 'Doigt du destin', damage: 45, damageType: 'necrotic', type: 'attack', description: 'Condamne une cible à mort' }
+    { id: 'enervating_focus', name: 'Focus énervant', damage: 35, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Drain de vie dévastateur' },
+    { id: 'finger_of_doom', name: 'Doigt du destin', damage: 45, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Condamne une cible à mort' }
   ],
   ultimateSkill: {
     id: 'annihilating_aura', name: 'Aura Annihilatrice', damage: 60, damageType: 'necrotic', type: 'special',
@@ -3305,8 +3305,8 @@ const BODAK: Monster = {
   conditionImmunities: ['charmed', 'frightened', 'poisoned'],
   description: 'Humanoïde corrompu par une rencontre avec un pouvoir maléfique absolu. Son regard tue.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Frappe mortelle' },
-    { id: 'death_gaze', name: 'Regard de mort', damage: 22, damageType: 'necrotic', type: 'attack', description: 'Regard qui tue', savingThrow: { ability: 'constitution', dc: 13 } }
+    { id: 'fist', name: 'Poing', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe mortelle' },
+    { id: 'death_gaze', name: 'Regard de mort', damage: 22, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Regard qui tue', savingThrow: { ability: 'constitution', dc: 13 } }
   ]
 };
 
@@ -3331,8 +3331,8 @@ const SKULL_LORD: Monster = {
     { id: 'spell', name: 'Sort', cost: 2, damage: 22, damageType: 'necrotic', description: 'Lance un sort' }
   ],
   skills: [
-    { id: 'bone_staff', name: 'Bâton d\'os', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Bâton enchanté', attackCount: 2 },
-    { id: 'finger_of_death', name: 'Doigt de mort', damage: 36, damageType: 'necrotic', type: 'attack', description: 'Rayon nécrotique' }
+    { id: 'bone_staff', name: 'Bâton d\'os', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton enchanté', attackCount: 2 },
+    { id: 'finger_of_death', name: 'Doigt de mort', damage: 36, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Rayon nécrotique' }
   ],
   ultimateSkill: {
     id: 'masters_call', name: 'Appel du Maître', damage: 45, damageType: 'necrotic', type: 'special',
@@ -3355,7 +3355,7 @@ const BONECLAW: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
   description: 'Une liche échouée dont la transformation a mal tourné. Liée à un maître vivant.',
   skills: [
-    { id: 'piercing_claw', name: 'Griffe perforante', damage: 25, damageType: 'piercing', type: 'attack', description: 'Griffes extensibles', attackCount: 2 },
+    { id: 'piercing_claw', name: 'Griffe perforante', damage: 25, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Griffes extensibles', attackCount: 2 },
     { id: 'shadow_jump', name: 'Saut d\'ombre', damage: 0, damageType: 'necrotic', type: 'special', description: 'Se téléporte via les ombres' }
   ]
 };
@@ -3385,8 +3385,8 @@ const ELDER_BRAIN: Monster = {
     { id: 'psychic_pulse', name: 'Pulse psychique', cost: 3, damage: 35, damageType: 'psychic', description: 'Onde psychique' }
   ],
   skills: [
-    { id: 'tentacle', name: 'Tentacule', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Frappe gluante' },
-    { id: 'mind_blast', name: 'Souffle mental', damage: 32, damageType: 'psychic', type: 'attack', description: 'Cône psychique 60 pieds', areaOfEffect: true, savingThrow: { ability: 'intelligence', dc: 18 } }
+    { id: 'tentacle', name: 'Tentacule', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe gluante' },
+    { id: 'mind_blast', name: 'Souffle mental', damage: 32, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Cône psychique 60 pieds', areaOfEffect: true, savingThrow: { ability: 'intelligence', dc: 18 } }
   ],
   ultimateSkill: {
     id: 'psychic_link', name: 'Lien Psychique', damage: 50, damageType: 'psychic', type: 'special',
@@ -3408,8 +3408,8 @@ const NEOTHELID: Monster = {
   immunities: ['psychic'],
   description: 'Un ver géant issu d\'un tadpole de flagelleur mental qui a grandi sans hôte. Bestial et vorace.',
   skills: [
-    { id: 'tentacles', name: 'Tentacules', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Tentacules écrasants' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 42, damageType: 'acid', type: 'attack', description: 'Cône d\'acide 60 pieds', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+    { id: 'tentacles', name: 'Tentacules', damage: 28, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Tentacules écrasants' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 42, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Cône d\'acide 60 pieds', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
   ],
   ultimateSkill: {
     id: 'psychic_scream', name: 'Hurlement Psychique', damage: 55, damageType: 'psychic', type: 'special',
@@ -3438,8 +3438,8 @@ const STAR_SPAWN_EMISSARY: Monster = {
     { id: 'teleport', name: 'Téléportation', cost: 2, damage: 0, damageType: 'force', description: 'Se téléporte' }
   ],
   skills: [
-    { id: 'lashing_claw', name: 'Griffe cinglante', damage: 28, damageType: 'slashing', type: 'attack', description: 'Griffes stellaires', attackCount: 2 },
-    { id: 'psychic_orb', name: 'Orbe psychique', damage: 35, damageType: 'psychic', type: 'attack', description: 'Orbe d\'énergie cosmique' }
+    { id: 'lashing_claw', name: 'Griffe cinglante', damage: 28, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes stellaires', attackCount: 2 },
+    { id: 'psychic_orb', name: 'Orbe psychique', damage: 35, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Orbe d\'énergie cosmique' }
   ],
   ultimateSkill: {
     id: 'cosmic_form', name: 'Forme Cosmique', damage: 70, damageType: 'force', type: 'special',
@@ -3469,9 +3469,9 @@ const KRAKEN: Monster = {
     { id: 'fling', name: 'Projection', cost: 3, damage: 35, damageType: 'bludgeoning', description: 'Projette une créature' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', description: 'Morsure titanesque' },
-    { id: 'tentacle', name: 'Tentacule', damage: 25, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de tentacule' },
-    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', description: 'Foudre des profondeurs', areaOfEffect: true, recharge: { min: 5 } }
+    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure titanesque' },
+    { id: 'tentacle', name: 'Tentacule', damage: 25, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de tentacule' },
+    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Foudre des profondeurs', areaOfEffect: true, recharge: { min: 5 } }
   ],
   ultimateSkill: {
     id: 'maelstrom', name: 'Maelström', damage: 80, damageType: 'bludgeoning', type: 'special',
@@ -3503,8 +3503,8 @@ const EMPYREAN: Monster = {
     { id: 'trembling_strike', name: 'Frappe tremblante', cost: 3, damage: 45, damageType: 'thunder', description: 'Impact sismique' }
   ],
   skills: [
-    { id: 'maul', name: 'Maul', damage: 35, damageType: 'bludgeoning', type: 'attack', description: 'Arme divine titanesque', attackCount: 2 },
-    { id: 'bolt', name: 'Trait de foudre', damage: 40, damageType: 'lightning', type: 'attack', description: 'Foudre céleste' }
+    { id: 'maul', name: 'Maul', damage: 35, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Arme divine titanesque', attackCount: 2 },
+    { id: 'bolt', name: 'Trait de foudre', damage: 40, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Foudre céleste' }
   ],
   ultimateSkill: {
     id: 'divine_wrath', name: 'Courroux Divin', damage: 90, damageType: 'radiant', type: 'special',
@@ -3528,7 +3528,7 @@ const PLANETAR: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
   description: 'Ange guerrier, commandant des armées célestes. Juste et impitoyable.',
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 28, damageType: 'slashing', type: 'attack', description: 'Épée divine', attackCount: 2 },
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 28, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée divine', attackCount: 2 },
     { id: 'healing_touch', name: 'Toucher guérisseur', damage: -30, damageType: 'radiant', type: 'buff', description: 'Guérit un allié' }
   ],
   ultimateSkill: {
@@ -3553,7 +3553,7 @@ const DEV: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'poisoned'],
   description: 'Ange messager, souvent envoyé sur le plan matériel pour guider les mortels.',
   skills: [
-    { id: 'mace', name: 'Masse', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Masse céleste', attackCount: 2 },
+    { id: 'mace', name: 'Masse', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Masse céleste', attackCount: 2 },
     { id: 'healing_touch', name: 'Toucher guérisseur', damage: -25, damageType: 'radiant', type: 'buff', description: 'Guérit un allié' }
   ]
 };
@@ -3577,9 +3577,9 @@ const STORM_GIANT: Monster = {
   immunities: ['lightning', 'thunder'],
   description: 'Le plus noble et puissant des géants. Maître des tempêtes et des océans.',
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 35, damageType: 'slashing', type: 'attack', description: 'Épée titanesque', attackCount: 2 },
-    { id: 'rock', name: 'Rocher', damage: 30, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' },
-    { id: 'lightning_strike', name: 'Frappe de foudre', damage: 40, damageType: 'lightning', type: 'attack', description: 'Canalise la foudre' }
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 35, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée titanesque', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 30, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' },
+    { id: 'lightning_strike', name: 'Frappe de foudre', damage: 40, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Canalise la foudre' }
   ],
   ultimateSkill: {
     id: 'tempest_fury', name: 'Furie Tempétueuse', damage: 60, damageType: 'lightning', type: 'special',
@@ -3600,8 +3600,8 @@ const HILL_GIANT: Monster = {
   isBoss: false,
   description: 'Le plus stupide et gourmand des géants. Brutal et affamé.',
   skills: [
-    { id: 'greatclub', name: 'Gourdin géant', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Frappe brutale', attackCount: 2 },
-    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' }
+    { id: 'greatclub', name: 'Gourdin géant', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe brutale', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' }
   ]
 };
 
@@ -3630,9 +3630,9 @@ const DROW_MATRON: Monster = {
     { id: 'divine_spell', name: 'Sort divin', cost: 1, damage: 18, damageType: 'necrotic', description: 'Sort de Lolth' }
   ],
   skills: [
-    { id: 'rod', name: 'Bâton de serpents', damage: 18, damageType: 'piercing', type: 'attack', description: 'Bâton vivant', attackCount: 2 },
-    { id: 'flame_strike', name: 'Colonne de feu', damage: 28, damageType: 'fire', type: 'attack', description: 'Flammes divines' },
-    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 22, damageType: 'piercing', type: 'attack', description: 'Nuée d\'araignées', areaOfEffect: true }
+    { id: 'rod', name: 'Bâton de serpents', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bâton vivant', attackCount: 2 },
+    { id: 'flame_strike', name: 'Colonne de feu', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Flammes divines' },
+    { id: 'insect_plague', name: 'Fléau d\'insectes', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Nuée d\'araignées', areaOfEffect: true }
   ],
   ultimateSkill: {
     id: 'lolth_blessing', name: 'Bénédiction de Lolth', damage: 50, damageType: 'necrotic', type: 'special',
@@ -3654,7 +3654,7 @@ const GITHYANKI_SUPREME_COMMANDER: Monster = {
   isHostileNpc: true,
   description: 'Chef de guerre githyanki, servant la reine-liche Vlaakith. Maître de l\'épée argentée.',
   skills: [
-    { id: 'silver_sword', name: 'Épée d\'argent', damage: 28, damageType: 'slashing', type: 'attack', description: 'Épée capable de couper les liens astraux', attackCount: 3 },
+    { id: 'silver_sword', name: 'Épée d\'argent', damage: 28, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée capable de couper les liens astraux', attackCount: 3 },
     { id: 'misty_step', name: 'Pas brumeux', damage: 0, damageType: 'force', type: 'special', description: 'Téléportation courte' }
   ],
   ultimateSkill: {
@@ -3679,10 +3679,10 @@ const ARCHMAGE: Monster = {
   immunities: [],
   description: 'Maître des arcanes, capable de lancer les sorts les plus dévastateurs.',
   skills: [
-    { id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', description: 'Dague enchantée' },
-    { id: 'fire_bolt', name: 'Trait de feu', damage: 18, damageType: 'fire', type: 'attack', description: 'Rayon de feu' },
-    { id: 'cone_of_cold', name: 'Cône de froid', damage: 36, damageType: 'cold', type: 'attack', description: 'Vague de froid', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 17 } },
-    { id: 'lightning_bolt', name: 'Éclair', damage: 32, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre', savingThrow: { ability: 'dexterity', dc: 17 } }
+    { id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague enchantée' },
+    { id: 'fire_bolt', name: 'Trait de feu', damage: 18, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Rayon de feu' },
+    { id: 'cone_of_cold', name: 'Cône de froid', damage: 36, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Vague de froid', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 17 } },
+    { id: 'lightning_bolt', name: 'Éclair', damage: 32, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre', savingThrow: { ability: 'dexterity', dc: 17 } }
   ],
   ultimateSkill: {
     id: 'time_stop', name: 'Arrêt du Temps', damage: 60, damageType: 'force', type: 'special',
@@ -3707,7 +3707,7 @@ const HYDRA: Monster = {
   isBoss: false,
   description: 'Bête à multiples têtes qui repoussent quand on les coupe. Terreur des marais.',
   skills: [
-    { id: 'bite', name: 'Morsures', damage: 18, damageType: 'piercing', type: 'attack', description: '5 morsures (une par tête)', attackCount: 5 }
+    { id: 'bite', name: 'Morsures', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: '5 morsures (une par tête)', attackCount: 5 }
   ]
 };
 
@@ -3724,8 +3724,8 @@ const PURPLE_WORM: Monster = {
   isBoss: true,
   description: 'Ver géant des profondeurs. Capable d\'avaler des créatures entières.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', description: 'Morsure dévorante' },
-    { id: 'tail_stinger', name: 'Dard de queue', damage: 28, damageType: 'piercing', type: 'attack', description: 'Dard venimeux', effect: { type: 'poison', value: 15, turns: 3 } }
+    { id: 'bite', name: 'Morsure', damage: 35, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure dévorante' },
+    { id: 'tail_stinger', name: 'Dard de queue', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dard venimeux', effect: { type: 'poison', value: 15, turns: 3 } }
   ],
   ultimateSkill: {
     id: 'swallow', name: 'Engloutir', damage: 50, damageType: 'acid', type: 'special',
@@ -3746,8 +3746,8 @@ const ROC: Monster = {
   isBoss: true,
   description: 'Oiseau légendaire géant. Capable d\'emporter des éléphants dans ses serres.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 32, damageType: 'piercing', type: 'attack', description: 'Bec titanesque' },
-    { id: 'talons', name: 'Serres', damage: 28, damageType: 'slashing', type: 'attack', description: 'Serres agrippantes' }
+    { id: 'beak', name: 'Bec', damage: 32, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bec titanesque' },
+    { id: 'talons', name: 'Serres', damage: 28, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres agrippantes' }
   ],
   ultimateSkill: {
     id: 'dive_attack', name: 'Attaque en Piqué', damage: 55, damageType: 'bludgeoning', type: 'special',
@@ -3769,8 +3769,8 @@ const BEHIR: Monster = {
   immunities: ['lightning'],
   description: 'Serpent géant à plusieurs pattes. Ennemi ancestral des dragons.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure avec constriction' },
-    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 42, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre 20 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure avec constriction' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 42, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre 20 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 16 } }
   ]
 };
 
@@ -3787,8 +3787,8 @@ const BULETTE: Monster = {
   isBoss: false,
   description: 'Requin terrestre. Surgit du sol pour dévorer ses proies.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure puissante' },
-    { id: 'deadly_leap', name: 'Bond mortel', damage: 25, damageType: 'bludgeoning', type: 'attack', description: 'Saute sur sa proie', areaOfEffect: true }
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure puissante' },
+    { id: 'deadly_leap', name: 'Bond mortel', damage: 25, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Saute sur sa proie', areaOfEffect: true }
   ]
 };
 
@@ -3806,7 +3806,7 @@ const GORGON: Monster = {
   conditionImmunities: ['petrified'],
   description: 'Taureau de fer au souffle pétrifiant. Pas à confondre avec la Méduse.',
   skills: [
-    { id: 'gore', name: 'Encornage', damage: 20, damageType: 'piercing', type: 'attack', description: 'Charge aux cornes' },
+    { id: 'gore', name: 'Encornage', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Charge aux cornes' },
     { id: 'petrifying_breath', name: 'Souffle pétrifiant', damage: 0, damageType: 'poison', type: 'debuff', description: 'Pétrifie les victimes', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 13 } }
   ]
 };
@@ -3831,8 +3831,8 @@ const PHOENIX: Monster = {
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned'],
   description: 'Oiseau de feu immortel. Renaît de ses cendres après chaque mort.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 28, damageType: 'fire', type: 'attack', description: 'Bec enflammé' },
-    { id: 'fiery_talons', name: 'Serres ardentes', damage: 25, damageType: 'fire', type: 'attack', description: 'Serres de flammes' }
+    { id: 'beak', name: 'Bec', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Bec enflammé' },
+    { id: 'fiery_talons', name: 'Serres ardentes', damage: 25, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Serres de flammes' }
   ],
   ultimateSkill: {
     id: 'inferno_rebirth', name: 'Renaissance Infernale', damage: 65, damageType: 'fire', type: 'special',
@@ -3861,8 +3861,8 @@ const ZARATAN: Monster = {
     { id: 'quake', name: 'Séisme', cost: 2, damage: 35, damageType: 'bludgeoning', description: 'Fait trembler le sol' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', description: 'Morsure titanesque' },
-    { id: 'stomp', name: 'Piétinement', damage: 28, damageType: 'bludgeoning', type: 'attack', description: 'Écrase les ennemis' }
+    { id: 'bite', name: 'Morsure', damage: 38, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure titanesque' },
+    { id: 'stomp', name: 'Piétinement', damage: 28, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Écrase les ennemis' }
   ],
   ultimateSkill: {
     id: 'earth_splitting', name: 'Fracture Terrestre', damage: 75, damageType: 'bludgeoning', type: 'special',
@@ -3891,8 +3891,8 @@ const ELDER_TEMPEST: Monster = {
     { id: 'screaming_wind', name: 'Vent hurlant', cost: 2, damage: 25, damageType: 'thunder', description: 'Bourrasque dévastatrice' }
   ],
   skills: [
-    { id: 'thunderous_slam', name: 'Frappe tonitruante', damage: 35, damageType: 'thunder', type: 'attack', description: 'Impact de tonnerre' },
-    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', description: 'Pluie d\'éclairs', areaOfEffect: true }
+    { id: 'thunderous_slam', name: 'Frappe tonitruante', damage: 35, damageType: 'thunder', type: 'attack', targetType: 'enemy', description: 'Impact de tonnerre' },
+    { id: 'lightning_storm', name: 'Tempête de foudre', damage: 45, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Pluie d\'éclairs', areaOfEffect: true }
   ],
   ultimateSkill: {
     id: 'primal_storm', name: 'Tempête Primordiale', damage: 85, damageType: 'lightning', type: 'special',
@@ -3921,7 +3921,7 @@ const MUMMY: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
   description: 'Ancien gardien momifié protégeant son tombeau pour l\'éternité.',
   skills: [
-    { id: 'rotting_fist', name: 'Poing putréfiant', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Frappe maudite', attackCount: 2 },
+    { id: 'rotting_fist', name: 'Poing putréfiant', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe maudite', attackCount: 2 },
     { id: 'dreadful_glare', name: 'Regard effroyable', damage: 0, damageType: 'necrotic', type: 'debuff', description: 'Paralyse de terreur', savingThrow: { ability: 'wisdom', dc: 11 } }
   ]
 };
@@ -3949,8 +3949,8 @@ const MUMMY_LORD: Monster = {
     { id: 'blasphemous_word', name: 'Parole blasphématoire', cost: 2, damage: 25, damageType: 'necrotic', description: 'Malédiction divine' }
   ],
   skills: [
-    { id: 'rotting_fist', name: 'Poing putréfiant', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Frappe maudite', attackCount: 2 },
-    { id: 'harm', name: 'Blessure', damage: 30, damageType: 'necrotic', type: 'attack', description: 'Sort nécrotique', savingThrow: { ability: 'constitution', dc: 16 } }
+    { id: 'rotting_fist', name: 'Poing putréfiant', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe maudite', attackCount: 2 },
+    { id: 'harm', name: 'Blessure', damage: 30, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Sort nécrotique', savingThrow: { ability: 'constitution', dc: 16 } }
   ],
   ultimateSkill: {
     id: 'whirlwind_of_sand', name: 'Tourbillon de Sable', damage: 45, damageType: 'bludgeoning', type: 'special',
@@ -3974,7 +3974,7 @@ const REVENANT: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned', 'stunned'],
   description: 'Esprit vengeur revenu d\'entre les morts pour accomplir sa vengeance.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Frappe vengeresse', attackCount: 2 },
+    { id: 'fist', name: 'Poing', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe vengeresse', attackCount: 2 },
     { id: 'vengeful_glare', name: 'Regard vengeur', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Marque sa proie' }
   ]
 };
@@ -3995,8 +3995,8 @@ const ALLIP: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
   description: 'Esprit d\'un érudit devenu fou, condamné à murmurer des secrets indicibles.',
   skills: [
-    { id: 'maddening_touch', name: 'Toucher de folie', damage: 18, damageType: 'psychic', type: 'attack', description: 'Contact psychique' },
-    { id: 'whispers_of_madness', name: 'Murmures de folie', damage: 22, damageType: 'psychic', type: 'attack', description: 'Folie contagieuse', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 14 } }
+    { id: 'maddening_touch', name: 'Toucher de folie', damage: 18, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Contact psychique' },
+    { id: 'whispers_of_madness', name: 'Murmures de folie', damage: 22, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Folie contagieuse', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 14 } }
   ]
 };
 
@@ -4016,7 +4016,7 @@ const SWORD_WRAITH_COMMANDER: Monster = {
   conditionImmunities: ['exhaustion', 'frightened', 'poisoned', 'unconscious'],
   description: 'Guerrier mort au combat, revenu pour mener son armée spectrale.',
   skills: [
-    { id: 'longsword', name: 'Épée longue', damage: 18, damageType: 'slashing', type: 'attack', description: 'Frappe martiale', attackCount: 2 },
+    { id: 'longsword', name: 'Épée longue', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe martiale', attackCount: 2 },
     { id: 'call_to_arms', name: 'Appel aux armes', damage: 0, damageType: 'necrotic', type: 'buff', description: 'Renforce les alliés morts-vivants' }
   ]
 };
@@ -4037,8 +4037,8 @@ const DEATHLOCK: Monster = {
   conditionImmunities: ['exhaustion', 'poisoned'],
   description: 'Sorcier mort-vivant lié à son patron d\'outre-tombe.',
   skills: [
-    { id: 'deathly_claw', name: 'Griffe mortelle', damage: 12, damageType: 'necrotic', type: 'attack', description: 'Frappe nécrotique' },
-    { id: 'eldritch_blast', name: 'Décharge occulte', damage: 16, damageType: 'force', type: 'attack', description: 'Rayon d\'énergie occulte' }
+    { id: 'deathly_claw', name: 'Griffe mortelle', damage: 12, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Frappe nécrotique' },
+    { id: 'eldritch_blast', name: 'Décharge occulte', damage: 16, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Rayon d\'énergie occulte' }
   ]
 };
 
@@ -4057,8 +4057,8 @@ const SPAWN_OF_KYUSS: Monster = {
   conditionImmunities: ['exhaustion', 'poisoned'],
   description: 'Mort-vivant infecté par les vers de Kyuss, le Dieu Ver.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes putrides', attackCount: 2 },
-    { id: 'burrowing_worm', name: 'Ver fouisseur', damage: 18, damageType: 'necrotic', type: 'attack', description: 'Projette un ver parasite' }
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes putrides', attackCount: 2 },
+    { id: 'burrowing_worm', name: 'Ver fouisseur', damage: 18, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Projette un ver parasite' }
   ]
 };
 
@@ -4080,9 +4080,9 @@ const ASSASSIN: Monster = {
   resistances: ['poison'],
   description: 'Tueur professionnel expert en élimination silencieuse.',
   skills: [
-    { id: 'shortsword', name: 'Épée courte', damage: 15, damageType: 'piercing', type: 'attack', description: 'Frappe précise', attackCount: 2 },
-    { id: 'light_crossbow', name: 'Arbalète légère', damage: 12, damageType: 'piercing', type: 'attack', description: 'Tir empoisonné' },
-    { id: 'sneak_attack', name: 'Attaque sournoise', damage: 28, damageType: 'piercing', type: 'attack', description: 'Frappe fatale' }
+    { id: 'shortsword', name: 'Épée courte', damage: 15, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Frappe précise', attackCount: 2 },
+    { id: 'light_crossbow', name: 'Arbalète légère', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tir empoisonné' },
+    { id: 'sneak_attack', name: 'Attaque sournoise', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Frappe fatale' }
   ]
 };
 
@@ -4099,8 +4099,8 @@ const GLADIATOR: Monster = {
   isBoss: false,
   description: 'Champion de l\'arène, maître du combat spectaculaire.',
   skills: [
-    { id: 'spear', name: 'Lance', damage: 16, damageType: 'piercing', type: 'attack', description: 'Coup de lance', attackCount: 3 },
-    { id: 'shield_bash', name: 'Coup de bouclier', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Frappe au bouclier' }
+    { id: 'spear', name: 'Lance', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de lance', attackCount: 3 },
+    { id: 'shield_bash', name: 'Coup de bouclier', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe au bouclier' }
   ]
 };
 
@@ -4117,8 +4117,8 @@ const VETERAN: Monster = {
   isBoss: false,
   description: 'Soldat expérimenté ayant survécu à d\'innombrables batailles.',
   skills: [
-    { id: 'longsword', name: 'Épée longue', damage: 12, damageType: 'slashing', type: 'attack', description: 'Frappe experte', attackCount: 2 },
-    { id: 'heavy_crossbow', name: 'Arbalète lourde', damage: 10, damageType: 'piercing', type: 'attack', description: 'Tir précis' }
+    { id: 'longsword', name: 'Épée longue', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe experte', attackCount: 2 },
+    { id: 'heavy_crossbow', name: 'Arbalète lourde', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tir précis' }
   ]
 };
 
@@ -4135,8 +4135,8 @@ const BANDIT_CAPTAIN: Monster = {
   isBoss: false,
   description: 'Chef de bande impitoyable et rusé.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 10, damageType: 'slashing', type: 'attack', description: 'Frappe rapide', attackCount: 3 },
-    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', description: 'Lancer de dague' }
+    { id: 'scimitar', name: 'Cimeterre', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe rapide', attackCount: 3 },
+    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer de dague' }
   ]
 };
 
@@ -4153,8 +4153,8 @@ const CULT_FANATIC: Monster = {
   isBoss: false,
   description: 'Adorateur dévot d\'une puissance maléfique.',
   skills: [
-    { id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', description: 'Dague rituelle', attackCount: 2 },
-    { id: 'sacred_flame', name: 'Flamme sacrée', damage: 10, damageType: 'radiant', type: 'attack', description: 'Feu divin corrompu' },
+    { id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague rituelle', attackCount: 2 },
+    { id: 'sacred_flame', name: 'Flamme sacrée', damage: 10, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Feu divin corrompu' },
     { id: 'hold_person', name: 'Immobilisation', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Paralyse la cible' }
   ]
 };
@@ -4172,8 +4172,8 @@ const PRIEST: Monster = {
   isBoss: false,
   description: 'Serviteur d\'une divinité, capable de miracles.',
   skills: [
-    { id: 'mace', name: 'Masse', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Masse sacrée' },
-    { id: 'guiding_bolt', name: 'Trait directeur', damage: 14, damageType: 'radiant', type: 'attack', description: 'Lumière divine' },
+    { id: 'mace', name: 'Masse', damage: 6, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Masse sacrée' },
+    { id: 'guiding_bolt', name: 'Trait directeur', damage: 14, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Lumière divine' },
     { id: 'cure_wounds', name: 'Soins', damage: -15, damageType: 'radiant', type: 'buff', description: 'Guérison divine' }
   ]
 };
@@ -4191,9 +4191,9 @@ const MAGE: Monster = {
   isBoss: false,
   description: 'Lanceur de sorts accompli maîtrisant les arcanes.',
   skills: [
-    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', description: 'Dague enchantée' },
-    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', description: 'Explosion de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 14 } },
-    { id: 'ice_storm', name: 'Tempête de grêle', damage: 18, damageType: 'cold', type: 'attack', description: 'Pluie de grêlons', areaOfEffect: true }
+    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague enchantée' },
+    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Explosion de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 14 } },
+    { id: 'ice_storm', name: 'Tempête de grêle', damage: 18, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Pluie de grêlons', areaOfEffect: true }
   ]
 };
 
@@ -4210,8 +4210,8 @@ const WAR_PRIEST: Monster = {
   isBoss: false,
   description: 'Champion divin mêlant foi et martial.',
   skills: [
-    { id: 'maul', name: 'Maul', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Marteau sacré', attackCount: 2 },
-    { id: 'flame_strike', name: 'Colonne de flammes', damage: 28, damageType: 'fire', type: 'attack', description: 'Feu divin', areaOfEffect: true },
+    { id: 'maul', name: 'Maul', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Marteau sacré', attackCount: 2 },
+    { id: 'flame_strike', name: 'Colonne de flammes', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Feu divin', areaOfEffect: true },
     { id: 'heal', name: 'Guérison', damage: -30, damageType: 'radiant', type: 'buff', description: 'Guérison divine majeure' }
   ]
 };
@@ -4229,7 +4229,7 @@ const BLACKGUARD: Monster = {
   isBoss: false,
   description: 'Paladin déchu au service des ténèbres.',
   skills: [
-    { id: 'glaive', name: 'Glaive', damage: 18, damageType: 'slashing', type: 'attack', description: 'Arme d\'hast maudite', attackCount: 3 },
+    { id: 'glaive', name: 'Glaive', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Arme d\'hast maudite', attackCount: 3 },
     { id: 'dreadful_aspect', name: 'Aspect terrifiant', damage: 0, damageType: 'necrotic', type: 'debuff', description: 'Aura de terreur', areaOfEffect: true }
   ]
 };
@@ -4247,8 +4247,8 @@ const CHAMPION: Monster = {
   isBoss: false,
   description: 'Guerrier d\'élite aux compétences martiales légendaires.',
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 20, damageType: 'slashing', type: 'attack', description: 'Frappe dévastatrice', attackCount: 3 },
-    { id: 'light_crossbow', name: 'Arbalète légère', damage: 12, damageType: 'piercing', type: 'attack', description: 'Tir de précision' }
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 20, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe dévastatrice', attackCount: 3 },
+    { id: 'light_crossbow', name: 'Arbalète légère', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tir de précision' }
   ]
 };
 
@@ -4271,7 +4271,7 @@ const WARLORD: Monster = {
     { id: 'frightening_charge', name: 'Charge terrifiante', cost: 3, damage: 25, damageType: 'slashing', description: 'Charge intimidante' }
   ],
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 20, damageType: 'slashing', type: 'attack', description: 'Frappe de maître', attackCount: 3 },
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 20, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe de maître', attackCount: 3 },
     { id: 'inspiring_cry', name: 'Cri inspirant', damage: 0, damageType: 'force', type: 'buff', description: 'Motive les alliés' }
   ],
   ultimateSkill: {
@@ -4297,7 +4297,7 @@ const DISPLACER_BEAST: Monster = {
   isBoss: false,
   description: 'Félin à six pattes projetant une illusion pour tromper ses proies.',
   skills: [
-    { id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Frappe tentaculaire', attackCount: 2 }
+    { id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe tentaculaire', attackCount: 2 }
   ]
 };
 
@@ -4314,7 +4314,7 @@ const HOOK_HORROR: Monster = {
   isBoss: false,
   description: 'Créature souterraine aux bras terminés par des crochets mortels.',
   skills: [
-    { id: 'hook', name: 'Crochet', damage: 14, damageType: 'piercing', type: 'attack', description: 'Frappe crochue', attackCount: 2 }
+    { id: 'hook', name: 'Crochet', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Frappe crochue', attackCount: 2 }
   ]
 };
 
@@ -4332,8 +4332,8 @@ const GRICK: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Ver serpentin aux tentacules acérés vivant dans les cavernes.',
   skills: [
-    { id: 'tentacles', name: 'Tentacules', damage: 10, damageType: 'slashing', type: 'attack', description: 'Fouet tentaculaire' },
-    { id: 'beak', name: 'Bec', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' }
+    { id: 'tentacles', name: 'Tentacules', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Fouet tentaculaire' },
+    { id: 'beak', name: 'Bec', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }
   ]
 };
 
@@ -4351,8 +4351,8 @@ const GRICK_ALPHA: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Grick géant, chef de meute redoutable.',
   skills: [
-    { id: 'tail', name: 'Queue', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de queue' },
-    { id: 'tentacles', name: 'Tentacules', damage: 18, damageType: 'slashing', type: 'attack', description: 'Fouet tentaculaire', attackCount: 2 }
+    { id: 'tail', name: 'Queue', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de queue' },
+    { id: 'tentacles', name: 'Tentacules', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Fouet tentaculaire', attackCount: 2 }
   ]
 };
 
@@ -4369,8 +4369,8 @@ const PERYTON: Monster = {
   isBoss: false,
   description: 'Créature ailée à corps de cerf et tête d\'aigle, dévoreuse de cœurs.',
   skills: [
-    { id: 'gore', name: 'Coup de bois', damage: 10, damageType: 'piercing', type: 'attack', description: 'Attaque aux bois' },
-    { id: 'talons', name: 'Serres', damage: 8, damageType: 'piercing', type: 'attack', description: 'Griffes acérées' }
+    { id: 'gore', name: 'Coup de bois', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Attaque aux bois' },
+    { id: 'talons', name: 'Serres', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' }
   ]
 };
 
@@ -4388,8 +4388,8 @@ const WINTER_WOLF: Monster = {
   immunities: ['cold'],
   description: 'Loup géant des terres gelées au souffle de givre.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 18, damageType: 'cold', type: 'attack', description: 'Cône glacial 15 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 18, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône glacial 15 pieds', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
   ]
 };
 
@@ -4406,7 +4406,7 @@ const WORG: Monster = {
   isBoss: false,
   description: 'Loup maléfique intelligent, souvent monture des gobelins.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure puissante' }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure puissante' }
   ]
 };
 
@@ -4429,8 +4429,8 @@ const DEATH_TYRANT: Monster = {
     { id: 'eye_ray', name: 'Rayon oculaire', cost: 1, damage: 25, damageType: 'necrotic', description: 'Tire un rayon' }
   ],
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Mâchoire centrale' },
-    { id: 'negative_energy_cone', name: 'Cône d\'énergie négative', damage: 30, damageType: 'necrotic', type: 'attack', description: 'Rayon central mortel', areaOfEffect: true }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoire centrale' },
+    { id: 'negative_energy_cone', name: 'Cône d\'énergie négative', damage: 30, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Rayon central mortel', areaOfEffect: true }
   ],
   ultimateSkill: {
     id: 'death_ray', name: 'Rayon de Mort', damage: 55, damageType: 'necrotic', type: 'special',
@@ -4451,8 +4451,8 @@ const CATOBLEPAS: Monster = {
   isBoss: false,
   description: 'Créature hideuse au regard mortel vivant dans les marécages.',
   skills: [
-    { id: 'tail', name: 'Queue', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Coup de queue' },
-    { id: 'death_ray', name: 'Rayon mortel', damage: 36, damageType: 'necrotic', type: 'attack', description: 'Regard de mort', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 16 } }
+    { id: 'tail', name: 'Queue', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de queue' },
+    { id: 'death_ray', name: 'Rayon mortel', damage: 36, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Regard de mort', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 16 } }
   ]
 };
 
@@ -4469,8 +4469,8 @@ const LEUCROTTA: Monster = {
   isBoss: false,
   description: 'Prédateur à la gueule bordée d\'os tranchants, imitant les voix.',
   skills: [
-    { id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Piétinement' },
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Mâchoires d\'os' }
+    { id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Piétinement' },
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoires d\'os' }
   ]
 };
 
@@ -4494,7 +4494,7 @@ const IMP: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Petit diable espion et serviteur des sorciers.',
   skills: [
-    { id: 'sting', name: 'Dard', damage: 6, damageType: 'piercing', type: 'attack', description: 'Piqûre venimeuse' }
+    { id: 'sting', name: 'Dard', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Piqûre venimeuse' }
   ]
 };
 
@@ -4514,7 +4514,7 @@ const QUASIT: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Petit démon serviteur et familier chaotique.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 5, damageType: 'slashing', type: 'attack', description: 'Griffes empoisonnées' }
+    { id: 'claws', name: 'Griffes', damage: 5, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes empoisonnées' }
   ]
 };
 
@@ -4534,7 +4534,7 @@ const LEMURE: Monster = {
   conditionImmunities: ['charmed', 'frightened', 'poisoned'],
   description: 'La forme la plus basse des diables, masse de chair gémissante.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 4, damageType: 'bludgeoning', type: 'attack', description: 'Coup faible' }
+    { id: 'fist', name: 'Poing', damage: 4, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup faible' }
   ]
 };
 
@@ -4554,8 +4554,8 @@ const DRETCH: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon de bas étage, serviteur pathétique mais dangereux en nombre.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 5, damageType: 'piercing', type: 'attack', description: 'Morsure faible' },
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' }
+    { id: 'bite', name: 'Morsure', damage: 5, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure faible' },
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' }
   ]
 };
 
@@ -4575,7 +4575,7 @@ const MANES: Monster = {
   conditionImmunities: ['charmed', 'frightened', 'poisoned'],
   description: 'Âme damnée transformée en démon inférieur.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 4, damageType: 'slashing', type: 'attack', description: 'Griffes faibles' }
+    { id: 'claws', name: 'Griffes', damage: 4, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes faibles' }
   ]
 };
 
@@ -4595,8 +4595,8 @@ const BEARDED_DEVIL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Soldat infernal à la barbe serpentine.',
   skills: [
-    { id: 'beard', name: 'Barbe', damage: 8, damageType: 'piercing', type: 'attack', description: 'Barbe empoisonnée' },
-    { id: 'glaive', name: 'Glaive', damage: 14, damageType: 'slashing', type: 'attack', description: 'Arme infernale' }
+    { id: 'beard', name: 'Barbe', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Barbe empoisonnée' },
+    { id: 'glaive', name: 'Glaive', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Arme infernale' }
   ]
 };
 
@@ -4616,7 +4616,7 @@ const CHAIN_DEVIL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Tortionnaire infernal maître des chaînes animées.',
   skills: [
-    { id: 'chain', name: 'Chaîne', damage: 16, damageType: 'slashing', type: 'attack', description: 'Chaîne animate', attackCount: 2 },
+    { id: 'chain', name: 'Chaîne', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Chaîne animate', attackCount: 2 },
     { id: 'animate_chains', name: 'Animation de chaînes', damage: 0, damageType: 'force', type: 'debuff', description: 'Les chaînes environnantes attaquent' }
   ]
 };
@@ -4637,8 +4637,8 @@ const BONE_DEVIL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Commandant osseux des légions infernales.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes osseuses', attackCount: 2 },
-    { id: 'sting', name: 'Dard', damage: 18, damageType: 'piercing', type: 'attack', description: 'Queue empoisonnée' }
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes osseuses', attackCount: 2 },
+    { id: 'sting', name: 'Dard', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Queue empoisonnée' }
   ]
 };
 
@@ -4658,9 +4658,9 @@ const ICE_DEVIL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Général gelé des Neuf Enfers, stratège implacable.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure glacée' },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes de glace', attackCount: 2 },
-    { id: 'tail', name: 'Queue', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Coup de queue' },
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure glacée' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes de glace', attackCount: 2 },
+    { id: 'tail', name: 'Queue', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de queue' },
     { id: 'wall_of_ice', name: 'Mur de glace', damage: 0, damageType: 'cold', type: 'special', description: 'Invoque un mur de glace' }
   ],
   ultimateSkill: {
@@ -4685,9 +4685,9 @@ const HORNED_DEVIL: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Elite infernale aux cornes dévastatrices.',
   skills: [
-    { id: 'fork', name: 'Fourche', damage: 18, damageType: 'piercing', type: 'attack', description: 'Fourche infernale', attackCount: 2 },
-    { id: 'tail', name: 'Queue', damage: 14, damageType: 'piercing', type: 'attack', description: 'Coup de queue' },
-    { id: 'hurl_flame', name: 'Jet de flammes', damage: 22, damageType: 'fire', type: 'attack', description: 'Lance des flammes' }
+    { id: 'fork', name: 'Fourche', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Fourche infernale', attackCount: 2 },
+    { id: 'tail', name: 'Queue', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de queue' },
+    { id: 'hurl_flame', name: 'Jet de flammes', damage: 22, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Lance des flammes' }
   ]
 };
 
@@ -4707,8 +4707,8 @@ const ERINYES: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Ange déchue au service des Enfers, belle et mortelle.',
   skills: [
-    { id: 'longsword', name: 'Épée longue', damage: 18, damageType: 'slashing', type: 'attack', description: 'Lame infernale', attackCount: 3 },
-    { id: 'longbow', name: 'Arc long', damage: 16, damageType: 'piercing', type: 'attack', description: 'Flèches empoisonnées', attackCount: 3 }
+    { id: 'longsword', name: 'Épée longue', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Lame infernale', attackCount: 3 },
+    { id: 'longbow', name: 'Arc long', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Flèches empoisonnées', attackCount: 3 }
   ],
   ultimateSkill: {
     id: 'rope_of_entanglement', name: 'Corde d\'Entrave', damage: 25, damageType: 'force', type: 'special',
@@ -4732,8 +4732,8 @@ const VROCK: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon vautour aux cris assourdissants.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 14, damageType: 'piercing', type: 'attack', description: 'Bec crochu' },
-    { id: 'talons', name: 'Serres', damage: 16, damageType: 'slashing', type: 'attack', description: 'Serres acérées' },
+    { id: 'beak', name: 'Bec', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bec crochu' },
+    { id: 'talons', name: 'Serres', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres acérées' },
     { id: 'stunning_screech', name: 'Cri étourdissant', damage: 0, damageType: 'thunder', type: 'debuff', description: 'Hurlement paralysant', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
   ]
 };
@@ -4754,8 +4754,8 @@ const HEZROU: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon crapaud à la puanteur nauséabonde.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Mâchoire de batracien' },
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoire de batracien' },
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -4775,8 +4775,8 @@ const GLABREZU: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon tentateur aux pinces gigantesques.',
   skills: [
-    { id: 'pincer', name: 'Pince', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Pinces écrasantes', attackCount: 2 },
-    { id: 'fist', name: 'Poing', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Coup de poing', attackCount: 2 }
+    { id: 'pincer', name: 'Pince', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Pinces écrasantes', attackCount: 2 },
+    { id: 'fist', name: 'Poing', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de poing', attackCount: 2 }
   ]
 };
 
@@ -4796,8 +4796,8 @@ const NALFESHNEE: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon juge obèse aux ailes atrophiées.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Mâchoire de porc' },
-    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoire de porc' },
+    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
     { id: 'horror_nimbus', name: 'Nimbe d\'horreur', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Aura de terreur', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'wisdom', dc: 15 } }
   ],
   ultimateSkill: {
@@ -4827,8 +4827,8 @@ const MARILITH: Monster = {
     { id: 'teleport', name: 'Téléportation', cost: 2, damage: 0, damageType: 'force', description: 'Se téléporte' }
   ],
   skills: [
-    { id: 'longsword', name: 'Épées longues', damage: 18, damageType: 'slashing', type: 'attack', description: 'Six lames', attackCount: 6 },
-    { id: 'tail', name: 'Queue', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Constriction' }
+    { id: 'longsword', name: 'Épées longues', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Six lames', attackCount: 6 },
+    { id: 'tail', name: 'Queue', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Constriction' }
   ],
   ultimateSkill: {
     id: 'dance_of_death', name: 'Danse de la Mort', damage: 75, damageType: 'slashing', type: 'special',
@@ -4852,9 +4852,9 @@ const GORISTRO: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon taureau, bélier de siège vivant de l\'Abysse.',
   skills: [
-    { id: 'gore', name: 'Encornage', damage: 32, damageType: 'piercing', type: 'attack', description: 'Cornes dévastatrices' },
-    { id: 'fist', name: 'Poing', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Coup de poing' },
-    { id: 'charge', name: 'Charge', damage: 40, damageType: 'bludgeoning', type: 'attack', description: 'Charge brutale' }
+    { id: 'gore', name: 'Encornage', damage: 32, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Cornes dévastatrices' },
+    { id: 'fist', name: 'Poing', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de poing' },
+    { id: 'charge', name: 'Charge', damage: 40, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Charge brutale' }
   ],
   ultimateSkill: {
     id: 'rampage', name: 'Déchaînement', damage: 65, damageType: 'bludgeoning', type: 'special',
@@ -4879,8 +4879,8 @@ const GIANT_APE: Monster = {
   isBoss: false,
   description: 'Primate colossal d\'une force prodigieuse.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 24, damageType: 'bludgeoning', type: 'attack', description: 'Coup puissant', attackCount: 2 },
-    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' }
+    { id: 'fist', name: 'Poing', damage: 24, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup puissant', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' }
   ]
 };
 
@@ -4897,8 +4897,8 @@ const GIANT_CROCODILE: Monster = {
   isBoss: false,
   description: 'Reptile antique des marais profonds.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Mâchoires puissantes' },
-    { id: 'tail', name: 'Queue', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Coup de queue' }
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoires puissantes' },
+    { id: 'tail', name: 'Queue', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de queue' }
   ]
 };
 
@@ -4915,8 +4915,8 @@ const GIANT_SCORPION: Monster = {
   isBoss: false,
   description: 'Arachnide géant au dard venimeux mortel.',
   skills: [
-    { id: 'claw', name: 'Pince', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Pinces broyeuses', attackCount: 2 },
-    { id: 'sting', name: 'Dard', damage: 14, damageType: 'piercing', type: 'attack', description: 'Dard empoisonné' }
+    { id: 'claw', name: 'Pince', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Pinces broyeuses', attackCount: 2 },
+    { id: 'sting', name: 'Dard', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dard empoisonné' }
   ]
 };
 
@@ -4933,7 +4933,7 @@ const GIANT_SPIDER: Monster = {
   isBoss: false,
   description: 'Arachnide géant tissant des toiles mortelles.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Crochets venimeux' },
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Crochets venimeux' },
     { id: 'web', name: 'Toile', damage: 0, damageType: 'force', type: 'debuff', description: 'Entrave dans une toile', recharge: { min: 5 } }
   ]
 };
@@ -4951,8 +4951,8 @@ const MAMMOTH: Monster = {
   isBoss: false,
   description: 'Éléphant laineux des terres glacées.',
   skills: [
-    { id: 'gore', name: 'Défenses', damage: 22, damageType: 'piercing', type: 'attack', description: 'Coup de défenses' },
-    { id: 'stomp', name: 'Piétinement', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Écrasement' }
+    { id: 'gore', name: 'Défenses', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Coup de défenses' },
+    { id: 'stomp', name: 'Piétinement', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Écrasement' }
   ]
 };
 
@@ -4969,8 +4969,8 @@ const TRICERATOPS: Monster = {
   isBoss: false,
   description: 'Dinosaure herbivore à trois cornes et collerette osseuse.',
   skills: [
-    { id: 'gore', name: 'Encornage', damage: 18, damageType: 'piercing', type: 'attack', description: 'Charge aux cornes' },
-    { id: 'stomp', name: 'Piétinement', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Écrasement' }
+    { id: 'gore', name: 'Encornage', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Charge aux cornes' },
+    { id: 'stomp', name: 'Piétinement', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Écrasement' }
   ]
 };
 
@@ -4987,8 +4987,8 @@ const TYRANNOSAURUS_REX: Monster = {
   isBoss: false,
   description: 'Le roi des dinosaures carnivores.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', description: 'Mâchoires titanesques' },
-    { id: 'tail', name: 'Queue', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Coup de queue' }
+    { id: 'bite', name: 'Morsure', damage: 32, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoires titanesques' },
+    { id: 'tail', name: 'Queue', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de queue' }
   ]
 };
 
@@ -5012,8 +5012,8 @@ const SATYR: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'fey', size: 'medium', portrait: '🐐', isBoss: false,
   description: 'Créature mi-homme mi-chèvre, fêtard et musicien.',
   skills: [
-    { id: 'ram', name: 'Coup de cornes', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Charge' },
-    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', description: 'Frappe rapide' }
+    { id: 'ram', name: 'Coup de cornes', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Charge' },
+    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Frappe rapide' }
   ]
 };
 
@@ -5023,7 +5023,7 @@ const BLINK_DOG: Monster = {
   speed: 40,
   challengeRating: 0.25, xpReward: 50, creatureType: 'fey', size: 'medium', portrait: '🐕', isBoss: false,
   description: 'Chien féerique capable de se téléporter.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }]
 };
 
 const SEA_HAG: Monster = {
@@ -5033,7 +5033,7 @@ const SEA_HAG: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'fey', size: 'medium', portrait: '🧙‍♀️', isBoss: false,
   description: 'Guenaude hideuse des profondeurs marines.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes acérées' },
+    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes acérées' },
     { id: 'horrific_appearance', name: 'Apparence horrifique', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Effroi paralysant', savingThrow: { ability: 'wisdom', dc: 11 } }
   ]
 };
@@ -5046,8 +5046,8 @@ const NIGHT_HAG: Monster = {
   resistances: ['cold', 'fire'], immunities: ['poison'], conditionImmunities: ['charmed'],
   description: 'Fiélon déguisé en guenaude, voleuse d\'âmes.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes maudites' },
-    { id: 'nightmare_haunting', name: 'Cauchemar', damage: 20, damageType: 'psychic', type: 'attack', description: 'Tourmente dans le sommeil' }
+    { id: 'claws', name: 'Griffes', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes maudites' },
+    { id: 'nightmare_haunting', name: 'Cauchemar', damage: 20, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Tourmente dans le sommeil' }
   ]
 };
 
@@ -5058,8 +5058,8 @@ const ANNIS_HAG: Monster = {
   challengeRating: 6, xpReward: 2300, creatureType: 'fey', size: 'large', portrait: '👹', isBoss: false,
   resistances: ['cold'], description: 'Guenaude géante à la force terrifiante.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Dents de fer' },
-    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes de fer', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dents de fer' },
+    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes de fer', attackCount: 2 }
   ]
 };
 
@@ -5070,8 +5070,8 @@ const BHEUR_HAG: Monster = {
   challengeRating: 7, xpReward: 2900, creatureType: 'fey', size: 'medium', portrait: '❄️', isBoss: false,
   immunities: ['cold'], description: 'Guenaude de l\'hiver éternel.',
   skills: [
-    { id: 'slam', name: 'Coup de bâton', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Bâton de glace' },
-    { id: 'maddening_feast', name: 'Festin de folie', damage: 22, damageType: 'cold', type: 'attack', description: 'Malédiction hivernale' }
+    { id: 'slam', name: 'Coup de bâton', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton de glace' },
+    { id: 'maddening_feast', name: 'Festin de folie', damage: 22, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Malédiction hivernale' }
   ]
 };
 
@@ -5082,8 +5082,8 @@ const REDCAP: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'fey', size: 'small', portrait: '🧢', isBoss: false,
   description: 'Gnome maléfique qui teint son bonnet du sang de ses victimes.',
   skills: [
-    { id: 'wicked_sickle', name: 'Faucille cruelle', damage: 14, damageType: 'slashing', type: 'attack', description: 'Faucille sanglante', attackCount: 2 },
-    { id: 'ironbound_boots', name: 'Bottes de fer', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Piétinement' }
+    { id: 'wicked_sickle', name: 'Faucille cruelle', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Faucille sanglante', attackCount: 2 },
+    { id: 'ironbound_boots', name: 'Bottes de fer', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Piétinement' }
   ]
 };
 
@@ -5093,7 +5093,7 @@ const QUICKLING: Monster = {
   speed: 120,
   challengeRating: 1, xpReward: 200, creatureType: 'fey', size: 'tiny', portrait: '⚡', isBoss: false,
   description: 'Fée ultra-rapide vivant à un rythme accéléré.',
-  skills: [{ id: 'dagger', name: 'Dague', damage: 10, damageType: 'piercing', type: 'attack', description: 'Frappes multiples', attackCount: 3 }]
+  skills: [{ id: 'dagger', name: 'Dague', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Frappes multiples', attackCount: 3 }]
 };
 
 const KORRED: Monster = {
@@ -5103,8 +5103,8 @@ const KORRED: Monster = {
   challengeRating: 7, xpReward: 2900, creatureType: 'fey', size: 'small', portrait: '🪨', isBoss: false,
   resistances: ['bludgeoning', 'piercing', 'slashing'], description: 'Fée des pierres aux cheveux animés.',
   skills: [
-    { id: 'greatclub', name: 'Gourdin', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Massue de pierre' },
-    { id: 'rock', name: 'Rocher', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' }
+    { id: 'greatclub', name: 'Gourdin', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Massue de pierre' },
+    { id: 'rock', name: 'Rocher', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' }
   ]
 };
 
@@ -5119,7 +5119,7 @@ const HOMUNCULUS: Monster = {
   challengeRating: 0, xpReward: 10, creatureType: 'construct', size: 'tiny', portrait: '🧬', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['charmed', 'poisoned'],
   description: 'Petit serviteur artificiel créé par un mage.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 3, damageType: 'piercing', type: 'attack', description: 'Morsure empoisonnée' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 3, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure empoisonnée' }]
 };
 
 const SCARECROW: Monster = {
@@ -5131,7 +5131,7 @@ const SCARECROW: Monster = {
   immunities: ['poison'], conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned', 'unconscious'],
   description: 'Épouvantail animé par un esprit maléfique.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes de foin', attackCount: 2 },
+    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes de foin', attackCount: 2 },
     { id: 'terrifying_glare', name: 'Regard terrifiant', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Paralysie de terreur', savingThrow: { ability: 'wisdom', dc: 11 } }
   ]
 };
@@ -5145,7 +5145,7 @@ const HELMED_HORROR: Monster = {
   immunities: ['force', 'necrotic', 'poison'],
   conditionImmunities: ['blinded', 'charmed', 'deafened', 'frightened', 'paralyzed', 'petrified', 'poisoned', 'stunned'],
   description: 'Armure enchantée animée, gardien éternel.',
-  skills: [{ id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', description: 'Frappe d\'acier', attackCount: 2 }]
+  skills: [{ id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe d\'acier', attackCount: 2 }]
 };
 
 const SHIELD_GUARDIAN: Monster = {
@@ -5155,7 +5155,7 @@ const SHIELD_GUARDIAN: Monster = {
   challengeRating: 7, xpReward: 2900, creatureType: 'construct', size: 'large', portrait: '🛡️', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'poisoned'],
   description: 'Golem gardien lié à un maître par une amulette.',
-  skills: [{ id: 'fist', name: 'Poing', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Coup puissant', attackCount: 2 }]
+  skills: [{ id: 'fist', name: 'Poing', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup puissant', attackCount: 2 }]
 };
 
 const STONE_GOLEM: Monster = {
@@ -5167,7 +5167,7 @@ const STONE_GOLEM: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'petrified', 'poisoned'],
   description: 'Statue de pierre animée d\'une force colossale.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de pierre', attackCount: 2 },
+    { id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de pierre', attackCount: 2 },
     { id: 'slow', name: 'Ralentissement', damage: 0, damageType: 'force', type: 'debuff', description: 'Aura ralentissante', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'wisdom', dc: 17 } }
   ],
   ultimateSkill: { id: 'seismic_pound', name: 'Frappe Sismique', damage: 45, damageType: 'bludgeoning', type: 'special', description: 'Fait trembler le sol' }
@@ -5182,8 +5182,8 @@ const IRON_GOLEM: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'petrified', 'poisoned'],
   description: 'Golem de métal presque indestructible.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 26, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de fer', attackCount: 2 },
-    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 35, damageType: 'poison', type: 'attack', description: 'Gaz toxique', areaOfEffect: true, recharge: { min: 6 }, savingThrow: { ability: 'constitution', dc: 19 } }
+    { id: 'slam', name: 'Coup', damage: 26, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de fer', attackCount: 2 },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 35, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Gaz toxique', areaOfEffect: true, recharge: { min: 6 }, savingThrow: { ability: 'constitution', dc: 19 } }
   ],
   ultimateSkill: { id: 'iron_fury', name: 'Furie de Fer', damage: 55, damageType: 'bludgeoning', type: 'special', description: 'Déchaînement mécanique' }
 };
@@ -5196,7 +5196,7 @@ const CLAY_GOLEM: Monster = {
   immunities: ['acid', 'poison', 'psychic'], resistances: ['bludgeoning', 'piercing', 'slashing'],
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'petrified', 'poisoned'],
   description: 'Golem d\'argile aux blessures maudites.',
-  skills: [{ id: 'slam', name: 'Coup', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Frappe d\'argile', attackCount: 2 }]
+  skills: [{ id: 'slam', name: 'Coup', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe d\'argile', attackCount: 2 }]
 };
 
 const FLESH_GOLEM: Monster = {
@@ -5207,7 +5207,7 @@ const FLESH_GOLEM: Monster = {
   immunities: ['lightning', 'poison'], resistances: ['bludgeoning', 'piercing', 'slashing'],
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'paralyzed', 'petrified', 'poisoned'],
   description: 'Créature faite de morceaux de cadavres assemblés.',
-  skills: [{ id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de chair', attackCount: 2 }]
+  skills: [{ id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de chair', attackCount: 2 }]
 };
 
 // ============================================
@@ -5221,7 +5221,7 @@ const AWAKENED_TREE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'plant', size: 'huge', portrait: '🌳', isBoss: false,
   vulnerabilities: ['fire'], resistances: ['bludgeoning', 'piercing'],
   description: 'Arbre animé par la magie druidique.',
-  skills: [{ id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Branche écrasante' }]
+  skills: [{ id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Branche écrasante' }]
 };
 
 const AWAKENED_SHRUB: Monster = {
@@ -5231,7 +5231,7 @@ const AWAKENED_SHRUB: Monster = {
   challengeRating: 0, xpReward: 10, creatureType: 'plant', size: 'small', portrait: '🌿', isBoss: false,
   vulnerabilities: ['fire'], resistances: ['piercing'],
   description: 'Petit buisson animé.',
-  skills: [{ id: 'rake', name: 'Griffure', damage: 3, damageType: 'slashing', type: 'attack', description: 'Branches épineuses' }]
+  skills: [{ id: 'rake', name: 'Griffure', damage: 3, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Branches épineuses' }]
 };
 
 const TWIG_BLIGHT: Monster = {
@@ -5241,7 +5241,7 @@ const TWIG_BLIGHT: Monster = {
   challengeRating: 0.125, xpReward: 25, creatureType: 'plant', size: 'small', portrait: '🌾', isBoss: false,
   vulnerabilities: ['fire'], conditionImmunities: ['blinded', 'deafened'],
   description: 'Petit végétal maléfique camouflé.',
-  skills: [{ id: 'claws', name: 'Griffes', damage: 4, damageType: 'piercing', type: 'attack', description: 'Branches griffues' }]
+  skills: [{ id: 'claws', name: 'Griffes', damage: 4, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Branches griffues' }]
 };
 
 const NEEDLE_BLIGHT: Monster = {
@@ -5252,8 +5252,8 @@ const NEEDLE_BLIGHT: Monster = {
   conditionImmunities: ['blinded', 'deafened'],
   description: 'Plante humanoïde lançant des aiguilles.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'piercing', type: 'attack', description: 'Branches épineuses' },
-    { id: 'needles', name: 'Aiguilles', damage: 12, damageType: 'piercing', type: 'attack', description: 'Volée d\'aiguilles' }
+    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Branches épineuses' },
+    { id: 'needles', name: 'Aiguilles', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Volée d\'aiguilles' }
   ]
 };
 
@@ -5265,7 +5265,7 @@ const VINE_BLIGHT: Monster = {
   conditionImmunities: ['blinded', 'deafened'],
   description: 'Masse de lianes entremêlées et agressives.',
   skills: [
-    { id: 'constrict', name: 'Constriction', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Lianes étrangleuses' },
+    { id: 'constrict', name: 'Constriction', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lianes étrangleuses' },
     { id: 'entangling_plants', name: 'Plantes enchevêtrées', damage: 0, damageType: 'force', type: 'debuff', description: 'Zone de lianes', areaOfEffect: true }
   ]
 };
@@ -5278,8 +5278,8 @@ const TREANT: Monster = {
   vulnerabilities: ['fire'], resistances: ['bludgeoning', 'piercing'],
   description: 'Ancien gardien des forêts, arbre millénaire.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Branche massive', attackCount: 2 },
-    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' },
+    { id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Branche massive', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' },
     { id: 'animate_trees', name: 'Animer les arbres', damage: 0, damageType: 'force', type: 'buff', description: 'Éveille les arbres alentour' }
   ],
   ultimateSkill: { id: 'forest_wrath', name: 'Colère de la Forêt', damage: 45, damageType: 'bludgeoning', type: 'special', description: 'La forêt se déchaîne' }
@@ -5292,7 +5292,7 @@ const BLACK_PUDDING: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'ooze', size: 'large', portrait: '⬛', isBoss: false,
   immunities: ['acid', 'cold', 'lightning'], conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'prone'],
   description: 'Vase noire corrosive dissolvant tout.',
-  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Coup acide' }]
+  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup acide' }]
 };
 
 const OCHRE_JELLY: Monster = {
@@ -5302,7 +5302,7 @@ const OCHRE_JELLY: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'ooze', size: 'large', portrait: '🟡', isBoss: false,
   resistances: ['acid'], immunities: ['lightning'], conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'prone'],
   description: 'Vase jaune qui se divise quand frappée.',
-  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Coup acide' }]
+  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup acide' }]
 };
 
 const GRAY_OOZE: Monster = {
@@ -5312,7 +5312,7 @@ const GRAY_OOZE: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'ooze', size: 'medium', portrait: '⬜', isBoss: false,
   resistances: ['acid', 'cold', 'fire'], conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'prone'],
   description: 'Vase grise corrodant le métal.',
-  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Coup corrosif' }]
+  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup corrosif' }]
 };
 
 const OBLEX_SPAWN: Monster = {
@@ -5322,7 +5322,7 @@ const OBLEX_SPAWN: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'ooze', size: 'tiny', portrait: '🔮', isBoss: false,
   conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'prone'],
   description: 'Jeune oblex voleur de souvenirs.',
-  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Coup psychique' }]
+  skills: [{ id: 'pseudopod', name: 'Pseudopode', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup psychique' }]
 };
 
 const ADULT_OBLEX: Monster = {
@@ -5333,8 +5333,8 @@ const ADULT_OBLEX: Monster = {
   conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'prone'],
   description: 'Oblex voleur de souvenirs et d\'identités.',
   skills: [
-    { id: 'pseudopod', name: 'Pseudopode', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Frappe' },
-    { id: 'eat_memories', name: 'Dévorer les souvenirs', damage: 18, damageType: 'psychic', type: 'attack', description: 'Vol de mémoire', savingThrow: { ability: 'wisdom', dc: 15 } }
+    { id: 'pseudopod', name: 'Pseudopode', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe' },
+    { id: 'eat_memories', name: 'Dévorer les souvenirs', damage: 18, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Vol de mémoire', savingThrow: { ability: 'wisdom', dc: 15 } }
   ]
 };
 
@@ -5346,8 +5346,8 @@ const ELDER_OBLEX: Monster = {
   conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'prone'],
   description: 'Ancien oblex aux multiples simulacres.',
   skills: [
-    { id: 'pseudopod', name: 'Pseudopode', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Frappe', attackCount: 2 },
-    { id: 'eat_memories', name: 'Dévorer les souvenirs', damage: 26, damageType: 'psychic', type: 'attack', description: 'Vol de mémoire', savingThrow: { ability: 'wisdom', dc: 18 } }
+    { id: 'pseudopod', name: 'Pseudopode', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe', attackCount: 2 },
+    { id: 'eat_memories', name: 'Dévorer les souvenirs', damage: 26, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Vol de mémoire', savingThrow: { ability: 'wisdom', dc: 18 } }
   ],
   ultimateSkill: { id: 'identity_theft', name: 'Vol d\'Identité', damage: 40, damageType: 'psychic', type: 'special', description: 'Vole l\'essence d\'une victime' }
 };
@@ -5364,7 +5364,7 @@ const GIBBERING_MOUTHER: Monster = {
   conditionImmunities: ['prone'],
   description: 'Masse de chair et de bouches marmonnantes.',
   skills: [
-    { id: 'bites', name: 'Morsures', damage: 14, damageType: 'piercing', type: 'attack', description: 'Multiples morsures' },
+    { id: 'bites', name: 'Morsures', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Multiples morsures' },
     { id: 'gibbering', name: 'Charabia', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Sons rendant fou', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 10 } }
   ]
 };
@@ -5376,8 +5376,8 @@ const OTYUGH: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'aberration', size: 'large', portrait: '🦠', isBoss: false,
   description: 'Charognard des égouts aux tentacules.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure infectée' },
-    { id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Coup de tentacule', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure infectée' },
+    { id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup de tentacule', attackCount: 2 }
   ]
 };
 
@@ -5388,8 +5388,8 @@ const CLOAKER: Monster = {
   challengeRating: 8, xpReward: 3900, creatureType: 'aberration', size: 'large', portrait: '🦇', isBoss: false,
   description: 'Créature ressemblant à une cape qui enveloppe ses proies.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'tail', name: 'Queue', damage: 12, damageType: 'slashing', type: 'attack', description: 'Coup de queue' },
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'tail', name: 'Queue', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Coup de queue' },
     { id: 'moan', name: 'Gémissement', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Gémissement effrayant', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 13 } }
   ]
 };
@@ -5402,8 +5402,8 @@ const GRELL: Monster = {
   immunities: ['lightning'], conditionImmunities: ['blinded', 'prone'],
   description: 'Cerveau flottant aux tentacules paralysants.',
   skills: [
-    { id: 'tentacles', name: 'Tentacules', damage: 12, damageType: 'piercing', type: 'attack', description: 'Tentacules paralysants' },
-    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Bec acéré' }
+    { id: 'tentacles', name: 'Tentacules', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tentacules paralysants' },
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bec acéré' }
   ]
 };
 
@@ -5415,8 +5415,8 @@ const INTELLECT_DEVOURER: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'], conditionImmunities: ['blinded'],
   description: 'Cerveau à pattes qui dévore l\'intelligence.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'devour_intellect', name: 'Dévorer l\'intellect', damage: 14, damageType: 'psychic', type: 'attack', description: 'Attaque mentale', savingThrow: { ability: 'intelligence', dc: 12 } }
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'devour_intellect', name: 'Dévorer l\'intellect', damage: 14, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Attaque mentale', savingThrow: { ability: 'intelligence', dc: 12 } }
   ]
 };
 
@@ -5428,8 +5428,8 @@ const SPECTATOR: Monster = {
   conditionImmunities: ['prone'],
   description: 'Petit cousin du tyrannœil, gardien convoqué.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'eye_ray', name: 'Rayon oculaire', damage: 14, damageType: 'force', type: 'attack', description: 'Rayon aléatoire' }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'eye_ray', name: 'Rayon oculaire', damage: 14, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Rayon aléatoire' }
   ]
 };
 
@@ -5440,8 +5440,8 @@ const UMBER_HULK: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'monstrosity', size: 'large', portrait: '🪲', isBoss: false,
   description: 'Insectoïde fouisseur au regard confondant.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes massives', attackCount: 2 },
-    { id: 'mandibles', name: 'Mandibules', damage: 14, damageType: 'slashing', type: 'attack', description: 'Mâchoires' },
+    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes massives', attackCount: 2 },
+    { id: 'mandibles', name: 'Mandibules', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Mâchoires' },
     { id: 'confusing_gaze', name: 'Regard confondant', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Confusion', savingThrow: { ability: 'charisma', dc: 15 } }
   ]
 };
@@ -5453,7 +5453,7 @@ const STAR_SPAWN_HULK: Monster = {
   challengeRating: 10, xpReward: 5900, creatureType: 'aberration', size: 'large', portrait: '⭐', isBoss: false,
   resistances: ['bludgeoning', 'piercing', 'slashing'], conditionImmunities: ['charmed', 'frightened'],
   description: 'Monstre massif venu des étoiles.',
-  skills: [{ id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Frappe cosmique', attackCount: 2 }]
+  skills: [{ id: 'slam', name: 'Coup', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe cosmique', attackCount: 2 }]
 };
 
 const STAR_SPAWN_MANGLER: Monster = {
@@ -5463,7 +5463,7 @@ const STAR_SPAWN_MANGLER: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'aberration', size: 'medium', portrait: '⭐', isBoss: false,
   resistances: ['cold'], conditionImmunities: ['charmed', 'frightened', 'prone'],
   description: 'Assassin venu des étoiles aux lames multiples.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 6 }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 6 }]
 };
 
 const STAR_SPAWN_SEER: Monster = {
@@ -5474,8 +5474,8 @@ const STAR_SPAWN_SEER: Monster = {
   resistances: ['cold'], conditionImmunities: ['charmed', 'frightened'],
   description: 'Oracle des Anciens, canalisateur de folie.',
   skills: [
-    { id: 'comet_staff', name: 'Bâton comète', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Bâton stellaire', attackCount: 2 },
-    { id: 'psychic_orb', name: 'Orbe psychique', damage: 28, damageType: 'psychic', type: 'attack', description: 'Attaque mentale' }
+    { id: 'comet_staff', name: 'Bâton comète', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton stellaire', attackCount: 2 },
+    { id: 'psychic_orb', name: 'Orbe psychique', damage: 28, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Attaque mentale' }
   ],
   ultimateSkill: { id: 'collapse_distance', name: 'Effondrer la Distance', damage: 50, damageType: 'force', type: 'special', description: 'Distord l\'espace' }
 };
@@ -5492,8 +5492,8 @@ const WEREBEAR: Monster = {
   immunities: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Lycanthrope ours, souvent de nature bienveillante.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -5505,8 +5505,8 @@ const WEREBOAR: Monster = {
   immunities: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Lycanthrope sanglier agressif et têtu.',
   skills: [
-    { id: 'tusks', name: 'Défenses', damage: 14, damageType: 'slashing', type: 'attack', description: 'Défenses' },
-    { id: 'maul', name: 'Matraquage', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Arme' }
+    { id: 'tusks', name: 'Défenses', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Défenses' },
+    { id: 'maul', name: 'Matraquage', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Arme' }
   ]
 };
 
@@ -5518,8 +5518,8 @@ const WERETIGER: Monster = {
   immunities: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Lycanthrope tigre, prédateur solitaire.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -5531,8 +5531,8 @@ const WERERAT: Monster = {
   immunities: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Lycanthrope rat, sournois et maladif.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', description: 'Épée' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée' }
   ]
 };
 
@@ -5547,8 +5547,8 @@ const GOBLIN_BOSS: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'small', portrait: '👺', isBoss: false,
   description: 'Chef de bande gobeline, plus rusé que les autres.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 10, damageType: 'slashing', type: 'attack', description: 'Frappe', attackCount: 2 },
-    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lancer' }
+    { id: 'scimitar', name: 'Cimeterre', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe', attackCount: 2 },
+    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer' }
   ]
 };
 
@@ -5559,8 +5559,8 @@ const HOBGOBLIN_CAPTAIN: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'humanoid', size: 'medium', portrait: '⚔️', isBoss: false,
   description: 'Officier hobgobelin discipliné et tactique.',
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 14, damageType: 'slashing', type: 'attack', description: 'Frappe', attackCount: 2 },
-    { id: 'javelin', name: 'Javelot', damage: 10, damageType: 'piercing', type: 'attack', description: 'Lancer' }
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe', attackCount: 2 },
+    { id: 'javelin', name: 'Javelot', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer' }
   ]
 };
 
@@ -5571,8 +5571,8 @@ const HOBGOBLIN_WARLORD: Monster = {
   challengeRating: 6, xpReward: 2300, creatureType: 'humanoid', size: 'medium', portrait: '👹', isBoss: false,
   description: 'Général hobgobelin redoutable.',
   skills: [
-    { id: 'longsword', name: 'Épée longue', damage: 16, damageType: 'slashing', type: 'attack', description: 'Frappe', attackCount: 3 },
-    { id: 'shield_bash', name: 'Coup de bouclier', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Frappe au bouclier' }
+    { id: 'longsword', name: 'Épée longue', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Frappe', attackCount: 3 },
+    { id: 'shield_bash', name: 'Coup de bouclier', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe au bouclier' }
   ]
 };
 
@@ -5583,8 +5583,8 @@ const ORC_WAR_CHIEF: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'humanoid', size: 'medium', portrait: '💪', isBoss: false,
   description: 'Chef de clan orc brutal et charismatique.',
   skills: [
-    { id: 'greataxe', name: 'Hache', damage: 16, damageType: 'slashing', type: 'attack', description: 'Grande hache', attackCount: 2 },
-    { id: 'spear', name: 'Lance', damage: 12, damageType: 'piercing', type: 'attack', description: 'Lancer de lance' }
+    { id: 'greataxe', name: 'Hache', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Grande hache', attackCount: 2 },
+    { id: 'spear', name: 'Lance', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer de lance' }
   ]
 };
 
@@ -5595,8 +5595,8 @@ const ORC_EYE_OF_GRUUMSH: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '👁️', isBoss: false,
   description: 'Prêtre guerrier de Gruumsh, borgne rituel.',
   skills: [
-    { id: 'spear', name: 'Lance', damage: 12, damageType: 'piercing', type: 'attack', description: 'Lance sacrée', attackCount: 2 },
-    { id: 'spiritual_weapon', name: 'Arme spirituelle', damage: 14, damageType: 'force', type: 'attack', description: 'Arme divine' }
+    { id: 'spear', name: 'Lance', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance sacrée', attackCount: 2 },
+    { id: 'spiritual_weapon', name: 'Arme spirituelle', damage: 14, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Arme divine' }
   ]
 };
 
@@ -5607,8 +5607,8 @@ const HALF_OGRE: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'giant', size: 'large', portrait: '👹', isBoss: false,
   description: 'Croisement entre humain et ogre.',
   skills: [
-    { id: 'battleaxe', name: 'Hache de bataille', damage: 14, damageType: 'slashing', type: 'attack', description: 'Grande hache' },
-    { id: 'javelin', name: 'Javelot', damage: 10, damageType: 'piercing', type: 'attack', description: 'Lancer' }
+    { id: 'battleaxe', name: 'Hache de bataille', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Grande hache' },
+    { id: 'javelin', name: 'Javelot', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer' }
   ]
 };
 
@@ -5619,8 +5619,8 @@ const ETTIN: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'giant', size: 'large', portrait: '👹', isBoss: false,
   description: 'Géant à deux têtes querellant constamment.',
   skills: [
-    { id: 'battleaxe', name: 'Hache', damage: 18, damageType: 'slashing', type: 'attack', description: 'Hache' },
-    { id: 'morningstar', name: 'Morgenstern', damage: 18, damageType: 'piercing', type: 'attack', description: 'Masse d\'armes' }
+    { id: 'battleaxe', name: 'Hache', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Hache' },
+    { id: 'morningstar', name: 'Morgenstern', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Masse d\'armes' }
   ]
 };
 
@@ -5631,8 +5631,8 @@ const ONI: Monster = {
   challengeRating: 7, xpReward: 2900, creatureType: 'giant', size: 'large', portrait: '👹', isBoss: false,
   description: 'Ogre-mage japonais aux pouvoirs magiques.',
   skills: [
-    { id: 'glaive', name: 'Glaive', damage: 18, damageType: 'slashing', type: 'attack', description: 'Arme d\'hast', attackCount: 2 },
-    { id: 'cone_of_cold', name: 'Cône de froid', damage: 28, damageType: 'cold', type: 'attack', description: 'Souffle glacé', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 13 } }
+    { id: 'glaive', name: 'Glaive', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Arme d\'hast', attackCount: 2 },
+    { id: 'cone_of_cold', name: 'Cône de froid', damage: 28, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Souffle glacé', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 13 } }
   ]
 };
 
@@ -5643,8 +5643,8 @@ const TROLLWIFE: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'giant', size: 'large', portrait: '🧟‍♀️', isBoss: false,
   description: 'Troll femelle plus rusée et plus dangereuse.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -5659,7 +5659,7 @@ const CRAWLING_CLAW: Monster = {
   challengeRating: 0, xpReward: 10, creatureType: 'undead', size: 'tiny', portrait: '✋', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['charmed', 'exhaustion', 'poisoned'],
   description: 'Main coupée animée par la nécromancie.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 4, damageType: 'bludgeoning', type: 'attack', description: 'Frappe' }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 4, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe' }]
 };
 
 const POLTERGEIST: Monster = {
@@ -5672,7 +5672,7 @@ const POLTERGEIST: Monster = {
   conditionImmunities: ['charmed', 'exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Esprit frappeur qui lance des objets.',
   skills: [
-    { id: 'forceful_slam', name: 'Choc télékinétique', damage: 10, damageType: 'force', type: 'attack', description: 'Lance des objets' },
+    { id: 'forceful_slam', name: 'Choc télékinétique', damage: 10, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Lance des objets' },
     { id: 'telekinetic_thrust', name: 'Poussée télékinétique', damage: 0, damageType: 'force', type: 'debuff', description: 'Repousse la cible', savingThrow: { ability: 'strength', dc: 12 } }
   ]
 };
@@ -5686,7 +5686,7 @@ const WILL_O_WISP: Monster = {
   immunities: ['lightning', 'poison'],
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'poisoned', 'prone', 'restrained', 'unconscious'],
   description: 'Lumière spectrale attirant les voyageurs à leur perte.',
-  skills: [{ id: 'shock', name: 'Choc', damage: 12, damageType: 'lightning', type: 'attack', description: 'Décharge électrique' }]
+  skills: [{ id: 'shock', name: 'Choc', damage: 12, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Décharge électrique' }]
 };
 
 const VAMPIRE_SPAWN: Monster = {
@@ -5698,8 +5698,8 @@ const VAMPIRE_SPAWN: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Serviteur vampire, moins puissant que son créateur.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure drainante' },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure drainante' },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -5710,7 +5710,7 @@ const ZOMBIE_OGRE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'undead', size: 'large', portrait: '🧟', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Ogre mort-vivant à la force brute.',
-  skills: [{ id: 'morningstar', name: 'Morgenstern', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Masse d\'armes' }]
+  skills: [{ id: 'morningstar', name: 'Morgenstern', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Masse d\'armes' }]
 };
 
 const BONEYARD_HULK: Monster = {
@@ -5720,7 +5720,7 @@ const BONEYARD_HULK: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'undead', size: 'large', portrait: '💀', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['exhaustion', 'poisoned'],
   description: 'Amas d\'ossements assemblés en créature géante.',
-  skills: [{ id: 'slam', name: 'Coup', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Frappe osseuse', attackCount: 2 }]
+  skills: [{ id: 'slam', name: 'Coup', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe osseuse', attackCount: 2 }]
 };
 
 // ============================================
@@ -5733,7 +5733,7 @@ const MERFOLK: Monster = {
   speed: 10,
   challengeRating: 0.125, xpReward: 25, creatureType: 'humanoid', size: 'medium', portrait: '🧜', isBoss: false,
   description: 'Habitant des mers mi-humain mi-poisson.',
-  skills: [{ id: 'spear', name: 'Lance', damage: 6, damageType: 'piercing', type: 'attack', description: 'Lance marine' }]
+  skills: [{ id: 'spear', name: 'Lance', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance marine' }]
 };
 
 const SAHUAGIN: Monster = {
@@ -5743,9 +5743,9 @@ const SAHUAGIN: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'medium', portrait: '🦈', isBoss: false,
   description: 'Homme-requin féroce des profondeurs.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lance' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance' }
   ]
 };
 
@@ -5756,9 +5756,9 @@ const SAHUAGIN_BARON: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'humanoid', size: 'large', portrait: '🦈', isBoss: false,
   description: 'Noble sahuagin à quatre bras.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 4 },
-    { id: 'trident', name: 'Trident', damage: 14, damageType: 'piercing', type: 'attack', description: 'Trident', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 4 },
+    { id: 'trident', name: 'Trident', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Trident', attackCount: 2 }
   ]
 };
 
@@ -5769,8 +5769,8 @@ const SEA_SPAWN: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'monstrosity', size: 'medium', portrait: '🐙', isBoss: false,
   description: 'Humain transformé par la magie des profondeurs.',
   skills: [
-    { id: 'unarmed', name: 'Frappe', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Coup' },
-    { id: 'piscine_anatomy', name: 'Anatomie piscine', damage: 8, damageType: 'slashing', type: 'attack', description: 'Nageoires tranchantes' }
+    { id: 'unarmed', name: 'Frappe', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup' },
+    { id: 'piscine_anatomy', name: 'Anatomie piscine', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Nageoires tranchantes' }
   ]
 };
 
@@ -5781,9 +5781,9 @@ const DEEP_SCION: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'humanoid', size: 'medium', portrait: '🌊', isBoss: false,
   description: 'Infiltrateur des cultes marins.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'psychic_screech', name: 'Cri psychique', damage: 14, damageType: 'psychic', type: 'attack', description: 'Hurlement mental', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 13 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'psychic_screech', name: 'Cri psychique', damage: 14, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Hurlement mental', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 13 } }
   ]
 };
 
@@ -5794,8 +5794,8 @@ const MORKOTH: Monster = {
   challengeRating: 11, xpReward: 7200, creatureType: 'aberration', size: 'medium', portrait: '🦑', isBoss: true,
   description: 'Aberration collectionneure obsessionnelle.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'tentacles', name: 'Tentacules', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Tentacules', attackCount: 3 },
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'tentacles', name: 'Tentacules', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Tentacules', attackCount: 3 },
     { id: 'hypnosis', name: 'Hypnose', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Charme la cible', savingThrow: { ability: 'wisdom', dc: 17 } }
   ],
   ultimateSkill: { id: 'spell_reflection', name: 'Réflexion de Sort', damage: 35, damageType: 'force', type: 'special', description: 'Renvoie un sort' }
@@ -5813,7 +5813,7 @@ const DUST_MEPHIT: Monster = {
   vulnerabilities: ['fire'], immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de poussière espiègle.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     { id: 'blinding_breath', name: 'Souffle aveuglant', damage: 0, damageType: 'force', type: 'debuff', description: 'Nuage aveuglant', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
   ]
 };
@@ -5826,8 +5826,8 @@ const ICE_MEPHIT: Monster = {
   vulnerabilities: ['bludgeoning', 'fire'], immunities: ['cold', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de glace malicieux.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'frost_breath', name: 'Souffle de givre', damage: 8, damageType: 'cold', type: 'attack', description: 'Cône glacé', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'frost_breath', name: 'Souffle de givre', damage: 8, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône glacé', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
   ]
 };
 
@@ -5839,8 +5839,8 @@ const MAGMA_MEPHIT: Monster = {
   vulnerabilities: ['cold'], immunities: ['fire', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de magma ardent.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', description: 'Griffes brûlantes' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 10, damageType: 'fire', type: 'attack', description: 'Cône de feu', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes brûlantes' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 10, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 11 } }
   ]
 };
 
@@ -5852,7 +5852,7 @@ const MUD_MEPHIT: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de boue lent.',
   skills: [
-    { id: 'fists', name: 'Poings', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Coups' },
+    { id: 'fists', name: 'Poings', damage: 6, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coups' },
     { id: 'mud_breath', name: 'Souffle de boue', damage: 0, damageType: 'force', type: 'debuff', description: 'Entrave la cible', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 11 } }
   ]
 };
@@ -5865,8 +5865,8 @@ const STEAM_MEPHIT: Monster = {
   immunities: ['fire', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de vapeur brûlante.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'steam_breath', name: 'Souffle de vapeur', damage: 8, damageType: 'fire', type: 'attack', description: 'Cône brûlant', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'steam_breath', name: 'Souffle de vapeur', damage: 8, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône brûlant', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
   ]
 };
 
@@ -5878,7 +5878,7 @@ const SMOKE_MEPHIT: Monster = {
   immunities: ['fire', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Petit élémentaire de fumée étouffante.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     { id: 'cinder_breath', name: 'Souffle de cendres', damage: 0, damageType: 'fire', type: 'debuff', description: 'Nuage aveuglant', recharge: { min: 6 }, savingThrow: { ability: 'dexterity', dc: 10 } }
   ]
 };
@@ -5892,7 +5892,7 @@ const GALEB_DUHR: Monster = {
   immunities: ['poison'], conditionImmunities: ['exhaustion', 'paralyzed', 'poisoned', 'petrified'],
   description: 'Élémentaire de terre ressemblant à un rocher.',
   skills: [
-    { id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Frappe de pierre', attackCount: 2 },
+    { id: 'slam', name: 'Coup', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe de pierre', attackCount: 2 },
     { id: 'animate_boulders', name: 'Animer les rochers', damage: 0, damageType: 'force', type: 'buff', description: 'Éveille des rochers' }
   ]
 };
@@ -5904,7 +5904,7 @@ const AZER: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'elemental', size: 'medium', portrait: '🔥', isBoss: false,
   immunities: ['fire', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Forgeron élémentaire du Plan du Feu.',
-  skills: [{ id: 'warhammer', name: 'Marteau de guerre', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Marteau brûlant' }]
+  skills: [{ id: 'warhammer', name: 'Marteau de guerre', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Marteau brûlant' }]
 };
 
 // ============================================
@@ -5919,8 +5919,8 @@ const MEZZOLOTH: Monster = {
   resistances: ['cold', 'fire', 'lightning'], immunities: ['acid', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Soldat yugoloth insectoïde mercenaire.',
   skills: [
-    { id: 'trident', name: 'Trident', damage: 14, damageType: 'piercing', type: 'attack', description: 'Trident', attackCount: 2 },
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes' }
+    { id: 'trident', name: 'Trident', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Trident', attackCount: 2 },
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }
   ]
 };
 
@@ -5932,8 +5932,8 @@ const NYCALOTH: Monster = {
   resistances: ['cold', 'fire', 'lightning'], immunities: ['acid', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Yugoloth volant aux ailes vertes, assassin aérien.',
   skills: [
-    { id: 'greataxe', name: 'Hache', damage: 20, damageType: 'slashing', type: 'attack', description: 'Grande hache', attackCount: 2 },
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes' }
+    { id: 'greataxe', name: 'Hache', damage: 20, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Grande hache', attackCount: 2 },
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }
   ]
 };
 
@@ -5945,8 +5945,8 @@ const ARCANALOTH: Monster = {
   resistances: ['cold', 'fire'], immunities: ['acid', 'poison'], conditionImmunities: ['charmed', 'poisoned'],
   description: 'Yugoloth érudit, négociateur de contrats infernaux.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'finger_of_death', name: 'Doigt de mort', damage: 35, damageType: 'necrotic', type: 'attack', description: 'Sort mortel', savingThrow: { ability: 'constitution', dc: 17 } }
+    { id: 'claws', name: 'Griffes', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'finger_of_death', name: 'Doigt de mort', damage: 35, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Sort mortel', savingThrow: { ability: 'constitution', dc: 17 } }
   ],
   ultimateSkill: { id: 'contract_breach', name: 'Rupture de Contrat', damage: 45, damageType: 'psychic', type: 'special', description: 'Maudit ceux qui brisent leurs serments' }
 };
@@ -5964,8 +5964,8 @@ const ULTROLOTH: Monster = {
     { id: 'teleport', name: 'Téléportation', cost: 2, damage: 0, damageType: 'force', description: 'Se téléporte' }
   ],
   skills: [
-    { id: 'longsword', name: 'Épée', damage: 18, damageType: 'slashing', type: 'attack', description: 'Épée', attackCount: 3 },
-    { id: 'fire_storm', name: 'Tempête de feu', damage: 30, damageType: 'fire', type: 'attack', description: 'Flammes infernales', areaOfEffect: true }
+    { id: 'longsword', name: 'Épée', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée', attackCount: 3 },
+    { id: 'fire_storm', name: 'Tempête de feu', damage: 30, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Flammes infernales', areaOfEffect: true }
   ],
   ultimateSkill: { id: 'soul_harvest', name: 'Moisson d\'Âmes', damage: 55, damageType: 'necrotic', type: 'special', description: 'Arrache les âmes' }
 };
@@ -5981,8 +5981,8 @@ const DROW: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🧝', isBoss: false,
   description: 'Elfe noir des profondeurs.',
   skills: [
-    { id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lame empoisonnée' },
-    { id: 'hand_crossbow', name: 'Arbalète de poing', damage: 6, damageType: 'piercing', type: 'attack', description: 'Carreau empoisonné' }
+    { id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lame empoisonnée' },
+    { id: 'hand_crossbow', name: 'Arbalète de poing', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Carreau empoisonné' }
   ]
 };
 
@@ -5993,8 +5993,8 @@ const DROW_ELITE_WARRIOR: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'humanoid', size: 'medium', portrait: '⚔️', isBoss: false,
   description: 'Guerrier drow d\'élite aux techniques mortelles.',
   skills: [
-    { id: 'shortsword', name: 'Épée courte', damage: 14, damageType: 'piercing', type: 'attack', description: 'Lame double', attackCount: 2 },
-    { id: 'hand_crossbow', name: 'Arbalète de poing', damage: 10, damageType: 'piercing', type: 'attack', description: 'Carreau empoisonné' }
+    { id: 'shortsword', name: 'Épée courte', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lame double', attackCount: 2 },
+    { id: 'hand_crossbow', name: 'Arbalète de poing', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Carreau empoisonné' }
   ]
 };
 
@@ -6005,8 +6005,8 @@ const DROW_MAGE: Monster = {
   challengeRating: 7, xpReward: 2900, creatureType: 'humanoid', size: 'medium', portrait: '🔮', isBoss: false,
   description: 'Lanceur de sorts drow aux pouvoirs ténébreux.',
   skills: [
-    { id: 'staff', name: 'Bâton', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Bâton' },
-    { id: 'lightning_bolt', name: 'Éclair', damage: 28, damageType: 'lightning', type: 'attack', description: 'Sort de foudre', savingThrow: { ability: 'dexterity', dc: 14 } },
+    { id: 'staff', name: 'Bâton', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton' },
+    { id: 'lightning_bolt', name: 'Éclair', damage: 28, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Sort de foudre', savingThrow: { ability: 'dexterity', dc: 14 } },
     { id: 'darkness', name: 'Ténèbres', damage: 0, damageType: 'necrotic', type: 'debuff', description: 'Zone de ténèbres' }
   ]
 };
@@ -6018,9 +6018,9 @@ const DROW_PRIESTESS: Monster = {
   challengeRating: 8, xpReward: 3900, creatureType: 'humanoid', size: 'medium', portrait: '🕷️', isBoss: false,
   description: 'Prêtresse de Lolth aux pouvoirs divins.',
   skills: [
-    { id: 'scourge', name: 'Fouet à serpents', damage: 14, damageType: 'piercing', type: 'attack', description: 'Fouet empoisonné' },
-    { id: 'spirit_guardians', name: 'Esprits gardiens', damage: 18, damageType: 'radiant', type: 'attack', description: 'Aura divine', areaOfEffect: true },
-    { id: 'harm', name: 'Blessure', damage: 26, damageType: 'necrotic', type: 'attack', description: 'Sort de blessure' }
+    { id: 'scourge', name: 'Fouet à serpents', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Fouet empoisonné' },
+    { id: 'spirit_guardians', name: 'Esprits gardiens', damage: 18, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Aura divine', areaOfEffect: true },
+    { id: 'harm', name: 'Blessure', damage: 26, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Sort de blessure' }
   ]
 };
 
@@ -6032,8 +6032,8 @@ const DRAEGLOTH: Monster = {
   resistances: ['cold', 'fire', 'lightning'], immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Demi-démon drow, serviteur de Lolth.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -6047,7 +6047,7 @@ const GIANT_CENTIPEDE: Monster = {
   speed: 30,
   challengeRating: 0.25, xpReward: 50, creatureType: 'beast', size: 'small', portrait: '🐛', isBoss: false,
   description: 'Arthropode venimeux géant.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', description: 'Morsure empoisonnée' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure empoisonnée' }]
 };
 
 const GIANT_WASP: Monster = {
@@ -6056,7 +6056,7 @@ const GIANT_WASP: Monster = {
   speed: 10,
   challengeRating: 0.5, xpReward: 100, creatureType: 'beast', size: 'medium', portrait: '🐝', isBoss: false,
   description: 'Insecte volant au dard mortel.',
-  skills: [{ id: 'sting', name: 'Dard', damage: 10, damageType: 'piercing', type: 'attack', description: 'Dard empoisonné' }]
+  skills: [{ id: 'sting', name: 'Dard', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dard empoisonné' }]
 };
 
 const ANKHEG_QUEEN: Monster = {
@@ -6066,8 +6066,8 @@ const ANKHEG_QUEEN: Monster = {
   challengeRating: 8, xpReward: 3900, creatureType: 'monstrosity', size: 'huge', portrait: '🦗', isBoss: true,
   description: 'Reine de la colonie ankheg.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'slashing', type: 'attack', description: 'Mandibules' },
-    { id: 'acid_spray', name: 'Jet d\'acide', damage: 30, damageType: 'acid', type: 'attack', description: 'Acide corrosif', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 15 } }
+    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Mandibules' },
+    { id: 'acid_spray', name: 'Jet d\'acide', damage: 30, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Acide corrosif', areaOfEffect: true, recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 15 } }
   ],
   ultimateSkill: { id: 'swarm_call', name: 'Appel de l\'Essaim', damage: 40, damageType: 'piercing', type: 'special', description: 'Invoque des ankhegs' }
 };
@@ -6079,8 +6079,8 @@ const CARRION_CRAWLER: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'monstrosity', size: 'large', portrait: '🐛', isBoss: false,
   description: 'Charognard aux tentacules paralysants.',
   skills: [
-    { id: 'tentacles', name: 'Tentacules', damage: 8, damageType: 'poison', type: 'attack', description: 'Tentacules paralysants', attackCount: 2 },
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' }
+    { id: 'tentacles', name: 'Tentacules', damage: 8, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Tentacules paralysants', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }
   ]
 };
 
@@ -6091,7 +6091,7 @@ const CAVE_FISHER: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'monstrosity', size: 'medium', portrait: '🦞', isBoss: false,
   description: 'Crustacé souterrain aux filaments collants.',
   skills: [
-    { id: 'claw', name: 'Pince', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Pince', attackCount: 2 },
+    { id: 'claw', name: 'Pince', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Pince', attackCount: 2 },
     { id: 'filament', name: 'Filament', damage: 0, damageType: 'force', type: 'debuff', description: 'Tire la proie' }
   ]
 };
@@ -6103,8 +6103,8 @@ const ROPER: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'monstrosity', size: 'large', portrait: '🪨', isBoss: false,
   description: 'Prédateur stalagmite aux tentacules.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', description: 'Mâchoire géante' },
-    { id: 'tendril', name: 'Tentacule', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Vrille gluante', attackCount: 4 }
+    { id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoire géante' },
+    { id: 'tendril', name: 'Tentacule', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Vrille gluante', attackCount: 4 }
   ]
 };
 
@@ -6114,7 +6114,7 @@ const PIERCER: Monster = {
   speed: 5,
   challengeRating: 0.5, xpReward: 100, creatureType: 'monstrosity', size: 'medium', portrait: '📌', isBoss: false,
   description: 'Stalactite vivante qui se laisse tomber.',
-  skills: [{ id: 'drop', name: 'Chute', damage: 14, damageType: 'piercing', type: 'attack', description: 'Chute mortelle' }]
+  skills: [{ id: 'drop', name: 'Chute', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Chute mortelle' }]
 };
 
 // ============================================
@@ -6128,8 +6128,8 @@ const CYCLOPS: Monster = {
   challengeRating: 6, xpReward: 2300, creatureType: 'giant', size: 'huge', portrait: '👁️', isBoss: false,
   description: 'Géant à un œil, berger solitaire.',
   skills: [
-    { id: 'greatclub', name: 'Gourdin', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Massue géante', attackCount: 2 },
-    { id: 'rock', name: 'Rocher', damage: 20, damageType: 'bludgeoning', type: 'attack', description: 'Lance un rocher' }
+    { id: 'greatclub', name: 'Gourdin', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Massue géante', attackCount: 2 },
+    { id: 'rock', name: 'Rocher', damage: 20, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Lance un rocher' }
   ]
 };
 
@@ -6140,8 +6140,8 @@ const FOMORIAN: Monster = {
   challengeRating: 8, xpReward: 3900, creatureType: 'giant', size: 'huge', portrait: '👹', isBoss: false,
   description: 'Géant féerique difforme et maudit.',
   skills: [
-    { id: 'greatclub', name: 'Gourdin', damage: 24, damageType: 'bludgeoning', type: 'attack', description: 'Massue', attackCount: 2 },
-    { id: 'evil_eye', name: 'Œil maléfique', damage: 28, damageType: 'psychic', type: 'attack', description: 'Regard maudit', savingThrow: { ability: 'charisma', dc: 14 } }
+    { id: 'greatclub', name: 'Gourdin', damage: 24, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Massue', attackCount: 2 },
+    { id: 'evil_eye', name: 'Œil maléfique', damage: 28, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Regard maudit', savingThrow: { ability: 'charisma', dc: 14 } }
   ]
 };
 
@@ -6151,7 +6151,7 @@ const GIANT_OGRE: Monster = {
   speed: 40,
   challengeRating: 2, xpReward: 450, creatureType: 'giant', size: 'large', portrait: '👹', isBoss: false,
   description: 'Ogre plus grand et plus brutal que la moyenne.',
-  skills: [{ id: 'greatclub', name: 'Gourdin', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Massue géante' }]
+  skills: [{ id: 'greatclub', name: 'Gourdin', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Massue géante' }]
 };
 
 const OGRE_ZOMBIE: Monster = {
@@ -6161,7 +6161,7 @@ const OGRE_ZOMBIE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'undead', size: 'large', portrait: '🧟', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Ogre mort-vivant à la force brute.',
-  skills: [{ id: 'morningstar', name: 'Morgenstern', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Masse d\'armes' }]
+  skills: [{ id: 'morningstar', name: 'Morgenstern', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Masse d\'armes' }]
 };
 
 const DIRE_TROLL: Monster = {
@@ -6171,8 +6171,8 @@ const DIRE_TROLL: Monster = {
   challengeRating: 13, xpReward: 10000, creatureType: 'giant', size: 'huge', portrait: '🧟‍♂️', isBoss: true,
   description: 'Troll mutant aux six bras régénérants.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 6 }
+    { id: 'bite', name: 'Morsure', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 6 }
   ],
   ultimateSkill: { id: 'rampage', name: 'Déchaînement', damage: 60, damageType: 'slashing', type: 'special', description: 'Frénésie de griffes' }
 };
@@ -6188,7 +6188,7 @@ const GITHZERAI_MONK: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '🧘', isBoss: false,
   description: 'Moine psychique de Limbo.',
   skills: [
-    { id: 'unarmed_strike', name: 'Frappe à mains nues', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Arts martiaux', attackCount: 2 },
+    { id: 'unarmed_strike', name: 'Frappe à mains nues', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Arts martiaux', attackCount: 2 },
     { id: 'psychic_defense', name: 'Défense psychique', damage: 0, damageType: 'psychic', type: 'buff', description: 'Bouclier mental' }
   ]
 };
@@ -6200,7 +6200,7 @@ const GITHYANKI_WARRIOR: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'humanoid', size: 'medium', portrait: '⚔️', isBoss: false,
   description: 'Guerrier psychique du Plan Astral.',
   skills: [
-    { id: 'greatsword', name: 'Épée à deux mains', damage: 16, damageType: 'slashing', type: 'attack', description: 'Lame d\'argent', attackCount: 2 }
+    { id: 'greatsword', name: 'Épée à deux mains', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Lame d\'argent', attackCount: 2 }
   ]
 };
 
@@ -6211,8 +6211,8 @@ const GITHYANKI_KNIGHT: Monster = {
   challengeRating: 8, xpReward: 3900, creatureType: 'humanoid', size: 'medium', portrait: '🗡️', isBoss: false,
   description: 'Chevalier d\'élite githyanki.',
   skills: [
-    { id: 'silver_greatsword', name: 'Épée d\'argent', damage: 20, damageType: 'slashing', type: 'attack', description: 'Lame psychique', attackCount: 3 },
-    { id: 'telekinetic_thrust', name: 'Poussée télékinétique', damage: 14, damageType: 'force', type: 'attack', description: 'Force mentale' }
+    { id: 'silver_greatsword', name: 'Épée d\'argent', damage: 20, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Lame psychique', attackCount: 3 },
+    { id: 'telekinetic_thrust', name: 'Poussée télékinétique', damage: 14, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Force mentale' }
   ]
 };
 
@@ -6224,8 +6224,8 @@ const SLAAD_RED: Monster = {
   resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
   description: 'Batracien chaotique de Limbo.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes implantantes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes implantantes', attackCount: 2 }
   ]
 };
 
@@ -6237,8 +6237,8 @@ const SLAAD_BLUE: Monster = {
   resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
   description: 'Slaad plus intelligent et dangereux.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -6250,9 +6250,9 @@ const SLAAD_GREEN: Monster = {
   resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
   description: 'Slaad évolué aux pouvoirs magiques.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', description: 'Sort de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 14 } }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Sort de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 14 } }
   ]
 };
 
@@ -6264,8 +6264,8 @@ const SLAAD_GRAY: Monster = {
   resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
   description: 'Slaad métamorphe à forme humanoïde.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
     { id: 'plane_shift', name: 'Changement de plan', damage: 0, damageType: 'force', type: 'special', description: 'Téléportation planaire' }
   ]
 };
@@ -6278,9 +6278,9 @@ const SLAAD_DEATH: Monster = {
   resistances: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
   description: 'Slaad ultime, maître du chaos.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'cloudkill', name: 'Nuage mortel', damage: 28, damageType: 'poison', type: 'attack', description: 'Gaz toxique', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 16 } }
+    { id: 'bite', name: 'Morsure', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 18, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'cloudkill', name: 'Nuage mortel', damage: 28, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Gaz toxique', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 16 } }
   ],
   ultimateSkill: { id: 'chaos_phage', name: 'Phage du Chaos', damage: 50, damageType: 'necrotic', type: 'special', description: 'Infection chaotique mortelle' }
 };
@@ -6291,7 +6291,7 @@ const MODRON_MONODRONE: Monster = {
   speed: 30,
   challengeRating: 0.125, xpReward: 25, creatureType: 'construct', size: 'medium', portrait: '⚙️', isBoss: false,
   description: 'Construct mécanique de Mechanus.',
-  skills: [{ id: 'dagger', name: 'Dague', damage: 4, damageType: 'piercing', type: 'attack', description: 'Dague' }]
+  skills: [{ id: 'dagger', name: 'Dague', damage: 4, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague' }]
 };
 
 const MODRON_PENTADRONE: Monster = {
@@ -6300,7 +6300,7 @@ const MODRON_PENTADRONE: Monster = {
   speed: 40,
   challengeRating: 2, xpReward: 450, creatureType: 'construct', size: 'large', portrait: '⚙️', isBoss: false,
   description: 'Modron à cinq bras coordinateur.',
-  skills: [{ id: 'arm', name: 'Bras', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Frappe', attackCount: 5 }]
+  skills: [{ id: 'arm', name: 'Bras', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe', attackCount: 5 }]
 };
 
 // ============================================
@@ -6313,7 +6313,7 @@ const DARKLINGS: Monster = {
   speed: 30,
   challengeRating: 0.5, xpReward: 100, creatureType: 'fey', size: 'small', portrait: '👤', isBoss: false,
   description: 'Fée maudite craignant la lumière.',
-  skills: [{ id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', description: 'Dague' }]
+  skills: [{ id: 'dagger', name: 'Dague', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague' }]
 };
 
 const DARKLING_ELDER: Monster = {
@@ -6322,7 +6322,7 @@ const DARKLING_ELDER: Monster = {
   speed: 30,
   challengeRating: 2, xpReward: 450, creatureType: 'fey', size: 'medium', portrait: '👤', isBoss: false,
   description: 'Chef des darklings, maudit par la lumière.',
-  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 12, damageType: 'piercing', type: 'attack', description: 'Lame sombre', attackCount: 2 }]
+  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lame sombre', attackCount: 2 }]
 };
 
 const NILBOG: Monster = {
@@ -6332,8 +6332,8 @@ const NILBOG: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'small', portrait: '🤡', isBoss: false,
   description: 'Gobelin possédé par un esprit de chaos.',
   skills: [
-    { id: 'staff', name: 'Bâton', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Bâton' },
-    { id: 'mocking_word', name: 'Mot moqueur', damage: 8, damageType: 'psychic', type: 'attack', description: 'Insulte magique' }
+    { id: 'staff', name: 'Bâton', damage: 6, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton' },
+    { id: 'mocking_word', name: 'Mot moqueur', damage: 8, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Insulte magique' }
   ]
 };
 
@@ -6344,8 +6344,8 @@ const NORKER: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'small', portrait: '👹', isBoss: false,
   description: 'Gobelin à la peau dure comme la pierre.',
   skills: [
-    { id: 'morningstar', name: 'Morgenstern', damage: 10, damageType: 'piercing', type: 'attack', description: 'Masse d\'armes' },
-    { id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', description: 'Morsure' }
+    { id: 'morningstar', name: 'Morgenstern', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Masse d\'armes' },
+    { id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }
   ]
 };
 
@@ -6356,7 +6356,7 @@ const MEENLOCK: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'fey', size: 'small', portrait: '😱', isBoss: false,
   conditionImmunities: ['frightened'],
   description: 'Fée cauchemardesque se nourrissant de terreur.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes paralysantes', attackCount: 2 }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes paralysantes', attackCount: 2 }]
 };
 
 const SKULK: Monster = {
@@ -6366,7 +6366,7 @@ const SKULK: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'monstrosity', size: 'medium', portrait: '👤', isBoss: false,
   conditionImmunities: ['blinded'],
   description: 'Créature invisible sauf dans la lumière.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes' }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }]
 };
 
 const BANDERHOBB: Monster = {
@@ -6376,9 +6376,9 @@ const BANDERHOBB: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'monstrosity', size: 'large', portrait: '🐸', isBoss: false,
   description: 'Créature de l\'Ombreterre qui avale ses proies.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Mâchoire géante' },
-    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'swallow', name: 'Avaler', damage: 22, damageType: 'bludgeoning', type: 'attack', description: 'Avale une créature' }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoire géante' },
+    { id: 'claw', name: 'Griffe', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'swallow', name: 'Avaler', damage: 22, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Avale une créature' }
   ]
 };
 
@@ -6389,7 +6389,7 @@ const SORROWSWORN_WRETCHED: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'monstrosity', size: 'small', portrait: '😢', isBoss: false,
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Manifestation de désespoir de l\'Ombreterre.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', description: 'Morsure' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }]
 };
 
 const SORROWSWORN_LONELY: Monster = {
@@ -6400,7 +6400,7 @@ const SORROWSWORN_LONELY: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Manifestation de solitude mortelle.',
   skills: [
-    { id: 'harpoon_arm', name: 'Bras harpon', damage: 20, damageType: 'piercing', type: 'attack', description: 'Harpon de chair', attackCount: 2 }
+    { id: 'harpoon_arm', name: 'Bras harpon', damage: 20, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Harpon de chair', attackCount: 2 }
   ]
 };
 
@@ -6412,7 +6412,7 @@ const SORROWSWORN_ANGRY: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Manifestation de rage dévastatrice.',
   skills: [
-    { id: 'hook', name: 'Crochet', damage: 22, damageType: 'piercing', type: 'attack', description: 'Crochets de rage', attackCount: 2 }
+    { id: 'hook', name: 'Crochet', damage: 22, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Crochets de rage', attackCount: 2 }
   ],
   ultimateSkill: { id: 'rage_incarnate', name: 'Rage Incarnée', damage: 60, damageType: 'bludgeoning', type: 'special', description: 'Déchaînement de fureur' }
 };
@@ -6428,8 +6428,8 @@ const WYRMLING_WHITE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['cold'], description: 'Jeune dragon blanc, prédateur des glaciers.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 16, damageType: 'cold', type: 'attack', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 16, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
   ]
 };
 
@@ -6440,8 +6440,8 @@ const WYRMLING_BLACK: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['acid'], description: 'Jeune dragon noir, embusqué dans les marais.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 16, damageType: 'acid', type: 'attack', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 16, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
   ]
 };
 
@@ -6452,8 +6452,8 @@ const WYRMLING_GREEN: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['poison'], description: 'Jeune dragon vert, manipulateur des forêts.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'poison_breath', name: 'Souffle de poison', damage: 18, damageType: 'poison', type: 'attack', description: 'Cône empoisonné', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 11 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'poison_breath', name: 'Souffle de poison', damage: 18, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Cône empoisonné', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 11 } }
   ]
 };
 
@@ -6464,8 +6464,8 @@ const WYRMLING_BLUE: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['lightning'], description: 'Jeune dragon bleu, tyran des déserts.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 22, damageType: 'lightning', type: 'attack', description: 'Ligne électrique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'lightning_breath', name: 'Souffle de foudre', damage: 22, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne électrique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
   ]
 };
 
@@ -6476,8 +6476,8 @@ const WYRMLING_RED: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['fire'], description: 'Jeune dragon rouge, destructeur né.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 24, damageType: 'fire', type: 'attack', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 24, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
   ]
 };
 
@@ -6488,8 +6488,8 @@ const WYRMLING_BRASS: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['fire'], description: 'Jeune dragon d\'airain, bavard et amical.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'breath_weapon', name: 'Souffle', damage: 8, damageType: 'fire', type: 'attack', description: 'Ligne de feu ou souffle soporifique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'breath_weapon', name: 'Souffle', damage: 8, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Ligne de feu ou souffle soporifique', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
   ]
 };
 
@@ -6500,8 +6500,8 @@ const WYRMLING_BRONZE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['lightning'], description: 'Jeune dragon de bronze, gardien des côtes.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'breath_weapon', name: 'Souffle', damage: 14, damageType: 'lightning', type: 'attack', description: 'Ligne de foudre', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'breath_weapon', name: 'Souffle', damage: 14, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Ligne de foudre', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 12 } }
   ]
 };
 
@@ -6512,8 +6512,8 @@ const WYRMLING_COPPER: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['acid'], description: 'Jeune dragon de cuivre, farceur et rusé.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'acid_breath', name: 'Souffle acide', damage: 12, damageType: 'acid', type: 'attack', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'acid_breath', name: 'Souffle acide', damage: 12, damageType: 'acid', type: 'attack', targetType: 'enemy', description: 'Ligne acide', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 11 } }
   ]
 };
 
@@ -6524,8 +6524,8 @@ const WYRMLING_GOLD: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['fire'], description: 'Jeune dragon d\'or, noble et juste.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'fire_breath', name: 'Souffle de feu', damage: 22, damageType: 'fire', type: 'attack', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'fire_breath', name: 'Souffle de feu', damage: 22, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Cône de feu', recharge: { min: 5 }, savingThrow: { ability: 'dexterity', dc: 13 } }
   ]
 };
 
@@ -6536,8 +6536,8 @@ const WYRMLING_SILVER: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'dragon', size: 'medium', portrait: '🐉', isBoss: false,
   immunities: ['cold'], description: 'Jeune dragon d\'argent, protecteur des mortels.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 18, damageType: 'cold', type: 'attack', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 18, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 12 } }
   ]
 };
 
@@ -6551,7 +6551,7 @@ const MYCONID_SPROUT: Monster = {
   speed: 10,
   challengeRating: 0, xpReward: 10, creatureType: 'plant', size: 'small', portrait: '🍄', isBoss: false,
   description: 'Jeune champignon humanoïde.',
-  skills: [{ id: 'fist', name: 'Poing', damage: 3, damageType: 'bludgeoning', type: 'attack', description: 'Coup' }]
+  skills: [{ id: 'fist', name: 'Poing', damage: 3, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup' }]
 };
 
 const MYCONID_ADULT: Monster = {
@@ -6561,7 +6561,7 @@ const MYCONID_ADULT: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'plant', size: 'medium', portrait: '🍄', isBoss: false,
   description: 'Champignon humanoïde communicant par spores.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 6, damageType: 'bludgeoning', type: 'attack', description: 'Coup' },
+    { id: 'fist', name: 'Poing', damage: 6, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup' },
     { id: 'pacifying_spores', name: 'Spores pacifiantes', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Endort la cible', savingThrow: { ability: 'constitution', dc: 11 } }
   ]
 };
@@ -6573,7 +6573,7 @@ const MYCONID_SOVEREIGN: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'plant', size: 'large', portrait: '🍄', isBoss: false,
   description: 'Chef des mycéloïdes, maître des spores.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Coup', attackCount: 2 },
+    { id: 'fist', name: 'Poing', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup', attackCount: 2 },
     { id: 'animating_spores', name: 'Spores animantes', damage: 0, damageType: 'necrotic', type: 'buff', description: 'Réanime un cadavre' }
   ]
 };
@@ -6585,7 +6585,7 @@ const QUAGGOTH: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '🦍', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Humanoïde bestial de l\'Outreterre.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }]
 };
 
 const QUAGGOTH_THONOT: Monster = {
@@ -6596,8 +6596,8 @@ const QUAGGOTH_THONOT: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Quaggoth chaman aux pouvoirs psychiques.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'mind_blast', name: 'Décharge mentale', damage: 14, damageType: 'psychic', type: 'attack', description: 'Attaque psychique', savingThrow: { ability: 'wisdom', dc: 12 } }
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'mind_blast', name: 'Décharge mentale', damage: 14, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Attaque psychique', savingThrow: { ability: 'wisdom', dc: 12 } }
   ]
 };
 
@@ -6607,7 +6607,7 @@ const FLUMPH: Monster = {
   speed: 5,
   challengeRating: 0.125, xpReward: 25, creatureType: 'aberration', size: 'small', portrait: '🪼', isBoss: false,
   description: 'Créature bienveillante de l\'Outreterre.',
-  skills: [{ id: 'tendrils', name: 'Tentacules', damage: 6, damageType: 'piercing', type: 'attack', description: 'Tentacules acides' }]
+  skills: [{ id: 'tendrils', name: 'Tentacules', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Tentacules acides' }]
 };
 
 const KUTO_TOA: Monster = {
@@ -6617,8 +6617,8 @@ const KUTO_TOA: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
   description: 'Homme-poisson fanatique des profondeurs.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lance' }
+    { id: 'bite', name: 'Morsure', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance' }
   ]
 };
 
@@ -6629,9 +6629,9 @@ const KUTO_TOA_WHIP: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
   description: 'Prêtre kuo-toa aux pouvoirs divins.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'pincer_staff', name: 'Bâton-pince', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Prise au piège' },
-    { id: 'sacred_flame', name: 'Flamme sacrée', damage: 10, damageType: 'radiant', type: 'attack', description: 'Feu divin' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'pincer_staff', name: 'Bâton-pince', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Prise au piège' },
+    { id: 'sacred_flame', name: 'Flamme sacrée', damage: 10, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Feu divin' }
   ]
 };
 
@@ -6642,8 +6642,8 @@ const KUTO_TOA_ARCHPRIEST: Monster = {
   challengeRating: 6, xpReward: 2300, creatureType: 'humanoid', size: 'medium', portrait: '🐟', isBoss: false,
   description: 'Grand prêtre kuo-toa aux pouvoirs immenses.',
   skills: [
-    { id: 'scepter', name: 'Sceptre', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Sceptre sacré', attackCount: 2 },
-    { id: 'spirit_guardians', name: 'Esprits gardiens', damage: 20, damageType: 'radiant', type: 'attack', description: 'Aura divine', areaOfEffect: true }
+    { id: 'scepter', name: 'Sceptre', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Sceptre sacré', attackCount: 2 },
+    { id: 'spirit_guardians', name: 'Esprits gardiens', damage: 20, damageType: 'radiant', type: 'attack', targetType: 'enemy', description: 'Aura divine', areaOfEffect: true }
   ]
 };
 
@@ -6654,8 +6654,8 @@ const TROGLODYTE: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🦎', isBoss: false,
   description: 'Reptile humanoïde à l\'odeur nauséabonde.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -6666,7 +6666,7 @@ const GRIMLOCK: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '👤', isBoss: false,
   conditionImmunities: ['blinded'],
   description: 'Humain aveugle des profondeurs.',
-  skills: [{ id: 'spiked_bone_club', name: 'Massue d\'os', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Massue' }]
+  skills: [{ id: 'spiked_bone_club', name: 'Massue d\'os', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Massue' }]
 };
 
 const DUERGAR: Monster = {
@@ -6676,8 +6676,8 @@ const DUERGAR: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'medium', portrait: '⛏️', isBoss: false,
   resistances: ['poison'], description: 'Nain gris des profondeurs.',
   skills: [
-    { id: 'war_pick', name: 'Pic de guerre', damage: 10, damageType: 'piercing', type: 'attack', description: 'Pic' },
-    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lancer' }
+    { id: 'war_pick', name: 'Pic de guerre', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Pic' },
+    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lancer' }
   ]
 };
 
@@ -6688,8 +6688,8 @@ const SVIRFNEBLIN: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'small', portrait: '🧙', isBoss: false,
   description: 'Gnome des profondeurs, discret et prudent.',
   skills: [
-    { id: 'war_pick', name: 'Pic de guerre', damage: 8, damageType: 'piercing', type: 'attack', description: 'Pic' },
-    { id: 'poisoned_dart', name: 'Fléchette empoisonnée', damage: 6, damageType: 'piercing', type: 'attack', description: 'Fléchette' }
+    { id: 'war_pick', name: 'Pic de guerre', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Pic' },
+    { id: 'poisoned_dart', name: 'Fléchette empoisonnée', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Fléchette' }
   ]
 };
 
@@ -6704,8 +6704,8 @@ const GIANT_ELK: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'huge', portrait: '🦌', isBoss: false,
   description: 'Élan majestueux de taille colossale.',
   skills: [
-    { id: 'ram', name: 'Coup de bois', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Charge' },
-    { id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Piétinement' }
+    { id: 'ram', name: 'Coup de bois', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Charge' },
+    { id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Piétinement' }
   ]
 };
 
@@ -6715,7 +6715,7 @@ const GIANT_BOAR: Monster = {
   speed: 40,
   challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'large', portrait: '🐗', isBoss: false,
   description: 'Sanglier massif aux défenses mortelles.',
-  skills: [{ id: 'tusk', name: 'Défense', damage: 14, damageType: 'slashing', type: 'attack', description: 'Défenses' }]
+  skills: [{ id: 'tusk', name: 'Défense', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Défenses' }]
 };
 
 const GIANT_CONSTRICTOR_SNAKE: Monster = {
@@ -6725,8 +6725,8 @@ const GIANT_CONSTRICTOR_SNAKE: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'beast', size: 'huge', portrait: '🐍', isBoss: false,
   description: 'Serpent géant qui écrase ses proies.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'constrict', name: 'Constriction', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Étranglement' }
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'constrict', name: 'Constriction', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Étranglement' }
   ]
 };
 
@@ -6737,8 +6737,8 @@ const GIANT_EAGLE: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🦅', isBoss: false,
   description: 'Aigle majestueux capable de transporter des humains.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Bec' },
-    { id: 'talons', name: 'Serres', damage: 12, damageType: 'slashing', type: 'attack', description: 'Serres' }
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bec' },
+    { id: 'talons', name: 'Serres', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres' }
   ]
 };
 
@@ -6748,7 +6748,7 @@ const GIANT_OCTOPUS: Monster = {
   speed: 10,
   challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🐙', isBoss: false,
   description: 'Pieuvre massive des profondeurs océanes.',
-  skills: [{ id: 'tentacles', name: 'Tentacules', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Tentacules' }]
+  skills: [{ id: 'tentacles', name: 'Tentacules', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Tentacules' }]
 };
 
 const GIANT_OWL: Monster = {
@@ -6757,7 +6757,7 @@ const GIANT_OWL: Monster = {
   speed: 5,
   challengeRating: 0.25, xpReward: 50, creatureType: 'beast', size: 'large', portrait: '🦉', isBoss: false,
   description: 'Hibou géant, sage gardien des forêts.',
-  skills: [{ id: 'talons', name: 'Serres', damage: 10, damageType: 'slashing', type: 'attack', description: 'Serres' }]
+  skills: [{ id: 'talons', name: 'Serres', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres' }]
 };
 
 const GIANT_SHARK: Monster = {
@@ -6766,7 +6766,7 @@ const GIANT_SHARK: Monster = {
   speed: 0,
   challengeRating: 5, xpReward: 1800, creatureType: 'beast', size: 'huge', portrait: '🦈', isBoss: false,
   description: 'Prédateur suprême des océans.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', description: 'Mâchoires géantes' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 24, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Mâchoires géantes' }]
 };
 
 const GIANT_VULTURE: Monster = {
@@ -6776,8 +6776,8 @@ const GIANT_VULTURE: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'beast', size: 'large', portrait: '🦅', isBoss: false,
   description: 'Charognard géant des terres désolées.',
   skills: [
-    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', description: 'Bec' },
-    { id: 'talons', name: 'Serres', damage: 8, damageType: 'slashing', type: 'attack', description: 'Serres' }
+    { id: 'beak', name: 'Bec', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bec' },
+    { id: 'talons', name: 'Serres', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres' }
   ]
 };
 
@@ -6787,7 +6787,7 @@ const RIDING_HORSE: Monster = {
   speed: 60,
   challengeRating: 0.25, xpReward: 50, creatureType: 'beast', size: 'large', portrait: '🐴', isBoss: false,
   description: 'Cheval domestique pour la monte.',
-  skills: [{ id: 'hooves', name: 'Sabots', damage: 8, damageType: 'bludgeoning', type: 'attack', description: 'Ruade' }]
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 8, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Ruade' }]
 };
 
 const WARHORSE: Monster = {
@@ -6796,7 +6796,7 @@ const WARHORSE: Monster = {
   speed: 60,
   challengeRating: 0.5, xpReward: 100, creatureType: 'beast', size: 'large', portrait: '🐴', isBoss: false,
   description: 'Destrier entraîné au combat.',
-  skills: [{ id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Ruade' }]
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Ruade' }]
 };
 
 const NIGHTMARE: Monster = {
@@ -6806,7 +6806,7 @@ const NIGHTMARE: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'fiend', size: 'large', portrait: '🐴', isBoss: false,
   immunities: ['fire'], description: 'Destrier infernal aux sabots enflammés.',
   skills: [
-    { id: 'hooves', name: 'Sabots', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Sabots de feu' },
+    { id: 'hooves', name: 'Sabots', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Sabots de feu' },
     { id: 'ethereal_stride', name: 'Passage éthéré', damage: 0, damageType: 'force', type: 'special', description: 'Voyage entre les plans' }
   ]
 };
@@ -6817,7 +6817,7 @@ const PEGASUS: Monster = {
   speed: 60,
   challengeRating: 2, xpReward: 450, creatureType: 'celestial', size: 'large', portrait: '🐎', isBoss: false,
   description: 'Cheval ailé céleste, pur et noble.',
-  skills: [{ id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Sabots' }]
+  skills: [{ id: 'hooves', name: 'Sabots', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Sabots' }]
 };
 
 // ============================================
@@ -6831,8 +6831,8 @@ const GNOLL: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'medium', portrait: '🐺', isBoss: false,
   description: 'Humanoïde hyène, démon de la faim.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'spear', name: 'Lance', damage: 10, damageType: 'piercing', type: 'attack', description: 'Lance' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'spear', name: 'Lance', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance' }
   ]
 };
 
@@ -6843,8 +6843,8 @@ const GNOLL_PACK_LORD: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '🐺', isBoss: false,
   description: 'Chef brutal d\'une meute de gnolls.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'glaive', name: 'Glaive', damage: 16, damageType: 'slashing', type: 'attack', description: 'Glaive', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'glaive', name: 'Glaive', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Glaive', attackCount: 2 }
   ]
 };
 
@@ -6855,8 +6855,8 @@ const GNOLL_FANG_OF_YEENOGHU: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'fiend', size: 'medium', portrait: '🐺', isBoss: false,
   description: 'Gnoll béni par Yeenoghu, créateur de gnolls.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure maudite' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure maudite' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -6867,8 +6867,8 @@ const LIZARDFOLK: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'medium', portrait: '🦎', isBoss: false,
   description: 'Reptilien tribal des marais.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', description: 'Javelot' }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'javelin', name: 'Javelot', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Javelot' }
   ]
 };
 
@@ -6879,7 +6879,7 @@ const LIZARDFOLK_SHAMAN: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '🦎', isBoss: false,
   description: 'Prêtre-druide des hommes-lézards.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
     { id: 'conjure_animals', name: 'Invocation d\'animaux', damage: 0, damageType: 'force', type: 'buff', description: 'Invoque des animaux' }
   ]
 };
@@ -6890,7 +6890,7 @@ const KENKU: Monster = {
   speed: 30,
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐦', isBoss: false,
   description: 'Corvien maudit, incapable de voler.',
-  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', description: 'Épée' }]
+  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée' }]
 };
 
 const YUAN_TI_PUREBLOOD: Monster = {
@@ -6901,8 +6901,8 @@ const YUAN_TI_PUREBLOOD: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Serpentide presque humain, infiltrateur.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', description: 'Cimeterre' },
-    { id: 'poison_spray', name: 'Rayon de poison', damage: 10, damageType: 'poison', type: 'attack', description: 'Poison', savingThrow: { ability: 'constitution', dc: 12 } }
+    { id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Cimeterre' },
+    { id: 'poison_spray', name: 'Rayon de poison', damage: 10, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Poison', savingThrow: { ability: 'constitution', dc: 12 } }
   ]
 };
 
@@ -6914,8 +6914,8 @@ const YUAN_TI_MALISON: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Yuan-ti mi-humain mi-serpent.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 12, damageType: 'slashing', type: 'attack', description: 'Cimeterre', attackCount: 2 },
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure empoisonnée' }
+    { id: 'scimitar', name: 'Cimeterre', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Cimeterre', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure empoisonnée' }
   ]
 };
 
@@ -6927,8 +6927,8 @@ const YUAN_TI_ABOMINATION: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Yuan-ti presque totalement serpent, leader religieux.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 16, damageType: 'slashing', type: 'attack', description: 'Cimeterre', attackCount: 2 },
-    { id: 'constrict', name: 'Constriction', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Étreinte' }
+    { id: 'scimitar', name: 'Cimeterre', damage: 16, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Cimeterre', attackCount: 2 },
+    { id: 'constrict', name: 'Constriction', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Étreinte' }
   ]
 };
 
@@ -6938,7 +6938,7 @@ const BULLYWUG: Monster = {
   speed: 20,
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐸', isBoss: false,
   description: 'Batracien humanoïde des marais.',
-  skills: [{ id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', description: 'Lance' }]
+  skills: [{ id: 'spear', name: 'Lance', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance' }]
 };
 
 const TABAXI: Monster = {
@@ -6948,8 +6948,8 @@ const TABAXI: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐱', isBoss: false,
   description: 'Félin humanoïde curieux et agile.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', description: 'Épée' }
+    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée' }
   ]
 };
 
@@ -6959,7 +6959,7 @@ const TORTLES: Monster = {
   speed: 30,
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🐢', isBoss: false,
   description: 'Tortue humanoïde pacifique.',
-  skills: [{ id: 'claw', name: 'Griffe', damage: 8, damageType: 'slashing', type: 'attack', description: 'Griffes' }]
+  skills: [{ id: 'claw', name: 'Griffe', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }]
 };
 
 const AARAKOCRA: Monster = {
@@ -6969,8 +6969,8 @@ const AARAKOCRA: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'medium', portrait: '🦅', isBoss: false,
   description: 'Homme-oiseau des hautes montagnes.',
   skills: [
-    { id: 'talon', name: 'Serres', damage: 8, damageType: 'slashing', type: 'attack', description: 'Serres' },
-    { id: 'javelin', name: 'Javelot', damage: 6, damageType: 'piercing', type: 'attack', description: 'Javelot' }
+    { id: 'talon', name: 'Serres', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Serres' },
+    { id: 'javelin', name: 'Javelot', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Javelot' }
   ]
 };
 
@@ -6981,8 +6981,8 @@ const THRI_KREEN: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'medium', portrait: '🦗', isBoss: false,
   description: 'Insecte humanoïde mantis des déserts.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 }
+    { id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 }
   ]
 };
 
@@ -6993,7 +6993,7 @@ const VEGEPYGMY: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'plant', size: 'small', portrait: '🌱', isBoss: false,
   resistances: ['lightning', 'piercing'],
   description: 'Petite créature végétale née de spores.',
-  skills: [{ id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', description: 'Griffes' }]
+  skills: [{ id: 'claws', name: 'Griffes', damage: 6, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }]
 };
 
 const VEGEPYGMY_CHIEF: Monster = {
@@ -7004,7 +7004,7 @@ const VEGEPYGMY_CHIEF: Monster = {
   resistances: ['lightning', 'piercing'],
   description: 'Chef d\'une communauté végépygmée.',
   skills: [
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
     { id: 'spores', name: 'Spores', damage: 0, damageType: 'poison', type: 'debuff', description: 'Nuage de spores', areaOfEffect: true }
   ]
 };
@@ -7016,7 +7016,7 @@ const JACKALWERE: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'medium', portrait: '🐺', isBoss: false,
   immunities: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Chacal métamorphe, trompeur et mortel.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', description: 'Morsure' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }]
 };
 
 const CAMBION: Monster = {
@@ -7027,8 +7027,8 @@ const CAMBION: Monster = {
   resistances: ['cold', 'fire', 'lightning', 'poison'],
   description: 'Demi-démon, enfant d\'un mortel et d\'un fiélon.',
   skills: [
-    { id: 'spear', name: 'Lance', damage: 14, damageType: 'piercing', type: 'attack', description: 'Lance fiélonne', attackCount: 2 },
-    { id: 'fire_ray', name: 'Rayon de feu', damage: 16, damageType: 'fire', type: 'attack', description: 'Rayon enflammé' }
+    { id: 'spear', name: 'Lance', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Lance fiélonne', attackCount: 2 },
+    { id: 'fire_ray', name: 'Rayon de feu', damage: 16, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Rayon enflammé' }
   ]
 };
 
@@ -7040,8 +7040,8 @@ const INCUBUS: Monster = {
   resistances: ['cold', 'fire', 'lightning', 'poison'],
   description: 'Démon séducteur masculin.',
   skills: [
-    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes' },
-    { id: 'draining_kiss', name: 'Baiser drainant', damage: 20, damageType: 'psychic', type: 'attack', description: 'Draine la vie', savingThrow: { ability: 'constitution', dc: 15 } }
+    { id: 'claw', name: 'Griffe', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
+    { id: 'draining_kiss', name: 'Baiser drainant', damage: 20, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Draine la vie', savingThrow: { ability: 'constitution', dc: 15 } }
   ]
 };
 
@@ -7055,7 +7055,7 @@ const SHADOW_DEMON: Monster = {
   immunities: ['cold', 'lightning', 'poison'],
   conditionImmunities: ['exhaustion', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
   description: 'Démon de pure ténèbres.',
-  skills: [{ id: 'claws', name: 'Griffes', damage: 14, damageType: 'psychic', type: 'attack', description: 'Griffes d\'ombre', attackCount: 2 }]
+  skills: [{ id: 'claws', name: 'Griffes', damage: 14, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Griffes d\'ombre', attackCount: 2 }]
 };
 
 const BARLGURA: Monster = {
@@ -7068,8 +7068,8 @@ const BARLGURA: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon singe brutal.',
   skills: [
-    { id: 'fist', name: 'Poing', damage: 14, damageType: 'bludgeoning', type: 'attack', description: 'Coup', attackCount: 2 },
-    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', description: 'Morsure' }
+    { id: 'fist', name: 'Poing', damage: 14, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Coup', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }
   ]
 };
 
@@ -7083,7 +7083,7 @@ const CHASME: Monster = {
   conditionImmunities: ['poisoned'],
   description: 'Démon-mouche au bourdonnement soporifique.',
   skills: [
-    { id: 'proboscis', name: 'Trompe', damage: 18, damageType: 'piercing', type: 'attack', description: 'Trompe drainante' },
+    { id: 'proboscis', name: 'Trompe', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Trompe drainante' },
     { id: 'drone', name: 'Bourdonnement', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Endort les créatures', areaOfEffect: true }
   ]
 };
@@ -7097,7 +7097,7 @@ const DYBBUK: Monster = {
   immunities: ['poison'],
   conditionImmunities: ['charmed', 'exhaustion', 'frightened', 'grappled', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained'],
   description: 'Démon possesseur de cadavres.',
-  skills: [{ id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'necrotic', type: 'attack', description: 'Tentacule spectrale' }]
+  skills: [{ id: 'tentacle', name: 'Tentacule', damage: 12, damageType: 'necrotic', type: 'attack', targetType: 'enemy', description: 'Tentacule spectrale' }]
 };
 
 const SPAWN_OF_TIAMAT_WHITE: Monster = {
@@ -7107,9 +7107,9 @@ const SPAWN_OF_TIAMAT_WHITE: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'monstrosity', size: 'large', portrait: '🐉', isBoss: false,
   immunities: ['cold'], description: 'Création draconique de Tiamat.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
-    { id: 'cold_breath', name: 'Souffle de froid', damage: 24, damageType: 'cold', type: 'attack', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
+    { id: 'bite', name: 'Morsure', damage: 18, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claw', name: 'Griffe', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
+    { id: 'cold_breath', name: 'Souffle de froid', damage: 24, damageType: 'cold', type: 'attack', targetType: 'enemy', description: 'Cône glacial', recharge: { min: 5 }, savingThrow: { ability: 'constitution', dc: 14 } }
   ]
 };
 
@@ -7130,8 +7130,8 @@ const HOBGOBLIN_DEVASTATOR: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'humanoid', size: 'medium', portrait: '👹', isBoss: false,
   description: 'Mage de guerre hobgobelin.',
   skills: [
-    { id: 'staff', name: 'Bâton', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Bâton magique' },
-    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', description: 'Explosion de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 13 } }
+    { id: 'staff', name: 'Bâton', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton magique' },
+    { id: 'fireball', name: 'Boule de feu', damage: 28, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Explosion de feu', areaOfEffect: true, savingThrow: { ability: 'dexterity', dc: 13 } }
   ]
 };
 
@@ -7142,7 +7142,7 @@ const HOBGOBLIN_IRON_SHADOW: Monster = {
   challengeRating: 2, xpReward: 450, creatureType: 'humanoid', size: 'medium', portrait: '👹', isBoss: false,
   description: 'Moine-assassin hobgobelin.',
   skills: [
-    { id: 'unarmed_strike', name: 'Frappe', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Frappe sans arme', attackCount: 2 },
+    { id: 'unarmed_strike', name: 'Frappe', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe sans arme', attackCount: 2 },
     { id: 'shadow_step', name: 'Pas d\'ombre', damage: 0, damageType: 'force', type: 'buff', description: 'Téléportation courte' }
   ]
 };
@@ -7154,8 +7154,8 @@ const NEOGI: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'aberration', size: 'small', portrait: '🕷️', isBoss: false,
   description: 'Esclavagiste arachnide psionique.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure venimeuse' },
-    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', description: 'Griffes' },
+    { id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure venimeuse' },
+    { id: 'claws', name: 'Griffes', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' },
     { id: 'enslave', name: 'Asservissement', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Contrôle mental', savingThrow: { ability: 'wisdom', dc: 14 } }
   ]
 };
@@ -7167,8 +7167,8 @@ const NEOGI_MASTER: Monster = {
   challengeRating: 4, xpReward: 1100, creatureType: 'aberration', size: 'medium', portrait: '🕷️', isBoss: false,
   description: 'Maître esclavagiste neogi aux pouvoirs amplifiés.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', description: 'Griffes', attackCount: 2 },
+    { id: 'bite', name: 'Morsure', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claws', name: 'Griffes', damage: 10, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes', attackCount: 2 },
     { id: 'mass_enslave', name: 'Asservissement de masse', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Contrôle mental de zone', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 15 } }
   ]
 };
@@ -7182,8 +7182,8 @@ const BARGHEST: Monster = {
   immunities: ['acid', 'poison'],
   description: 'Loup démon métamorphe gobelinou.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', description: 'Griffes' }
+    { id: 'bite', name: 'Morsure', damage: 16, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'claws', name: 'Griffes', damage: 12, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Griffes' }
   ]
 };
 
@@ -7194,7 +7194,7 @@ const FLAIL_SNAIL: Monster = {
   challengeRating: 3, xpReward: 700, creatureType: 'elemental', size: 'large', portrait: '🐌', isBoss: false,
   immunities: ['fire', 'poison'], conditionImmunities: ['poisoned'],
   description: 'Escargot géant avec des tentacules massues.',
-  skills: [{ id: 'flail', name: 'Fléau tentaculaire', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Frappe tentaculaire', attackCount: 4 }]
+  skills: [{ id: 'flail', name: 'Fléau tentaculaire', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Frappe tentaculaire', attackCount: 4 }]
 };
 
 const MEAZEL: Monster = {
@@ -7204,7 +7204,7 @@ const MEAZEL: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'monstrosity', size: 'medium', portrait: '👤', isBoss: false,
   description: 'Étrangleur furtif né de la malédiction.',
   skills: [
-    { id: 'garrote', name: 'Garrot', damage: 10, damageType: 'bludgeoning', type: 'attack', description: 'Étranglement' },
+    { id: 'garrote', name: 'Garrot', damage: 10, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Étranglement' },
     { id: 'shadow_teleport', name: 'Téléportation d\'ombre', damage: 0, damageType: 'force', type: 'special', description: 'Téléporte dans les ombres' }
   ]
 };
@@ -7216,8 +7216,8 @@ const TLINCALLI: Monster = {
   challengeRating: 5, xpReward: 1800, creatureType: 'monstrosity', size: 'large', portrait: '🦂', isBoss: false,
   description: 'Humanoïde scorpion du désert.',
   skills: [
-    { id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', description: 'Épée', attackCount: 2 },
-    { id: 'sting', name: 'Dard', damage: 12, damageType: 'piercing', type: 'attack', description: 'Dard empoisonné' }
+    { id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée', attackCount: 2 },
+    { id: 'sting', name: 'Dard', damage: 12, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dard empoisonné' }
   ]
 };
 
@@ -7229,9 +7229,9 @@ const FROGHEMOTH: Monster = {
   resistances: ['fire', 'lightning'],
   description: 'Grenouille monstrueuse géante tentaculée.',
   skills: [
-    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', description: 'Morsure' },
-    { id: 'tentacle', name: 'Tentacule', damage: 18, damageType: 'bludgeoning', type: 'attack', description: 'Tentacule', attackCount: 2 },
-    { id: 'tongue', name: 'Langue', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Attrape et tire' }
+    { id: 'bite', name: 'Morsure', damage: 28, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' },
+    { id: 'tentacle', name: 'Tentacule', damage: 18, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Tentacule', attackCount: 2 },
+    { id: 'tongue', name: 'Langue', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Attrape et tire' }
   ]
 };
 
@@ -7243,8 +7243,8 @@ const NAGPA: Monster = {
   resistances: ['bludgeoning', 'piercing', 'slashing'],
   description: 'Sorcier-vautour maudit, érudit corrompu.',
   skills: [
-    { id: 'staff', name: 'Bâton', damage: 12, damageType: 'bludgeoning', type: 'attack', description: 'Bâton' },
-    { id: 'disintegrate', name: 'Désintégration', damage: 75, damageType: 'force', type: 'attack', description: 'Rayon désintégrateur', savingThrow: { ability: 'dexterity', dc: 20 } }
+    { id: 'staff', name: 'Bâton', damage: 12, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Bâton' },
+    { id: 'disintegrate', name: 'Désintégration', damage: 75, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Rayon désintégrateur', savingThrow: { ability: 'dexterity', dc: 20 } }
   ],
   ultimateSkill: { id: 'curse', name: 'Malédiction éternelle', damage: 0, damageType: 'necrotic', type: 'debuff', description: 'Maudit une créature', areaOfEffect: true, savingThrow: { ability: 'wisdom', dc: 20 } }
 };
@@ -7257,8 +7257,8 @@ const OBLEX_ELDER_SPECIAL: Monster = {
   conditionImmunities: ['blinded', 'charmed', 'deafened', 'exhaustion', 'prone'],
   description: 'Vase psionique qui vole les souvenirs.',
   skills: [
-    { id: 'pseudopod', name: 'Pseudopode', damage: 16, damageType: 'bludgeoning', type: 'attack', description: 'Pseudopode', attackCount: 3 },
-    { id: 'eat_memory', name: 'Dévorer les souvenirs', damage: 28, damageType: 'psychic', type: 'attack', description: 'Vole les souvenirs', savingThrow: { ability: 'wisdom', dc: 18 } }
+    { id: 'pseudopod', name: 'Pseudopode', damage: 16, damageType: 'bludgeoning', type: 'attack', targetType: 'enemy', description: 'Pseudopode', attackCount: 3 },
+    { id: 'eat_memory', name: 'Dévorer les souvenirs', damage: 28, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Vole les souvenirs', savingThrow: { ability: 'wisdom', dc: 18 } }
   ]
 };
 
@@ -7270,7 +7270,7 @@ const SWORD_WRAITH_WARRIOR: Monster = {
   resistances: ['necrotic'],
   immunities: ['poison'], conditionImmunities: ['exhaustion', 'poisoned'],
   description: 'Guerrier mort obsédé par le combat.',
-  skills: [{ id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', description: 'Épée', attackCount: 2 }]
+  skills: [{ id: 'longsword', name: 'Épée longue', damage: 14, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Épée', attackCount: 2 }]
 };
 
 const CORE_SPAWN_CRAWLER: Monster = {
@@ -7280,7 +7280,7 @@ const CORE_SPAWN_CRAWLER: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'aberration', size: 'small', portrait: '🐛', isBoss: false,
   immunities: ['psychic'],
   description: 'Créature aberrante née d\'une entité antique.',
-  skills: [{ id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', description: 'Morsure' }]
+  skills: [{ id: 'bite', name: 'Morsure', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsure' }]
 };
 
 const CORE_SPAWN_SEER: Monster = {
@@ -7291,8 +7291,8 @@ const CORE_SPAWN_SEER: Monster = {
   immunities: ['psychic'], conditionImmunities: ['charmed', 'frightened'],
   description: 'Prophète aberrant lié à une entité antique.',
   skills: [
-    { id: 'psychic_orb', name: 'Orbe psychique', damage: 24, damageType: 'psychic', type: 'attack', description: 'Attaque mentale' },
-    { id: 'mind_blast', name: 'Souffle mental', damage: 32, damageType: 'psychic', type: 'attack', description: 'Explosion psionique', areaOfEffect: true, savingThrow: { ability: 'intelligence', dc: 17 } }
+    { id: 'psychic_orb', name: 'Orbe psychique', damage: 24, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Attaque mentale' },
+    { id: 'mind_blast', name: 'Souffle mental', damage: 32, damageType: 'psychic', type: 'attack', targetType: 'enemy', description: 'Explosion psionique', areaOfEffect: true, savingThrow: { ability: 'intelligence', dc: 17 } }
   ]
 };
 
@@ -7305,7 +7305,7 @@ const SWARM_OF_CRANIUM_RATS: Monster = {
   conditionImmunities: ['charmed', 'frightened', 'grappled', 'paralyzed', 'petrified', 'prone', 'restrained', 'stunned'],
   description: 'Essaim de rats psioniques contrôlés par une intelligence collective.',
   skills: [
-    { id: 'bites', name: 'Morsures', damage: 14, damageType: 'piercing', type: 'attack', description: 'Morsures multiples' },
+    { id: 'bites', name: 'Morsures', damage: 14, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Morsures multiples' },
     { id: 'command', name: 'Commandement', damage: 0, damageType: 'psychic', type: 'debuff', description: 'Contrôle psychique', savingThrow: { ability: 'wisdom', dc: 15 } }
   ]
 };
@@ -7317,7 +7317,7 @@ const KOBOLD_DRAGONSHIELD: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'small', portrait: '🐲', isBoss: false,
   resistances: ['fire'],
   description: 'Kobold élite, protecteur de dragon.',
-  skills: [{ id: 'sword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', description: 'Épée', attackCount: 2 }]
+  skills: [{ id: 'sword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée', attackCount: 2 }]
 };
 
 const KOBOLD_SCALE_SORCERER: Monster = {
@@ -7327,8 +7327,8 @@ const KOBOLD_SCALE_SORCERER: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'humanoid', size: 'small', portrait: '🐲', isBoss: false,
   description: 'Kobold mage draconic.',
   skills: [
-    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', description: 'Dague' },
-    { id: 'chromatic_orb', name: 'Orbe chromatique', damage: 18, damageType: 'fire', type: 'attack', description: 'Orbe de feu ou glace' }
+    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague' },
+    { id: 'chromatic_orb', name: 'Orbe chromatique', damage: 18, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Orbe de feu ou glace' }
   ]
 };
 
@@ -7348,8 +7348,8 @@ const XVART_WARLOCK: Monster = {
   challengeRating: 1, xpReward: 200, creatureType: 'monstrosity', size: 'small', portrait: '👿', isBoss: false,
   description: 'Xvart lié à Raxivort par un pacte.',
   skills: [
-    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', description: 'Dague' },
-    { id: 'eldritch_blast', name: 'Explosion occulte', damage: 10, damageType: 'force', type: 'attack', description: 'Rayon occulte' }
+    { id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague' },
+    { id: 'eldritch_blast', name: 'Explosion occulte', damage: 10, damageType: 'force', type: 'attack', targetType: 'enemy', description: 'Rayon occulte' }
   ]
 };
 
@@ -7360,7 +7360,7 @@ const DERRO: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'small', portrait: '🧝', isBoss: false,
   resistances: ['psychic'],
   description: 'Nain des profondeurs fou et cruel.',
-  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', description: 'Épée' }]
+  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée' }]
 };
 
 const DERRO_SAVANT: Monster = {
@@ -7371,8 +7371,8 @@ const DERRO_SAVANT: Monster = {
   resistances: ['psychic'],
   description: 'Mage derro à la magie chaotique.',
   skills: [
-    { id: 'hooked_staff', name: 'Bâton à crochet', damage: 8, damageType: 'piercing', type: 'attack', description: 'Bâton' },
-    { id: 'lightning', name: 'Éclair', damage: 18, damageType: 'lightning', type: 'attack', description: 'Éclair', savingThrow: { ability: 'dexterity', dc: 12 } }
+    { id: 'hooked_staff', name: 'Bâton à crochet', damage: 8, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Bâton' },
+    { id: 'lightning', name: 'Éclair', damage: 18, damageType: 'lightning', type: 'attack', targetType: 'enemy', description: 'Éclair', savingThrow: { ability: 'dexterity', dc: 12 } }
   ]
 };
 
@@ -7383,7 +7383,7 @@ const FIRENEWT_WARRIOR: Monster = {
   challengeRating: 0.5, xpReward: 100, creatureType: 'humanoid', size: 'medium', portrait: '🦎', isBoss: false,
   immunities: ['fire'],
   description: 'Reptilien humanoïde du feu.',
-  skills: [{ id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', description: 'Cimeterre' }]
+  skills: [{ id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Cimeterre' }]
 };
 
 const FIRENEWT_WARLOCK: Monster = {
@@ -7394,8 +7394,8 @@ const FIRENEWT_WARLOCK: Monster = {
   immunities: ['fire'],
   description: 'Sorcier reptilien lié à Imix.',
   skills: [
-    { id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', description: 'Cimeterre' },
-    { id: 'fire_bolt', name: 'Trait de feu', damage: 12, damageType: 'fire', type: 'attack', description: 'Trait enflammé' }
+    { id: 'scimitar', name: 'Cimeterre', damage: 8, damageType: 'slashing', type: 'attack', targetType: 'enemy', description: 'Cimeterre' },
+    { id: 'fire_bolt', name: 'Trait de feu', damage: 12, damageType: 'fire', type: 'attack', targetType: 'enemy', description: 'Trait enflammé' }
   ]
 };
 
@@ -7406,7 +7406,7 @@ const GRUNG: Monster = {
   challengeRating: 0.25, xpReward: 50, creatureType: 'humanoid', size: 'small', portrait: '🐸', isBoss: false,
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Grenouille humanoïde venimeuse.',
-  skills: [{ id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', description: 'Dague empoisonnée' }]
+  skills: [{ id: 'dagger', name: 'Dague', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Dague empoisonnée' }]
 };
 
 const GRUNG_ELITE: Monster = {
@@ -7417,8 +7417,8 @@ const GRUNG_ELITE: Monster = {
   immunities: ['poison'], conditionImmunities: ['poisoned'],
   description: 'Guerrier grenouille d\'élite.',
   skills: [
-    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', description: 'Épée', attackCount: 2 },
-    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 14, damageType: 'poison', type: 'attack', description: 'Nuage toxique', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 12 } }
+    { id: 'shortsword', name: 'Épée courte', damage: 10, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée', attackCount: 2 },
+    { id: 'poison_breath', name: 'Souffle empoisonné', damage: 14, damageType: 'poison', type: 'attack', targetType: 'enemy', description: 'Nuage toxique', areaOfEffect: true, savingThrow: { ability: 'constitution', dc: 12 } }
   ]
 };
 
