@@ -26,9 +26,57 @@ export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
   const { animationMode, setAnimationMode, isManual, isAuto, isSkip } = useAnimationPreferences();
-  const [centralDisplay, setCentralDisplay] = useState<{ type: 'attack' | 'damage'; result: string; details?: string; isHit?: boolean; isCritical?: boolean } | null>(null);
+  const [centralDisplay, setCentralDisplay] = useState<{ 
+    type: 'attack' | 'damage'; 
+    result: string; 
+    details?: string; 
+    isHit?: boolean; 
+    isCritical?: boolean;
+    damage?: number;
+  } | null>(null);
   // Compatibilité legacy pour les timers
   const autoMode = isAuto || isSkip;
+  
+  // Helper pour afficher les résultats en mode Skip (fenêtre centrale au lieu des animations)
+  const showSkipResult = (attackResult: {
+    roll: number;
+    modifier: number;
+    total: number;
+    targetAC: number;
+    hit: boolean;
+    isCritical: boolean;
+    attacker: string;
+    target: string;
+  }, damage?: number) => {
+    const hitText = attackResult.isCritical ? '💥 CRITIQUE !' : (attackResult.hit ? '✅ TOUCHÉ' : '❌ RATÉ');
+    setCentralDisplay({
+      type: 'attack',
+      result: hitText,
+      details: `🎲 ${attackResult.roll}+${attackResult.modifier}=${attackResult.total} vs CA ${attackResult.targetAC}`,
+      isHit: attackResult.hit,
+      isCritical: attackResult.isCritical,
+      damage: damage
+    });
+    
+    // Auto-fermer après un délai
+    setTimeout(() => {
+      if (damage && damage > 0 && attackResult.hit) {
+        // Afficher les dégâts
+        setCentralDisplay({
+          type: 'damage',
+          result: `⚔️ ${damage} DÉGÂTS`,
+          details: attackResult.isCritical ? '(Coup critique !)' : undefined,
+          isHit: true,
+          isCritical: attackResult.isCritical,
+          damage: damage
+        });
+        // Fermer après affichage des dégâts
+        setTimeout(() => setCentralDisplay(null), 400);
+      } else {
+        setCentralDisplay(null);
+      }
+    }, 300);
+  };
   const [monsterDialogue, setMonsterDialogue] = useState<string>('');
   const [showDialogue, setShowDialogue] = useState(false);
   const [selectingTarget, setSelectingTarget] = useState<'ally' | 'enemy' | null>(null);
@@ -1035,36 +1083,55 @@ export function CombatPage() {
             // Log du jet de touche
             logs.push(`🎲 ${currentMonster.name} : ${monsterAttackResult.attackRoll.rolls[0]} + ${monsterAttackResult.totalAttackBonus} = ${monsterAttackResult.attackRoll.total} vs CA ${monsterAttackResult.targetAC}`);
             
-            // Afficher l'animation de dés 3D pour le monstre et ATTENDRE le clic
-            await new Promise<void>(resolve => {
-              setActiveDiceRoll({
-                dieType: 'd20',
-                count: 1,
-                modifier: monsterAttackResult.totalAttackBonus,
-                damageType: 'physical',
-                label: `${currentMonster.name} attaque ${target.name} !`,
-                preRolledValues: monsterAttackResult.attackRoll.rolls,
-                waitForClick: true,
-                onDismiss: resolve
-              });
-            });
-            
-            // Afficher le résultat du jet pour le monstre et attendre le clic
-            await new Promise<void>(resolve => {
-              setLastAttackResult({
+            // En mode Skip : affichage central rapide. Sinon : animations complètes
+            if (isSkip) {
+              // Mode Skip : affichage central uniquement
+              const baseDamage = Math.max(4, Math.floor(currentMonster.challengeRating * 1.5) + 2);
+              let damage = calculateDamage(baseDamage, currentMonster, target, 'physical');
+              if (monsterAttackResult.isCriticalHit) damage = Math.floor(damage * 2);
+              showSkipResult({
                 roll: monsterAttackResult.attackRoll.rolls[0],
                 modifier: monsterAttackResult.totalAttackBonus,
                 total: monsterAttackResult.attackRoll.total,
                 targetAC: monsterAttackResult.targetAC,
                 hit: monsterAttackResult.hit,
                 isCritical: monsterAttackResult.isCriticalHit,
-                isCriticalMiss: monsterAttackResult.isCriticalMiss,
+                attacker: currentMonster.name,
+                target: target.name
+              }, monsterAttackResult.hit ? damage : 0);
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } else {
+              // Mode normal/auto : animations de dés
+              await new Promise<void>(resolve => {
+                setActiveDiceRoll({
+                  dieType: 'd20',
+                  count: 1,
+                  modifier: monsterAttackResult.totalAttackBonus,
+                  damageType: 'physical',
+                  label: `${currentMonster.name} attaque ${target.name} !`,
+                  preRolledValues: monsterAttackResult.attackRoll.rolls,
+                  waitForClick: true,
+                  onDismiss: resolve
+                });
+              });
+              
+              // Afficher le résultat du jet pour le monstre et attendre le clic
+              await new Promise<void>(resolve => {
+                setLastAttackResult({
+                  roll: monsterAttackResult.attackRoll.rolls[0],
+                  modifier: monsterAttackResult.totalAttackBonus,
+                  total: monsterAttackResult.attackRoll.total,
+                  targetAC: monsterAttackResult.targetAC,
+                  hit: monsterAttackResult.hit,
+                  isCritical: monsterAttackResult.isCriticalHit,
+                  isCriticalMiss: monsterAttackResult.isCriticalMiss,
                 attacker: currentMonster.name,
                 target: target.name,
                 waitForClick: true,
                 onDismiss: resolve
               });
             });
+            } // Fin du else (mode non-skip)
             
             if (monsterAttackResult.isCriticalMiss) {
               // Échec critique !
@@ -2478,15 +2545,53 @@ export function CombatPage() {
         
         // TOUCHÉ ! Calcul des dégâts D&D
         let actualDamage: number;
+        let damageRolls: number[] = [];
+        let damageModifier = 0;
+        
         if (hasDamageDice) {
           // Utiliser les dés de dégâts D&D (ex: 1d8, 2d6+3)
           const isSpell = skill.isSpellAttack || skill.damageType === 'magical';
           const damageResult = rollDamage(attacker, skill, isCritical, isSpell);
           actualDamage = damageResult.totalDamage;
+          damageRolls = damageResult.damageRoll.rolls;
+          damageModifier = damageResult.damageRoll.modifier;
           logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${actualDamage}`);
         } else {
           // Dégâts fixes
           actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
+          damageRolls = [actualDamage];
+        }
+        
+        // Afficher les dégâts visuellement
+        if (isSkip) {
+          // Mode Skip : affichage central
+          setCentralDisplay({
+            type: 'damage',
+            result: `⚔️ ${actualDamage} DÉGÂTS`,
+            details: hasDamageDice ? `🎲 ${damageRolls.join('+')}${damageModifier > 0 ? '+' + damageModifier : ''}` : skill.name,
+            isCritical
+          });
+          await new Promise(resolve => setTimeout(resolve, 400));
+          setCentralDisplay(null);
+        } else if (!isSkip) {
+          // Mode normal : affichage animé
+          await new Promise<void>(resolve => {
+            setLastDamageResult({
+              rolls: damageRolls,
+              total: actualDamage,
+              bonus: damageModifier,
+              damageType: damageType,
+              isCritical,
+              totalDamage: actualDamage,
+              modifier: damageModifier,
+              onDismiss: resolve,
+              waitForClick: !autoMode
+            });
+            if (autoMode) {
+              setTimeout(resolve, 800);
+            }
+          });
+          setLastDamageResult(null);
         }
         
         target.hp = Math.max(0, target.hp - actualDamage);
@@ -3422,8 +3527,8 @@ export function CombatPage() {
         />
       )}
       
-      {/* Animation de dés 3D */}
-      {activeDiceRoll && (
+      {/* Animation de dés 3D - Masqué en mode Skip */}
+      {activeDiceRoll && !isSkip && (
         <DiceRoller
           roll={{
             dieType: activeDiceRoll.dieType,
@@ -3445,8 +3550,8 @@ export function CombatPage() {
         />
       )}
       
-      {/* Indicateur de jet d'attaque D&D amélioré */}
-      {lastAttackResult && (
+      {/* Indicateur de jet d'attaque D&D - Masqué en mode Skip */}
+      {lastAttackResult && !isSkip && (
         <div 
           className={`attack-roll-indicator ${lastAttackResult.hit ? 'hit' : 'miss'} ${lastAttackResult.isCritical ? 'critical' : ''} ${lastAttackResult.isCriticalMiss ? 'critical-miss' : ''} ${lastAttackResult.waitForClick ? 'clickable' : ''}`}
           onClick={() => {

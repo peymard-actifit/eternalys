@@ -7724,8 +7724,20 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   const index = Math.floor(Math.random() * bossList.length);
   const rawBoss = JSON.parse(JSON.stringify(bossList[index])); // Deep copy
   
-  // Convertir vers l'échelle Eternalys avec stats BOSS (pas de cap, HP élevés)
-  const boss = localConvertMonsterToEternalysScale(rawBoss, dungeonLevel, true);
+  // v2.31.1 : Mini-boss (niveau 1-7) gardent leurs stats D&D définies manuellement
+  // Pas de conversion CR pour éviter l'inflation des HP
+  let boss: Monster;
+  if (dungeonLevel <= 7 && bossList === BOSSES_TIER_0) {
+    // Mini-boss : garder les HP définis (40-55 HP), juste ajouter XP et ID unique
+    boss = {
+      ...rawBoss,
+      id: rawBoss.id + '_' + Date.now(),
+      xpReward: Math.max(rawBoss.xpReward || 100, 50 * rawBoss.challengeRating),
+    };
+  } else {
+    // Boss normaux : convertir vers l'échelle Eternalys avec stats BOSS
+    boss = localConvertMonsterToEternalysScale(rawBoss, dungeonLevel, true);
+  }
   
   // Réinitialiser les actions légendaires
   if (boss.legendaryActionsPerTurn) {

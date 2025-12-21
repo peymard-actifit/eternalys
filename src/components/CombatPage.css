@@ -961,57 +961,79 @@
 
 /* Affichage central des jets (mode Skip) */
 .central-roll-display {
-  background: rgba(0, 0, 0, 0.85);
-  border: 2px solid #9b59b6;
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(30, 20, 50, 0.95));
+  border: 3px solid #9b59b6;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
   text-align: center;
-  animation: centralFadeIn 0.3s ease;
+  animation: centralFadeIn 0.2s ease;
+  min-width: 200px;
 }
 
 .central-roll-display.attack.hit {
   border-color: #27ae60;
-  box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+  box-shadow: 0 0 30px rgba(39, 174, 96, 0.6), inset 0 0 30px rgba(39, 174, 96, 0.1);
 }
 
 .central-roll-display.attack.miss {
   border-color: #e74c3c;
-  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+  box-shadow: 0 0 30px rgba(231, 76, 60, 0.6), inset 0 0 30px rgba(231, 76, 60, 0.1);
 }
 
 .central-roll-display.critical {
   border-color: #f1c40f;
-  box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
-  animation: centralFadeIn 0.3s ease, criticalPulse 0.5s ease infinite alternate;
+  box-shadow: 0 0 40px rgba(241, 196, 15, 0.8), 0 0 60px rgba(255, 100, 0, 0.4);
+  animation: centralFadeIn 0.2s ease, criticalPulse 0.3s ease infinite alternate;
 }
 
 .central-roll-display.damage {
   border-color: #e74c3c;
-  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+  box-shadow: 0 0 30px rgba(231, 76, 60, 0.6);
+  background: linear-gradient(145deg, rgba(80, 20, 20, 0.95), rgba(50, 10, 10, 0.95));
 }
 
 .central-roll-display .roll-result {
   font-family: 'Cinzel', serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  margin-bottom: 0.3rem;
+}
+
+.central-roll-display.attack.hit .roll-result {
+  color: #2ecc71;
+}
+
+.central-roll-display.attack.miss .roll-result {
+  color: #e74c3c;
+}
+
+.central-roll-display.critical .roll-result {
+  color: #f1c40f;
+  text-shadow: 0 0 20px rgba(241, 196, 15, 0.8);
+}
+
+.central-roll-display.damage .roll-result {
+  color: #ff6b6b;
+  font-size: 2.2rem;
 }
 
 .central-roll-display .roll-details {
-  font-size: 0.9rem;
-  color: #bbb;
-  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #ccc;
+  margin-top: 0.3rem;
+  font-family: monospace;
 }
 
 @keyframes centralFadeIn {
-  from { opacity: 0; transform: scale(0.8); }
+  from { opacity: 0; transform: scale(0.7); }
   to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes criticalPulse {
-  from { box-shadow: 0 0 30px rgba(241, 196, 15, 0.7); }
-  to { box-shadow: 0 0 50px rgba(241, 196, 15, 0.9), 0 0 80px rgba(255, 0, 0, 0.3); }
+  from { box-shadow: 0 0 40px rgba(241, 196, 15, 0.8), 0 0 60px rgba(255, 100, 0, 0.4); }
+  to { box-shadow: 0 0 60px rgba(241, 196, 15, 1), 0 0 100px rgba(255, 50, 0, 0.6); }
 }
 
 /* Boutons de mode d'animation */
