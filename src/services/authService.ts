@@ -155,7 +155,7 @@ export const authService = {
   async ensureAdminExists(): Promise<void> {
     // Ne rien faire si Supabase n'est pas configuré
     if (!canUseSupabase() || !supabase) {
-      console.log('Supabase non configuré - mode hors-ligne');
+      if (import.meta.env.DEV) console.log('Supabase non configuré - mode hors-ligne');
       return;
     }
     
@@ -177,7 +177,7 @@ export const authService = {
             password_hash: passwordHash,
             is_admin: true
           });
-        console.log('Compte admin créé avec succès');
+        if (import.meta.env.DEV) console.log('Compte admin créé avec succès');
       }
     } catch (err) {
       // Ignorer les erreurs silencieusement pour ne pas bloquer le jeu

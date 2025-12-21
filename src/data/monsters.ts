@@ -4,6 +4,7 @@
 // ============================================
 
 import { Monster, CreatureType, AbilityScores, LegendaryAction, MonsterSkill } from '../types/game.types';
+import { getLazyConvertedMonsters, getLazyConvertedBosses, convertMonsterToEternalysScale } from '../utils/monsterScaling';
 
 // Helper pour créer les caractéristiques
 const createAbilities = (str: number, dex: number, con: number, int: number, wis: number, cha: number): AbilityScores => ({
@@ -7348,6 +7349,34 @@ export const ALL_MONSTERS: Monster[] = [
 
 // Alias pour compatibilité avec l'ancien code
 export const MONSTERS = ALL_MONSTERS;
+
+// ============================================
+// LAZY LOADING - MONSTRES CONVERTIS (CR 1-100)
+// ============================================
+
+/**
+ * Obtient tous les monstres convertis vers l'échelle Eternalys (CR 1-100)
+ * La conversion est effectuée à la demande, pas à l'import
+ */
+export function getConvertedMonsters(): Monster[] {
+  return getLazyConvertedMonsters(() => ALL_MONSTERS);
+}
+
+/**
+ * Obtient tous les boss convertis vers l'échelle Eternalys (CR 1-100)
+ */
+export function getConvertedBosses(): Monster[] {
+  return getLazyConvertedBosses(() => BOSSES);
+}
+
+/**
+ * Obtient un monstre converti par son ID
+ */
+export function getConvertedMonsterById(id: string): Monster | undefined {
+  const monster = ALL_MONSTERS.find(m => m.id === id);
+  if (!monster) return undefined;
+  return convertMonsterToEternalysScale(monster);
+}
 
 // PERSONNAGES HOSTILES NOMMÉS (pour le bestiaire) - version D&D
 const HOSTILE_NPCS_DND: Monster[] = [

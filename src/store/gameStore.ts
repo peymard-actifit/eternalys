@@ -172,7 +172,7 @@ const loadFromLocalStorage = (): Partial<GameState> | null => {
       const parsed = JSON.parse(saved);
       // Vérifier que la phase est valide et que l'équipe existe
       if (parsed && PERSISTABLE_PHASES.includes(parsed.phase) && parsed.team && parsed.team.length > 0) {
-        console.log('[GameStore] État restauré depuis localStorage, phase:', parsed.phase);
+        if (import.meta.env.DEV) console.log('[GameStore] État restauré depuis localStorage, phase:', parsed.phase);
         return parsed;
       }
     }
@@ -775,10 +775,12 @@ export const gameStore = {
       
       const isBossFight = state.currentEnemies.some(e => e.isBoss);
       
-      // Log XP gagné
-      console.log(`[Combat] Victoire! XP gagné: ${totalXP} (${xpPerCharacter}/personnage)`);
-      if (leveledUp) {
-        console.log('[Combat] Des personnages ont gagné un niveau et doivent choisir un talent !');
+      // Log XP gagné (dev only)
+      if (import.meta.env.DEV) {
+        console.log(`[Combat] Victoire! XP gagné: ${totalXP} (${xpPerCharacter}/personnage)`);
+        if (leveledUp) {
+          console.log('[Combat] Des personnages ont gagné un niveau et doivent choisir un talent !');
+        }
       }
       
       // Si des personnages doivent choisir un talent, passer à la phase level_up

@@ -35,7 +35,7 @@ function App() {
     const wasRestored = gameStore.restoreSavedState();
     if (wasRestored) {
       // Une partie était en cours, entrer directement dans le jeu
-      console.log('[App] Partie restaurée, entrée directe dans le jeu');
+      if (import.meta.env.DEV) console.log('[App] Partie restaurée, entrée directe dans le jeu');
       setHasEnteredGame(true);
       // Mettre à jour l'état local avec l'état restauré
       setState(gameStore.getState());
