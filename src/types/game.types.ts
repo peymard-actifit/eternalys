@@ -544,11 +544,18 @@ export interface CombatHistoryEntry {
   target?: string;
   damage?: number;
   heal?: number;
+  healing?: number;  // Alias pour compatibilité
   effect?: string;
   isPlayerAction: boolean;
+  isEnemyAction?: boolean;
   damageType?: DamageType | 'physical' | 'magical' | 'holy';
   timestamp: number;
   diceRoll?: { roll: number; modifier: number; total: number; advantage?: boolean };
+  // Propriétés pour l'affichage dans CombatHistory
+  message?: string;
+  type?: 'attack' | 'heal' | 'buff' | 'debuff' | 'death' | 'info';
+  isCritical?: boolean;
+  isMiss?: boolean;
 }
 
 // =============================================================================
