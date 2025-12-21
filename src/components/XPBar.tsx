@@ -48,3 +48,4 @@ export function XPBar({ character, showDetails = false, compact = false }: XPBar
 
 export default XPBar;
 
+

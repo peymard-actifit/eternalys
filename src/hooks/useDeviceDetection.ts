@@ -176,3 +176,4 @@ export function useDeviceClass(): void {
 export default useDeviceDetection;
 
 
+
