@@ -7338,7 +7338,7 @@ const XVART: Monster = {
   speed: 30,
   challengeRating: 0.125, xpReward: 25, creatureType: 'monstrosity', size: 'small', portrait: '👿', isBoss: false,
   description: 'Petit humanoïde bleu servant Raxivort.',
-  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 6, damageType: 'piercing', type: 'attack', description: 'Épée' }]
+  skills: [{ id: 'shortsword', name: 'Épée courte', damage: 6, damageType: 'piercing', type: 'attack', targetType: 'enemy', description: 'Épée', requiresAttackRoll: true }]
 };
 
 const XVART_WARLOCK: Monster = {

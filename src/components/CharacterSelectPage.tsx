@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Character, getModifier } from '../types/game.types';
 import { AVAILABLE_CHARACTERS } from '../data/characters';
 import { gameStore } from '../store/gameStore';
-import { XPBar } from './XPBar';
 import './CharacterSelectPage.css';
 
 interface SelectedCharacter extends Character {
@@ -11,73 +10,64 @@ interface SelectedCharacter extends Character {
 
 export function CharacterSelectPage() {
   const [selectedCharacters, setSelectedCharacters] = useState<(SelectedCharacter | null)[]>([null, null, null, null]);
-  const [activeSlot, setActiveSlot] = useState<number | null>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [tempName, setTempName] = useState('');
+  const [hoveredCharacter, setHoveredCharacter] = useState<Character | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const maxTeamSize = 4;
 
-  // Ouvrir le menu de sélection pour un slot
-  const openCharacterMenu = (slotIndex: number) => {
-    setActiveSlot(slotIndex);
-  };
-
-  // Fermer le menu de sélection
-  const closeCharacterMenu = () => {
-    setActiveSlot(null);
-  };
-
-  // Sélectionner un personnage pour le slot actif
-  const selectCharacter = (character: Character) => {
-    if (activeSlot === null) return;
+  // Sélectionner/désélectionner un personnage
+  const toggleCharacter = (character: Character) => {
+    const existingIndex = selectedCharacters.findIndex(c => c?.id === character.id);
     
-    // Vérifier si le personnage est déjà sélectionné dans un autre slot
-    const isAlreadySelected = selectedCharacters.some(c => c?.id === character.id);
-    if (isAlreadySelected) return;
+    if (existingIndex !== -1) {
+      // Retirer le personnage
+      const newSelection = [...selectedCharacters];
+      newSelection[existingIndex] = null;
+      setSelectedCharacters(newSelection);
+    } else {
+      // Ajouter le personnage au premier slot vide
+      const emptyIndex = selectedCharacters.findIndex(c => c === null);
+      if (emptyIndex !== -1) {
+        const newSelection = [...selectedCharacters];
+        newSelection[emptyIndex] = { ...character, customName: character.name };
+        setSelectedCharacters(newSelection);
+      }
+    }
+  };
+
+  // Gérer le survol pour le tooltip
+  const handleMouseEnter = (character: Character, e: React.MouseEvent) => {
+    setHoveredCharacter(character);
+    updateTooltipPosition(e);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (hoveredCharacter) {
+      updateTooltipPosition(e);
+    }
+  };
+
+  const updateTooltipPosition = (e: React.MouseEvent) => {
+    const offset = 15;
+    let x = e.clientX + offset;
+    let y = e.clientY + offset;
     
-    const newSelection = [...selectedCharacters];
-    newSelection[activeSlot] = { ...character, customName: character.name };
-    setSelectedCharacters(newSelection);
-    setActiveSlot(null);
-  };
-
-  // Retirer un personnage d'un slot
-  const removeCharacter = (slotIndex: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newSelection = [...selectedCharacters];
-    newSelection[slotIndex] = null;
-    setSelectedCharacters(newSelection);
-  };
-
-  // Édition du nom
-  const startEditingName = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const char = selectedCharacters[index];
-    if (!char) return;
-    setEditingIndex(index);
-    setTempName(char.customName || char.name);
-  };
-
-  const saveName = () => {
-    if (editingIndex !== null && tempName.trim() && selectedCharacters[editingIndex]) {
-      const updated = [...selectedCharacters];
-      updated[editingIndex] = {
-        ...updated[editingIndex]!,
-        customName: tempName.trim(),
-        name: tempName.trim()
-      };
-      setSelectedCharacters(updated);
+    // Ajuster si le tooltip sort de l'écran
+    if (tooltipRef.current) {
+      const rect = tooltipRef.current.getBoundingClientRect();
+      if (x + rect.width > window.innerWidth) {
+        x = e.clientX - rect.width - offset;
+      }
+      if (y + rect.height > window.innerHeight) {
+        y = e.clientY - rect.height - offset;
+      }
     }
-    setEditingIndex(null);
-    setTempName('');
+    
+    setTooltipPos({ x, y });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      saveName();
-    } else if (e.key === 'Escape') {
-      setEditingIndex(null);
-      setTempName('');
-    }
+  const handleMouseLeave = () => {
+    setHoveredCharacter(null);
   };
 
   // Démarrer le donjon
@@ -95,7 +85,7 @@ export function CharacterSelectPage() {
   // Compter les personnages sélectionnés
   const selectedCount = selectedCharacters.filter(c => c !== null).length;
 
-  // Vérifier si un personnage est déjà sélectionné
+  // Vérifier si un personnage est sélectionné
   const isCharacterSelected = (characterId: string) => {
     return selectedCharacters.some(c => c?.id === characterId);
   };
@@ -123,80 +113,56 @@ export function CharacterSelectPage() {
       <div className="select-header">
         <h1>🏰 Sélection de l'équipe</h1>
         <p className="select-subtitle">
-          Cliquez sur un emplacement pour choisir un héros
+          Cliquez sur un héros pour le sélectionner ({selectedCount}/{maxTeamSize})
         </p>
       </div>
 
-      {/* Emplacements d'équipe */}
-      <div className="team-slots-container">
-        <div className="team-slots">
-          {selectedCharacters.map((char, index) => (
-            <div 
-              key={index} 
-              className={`team-slot ${char ? 'filled' : 'empty'} ${activeSlot === index ? 'active' : ''}`}
-              onClick={() => char ? null : openCharacterMenu(index)}
+      {/* Grille de tous les personnages */}
+      <div className="characters-grid">
+        {AVAILABLE_CHARACTERS.map(character => {
+          const isSelected = isCharacterSelected(character.id);
+          const isFull = selectedCount >= maxTeamSize && !isSelected;
+          
+          return (
+            <div
+              key={character.id}
+              className={`char-mini-card ${isSelected ? 'selected' : ''} ${isFull ? 'disabled' : ''}`}
+              onClick={() => !isFull && toggleCharacter(character)}
+              onMouseEnter={(e) => handleMouseEnter(character, e)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
             >
-              {char ? (
-                <>
-                  <button 
-                    className="remove-btn"
-                    onClick={(e) => removeCharacter(index, e)}
-                    title="Retirer ce personnage"
-                  >
-                    ✕
-                  </button>
-                  <span className="slot-portrait">{char.portrait}</span>
-                  {editingIndex === index ? (
-                    <input
-                      type="text"
-                      className="name-input"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      onBlur={saveName}
-                      onKeyDown={handleKeyDown}
-                      autoFocus
-                      maxLength={15}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  ) : (
-                    <span 
-                      className="slot-name editable"
-                      onClick={(e) => startEditingName(index, e)}
-                      title="Cliquez pour modifier le nom"
-                    >
-                      {char.customName || char.name}
-                      <span className="edit-icon">✏️</span>
-                    </span>
-                  )}
-                  <span className="slot-class">{char.class} Niv.{char.level}</span>
-                  <div className="slot-stats">
-                    <span title="PV">❤️ {char.hp}</span>
-                    <span title="CA">🛡️ {char.armorClass}</span>
-                  </div>
-                  <div className="slot-xp">
-                    <XPBar character={char} compact />
-                  </div>
-                  {/* Cliquer pour changer */}
-                  <button 
-                    className="change-btn"
-                    onClick={(e) => { e.stopPropagation(); openCharacterMenu(index); }}
-                    title="Changer de personnage"
-                  >
-                    🔄 Changer
-                  </button>
-                </>
-              ) : (
-                <div className="empty-slot-content">
-                  <span className="slot-empty-icon">+</span>
-                  <span className="slot-empty-text">Ajouter</span>
-                </div>
-              )}
+              {isSelected && <div className="selected-badge">✓</div>}
+              <span className="char-mini-portrait">{character.portrait}</span>
+              <span className="char-mini-name">{character.name}</span>
+              <span className="char-mini-class">{character.class}</span>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      {/* Bouton Entrer dans le donjon - toujours visible */}
+      {/* Équipe sélectionnée */}
+      {selectedCount > 0 && (
+        <div className="selected-team">
+          <h3>Équipe sélectionnée</h3>
+          <div className="selected-portraits">
+            {selectedCharacters.filter(c => c !== null).map(char => (
+              <div 
+                key={char!.id} 
+                className="selected-portrait"
+                onClick={() => toggleCharacter(char!)}
+                title="Cliquez pour retirer"
+              >
+                <span className="sp-icon">{char!.portrait}</span>
+                <span className="sp-name">{char!.name}</span>
+                <span className="sp-remove">✕</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bouton Entrer */}
       <div className="select-actions">
         <button 
           className="start-dungeon-button"
@@ -212,122 +178,83 @@ export function CharacterSelectPage() {
         )}
       </div>
 
-      {/* Menu de sélection de personnage (overlay) */}
-      {activeSlot !== null && (
-        <div className="character-menu-overlay" onClick={closeCharacterMenu}>
-          <div className="character-menu" onClick={(e) => e.stopPropagation()}>
-            <div className="menu-header">
-              <h2>Choisir un héros</h2>
-              <button className="close-menu-btn" onClick={closeCharacterMenu}>✕</button>
+      {/* Tooltip au survol */}
+      {hoveredCharacter && (
+        <div 
+          ref={tooltipRef}
+          className="char-tooltip"
+          style={{ 
+            left: tooltipPos.x, 
+            top: tooltipPos.y 
+          }}
+        >
+          <div className="tooltip-header">
+            <span className="t-portrait">{hoveredCharacter.portrait}</span>
+            <div className="t-info">
+              <h4>{hoveredCharacter.name}</h4>
+              <p>{hoveredCharacter.class} Niv. {hoveredCharacter.level}</p>
             </div>
-            
-            <div className="menu-content">
-              {AVAILABLE_CHARACTERS.map(character => {
-                const isSelected = isCharacterSelected(character.id);
-                
-                return (
-                  <div
-                    key={character.id}
-                    className={`menu-character-card ${isSelected ? 'already-selected' : ''}`}
-                    onClick={() => !isSelected && selectCharacter(character)}
-                  >
-                    {isSelected && <div className="already-in-team">Déjà dans l'équipe</div>}
-                    
-                    <div className="menu-card-header">
-                      <span className="menu-portrait">{character.portrait}</span>
-                      <div className="menu-card-info">
-                        <h3>{character.name}</h3>
-                        <p className="menu-class">{character.class} Niv. {character.level}</p>
-                      </div>
-                    </div>
+          </div>
 
-                    {/* Stats D&D principales */}
-                    <div className="menu-stats-row">
-                      <div className="menu-stat">
-                        <span className="ms-icon">❤️</span>
-                        <span className="ms-value">{character.hp}</span>
-                        <span className="ms-label">PV</span>
-                      </div>
-                      <div className="menu-stat">
-                        <span className="ms-icon">🛡️</span>
-                        <span className="ms-value">{character.armorClass}</span>
-                        <span className="ms-label">CA</span>
-                      </div>
-                      <div className="menu-stat">
-                        <span className="ms-icon">⚔️</span>
-                        <span className="ms-value">{getModifierString(Math.max(character.abilities.strength, character.abilities.dexterity) + character.proficiencyBonus - 10)}</span>
-                        <span className="ms-label">ATT</span>
-                      </div>
-                      <div className="menu-stat">
-                        <span className="ms-icon">🎯</span>
-                        <span className="ms-value">+{character.proficiencyBonus}</span>
-                        <span className="ms-label">MAÎT</span>
-                      </div>
-                    </div>
-                    
-                    {/* Barre d'XP */}
-                    <div className="menu-xp-bar">
-                      <XPBar character={character} compact />
-                    </div>
+          <div className="tooltip-stats">
+            <div className="t-stat">
+              <span>❤️ PV</span>
+              <span>{hoveredCharacter.hp}/{hoveredCharacter.maxHp}</span>
+            </div>
+            <div className="t-stat">
+              <span>🛡️ CA</span>
+              <span>{hoveredCharacter.armorClass}</span>
+            </div>
+            <div className="t-stat">
+              <span>🎯 Maît.</span>
+              <span>+{hoveredCharacter.proficiencyBonus}</span>
+            </div>
+          </div>
 
-                    {/* Caractéristiques D&D */}
-                    <div className="menu-abilities">
-                      <div className="menu-ability">
-                        <span className="ma-label">FOR</span>
-                        <span className="ma-score">{character.abilities.strength}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.strength)}</span>
-                      </div>
-                      <div className="menu-ability">
-                        <span className="ma-label">DEX</span>
-                        <span className="ma-score">{character.abilities.dexterity}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.dexterity)}</span>
-                      </div>
-                      <div className="menu-ability">
-                        <span className="ma-label">CON</span>
-                        <span className="ma-score">{character.abilities.constitution}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.constitution)}</span>
-                      </div>
-                      <div className="menu-ability">
-                        <span className="ma-label">INT</span>
-                        <span className="ma-score">{character.abilities.intelligence}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.intelligence)}</span>
-                      </div>
-                      <div className="menu-ability">
-                        <span className="ma-label">SAG</span>
-                        <span className="ma-score">{character.abilities.wisdom}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.wisdom)}</span>
-                      </div>
-                      <div className="menu-ability">
-                        <span className="ma-label">CHA</span>
-                        <span className="ma-score">{character.abilities.charisma}</span>
-                        <span className="ma-mod">{getModifierString(character.abilities.charisma)}</span>
-                      </div>
-                    </div>
+          <div className="tooltip-abilities">
+            <div className="t-ability">
+              <span className="ta-label">FOR</span>
+              <span className="ta-score">{hoveredCharacter.abilities.strength}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.strength)}</span>
+            </div>
+            <div className="t-ability">
+              <span className="ta-label">DEX</span>
+              <span className="ta-score">{hoveredCharacter.abilities.dexterity}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.dexterity)}</span>
+            </div>
+            <div className="t-ability">
+              <span className="ta-label">CON</span>
+              <span className="ta-score">{hoveredCharacter.abilities.constitution}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.constitution)}</span>
+            </div>
+            <div className="t-ability">
+              <span className="ta-label">INT</span>
+              <span className="ta-score">{hoveredCharacter.abilities.intelligence}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.intelligence)}</span>
+            </div>
+            <div className="t-ability">
+              <span className="ta-label">SAG</span>
+              <span className="ta-score">{hoveredCharacter.abilities.wisdom}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.wisdom)}</span>
+            </div>
+            <div className="t-ability">
+              <span className="ta-label">CHA</span>
+              <span className="ta-score">{hoveredCharacter.abilities.charisma}</span>
+              <span className="ta-mod">{getModifierString(hoveredCharacter.abilities.charisma)}</span>
+            </div>
+          </div>
 
-                    {/* Compétences */}
-                    <div className="menu-skills">
-                      {character.skills.slice(0, 3).map(skill => (
-                        <span 
-                          key={skill.id} 
-                          className={`menu-skill-tag ${getDamageTypeClass(skill.damageType)}`}
-                          title={skill.description}
-                        >
-                          {skill.name}
-                        </span>
-                      ))}
-                      {character.skills.length > 3 && (
-                        <span className="menu-skill-more">+{character.skills.length - 3}</span>
-                      )}
-                    </div>
-
-                    {!isSelected && (
-                      <button className="select-character-btn">
-                        ✓ Sélectionner
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+          <div className="tooltip-skills">
+            <h5>Compétences</h5>
+            <div className="t-skills-list">
+              {hoveredCharacter.skills.map(skill => (
+                <span 
+                  key={skill.id} 
+                  className={`t-skill-tag ${getDamageTypeClass(skill.damageType)}`}
+                >
+                  {skill.name}
+                </span>
+              ))}
             </div>
           </div>
         </div>

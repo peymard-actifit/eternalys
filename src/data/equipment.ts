@@ -32,7 +32,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     damage: '1d4',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { dexterity: 2, speed: 1 },
+    bonuses: {},
     value: 2
   },
   {
@@ -45,7 +45,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'slashing',
-    bonuses: { strength: 3 },
+    bonuses: {},
     value: 5
   },
   {
@@ -58,7 +58,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'bludgeoning',
-    bonuses: { strength: 3 },
+    bonuses: {},
     value: 5
   },
   {
@@ -71,7 +71,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'bludgeoning',
-    bonuses: { strength: 2, armorClass: 1 },
+    bonuses: {},
     value: 2
   },
   {
@@ -84,7 +84,7 @@ export const WEAPONS_SIMPLE_MELEE: Equipment[] = [
     weaponCategory: 'simple_melee',
     damage: '1d6',
     damageType: 'piercing',
-    bonuses: { strength: 3 },
+    bonuses: {},
     value: 1
   }
 ];
@@ -103,7 +103,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'slashing',
-    bonuses: { strength: 5 },
+    bonuses: {},
     value: 15
   },
   {
@@ -116,7 +116,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'slashing',
-    bonuses: { strength: 6 },
+    bonuses: {},
     value: 10
   },
   {
@@ -129,7 +129,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'bludgeoning',
-    bonuses: { strength: 5 },
+    bonuses: {},
     value: 15
   },
   {
@@ -143,7 +143,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { dexterity: 5, speed: 2 },
+    bonuses: {},
     value: 25
   },
   {
@@ -157,7 +157,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d6',
     damageType: 'piercing',
     finesse: true,
-    bonuses: { dexterity: 4, speed: 2 },
+    bonuses: {},
     value: 10
   },
   {
@@ -171,7 +171,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d6',
     damageType: 'slashing',
     finesse: true,
-    bonuses: { dexterity: 4, speed: 2 },
+    bonuses: {},
     value: 25
   },
   {
@@ -185,7 +185,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d12',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { strength: 8 },
+    bonuses: {},
     value: 30
   },
   {
@@ -199,7 +199,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '2d6',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { strength: 8 },
+    bonuses: {},
     value: 50
   },
   {
@@ -213,7 +213,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     damage: '1d10',
     damageType: 'slashing',
     twoHanded: true,
-    bonuses: { strength: 7 },
+    bonuses: {},
     value: 20
   },
   {
@@ -226,7 +226,7 @@ export const WEAPONS_MARTIAL_MELEE: Equipment[] = [
     weaponCategory: 'martial_melee',
     damage: '1d8',
     damageType: 'bludgeoning',
-    bonuses: { strength: 5 },
+    bonuses: {},
     value: 10
   }
 ];
@@ -246,7 +246,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d6',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { strength: 4 },
+    bonuses: {},
     value: 25
   },
   {
@@ -260,7 +260,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { strength: 6 },
+    bonuses: {},
     value: 50
   },
   {
@@ -274,7 +274,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d8',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { strength: 5 },
+    bonuses: {},
     value: 25
   },
   {
@@ -288,7 +288,7 @@ export const WEAPONS_RANGED: Equipment[] = [
     damage: '1d10',
     damageType: 'piercing',
     twoHanded: true,
-    bonuses: { strength: 7 },
+    bonuses: {},
     value: 50
   }
 ];

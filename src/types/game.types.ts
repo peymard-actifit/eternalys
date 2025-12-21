@@ -455,6 +455,7 @@ export interface MonsterSkill {
   name: string;
   description: string;
   type: 'attack' | 'special' | 'buff' | 'debuff' | 'multiattack';
+  targetType?: 'enemy' | 'ally' | 'self' | 'all_enemies' | 'all_allies';
   
   // === DÉGÂTS ===
   damage: number;
