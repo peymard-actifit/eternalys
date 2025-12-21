@@ -1,5 +1,5 @@
 import { Character, Monster, GameEvent, Room, GameState, HistoryEntry, TreasureLegacy, PendingTreasureData } from '../types/game.types';
-import { getRandomMonster, getRandomBoss, MONSTERS, resetLegendaryActions } from '../data/monsters';
+import { getRandomMonster, getRandomBoss, getMonsterById, resetLegendaryActions } from '../data/monsters';
 import { getRandomEvent } from '../data/events';
 import { getRandomTreasure, Treasure, allTreasures } from '../data/treasures';
 
@@ -48,11 +48,12 @@ const getBossMinions = (boss: Monster): Monster[] => {
   
   for (let i = 0; i < minionCount; i++) {
     const minionId = boss.minions[Math.floor(Math.random() * boss.minions.length)];
-    const minionTemplate = MONSTERS.find(m => m.id === minionId);
+    // Utiliser getMonsterById pour obtenir le monstre converti (CR Eternalys)
+    const minionTemplate = getMonsterById(minionId);
     
     if (minionTemplate) {
       minions.push({
-        ...minionTemplate,
+        ...JSON.parse(JSON.stringify(minionTemplate)), // Deep copy
         id: `${minionTemplate.id}_minion_${i}_${Date.now()}`,
         skills: minionTemplate.skills?.map(s => ({ ...s }))
       });

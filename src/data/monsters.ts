@@ -7586,14 +7586,34 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   return boss;
 }
 
-// Obtenir des monstres par type
-export function getMonstersByType(type: CreatureType): Monster[] {
-  return ALL_MONSTERS.filter(m => m.creatureType === type);
+// =============================================================================
+// CACHE DE CONVERSION POUR LE BESTIARY
+// =============================================================================
+let _convertedMonstersCache: Monster[] | null = null;
+
+function getConvertedMonstersForBestiary(): Monster[] {
+  if (_convertedMonstersCache === null) {
+    _convertedMonstersCache = ALL_MONSTERS.map(m => {
+      const copy = JSON.parse(JSON.stringify(m));
+      return localConvertMonsterToEternalysScale(copy);
+    });
+  }
+  return _convertedMonstersCache;
 }
 
-// Obtenir un monstre par ID
+// Obtenir des monstres par type (avec conversion CR Eternalys)
+export function getMonstersByType(type: CreatureType): Monster[] {
+  return getConvertedMonstersForBestiary().filter(m => m.creatureType === type);
+}
+
+// Obtenir un monstre par ID (avec conversion CR Eternalys)
 export function getMonsterById(id: string): Monster | undefined {
-  return ALL_MONSTERS.find(m => m.id === id);
+  return getConvertedMonstersForBestiary().find(m => m.id === id);
+}
+
+// Obtenir tous les monstres convertis (pour le Bestiary)
+export function getAllConvertedMonsters(): Monster[] {
+  return getConvertedMonstersForBestiary();
 }
 
 // Réinitialiser les actions légendaires (appelé à chaque nouveau tour)

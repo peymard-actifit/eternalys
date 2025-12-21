@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Monster, CreatureType } from '../types/game.types';
-import { ALL_MONSTERS, MONSTERS_BY_CR, getMonstersByType } from '../data/monsters';
+import { getAllConvertedMonsters, getMonstersByType } from '../data/monsters';
 import './Bestiary.css';
+
+// Utiliser les monstres convertis à l'échelle Eternalys (CR 1-100)
 
 interface BestiaryProps {
   isOpen: boolean;
@@ -102,10 +104,13 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
     }
   }, [isOpen, onClose]);
 
+  // Mémoriser les monstres convertis (CR Eternalys 1-100)
+  const allMonsters = useMemo(() => getAllConvertedMonsters(), []);
+
   if (!isOpen) return null;
 
   // Filtrer les monstres
-  let filteredMonsters = [...ALL_MONSTERS];
+  let filteredMonsters = [...allMonsters];
   
   // Filtre par type de créature
   if (filterType === 'hostileNpc') {
@@ -228,8 +233,8 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
           {(Object.keys(DANGER_LEVELS) as DangerLevel[]).map(level => {
             const { name, icon, min, max } = DANGER_LEVELS[level];
             const count = level === 'all' 
-              ? ALL_MONSTERS.length 
-              : ALL_MONSTERS.filter(m => (m.challengeRating || 0) >= min && (m.challengeRating || 0) <= max).length;
+              ? allMonsters.length 
+              : allMonsters.filter(m => (m.challengeRating || 0) >= min && (m.challengeRating || 0) <= max).length;
             if (count === 0 && level !== 'all') return null;
             return (
               <button 
@@ -250,24 +255,24 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
             className={`type-filter-btn ${filterType === 'all' ? 'active' : ''}`}
             onClick={() => setFilterType('all')}
           >
-            Tous ({ALL_MONSTERS.length})
+            Tous ({allMonsters.length})
           </button>
           <button 
             className={`type-filter-btn special ${filterType === 'hostileNpc' ? 'active' : ''}`}
             onClick={() => setFilterType('hostileNpc')}
             title="Personnages hostiles nommés"
           >
-            👿 PNJ ({ALL_MONSTERS.filter(m => m.isHostileNpc).length})
+            👿 PNJ ({allMonsters.filter(m => m.isHostileNpc).length})
           </button>
           <button 
             className={`type-filter-btn special ${filterType === 'boss' ? 'active' : ''}`}
             onClick={() => setFilterType('boss')}
             title="Boss"
           >
-            💀 Boss ({ALL_MONSTERS.filter(m => m.isBoss).length})
+            💀 Boss ({allMonsters.filter(m => m.isBoss).length})
           </button>
           {creatureTypes.map(type => {
-            const count = ALL_MONSTERS.filter(m => m.creatureType === type).length;
+            const count = allMonsters.filter(m => m.creatureType === type).length;
             if (count === 0) return null;
             return (
               <button 
@@ -471,9 +476,9 @@ export function Bestiary({ isOpen, onClose }: BestiaryProps) {
 
         {/* Footer avec stats */}
         <div className="bestiary-footer">
-          <span>Total: {ALL_MONSTERS.length} créatures</span>
+          <span>Total: {allMonsters.length} créatures</span>
           <span>|</span>
-          <span>Boss: {ALL_MONSTERS.filter(m => m.isBoss).length}</span>
+          <span>Boss: {allMonsters.filter(m => m.isBoss).length}</span>
           <span>|</span>
           <span>Appuyez sur B ou Échap pour fermer</span>
         </div>
