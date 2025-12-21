@@ -4,6 +4,7 @@
 // ============================================
 
 import { Monster, CreatureType, AbilityScores, LegendaryAction, MonsterSkill } from '../types/game.types';
+import { convertMonsterToEternalysScale } from '../utils/monsterScaling';
 
 // Helper pour créer les caractéristiques
 const createAbilities = (str: number, dex: number, con: number, int: number, wis: number, cha: number): AbilityScores => ({
@@ -7381,10 +7382,14 @@ export const BOSSES: Monster[] = [
 // ============================================
 
 // Obtenir un monstre aléatoire par CR
+// Note: Applique automatiquement la conversion vers l'échelle Eternalys (CR 1-100)
 export function getRandomMonsterByCR(cr: number): Monster {
   const monsters = MONSTERS_BY_CR[cr] || MONSTERS_BY_CR[0.25];
   const index = Math.floor(Math.random() * monsters.length);
-  return JSON.parse(JSON.stringify(monsters[index])); // Deep copy
+  const rawMonster = JSON.parse(JSON.stringify(monsters[index])); // Deep copy
+  
+  // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
+  return convertMonsterToEternalysScale(rawMonster);
 }
 
 // Obtenir un monstre aléatoire adapté au niveau de donjon
@@ -7446,6 +7451,7 @@ export function getRandomEncounter(targetCR: number, count: number = 1): Monster
 }
 
 // Obtenir un boss aléatoire adapté au niveau du donjon
+// Note: Applique automatiquement la conversion vers l'échelle Eternalys (CR 1-100)
 export function getRandomBoss(dungeonLevel: number = 1): Monster {
   // Sélectionner les boss par tier basé sur le niveau du donjon
   let bossList: Monster[];
@@ -7470,7 +7476,10 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   }
   
   const index = Math.floor(Math.random() * bossList.length);
-  const boss = JSON.parse(JSON.stringify(bossList[index])); // Deep copy
+  const rawBoss = JSON.parse(JSON.stringify(bossList[index])); // Deep copy
+  
+  // Convertir vers l'échelle Eternalys (CR 1-100 avec stats ajustées)
+  const boss = convertMonsterToEternalysScale(rawBoss);
   
   // Réinitialiser les actions légendaires
   if (boss.legendaryActionsPerTurn) {
