@@ -7539,13 +7539,13 @@ const HOSTILE_NPCS_DND: Monster[] = [
 export const HOSTILE_NPCS: Monster[] = HOSTILE_NPCS_DND;
 
 // Mini-boss pour les premiers niveaux (CR 1-3)
-// v2.30.3 : HP ajustés pour être battables par 4 personnages niveau 1-2 (50-70 HP total, 10 HP chacun)
-// Combat de 5-8 tours = boss avec ~40-60 HP
+// v2.31.3 : HP ajustés pour combat épique de 4-6 tours
+// Équipe 4 personnages niveau 1 : ~40 HP total, ~32 dégâts/tour → boss 80-100 HP = 3-4 tours
 export const MINI_BOSSES: Monster[] = [
-  { ...OGRE, isBoss: true, name: 'Chef Ogre', portrait: '👹', hp: 55, maxHp: 55, challengeRating: 2, description: 'Un ogre particulièrement imposant qui domine sa bande.' },
-  { ...GHOUL, isBoss: true, name: 'Goule Alpha', portrait: '🧟', hp: 40, maxHp: 40, challengeRating: 1, description: 'Une goule plus grande et plus féroce que ses congénères.' },
-  { ...GARGOYLE, isBoss: true, name: 'Gargouille Ancienne', portrait: '🗿', hp: 50, maxHp: 50, challengeRating: 2, description: 'Une gargouille très ancienne dotée d\'une intelligence rudimentaire.' },
-  { ...GNOLL, isBoss: true, name: 'Chef de Meute Gnoll', portrait: '🐺', hp: 45, maxHp: 45, challengeRating: 1, description: 'Le chef brutal d\'une bande de gnolls.' }
+  { ...OGRE, isBoss: true, name: 'Chef Ogre', portrait: '👹', hp: 85, maxHp: 85, challengeRating: 2, armorClass: 12, description: 'Un ogre particulièrement imposant qui domine sa bande.' },
+  { ...GHOUL, isBoss: true, name: 'Goule Alpha', portrait: '🧟', hp: 65, maxHp: 65, challengeRating: 1, armorClass: 13, description: 'Une goule plus grande et plus féroce que ses congénères.' },
+  { ...GARGOYLE, isBoss: true, name: 'Gargouille Ancienne', portrait: '🗿', hp: 80, maxHp: 80, challengeRating: 2, armorClass: 14, description: 'Une gargouille très ancienne dotée d\'une intelligence rudimentaire.' },
+  { ...GNOLL, isBoss: true, name: 'Chef de Meute Gnoll', portrait: '🐺', hp: 70, maxHp: 70, challengeRating: 1, armorClass: 13, description: 'Le chef brutal d\'une bande de gnolls.' }
 ];
 
 // Boss organisés par tier de difficulté
