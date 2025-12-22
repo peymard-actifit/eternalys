@@ -17,13 +17,17 @@ import { LevelUpModal } from './components/LevelUpModal';
 import { TestChecklist } from './components/TestChecklist';
 import { useDeviceClass } from './hooks/useDeviceDetection';
 
-// Liste des emails autorisés pour les tests (admin/testeur)
-const TESTER_EMAILS = [
-  'antoine@eternalys.com',
-  'admin@eternalys.com',
-  'testeur@eternalys.com',
-  'pey@eternalys.com',
-  // Ajouter d'autres emails ici
+// Liste des comptes ADMIN (accès complet + onglet caché)
+const ADMIN_IDENTIFIERS = [
+  'admin',           // Username ou partie d'email
+  'antoine',         // Username ou partie d'email
+];
+
+// Liste des comptes TESTEUR (accès raccourci clavier uniquement)
+const TESTER_IDENTIFIERS = [
+  'testeur',
+  'pey',
+  'test',
 ];
 import './App.css';
 import './styles/responsive.css';
@@ -273,12 +277,30 @@ function App() {
 
   // Déterminer si l'utilisateur peut accéder à la checklist de test
   const canAccessTestChecklist = (): 'admin' | 'testeur' | 'player' => {
-    // En mode DEV, toujours autoriser
+    // En mode DEV, toujours autoriser comme admin
     if (import.meta.env.DEV) return 'admin';
     
-    // Vérifier si l'utilisateur est dans la liste des testeurs
-    const userEmail = authState.currentUser?.email?.toLowerCase();
-    if (userEmail && TESTER_EMAILS.some(email => userEmail.includes(email.split('@')[0]))) {
+    // Récupérer les identifiants de l'utilisateur
+    const userEmail = authState.currentUser?.email?.toLowerCase() || '';
+    const userName = authState.currentUser?.username?.toLowerCase() || '';
+    const displayName = authState.currentUser?.display_name?.toLowerCase() || '';
+    
+    // Fonction pour vérifier si un identifiant correspond
+    const matchesIdentifier = (identifier: string) => {
+      return userEmail.includes(identifier) || 
+             userName.includes(identifier) || 
+             displayName.includes(identifier) ||
+             userName === identifier ||
+             displayName === identifier;
+    };
+    
+    // Vérifier si ADMIN (prioritaire)
+    if (ADMIN_IDENTIFIERS.some(id => matchesIdentifier(id))) {
+      return 'admin';
+    }
+    
+    // Vérifier si TESTEUR
+    if (TESTER_IDENTIFIERS.some(id => matchesIdentifier(id))) {
       return 'testeur';
     }
     
