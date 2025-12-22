@@ -3186,7 +3186,7 @@ export function CombatPage() {
                   <span>{skill.name}</span>
                   <span className="damage-preview">
                     {skill.type === 'heal' 
-                      ? `+${skill.healing || Math.abs(skill.damage)} PV` 
+                      ? `+${Math.abs(skill.damage)} PV` 
                       : skill.damageDice 
                         ? `🎲 ${skill.damageDice}` 
                         : skill.type === 'buff' 
@@ -3210,10 +3210,10 @@ export function CombatPage() {
                         <span className="stat-value">{skill.damage}</span>
                       </div>
                     )}
-                    {skill.healing && skill.healing > 0 && (
+                    {skill.type === 'heal' && skill.damage !== 0 && (
                       <div className="tooltip-stat">
                         <span className="stat-name">Soins</span>
-                        <span className="stat-value heal">+{skill.healing}</span>
+                        <span className="stat-value heal">+{Math.abs(skill.damage)}</span>
                       </div>
                     )}
                     {skill.cooldown && skill.cooldown > 0 && (
