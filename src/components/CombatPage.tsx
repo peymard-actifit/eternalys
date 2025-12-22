@@ -38,6 +38,7 @@ export function CombatPage() {
   const autoMode = isAuto || isSkip;
   
   // Helper pour afficher les résultats en mode Skip (fenêtre centrale au lieu des animations)
+  // L'affichage reste jusqu'à la prochaine action (pas de fermeture automatique)
   const showSkipResult = (attackResult: {
     roll: number;
     modifier: number;
@@ -49,33 +50,36 @@ export function CombatPage() {
     target: string;
   }, damage?: number) => {
     const hitText = attackResult.isCritical ? '💥 CRITIQUE !' : (attackResult.hit ? '✅ TOUCHÉ' : '❌ RATÉ');
-    setCentralDisplay({
-      type: 'attack',
-      result: hitText,
-      details: `🎲 ${attackResult.roll}+${attackResult.modifier}=${attackResult.total} vs CA ${attackResult.targetAC}`,
-      isHit: attackResult.hit,
-      isCritical: attackResult.isCritical,
-      damage: damage
-    });
     
-    // Auto-fermer après un délai
-    setTimeout(() => {
-      if (damage && damage > 0 && attackResult.hit) {
-        // Afficher les dégâts
-        setCentralDisplay({
-          type: 'damage',
-          result: `⚔️ ${damage} DÉGÂTS`,
-          details: attackResult.isCritical ? '(Coup critique !)' : undefined,
-          isHit: true,
-          isCritical: attackResult.isCritical,
-          damage: damage
-        });
-        // Fermer après affichage des dégâts
-        setTimeout(() => setCentralDisplay(null), 400);
-      } else {
-        setCentralDisplay(null);
-      }
-    }, 300);
+    if (damage && damage > 0 && attackResult.hit) {
+      // Afficher jet + dégâts ensemble
+      setCentralDisplay({
+        type: 'attack',
+        result: `${hitText} → ${damage} DMG`,
+        details: `🎲 ${attackResult.roll}+${attackResult.modifier}=${attackResult.total} vs CA ${attackResult.targetAC}`,
+        isHit: attackResult.hit,
+        isCritical: attackResult.isCritical,
+        damage: damage
+      });
+    } else {
+      // Juste le résultat du jet (raté ou pas de dégâts)
+      setCentralDisplay({
+        type: 'attack',
+        result: hitText,
+        details: `🎲 ${attackResult.roll}+${attackResult.modifier}=${attackResult.total} vs CA ${attackResult.targetAC}`,
+        isHit: attackResult.hit,
+        isCritical: attackResult.isCritical,
+        damage: 0
+      });
+    }
+    // PAS de setTimeout - l'affichage reste jusqu'à la prochaine action
+  };
+  
+  // Fermer l'affichage central quand une nouvelle action commence
+  const clearCentralDisplayOnNewAction = () => {
+    if (isSkip && centralDisplay) {
+      setCentralDisplay(null);
+    }
   };
   const [monsterDialogue, setMonsterDialogue] = useState<string>('');
   const [showDialogue, setShowDialogue] = useState(false);
@@ -230,7 +234,7 @@ export function CombatPage() {
             lastAttackResult.onDismiss();
           }
           setLastAttackResult(null);
-          if (isSkip) setCentralDisplay(null);
+          // Ne PAS fermer centralDisplay ici - il reste jusqu'à la prochaine action
         }, delay);
         return () => clearTimeout(timer);
       }
@@ -242,11 +246,11 @@ export function CombatPage() {
     if (lastDamageResult) {
       const delay = isSkip ? 100 : isAuto ? 600 : (!lastDamageResult.waitForClick ? 1500 : 0);
       
-      // En mode skip, afficher dans la zone centrale
+      // En mode skip, afficher dans la zone centrale (reste jusqu'à prochaine action)
       if (isSkip && lastDamageResult) {
         setCentralDisplay({
           type: 'damage',
-          result: `${lastDamageResult.totalDamage} DÉGÂTS`,
+          result: `⚔️ ${lastDamageResult.totalDamage} DÉGÂTS`,
           details: `🎲 ${lastDamageResult.rolls.join('+')}${lastDamageResult.modifier !== 0 ? (lastDamageResult.modifier > 0 ? '+' : '') + lastDamageResult.modifier : ''}`
         });
       }
@@ -257,7 +261,7 @@ export function CombatPage() {
             lastDamageResult.onDismiss();
           }
           setLastDamageResult(null);
-          if (isSkip) setCentralDisplay(null);
+          // Ne PAS fermer centralDisplay ici - il reste jusqu'à la prochaine action
         }, delay);
         return () => clearTimeout(timer);
       }
@@ -906,6 +910,11 @@ export function CombatPage() {
     const currentMonster = isEnemyTurn ? currentTurn as Monster : null;
     
     if (isEnemyTurn && !isAnimating && currentMonster && currentMonster.hp > 0) {
+      // Effacer l'affichage central précédent (mode Skip)
+      if (isSkip && centralDisplay) {
+        setCentralDisplay(null);
+      }
+      
       setIsAnimating(true);
       
       const executeMonsterTurn = async () => {
@@ -1921,6 +1930,9 @@ export function CombatPage() {
   const executeAttack = async () => {
     if (!pendingAction || pendingAction.type !== 'attack') return;
     
+    // Effacer l'affichage central précédent (mode Skip)
+    clearCentralDisplayOnNewAction();
+    
     const attacker = pendingAction.attacker!;
     const target = pendingAction.target as Monster;
     
@@ -2180,6 +2192,9 @@ export function CombatPage() {
   };
 
   const executeSkill = async (skill: Skill, attackerParam: Character, target: Character | Monster | null) => {
+    // Effacer l'affichage central précédent (mode Skip)
+    clearCentralDisplayOnNewAction();
+    
     setIsAnimating(true);
     const logs: string[] = [...combatLog];
     const damageType = skill.damageType || 'physical';
@@ -2571,8 +2586,8 @@ export function CombatPage() {
             details: hasDamageDice ? `🎲 ${damageRolls.join('+')}${damageModifier > 0 ? '+' + damageModifier : ''}` : skill.name,
             isCritical
           });
-          await new Promise(resolve => setTimeout(resolve, 400));
-          setCentralDisplay(null);
+          // PAS de fermeture automatique - reste jusqu'à prochaine action
+          await new Promise(resolve => setTimeout(resolve, 200));
         } else if (!isSkip) {
           // Mode normal : affichage animé
           await new Promise<void>(resolve => {
