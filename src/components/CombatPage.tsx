@@ -28,6 +28,7 @@ import {
   CombatHistoryPanel,
   AnimationModeButtons,
   TurnOrderDisplay
+  // CentralDisplay et StatsTooltip disponibles mais non utilisés
 } from './combat';
 import './CombatPage.css';
 
