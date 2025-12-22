@@ -2,6 +2,47 @@
    TEST CHECKLIST - CYCLE DE MISSION GAMMA
    ============================================ */
 
+/* Onglet caché sur le côté (admin uniquement) */
+.test-checklist-hidden-tab {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+  border-radius: 8px 0 0 8px;
+  padding: 12px 8px;
+  cursor: pointer;
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: -4px 0 20px rgba(233, 69, 96, 0.4);
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.test-checklist-hidden-tab:hover {
+  opacity: 1;
+  padding-right: 16px;
+  box-shadow: -6px 0 30px rgba(233, 69, 96, 0.6);
+}
+
+.test-checklist-hidden-tab .tab-icon {
+  font-size: 1.5rem;
+}
+
+.test-checklist-hidden-tab .tab-arrow {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  animation: pulse-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-arrow {
+  0%, 100% { opacity: 0.5; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(-3px); }
+}
+
 .test-checklist-overlay {
   position: fixed;
   top: 0;

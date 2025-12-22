@@ -141,6 +141,7 @@ interface TestChecklistProps {
 
 export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTab, setShowTab] = useState(false);
   const [tests, setTests] = useState<TestItem[]>([]);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [activePhase, setActivePhase] = useState<string>('all');
@@ -191,11 +192,18 @@ export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin'
     }
   }, [testerName]);
 
-  // Raccourci clavier Ctrl+Shift+T
+  // Raccourci clavier Ctrl+Alt+G (G pour Gamma) - évite les conflits navigateur
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+    // Ctrl+Alt+G pour ouvrir/fermer (admin et testeur)
+    if (e.ctrlKey && e.altKey && (e.key === 'g' || e.key === 'G')) {
       e.preventDefault();
-      // Vérifier le rôle
+      if (userRole === 'admin' || userRole === 'testeur') {
+        setIsOpen(prev => !prev);
+      }
+    }
+    // F9 comme alternative (moins utilisé par les navigateurs)
+    if (e.key === 'F9') {
+      e.preventDefault();
       if (userRole === 'admin' || userRole === 'testeur') {
         setIsOpen(prev => !prev);
       }
@@ -206,6 +214,14 @@ export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin'
       setShowExport(false);
     }
   }, [userRole, isOpen]);
+
+  // Afficher l'onglet caché après un délai (pour ne pas être intrusif)
+  useEffect(() => {
+    if (userRole === 'admin') {
+      const timer = setTimeout(() => setShowTab(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [userRole]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -329,9 +345,26 @@ export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin'
     pending: tests.filter(t => t.result === 'pending').length,
   };
 
-  if (!isOpen) return null;
+  // Onglet caché sur le côté (admin uniquement)
+  const renderHiddenTab = () => {
+    if (userRole !== 'admin' || !showTab || isOpen) return null;
+    
+    return (
+      <div 
+        className="test-checklist-hidden-tab"
+        onClick={() => setIsOpen(true)}
+        title="Ouvrir Checklist Gamma (Ctrl+Alt+G ou F9)"
+      >
+        <span className="tab-icon">🧪</span>
+        <span className="tab-arrow">◀</span>
+      </div>
+    );
+  };
 
   return (
+    <>
+      {renderHiddenTab()}
+      {!isOpen ? null : (
     <div className="test-checklist-overlay">
       <div className="test-checklist-modal">
         {/* Header */}
@@ -489,10 +522,12 @@ export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin'
 
         {/* Footer avec instructions */}
         <div className="test-checklist-footer">
-          <span>💡 Raccourci: Ctrl+Shift+T pour ouvrir/fermer | Échap pour fermer</span>
+          <span>💡 Raccourcis: Ctrl+Alt+G ou F9 pour ouvrir/fermer | Échap pour fermer</span>
         </div>
       </div>
     </div>
+      )}
+    </>
   );
 };
 
