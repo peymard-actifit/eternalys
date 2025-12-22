@@ -2650,38 +2650,126 @@ export function CombatPage() {
             setIsAnimating(false);
             return;
           }
+        } else if (skill.savingThrow) {
+          // === JET DE SAUVEGARDE D&D 5e POUR COMPÉTENCE DE JOUEUR ===
+          const saveResult = makeSavingThrow(target, skill.savingThrow.ability, skill.savingThrow.dc);
+          const abilityLabel = ABILITY_LABELS[skill.savingThrow.ability];
+          
+          const chosenSaveRoll = saveResult.roll.chosenRoll || saveResult.roll.rolls[0];
+          logs.push(`🎲 ${target.name} jet de ${abilityLabel}: ${chosenSaveRoll} + ${saveResult.totalBonus} = ${saveResult.roll.total} vs DD ${skill.savingThrow.dc}`);
+          
+          // Afficher l'animation de dés pour le jet de sauvegarde (mode manuel)
+          if (!isSkip && !isAuto) {
+            await new Promise<void>(resolve => {
+              setActiveDiceRoll({
+                dieType: 'd20',
+                count: 1,
+                modifier: saveResult.totalBonus,
+                damageType: skill.damageType === 'magical' ? 'magical' : 'physical',
+                label: `${target.name}: Jet de ${abilityLabel}`,
+                preRolledValues: saveResult.roll.rolls,
+                waitForClick: true,
+                onDismiss: resolve
+              });
+            });
+          } else if (isSkip) {
+            // Mode Skip : affichage central
+            setCentralDisplay({
+              type: 'attack',
+              result: saveResult.success ? '✓ SAUVEGARDE' : '✗ RATÉ',
+              details: `🎲 ${chosenSaveRoll}+${saveResult.totalBonus}=${saveResult.roll.total} vs DD ${skill.savingThrow.dc}`,
+              isHit: !saveResult.success, // isHit = true si la sauvegarde rate (dégâts complets)
+              isCritical: false
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+          
+          if (saveResult.success) {
+            // Sauvegarde réussie - dégâts réduits de moitié ou annulés
+            const halfDamage = skill.halfDamageOnSave !== false; // Par défaut demi-dégâts
+            if (halfDamage) {
+              hit = true; // On va calculer les dégâts mais divisés par 2
+              logs.push(`✓ Sauvegarde réussie ! Dégâts réduits de moitié.`);
+            } else {
+              hit = false;
+              logs.push(`✓ ${target.name} résiste complètement à ${skill.name} !`);
+              addCombatHistoryEntry({
+                turn: combatTurn,
+                actor: attacker.name,
+                actorPortrait: attacker.portrait,
+                action: `${skill.name} (résisté)`,
+                target: target.name,
+                damage: 0,
+                isPlayerAction: true,
+                damageType
+              });
+              checkCombatEnd(logs, attacker.id, undefined, enemies);
+              setIsAnimating(false);
+              return;
+            }
+          } else {
+            // Sauvegarde ratée - dégâts complets
+            logs.push(`✗ Sauvegarde ratée !`);
+            hit = true;
+          }
         } else {
-          // Pas de jet de touche - vérifier le coup critique normal
+          // Pas de jet de touche ni de sauvegarde - vérifier le coup critique normal
           const critCheck = checkCritical(attacker);
           isCritical = critCheck.isCritical;
         }
+        
+        // Vérifier si la cible est blessée (pour Toll the Dead et effets similaires)
+        const targetIsWounded = target.hp < target.maxHp;
+        
+        // Déterminer les dés de dégâts (avec upgrade si blessé)
+        let effectiveDamageDice = skill.damageDice;
+        if (skill.woundedDamageDice && targetIsWounded) {
+          effectiveDamageDice = skill.woundedDamageDice;
+          logs.push(`💀 ${target.name} est blessé - dégâts augmentés (${skill.woundedDamageDice}) !`);
+        }
+        
+        // Si sauvegarde réussie et demi-dégâts, on divise à la fin
+        const halfDamageOnSave = skill.savingThrow && hit && !isCritical;
         
         // TOUCHÉ ! Calcul des dégâts D&D
         let actualDamage: number;
         let damageRolls: number[] = [];
         let damageModifier = 0;
         
-        if (hasDamageDice) {
+        if (effectiveDamageDice) {
           // Utiliser les dés de dégâts D&D (ex: 1d8, 2d6+3)
           const isSpell = skill.isSpellAttack || skill.damageType === 'magical';
-          const damageResult = rollDamage(attacker, skill, isCritical, isSpell);
+          // Créer un skill temporaire avec les dés effectifs
+          const effectiveSkill = { ...skill, damageDice: effectiveDamageDice };
+          const damageResult = rollDamage(attacker, effectiveSkill, isCritical, isSpell);
           actualDamage = damageResult.totalDamage;
           damageRolls = damageResult.damageRoll.rolls;
           damageModifier = damageResult.damageRoll.modifier;
-          logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${actualDamage}`);
+          
+          // Appliquer demi-dégâts si sauvegarde réussie
+          if (halfDamageOnSave) {
+            actualDamage = Math.floor(actualDamage / 2);
+            logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${damageResult.totalDamage} ÷ 2 = ${actualDamage}`);
+          } else {
+            logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${actualDamage}`);
+          }
         } else {
           // Dégâts fixes
           actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
+          if (halfDamageOnSave) {
+            actualDamage = Math.floor(actualDamage / 2);
+          }
           damageRolls = [actualDamage];
         }
         
         // Afficher les dégâts visuellement
+        const hasEffectiveDice = !!effectiveDamageDice;
         if (isSkip) {
           // Mode Skip : affichage central
           setCentralDisplay({
             type: 'damage',
-            result: `⚔️ ${actualDamage} DÉGÂTS`,
-            details: hasDamageDice ? `🎲 ${damageRolls.join('+')}${damageModifier > 0 ? '+' + damageModifier : ''}` : skill.name,
+            result: `⚔️ ${actualDamage} DÉGÂTS${halfDamageOnSave ? ' (½)' : ''}`,
+            details: hasEffectiveDice ? `🎲 ${damageRolls.join('+')}${damageModifier > 0 ? '+' + damageModifier : ''}` : skill.name,
             isCritical
           });
           // PAS de fermeture automatique - reste jusqu'à prochaine action

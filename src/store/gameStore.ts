@@ -586,12 +586,36 @@ export const gameStore = {
       };
     });
     
-    // Trier par initiative (DEX modifier)
+    // === INITIATIVE D&D 5e ===
+    // Chaque combattant lance 1d20 + mod DEX
     const allCombatants = [...aliveTeam, ...monstersReady];
-    const turnOrder = allCombatants.sort((a, b) => {
-      const aInit = getModifier(a.abilities?.dexterity || 10);
-      const bInit = getModifier(b.abilities?.dexterity || 10);
-      return bInit - aInit;
+    
+    // Lancer l'initiative pour chaque combattant
+    const combatantsWithInit = allCombatants.map(combatant => {
+      const dexMod = getModifier(combatant.abilities?.dexterity || 10);
+      const d20Roll = Math.floor(Math.random() * 20) + 1;
+      const initiativeTotal = d20Roll + dexMod;
+      
+      return {
+        ...combatant,
+        initiativeRoll: d20Roll,
+        initiativeBonus: dexMod,
+        initiativeTotal: initiativeTotal
+      };
+    });
+    
+    // Trier par initiative totale (décroissant)
+    // En cas d'égalité, utiliser le mod DEX, puis le d20
+    const turnOrder = combatantsWithInit.sort((a, b) => {
+      if (b.initiativeTotal !== a.initiativeTotal) {
+        return b.initiativeTotal - a.initiativeTotal;
+      }
+      // Égalité : comparer le mod DEX
+      if (b.initiativeBonus !== a.initiativeBonus) {
+        return b.initiativeBonus - a.initiativeBonus;
+      }
+      // Toujours égalité : comparer le jet brut
+      return b.initiativeRoll - a.initiativeRoll;
     });
     
     const enemyNames = monstersReady.map(e => e.name).join(', ');

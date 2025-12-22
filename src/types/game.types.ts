@@ -146,6 +146,11 @@ export interface Character {
   proficiencyBonus: number; // Bonus de maîtrise (basé sur niveau)
   initiative?: number;    // mod(DEX) + bonus
   
+  // === INITIATIVE D&D 5e ===
+  initiativeRoll?: number;   // Jet de d20 brut
+  initiativeBonus?: number;  // Modificateur de DEX
+  initiativeTotal?: number;  // Total = d20 + mod DEX
+  
   // === MAÎTRISES ===
   savingThrowProficiencies: (keyof AbilityScores)[]; // Jets de sauvegarde maîtrisés
   
@@ -366,6 +371,10 @@ export interface Skill {
   damageReflect?: number;
   bonusVsDemon?: number;
   bonusVsUndead?: number;
+  
+  // === MÉCANIQUES CONDITIONNELLES ===
+  woundedDamageDice?: string;    // Dés de dégâts si cible blessée (ex: "1d12" pour Toll the Dead)
+  halfDamageOnSave?: boolean;    // true = demi-dégâts sur save réussi, false = 0 dégâts
 }
 
 export interface SkillEffect {
@@ -403,6 +412,11 @@ export interface Monster {
   abilities: AbilityScores;
   armorClass: number;
   speed: number;
+  
+  // === INITIATIVE D&D 5e ===
+  initiativeRoll?: number;   // Jet de d20 brut
+  initiativeBonus?: number;  // Modificateur de DEX
+  initiativeTotal?: number;  // Total = d20 + mod DEX
   
   // === RÉSISTANCES ===
   resistances?: DamageType[];

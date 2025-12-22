@@ -560,11 +560,13 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         name: 'Glas funèbre', 
         damage: 0,
         damageDice: '1d8',
+        woundedDamageDice: '1d12', // Dégâts augmentés si cible blessée
         type: 'damage',
         damageType: 'necrotic',
         targetType: 'enemy',
         requiresAttackRoll: false,
         savingThrow: { ability: 'wisdom', dc: 13 },
+        halfDamageOnSave: false, // Sort annulé complètement sur sauvegarde réussie
         cooldown: 0,
         description: 'Sort mineur. 1d8 nécrotique (1d12 si cible blessée), JS SAG pour annuler.'
       }
