@@ -10,15 +10,10 @@ import { getXPForNextLevel } from '../store/progressionStore';
 import { 
   makeAttackRoll, 
   rollDamage, 
-  applyTemporaryHp, 
-  applyDamageWithTempHp,
   hasAdvantageOnAttack,
   hasDisadvantageOnAttack,
   makeSavingThrow,
-  ABILITY_LABELS,
-  AttackRollResult,
-  DamageRollResult,
-  SavingThrowResult
+  ABILITY_LABELS
 } from '../utils/dndMechanics';
 // Composants extraits pour réduire la taille de CombatPage
 import { 
@@ -34,7 +29,7 @@ import './CombatPage.css';
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
-  const { animationMode, setAnimationMode, isManual, isAuto, isSkip } = useAnimationPreferences();
+  const { animationMode, setAnimationMode, isAuto, isSkip } = useAnimationPreferences();
   const [centralDisplay, setCentralDisplay] = useState<{ 
     type: 'attack' | 'damage'; 
     result: string; 
