@@ -10,26 +10,22 @@ import { getXPForNextLevel } from '../store/progressionStore';
 import { 
   makeAttackRoll, 
   rollDamage, 
+  applyTemporaryHp, 
+  applyDamageWithTempHp,
   hasAdvantageOnAttack,
   hasDisadvantageOnAttack,
   makeSavingThrow,
-  ABILITY_LABELS
+  ABILITY_LABELS,
+  AttackRollResult,
+  DamageRollResult,
+  SavingThrowResult
 } from '../utils/dndMechanics';
-// Composants extraits pour réduire la taille de CombatPage
-import { 
-  CombatHeader, 
-  CombatHistoryPanel, 
-  BuffsDisplay, 
-  AnimationModeButtons, 
-  TurnOrderDisplay,
-  TargetSelectionModal
-} from './combat';
 import './CombatPage.css';
 
 export function CombatPage() {
   const [state, setState] = useState<GameState>(gameStore.getState());
   const [isAnimating, setIsAnimating] = useState(false);
-  const { animationMode, setAnimationMode, isAuto, isSkip } = useAnimationPreferences();
+  const { animationMode, setAnimationMode, isManual, isAuto, isSkip } = useAnimationPreferences();
   const [centralDisplay, setCentralDisplay] = useState<{ 
     type: 'attack' | 'damage'; 
     result: string; 
@@ -2381,12 +2377,11 @@ export function CombatPage() {
             }
           };
           
-          const buffStats = skill.buffStats!; // Safe car on est dans if (skill.buffStats)
           const getStatLabel = (stat: string) => {
             switch (stat) {
-              case 'ability': return buffStats.ability ? 
+              case 'ability': return skill.buffStats.ability ? 
                 { strength: 'Force', dexterity: 'Dextérité', constitution: 'Constitution',
-                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[buffStats.ability] || stat
+                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[skill.buffStats.ability] || stat
                 : 'Caractéristique';
               case 'ac': return 'Classe d\'Armure';
               case 'speed': return 'Vitesse';
@@ -2397,12 +2392,12 @@ export function CombatPage() {
           const buff: ActiveBuff = {
             id: skill.id + '_' + Date.now() + '_' + t.id,
             name: skill.name,
-            type: buffStats.stat as any,
-            abilityAffected: buffStats.ability,
-            value: buffStats.value,
-            turnsRemaining: buffStats.turns,
+            type: skill.buffStats.stat as any,
+            abilityAffected: skill.buffStats.ability,
+            value: skill.buffStats.value,
+            turnsRemaining: skill.buffStats.turns,
             ownerId: t.id,
-            icon: getBuffIcon(buffStats.stat),
+            icon: getBuffIcon(skill.buffStats.stat),
             isApplied: true
           };
           
@@ -2418,7 +2413,7 @@ export function CombatPage() {
           t.proficiencyBonus = recalculated.proficiencyBonus;
           t.initiative = recalculated.initiative;
           
-          logs.push(`${t.name} gagne +${buffStats.value} ${getStatLabel(buffStats.stat)} pendant ${buffStats.turns} tours !`);
+          logs.push(`${t.name} gagne +${skill.buffStats.value} ${getStatLabel(skill.buffStats.stat)} pendant ${skill.buffStats.turns} tours !`);
         }
         
         if (skill.damageReflect) {
@@ -2690,7 +2685,32 @@ export function CombatPage() {
     setIsAnimating(false);
   };
 
-  // renderBuffs et renderMonsterBuffs déplacés vers BuffsDisplay component
+  const renderBuffs = (character: Character) => {
+    if (!character.buffs || character.buffs.length === 0) return null;
+    return (
+      <div className="active-buffs">
+        {character.buffs.map((buff, i) => (
+          <span key={i} className="buff-icon" title={`${buff.name}: ${buff.turnsRemaining} tour(s) restant(s)`}>
+            {buff.icon}<sub>{buff.turnsRemaining}</sub>
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  // Rendu des buffs pour les monstres
+  const renderMonsterBuffs = (monster: Monster) => {
+    if (!monster.buffs || monster.buffs.length === 0) return null;
+    return (
+      <div className="active-buffs monster-buffs">
+        {monster.buffs.map((buff, i) => (
+          <span key={i} className="buff-icon" title={`${buff.name}: ${buff.turnsRemaining} tour(s) restant(s)`}>
+            {buff.icon}<sub>{buff.turnsRemaining}</sub>
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   const getSkillIcon = (skill: Skill) => {
     if (skill.type === 'heal') return '💚';
@@ -2903,20 +2923,48 @@ export function CombatPage() {
 
   return (
     <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
-      <CombatHeader 
-        combatTurn={combatTurn}
-        enemies={enemies}
-        aliveEnemiesCount={aliveEnemies.length}
-      />
+      <div className="combat-header">
+        <h2>⚔️ COMBAT ⚔️</h2>
+        <span className="turn-counter">Tour {combatTurn}</span>
+        {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
+        {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
+      </div>
 
       {selectingTarget && (
-        <TargetSelectionModal
-          pendingSkill={pendingSkill}
-          targets={team}
-          onSelectTarget={handleTargetSelect}
-          onCancel={cancelTargetSelection}
-          getHpBarColor={getHpBarColor}
-        />
+        <div className="target-selection-overlay">
+          <div className="target-selection-modal">
+            <h3>🎯 Choisir la cible de {pendingSkill?.name}</h3>
+            <p className="skill-desc">{pendingSkill?.description}</p>
+            <div className="target-list">
+              {team.filter(c => c.hp > 0).map(character => (
+                <button
+                  key={character.id}
+                  className="target-btn"
+                  onClick={() => handleTargetSelect(character)}
+                >
+                  <span className="target-portrait">{character.portrait}</span>
+                  <div className="target-info">
+                    <span className="target-name">{character.name}</span>
+                    <span className="target-class">{character.class}</span>
+                    <div className="target-hp">
+                      <div 
+                        className="hp-fill" 
+                        style={{ 
+                          width: `${(character.hp / character.maxHp) * 100}%`,
+                          background: getHpBarColor(character.hp, character.maxHp)
+                        }}
+                      ></div>
+                      <span className="hp-text">{character.hp}/{character.maxHp}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button className="cancel-btn" onClick={cancelTargetSelection}>
+              ❌ Annuler
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="combat-main-layout">
@@ -2928,13 +2976,79 @@ export function CombatPage() {
           {isMobileHistoryOpen ? '▶' : '◀'}
         </button>
 
-        <CombatHistoryPanel
-          combatHistory={combatHistory}
-          isExpanded={isHistoryExpanded}
-          isMobileOpen={isMobileHistoryOpen}
-          onToggleExpand={() => setIsHistoryExpanded(!isHistoryExpanded)}
-          onCloseMobile={() => setIsMobileHistoryOpen(false)}
-        />
+        <div className={`combat-history-panel ${isHistoryExpanded ? 'expanded' : 'compact'} ${isMobileHistoryOpen ? 'mobile-open' : ''}`}>
+          {/* Bouton fermer mobile */}
+          <button 
+            className="close-history-btn"
+            onClick={() => setIsMobileHistoryOpen(false)}
+          >
+            ✕
+          </button>
+          <div className="history-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}>
+            <h4>📜 Historique ({combatHistory.length})</h4>
+            <button className="history-toggle-btn">
+              {isHistoryExpanded ? '▼ Réduire' : '▲ Agrandir'}
+            </button>
+          </div>
+          <div className="combat-history-list">
+            {combatHistory.length === 0 ? (
+              <p className="history-empty">⏳ En attente de la première action...</p>
+            ) : (
+              [...combatHistory].reverse().slice(0, isHistoryExpanded ? 100 : 8).map(entry => {
+                // Icône de type de dégâts selon D&D
+                const getDamageIcon = (type: string | undefined) => {
+                  switch (type) {
+                    case 'fire': return '🔥';
+                    case 'cold': return '❄️';
+                    case 'lightning': return '⚡';
+                    case 'poison': return '☠️';
+                    case 'necrotic': return '💀';
+                    case 'radiant': case 'holy': return '✨';
+                    case 'force': return '💫';
+                    case 'magical': return '🔮';
+                    case 'slashing': return '🗡️';
+                    case 'piercing': return '🏹';
+                    case 'bludgeoning': return '🔨';
+                    default: return '⚔️';
+                  }
+                };
+                
+                return (
+                  <div 
+                    key={entry.id} 
+                    className={`combat-history-entry ${entry.isPlayerAction ? 'player' : 'enemy'}`}
+                  >
+                    <div className="history-actor">
+                      <span className="history-portrait">{entry.actorPortrait}</span>
+                      <span className="history-turn">Tour {entry.turn}</span>
+                    </div>
+                    <div className="history-details">
+                      <span className="history-action">
+                        {entry.isPlayerAction ? '🎯' : '👹'} {entry.action}
+                      </span>
+                      {entry.target && (
+                        <span className="history-target">
+                          ➜ <strong>{entry.target}</strong>
+                        </span>
+                      )}
+                      {entry.damage !== undefined && entry.damage > 0 && (
+                        <span className={`history-damage ${entry.damageType || 'physical'}`}>
+                          {getDamageIcon(entry.damageType)} -{entry.damage} dégâts
+                        </span>
+                      )}
+                      {entry.heal !== undefined && entry.heal > 0 && (
+                        <span className="history-heal">💚 +{entry.heal} PV restaurés</span>
+                      )}
+                      {entry.effect && (
+                        <span className="history-effect">✦ {entry.effect}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
 
         <div className="combat-arena">
           {/* Section des ennemis - Support multi-monstres */}
@@ -2989,7 +3103,7 @@ export function CombatPage() {
                     {enemy.creatureType && (
                       <span className="monster-type">{enemy.creatureType}</span>
                     )}
-                    <BuffsDisplay buffs={enemy.buffs} isMonster={true} />
+                    {renderMonsterBuffs(enemy)}
                     <div className="enemy-hp-bar">
                       <div 
                         className="hp-fill enemy" 
@@ -3072,7 +3186,7 @@ export function CombatPage() {
                   <div className="fighter-info">
                     <span className="fighter-name">{character.name}</span>
                     <span className="fighter-class">{character.class}</span>
-                    <BuffsDisplay buffs={character.buffs} />
+                    {renderBuffs(character)}
                     <div className="fighter-hp-bar">
                       <div 
                         className="hp-fill" 
@@ -3150,10 +3264,29 @@ export function CombatPage() {
                 ⚙️
               </button>
               {/* 3 boutons de mode : Off / On / Skip */}
-              <AnimationModeButtons 
-                animationMode={animationMode}
-                onSetMode={setAnimationMode}
-              />
+              <div className="animation-mode-buttons">
+                <button 
+                  className={`mode-btn ${animationMode === 'off' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('off')}
+                  title="Mode Manuel - Cliquez pour valider chaque jet"
+                >
+                  🔒
+                </button>
+                <button 
+                  className={`mode-btn ${animationMode === 'on' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('on')}
+                  title="Mode Auto - Validation automatique avec animations"
+                >
+                  🔓
+                </button>
+                <button 
+                  className={`mode-btn ${animationMode === 'skip' ? 'active' : ''}`}
+                  onClick={() => setAnimationMode('skip')}
+                  title="Mode Skip - Pas d'animations, résultats directs"
+                >
+                  ⏩
+                </button>
+              </div>
               {/* Bouton minimize visible UNIQUEMENT sur mobile/tablette */}
               <button 
                 className="minimize-actions-btn mobile-only"
@@ -3182,7 +3315,7 @@ export function CombatPage() {
                   <span>{skill.name}</span>
                   <span className="damage-preview">
                     {skill.type === 'heal' 
-                      ? `+${Math.abs(skill.damage)} PV` 
+                      ? `+${skill.healing || Math.abs(skill.damage)} PV` 
                       : skill.damageDice 
                         ? `🎲 ${skill.damageDice}` 
                         : skill.type === 'buff' 
@@ -3206,10 +3339,10 @@ export function CombatPage() {
                         <span className="stat-value">{skill.damage}</span>
                       </div>
                     )}
-                    {skill.type === 'heal' && skill.damage !== 0 && (
+                    {skill.healing && skill.healing > 0 && (
                       <div className="tooltip-stat">
                         <span className="stat-name">Soins</span>
-                        <span className="stat-value heal">+{Math.abs(skill.damage)}</span>
+                        <span className="stat-value heal">+{skill.healing}</span>
                       </div>
                     )}
                     {skill.cooldown && skill.cooldown > 0 && (
@@ -3262,10 +3395,23 @@ export function CombatPage() {
         </div>
       )}
 
-      <TurnOrderDisplay 
-        turnOrder={turnOrder}
-        currentTurnIndex={currentTurnIndex}
-      />
+      <div className="turn-order">
+        <h4>Initiative</h4>
+        <div className="turn-list">
+          {turnOrder.map((entity, i) => {
+            const isDead = entity.hp <= 0;
+            return (
+              <div 
+                key={i} 
+                className={`turn-item ${i === currentTurnIndex ? 'current' : ''} ${isDead ? 'dead' : ''}`}
+                title={'name' in entity ? entity.name : ''}
+              >
+                {'portrait' in entity && entity.portrait}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Modal de distribution des drops */}
       {pendingDrops && pendingDrops.drops.length > 0 && (
