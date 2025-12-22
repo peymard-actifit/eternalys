@@ -20,6 +20,7 @@ import {
   DamageRollResult,
   SavingThrowResult
 } from '../utils/dndMechanics';
+import { CombatHeader } from './combat';
 import './CombatPage.css';
 
 export function CombatPage() {
@@ -2923,12 +2924,11 @@ export function CombatPage() {
 
   return (
     <div className={`combat-page ${screenShake ? 'screen-shake' : ''}`}>
-      <div className="combat-header">
-        <h2>⚔️ COMBAT ⚔️</h2>
-        <span className="turn-counter">Tour {combatTurn}</span>
-        {enemies.some(e => e.isBoss) && <span className="boss-label">👑 BOSS</span>}
-        {enemies.length > 1 && <span className="multi-enemy-label">⚔️ {aliveEnemies.length}/{enemies.length}</span>}
-      </div>
+      <CombatHeader 
+        combatTurn={combatTurn}
+        enemies={enemies}
+        aliveEnemiesCount={aliveEnemies.length}
+      />
 
       {selectingTarget && (
         <div className="target-selection-overlay">
