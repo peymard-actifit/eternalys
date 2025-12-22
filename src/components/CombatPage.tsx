@@ -84,6 +84,25 @@ export function CombatPage() {
     // PAS de setTimeout - l'affichage reste jusqu'à la prochaine action
   };
   
+  // Helper pour afficher les soins en mode Skip
+  const showSkipHealResult = (healResult: {
+    rolls: number[];
+    modifier: number;
+    total: number;
+    healer: string;
+    target: string;
+  }) => {
+    const rollsStr = healResult.rolls.join('+');
+    setCentralDisplay({
+      type: 'damage', // Réutilise le type damage pour l'affichage
+      result: `💚 +${healResult.total} PV`,
+      details: `🎲 ${rollsStr}${healResult.modifier > 0 ? '+' + healResult.modifier : ''} → ${healResult.target}`,
+      isHit: true,
+      isCritical: false,
+      damage: healResult.total
+    });
+  };
+  
   // Fermer l'affichage central quand une nouvelle action commence
   const clearCentralDisplayOnNewAction = () => {
     if (isSkip && centralDisplay) {
@@ -1158,7 +1177,7 @@ export function CombatPage() {
                 turn: combatTurn,
                 actor: currentMonster.name,
                 actorPortrait: currentMonster.portrait,
-                action: 'Attaque (échec critique)',
+                action: `${currentMonster.attackName || 'Attaque'} (échec critique)`,
                 target: target.name,
                 damage: 0,
                 isPlayerAction: false,
@@ -1172,7 +1191,7 @@ export function CombatPage() {
                 turn: combatTurn,
                 actor: currentMonster.name,
                 actorPortrait: currentMonster.portrait,
-                action: 'Attaque (raté)',
+                action: `${currentMonster.attackName || 'Attaque'} (raté)`,
                 target: target.name,
                 damage: 0,
                 isPlayerAction: false,
@@ -1187,7 +1206,7 @@ export function CombatPage() {
                   turn: combatTurn,
                   actor: currentMonster.name,
                   actorPortrait: currentMonster.portrait,
-                  action: 'Attaque (esquivée)',
+                  action: `${currentMonster.attackName || 'Attaque'} (esquivée)`,
                   target: target.name,
                   damage: 0,
                   isPlayerAction: false,
@@ -1219,7 +1238,7 @@ export function CombatPage() {
                   turn: combatTurn,
                   actor: currentMonster.name,
                   actorPortrait: currentMonster.portrait,
-                  action: monsterAttackResult.isCriticalHit ? 'Attaque (CRIT)' : 'Attaque',
+                  action: `${currentMonster.attackName || 'Attaque'}${monsterAttackResult.isCriticalHit ? ' (CRIT)' : ''}`,
                   target: target.name,
                   damage,
                   isPlayerAction: false,
@@ -2255,7 +2274,10 @@ export function CombatPage() {
       // Vérifier si c'est une compétence de PV temporaires (Simulacre de vie)
       const isTempHpSkill = skill.id === 'false_life' || skill.name.toLowerCase().includes('simulacre');
       
-      targetIndices.forEach(idx => {
+      // Calculer le modificateur de Sagesse une seule fois
+      const wisMod = Math.floor(((attacker.abilities?.wisdom || 10) - 10) / 2);
+      
+      for (const idx of targetIndices) {
         const t = updatedTeam[idx];
         
         if (isTempHpSkill) {
@@ -2268,21 +2290,88 @@ export function CombatPage() {
           t.temporaryHp = Math.max(currentTempHp, tempHpAmount);
           
           logs.push(`✨ ${t.name} gagne ${tempHpAmount} PV temporaires (🎲 ${tempHpRoll.rolls[0]}+4) !`);
+          
+// Affichage central en mode Skip
+              if (isSkip) {
+                showSkipHealResult({
+                  rolls: [tempHpRoll.rolls[0]],
+                  modifier: 4,
+                  total: tempHpAmount,
+                  healer: attacker.name,
+                  target: t.name
+                });
+              }
         } else {
           // Soin normal avec dés D&D
           let healValue: number;
+          let healRollResult: { rolls: number[], total: number, modifier: number } | null = null;
+          
           if (skill.damageDice) {
-            // Utiliser les dés de soin D&D (ex: 1d8, 1d4+4)
-            const healRoll = rollDice(skill.damageDice.includes('d') ? skill.damageDice.split('d')[1].split('+')[0] as any : 'd8', 
-              parseInt(skill.damageDice.split('d')[0]) || 1,
-              parseInt(skill.damageDice.split('+')[1]) || 0);
-            // Ajouter le modificateur de Sagesse pour les soins
-            const wisMod = Math.floor(((attacker.abilities?.wisdom || 10) - 10) / 2);
-            healValue = healRoll.total + Math.max(0, wisMod);
-            logs.push(`🎲 Soins: ${healRoll.rolls.join('+')}${healRoll.modifier !== 0 ? (healRoll.modifier > 0 ? '+' : '') + healRoll.modifier : ''}${wisMod > 0 ? '+' + wisMod + '(SAG)' : ''} = ${healValue}`);
+            // Parser correctement les dés (ex: '1d8', '1d8+3', '2d6')
+            const diceMatch = skill.damageDice.match(/(\d*)d(\d+)(?:\+(\d+))?/);
+            if (diceMatch) {
+              const diceCount = parseInt(diceMatch[1]) || 1;
+              const dieType = ('d' + diceMatch[2]) as 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
+              const bonusMod = parseInt(diceMatch[3]) || 0;
+              
+              // Effectuer le jet de dés
+              healRollResult = rollDice(dieType, diceCount, bonusMod);
+              healValue = healRollResult.total + Math.max(0, wisMod);
+              
+              // Log détaillé du jet
+              const rollsStr = healRollResult.rolls.join('+');
+              const modStr = bonusMod > 0 ? `+${bonusMod}` : '';
+              const wisStr = wisMod > 0 ? `+${wisMod}(SAG)` : '';
+              logs.push(`🎲 Soins: ${rollsStr}${modStr}${wisStr} = ${healValue} PV`);
+              
+              // Animation du jet de dés (mode normal/auto)
+              if (!isSkip && !isAuto) {
+                await new Promise<void>(resolve => {
+                  setActiveDiceRoll({
+                    dieType: dieType,
+                    count: diceCount,
+                    modifier: bonusMod + Math.max(0, wisMod),
+                    damageType: 'holy',
+                    label: `${attacker.name} soigne ${t.name} !`,
+                    preRolledValues: healRollResult!.rolls,
+                    waitForClick: true,
+                    onDismiss: resolve
+                  });
+                });
+              }
+              
+              // Affichage central en mode Skip
+              if (isSkip) {
+                showSkipHealResult({
+                  rolls: healRollResult!.rolls,
+                  modifier: bonusMod + Math.max(0, wisMod),
+                  total: healValue,
+                  healer: attacker.name,
+                  target: t.name
+                });
+              }
+            } else {
+              // Fallback si le format n'est pas reconnu
+              healValue = Math.abs(skill.damage || 0) + Math.max(0, wisMod);
+              logs.push(`💚 Soins fixes: ${healValue} PV`);
+            }
           } else {
-            healValue = Math.abs(skill.damage || 0);
+            // Pas de dés, utiliser la valeur fixe + modificateur Sagesse
+            healValue = Math.abs(skill.damage || 0) + Math.max(0, wisMod);
+            logs.push(`💚 Soins: ${Math.abs(skill.damage || 0)}${wisMod > 0 ? `+${wisMod}(SAG)` : ''} = ${healValue} PV`);
+            
+            // Affichage central en mode Skip pour valeurs fixes aussi
+            if (isSkip) {
+              showSkipHealResult({
+                rolls: [Math.abs(skill.damage || 0)],
+                modifier: Math.max(0, wisMod),
+                total: healValue,
+                healer: attacker.name,
+                target: t.name
+              });
+            }
           }
+          
           const healAmount = Math.min(healValue, t.maxHp - t.hp);
           t.hp = Math.min(t.maxHp, t.hp + healValue);
           totalHealing += healAmount;
@@ -2301,7 +2390,7 @@ export function CombatPage() {
           };
           t.buffs = [...(t.buffs || []), regen];
         }
-      });
+      }
       
       if (!isTempHpSkill) {
         trackHealing(attacker.id, totalHealing);
@@ -3186,7 +3275,7 @@ export function CombatPage() {
                   <span>{skill.name}</span>
                   <span className="damage-preview">
                     {skill.type === 'heal' 
-                      ? `+${skill.healing || Math.abs(skill.damage)} PV` 
+                      ? `+${Math.abs(skill.damage || 0)} PV` 
                       : skill.damageDice 
                         ? `🎲 ${skill.damageDice}` 
                         : skill.type === 'buff' 
@@ -3210,10 +3299,10 @@ export function CombatPage() {
                         <span className="stat-value">{skill.damage}</span>
                       </div>
                     )}
-                    {skill.healing && skill.healing > 0 && (
+                    {skill.type === 'heal' && skill.damage !== undefined && (
                       <div className="tooltip-stat">
                         <span className="stat-name">Soins</span>
-                        <span className="stat-value heal">+{skill.healing}</span>
+                        <span className="stat-value heal">+{Math.abs(skill.damage)}{skill.damageDice ? ` (${skill.damageDice})` : ''}</span>
                       </div>
                     )}
                     {skill.cooldown && skill.cooldown > 0 && (

@@ -384,6 +384,7 @@ export interface Monster {
   name: string;
   portrait: string;
   description?: string;
+  attackName?: string; // Nom de l'attaque de base (ex: "Morsure", "Griffe", "Épée")
   
   // === INFOS D&D ===
   creatureType: CreatureType;

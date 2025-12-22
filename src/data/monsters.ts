@@ -7564,6 +7564,51 @@ export const BOSSES: Monster[] = [
 // FONCTIONS UTILITAIRES
 // ============================================
 
+// Fonction pour assigner un nom d'attaque basé sur le type de créature
+function getDefaultAttackName(monster: Monster): string {
+  const creatureType = monster.creatureType;
+  const name = monster.name.toLowerCase();
+  
+  // Attaques spécifiques par nom
+  if (name.includes('dragon')) return 'Morsure';
+  if (name.includes('serpent') || name.includes('snake')) return 'Morsure venimeuse';
+  if (name.includes('loup') || name.includes('wolf')) return 'Morsure';
+  if (name.includes('ours') || name.includes('bear')) return 'Griffes';
+  if (name.includes('araignée') || name.includes('spider')) return 'Morsure toxique';
+  if (name.includes('squelette') || name.includes('skeleton')) return 'Coup d\'épée';
+  if (name.includes('zombie')) return 'Griffes pourries';
+  if (name.includes('gobelins') || name.includes('gobelin') || name.includes('goblin')) return 'Dague rouillée';
+  if (name.includes('orc') || name.includes('orque')) return 'Hache';
+  if (name.includes('ogre')) return 'Massue';
+  if (name.includes('troll')) return 'Griffes';
+  if (name.includes('géant') || name.includes('giant')) return 'Coup de massue';
+  if (name.includes('vampire')) return 'Morsure vampirique';
+  if (name.includes('liche') || name.includes('lich')) return 'Toucher glacial';
+  if (name.includes('démon') || name.includes('demon')) return 'Griffes démoniaques';
+  if (name.includes('diable') || name.includes('devil')) return 'Griffes infernales';
+  if (name.includes('golem')) return 'Coup de poing';
+  if (name.includes('élémentaire') || name.includes('elemental')) return 'Frappe élémentaire';
+  
+  // Par type de créature
+  switch (creatureType) {
+    case 'beast': return 'Morsure';
+    case 'dragon': return 'Morsure';
+    case 'undead': return 'Toucher putride';
+    case 'fiend': return 'Griffes';
+    case 'humanoid': return 'Attaque';
+    case 'monstrosity': return 'Attaque féroce';
+    case 'aberration': return 'Tentacule';
+    case 'celestial': return 'Frappe divine';
+    case 'construct': return 'Coup';
+    case 'elemental': return 'Frappe élémentaire';
+    case 'fey': return 'Toucher féerique';
+    case 'giant': return 'Coup de massue';
+    case 'ooze': return 'Pseudopode';
+    case 'plant': return 'Lianes';
+    default: return 'Attaque';
+  }
+}
+
 // Obtenir un monstre aléatoire par CR D&D
 // Note: Applique automatiquement la conversion vers l'échelle Eternalys (CR 1-100)
 // Le dungeonLevel permet d'appliquer le cap CR approprié
@@ -7573,7 +7618,14 @@ export function getRandomMonsterByCR(cr: number, dungeonLevel: number = 50): Mon
   const rawMonster = JSON.parse(JSON.stringify(monsters[index])); // Deep copy
   
   // Convertir vers l'échelle Eternalys avec cap CR basé sur le niveau de donjon
-  return localConvertMonsterToEternalysScale(rawMonster, dungeonLevel, false);
+  const scaledMonster = localConvertMonsterToEternalysScale(rawMonster, dungeonLevel, false);
+  
+  // Assigner un nom d'attaque si non défini
+  if (!scaledMonster.attackName) {
+    scaledMonster.attackName = getDefaultAttackName(scaledMonster);
+  }
+  
+  return scaledMonster;
 }
 
 // =============================================================================
@@ -7742,6 +7794,11 @@ export function getRandomBoss(dungeonLevel: number = 1): Monster {
   // Réinitialiser les actions légendaires
   if (boss.legendaryActionsPerTurn) {
     boss.legendaryActionsRemaining = boss.legendaryActionsPerTurn;
+  }
+  
+  // Assigner un nom d'attaque si non défini
+  if (!boss.attackName) {
+    boss.attackName = getDefaultAttackName(boss);
   }
   
   return boss;
