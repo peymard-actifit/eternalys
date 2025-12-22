@@ -14,7 +14,17 @@ import { SummaryScreen } from './components/SummaryScreen';
 import { PauseMenu } from './components/PauseMenu';
 import { Bestiary } from './components/Bestiary';
 import { LevelUpModal } from './components/LevelUpModal';
+import { TestChecklist } from './components/TestChecklist';
 import { useDeviceClass } from './hooks/useDeviceDetection';
+
+// Liste des emails autorisés pour les tests (admin/testeur)
+const TESTER_EMAILS = [
+  'antoine@eternalys.com',
+  'admin@eternalys.com',
+  'testeur@eternalys.com',
+  'pey@eternalys.com',
+  // Ajouter d'autres emails ici
+];
 import './App.css';
 import './styles/responsive.css';
 import './styles/animations-toggle.css';
@@ -261,12 +271,32 @@ function App() {
     }
   };
 
+  // Déterminer si l'utilisateur peut accéder à la checklist de test
+  const canAccessTestChecklist = (): 'admin' | 'testeur' | 'player' => {
+    // En mode DEV, toujours autoriser
+    if (import.meta.env.DEV) return 'admin';
+    
+    // Vérifier si l'utilisateur est dans la liste des testeurs
+    const userEmail = authState.currentUser?.email?.toLowerCase();
+    if (userEmail && TESTER_EMAILS.some(email => userEmail.includes(email.split('@')[0]))) {
+      return 'testeur';
+    }
+    
+    return 'player';
+  };
+
+  const userRole = canAccessTestChecklist();
+
   return (
     <div className="app">
       {renderPage()}
       {showInventory && <InventoryModal />}
       {showPauseMenu && <PauseMenu />}
       <Bestiary isOpen={showBestiary} onClose={() => setShowBestiary(false)} />
+      {/* Checklist de test - accessible via Ctrl+Shift+T (admin/testeur uniquement) */}
+      {(userRole === 'admin' || userRole === 'testeur') && (
+        <TestChecklist userRole={userRole} />
+      )}
     </div>
   );
 }
