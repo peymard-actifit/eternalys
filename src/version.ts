@@ -1,3 +1,3 @@
 // Version du jeu - mise a jour automatiquement lors des deploiements
-export const VERSION = '2.31.13';
+export const VERSION = '2.31.14';
 

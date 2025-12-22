@@ -2386,11 +2386,12 @@ export function CombatPage() {
             }
           };
           
+          const buffStats = skill.buffStats!; // Safe car on est dans if (skill.buffStats)
           const getStatLabel = (stat: string) => {
             switch (stat) {
-              case 'ability': return skill.buffStats.ability ? 
+              case 'ability': return buffStats.ability ? 
                 { strength: 'Force', dexterity: 'Dextérité', constitution: 'Constitution',
-                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[skill.buffStats.ability] || stat
+                  intelligence: 'Intelligence', wisdom: 'Sagesse', charisma: 'Charisme' }[buffStats.ability] || stat
                 : 'Caractéristique';
               case 'ac': return 'Classe d\'Armure';
               case 'speed': return 'Vitesse';
@@ -2401,12 +2402,12 @@ export function CombatPage() {
           const buff: ActiveBuff = {
             id: skill.id + '_' + Date.now() + '_' + t.id,
             name: skill.name,
-            type: skill.buffStats.stat as any,
-            abilityAffected: skill.buffStats.ability,
-            value: skill.buffStats.value,
-            turnsRemaining: skill.buffStats.turns,
+            type: buffStats.stat as any,
+            abilityAffected: buffStats.ability,
+            value: buffStats.value,
+            turnsRemaining: buffStats.turns,
             ownerId: t.id,
-            icon: getBuffIcon(skill.buffStats.stat),
+            icon: getBuffIcon(buffStats.stat),
             isApplied: true
           };
           
@@ -2422,7 +2423,7 @@ export function CombatPage() {
           t.proficiencyBonus = recalculated.proficiencyBonus;
           t.initiative = recalculated.initiative;
           
-          logs.push(`${t.name} gagne +${skill.buffStats.value} ${getStatLabel(skill.buffStats.stat)} pendant ${skill.buffStats.turns} tours !`);
+          logs.push(`${t.name} gagne +${buffStats.value} ${getStatLabel(buffStats.stat)} pendant ${buffStats.turns} tours !`);
         }
         
         if (skill.damageReflect) {
