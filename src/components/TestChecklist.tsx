@@ -140,6 +140,9 @@ const GAMMA_METRICS: Omit<MetricItem, 'value'>[] = [
   { id: 'm20', phase: '7γ', name: 'Salles avant boss (niv.1)', target: '4-10', unit: 'salles' },
 ];
 
+// Version de la checklist - INCRÉMENTER à chaque modification des tests
+const CHECKLIST_VERSION = '2.32.2';
+
 // Noms des phases
 const PHASE_NAMES: Record<string, string> = {
   '0γ': 'INIT',
@@ -169,19 +172,43 @@ export const TestChecklist: React.FC<TestChecklistProps> = ({ userRole = 'admin'
 
   // Initialiser les tests et métriques
   useEffect(() => {
+    // Vérifier la version sauvegardée
+    const savedVersion = localStorage.getItem('gamma_checklist_version');
+    const versionChanged = savedVersion !== CHECKLIST_VERSION;
+    
+    // Si la version a changé, forcer le reset
+    if (versionChanged) {
+      console.log(`[Checklist] Version changée: ${savedVersion} → ${CHECKLIST_VERSION}. Reset des données.`);
+      localStorage.removeItem('gamma_tests');
+      localStorage.removeItem('gamma_metrics');
+      localStorage.setItem('gamma_checklist_version', CHECKLIST_VERSION);
+    }
+    
     // Charger depuis localStorage ou initialiser
     const savedTests = localStorage.getItem('gamma_tests');
     const savedMetrics = localStorage.getItem('gamma_metrics');
     const savedTester = localStorage.getItem('gamma_tester');
     
-    if (savedTests) {
-      setTests(JSON.parse(savedTests));
+    if (savedTests && !versionChanged) {
+      // Vérifier que les tests sauvegardés correspondent à la structure actuelle
+      const parsed = JSON.parse(savedTests);
+      if (parsed.length === GAMMA_TESTS.length) {
+        setTests(parsed);
+      } else {
+        // Structure différente, reset
+        setTests(GAMMA_TESTS.map(t => ({ ...t, result: 'pending' as const, notes: '' })));
+      }
     } else {
       setTests(GAMMA_TESTS.map(t => ({ ...t, result: 'pending' as const, notes: '' })));
     }
     
-    if (savedMetrics) {
-      setMetrics(JSON.parse(savedMetrics));
+    if (savedMetrics && !versionChanged) {
+      const parsed = JSON.parse(savedMetrics);
+      if (parsed.length === GAMMA_METRICS.length) {
+        setMetrics(parsed);
+      } else {
+        setMetrics(GAMMA_METRICS.map(m => ({ ...m, value: '' })));
+      }
     } else {
       setMetrics(GAMMA_METRICS.map(m => ({ ...m, value: '' })));
     }
