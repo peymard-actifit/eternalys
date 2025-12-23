@@ -22,7 +22,7 @@ interface MetricItem {
   unit: string;
 }
 
-// Configuration des tests du Cycle Gamma
+// Configuration des tests du Cycle Gamma (v2.32.1)
 const GAMMA_TESTS: Omit<TestItem, 'result' | 'notes'>[] = [
   // Phase 0γ - INIT
   { id: '0.1', phase: '0γ', number: '0.1', description: 'Le jeu se charge sans erreur', target: 'Oui' },
@@ -48,34 +48,42 @@ const GAMMA_TESTS: Omit<TestItem, 'result' | 'notes'>[] = [
   { id: '2.4', phase: '2γ', number: '2.4', description: 'Compétence de soin restaure HP', target: 'HP augmente' },
   { id: '2.5', phase: '2γ', number: '2.5', description: 'Soin utilise modificateur Sagesse', target: '+WIS mod' },
   { id: '2.6', phase: '2γ', number: '2.6', description: 'Buff applique bonus correct', target: 'Stats +' },
-  { id: '2.7', phase: '2γ', number: '2.7', description: 'Debuff applique malus correct', target: 'Stats -' },
-  { id: '2.8', phase: '2γ', number: '2.8', description: 'AoE touche tous les ennemis', target: 'Multi-cibles' },
+  { id: '2.7', phase: '2γ', number: '2.7', description: 'Debuff affiché sur adversaire', target: 'Visible' },
+  { id: '2.8', phase: '2γ', number: '2.8', description: 'AoE Vague tonnante touche tous', target: 'Multi-cibles' },
   { id: '2.9', phase: '2γ', number: '2.9', description: 'Compétence avec CD respecte le CD', target: 'Grisée après' },
   
+  // Phase 2Sγ - JETS DE SAUVEGARDE (NOUVEAU v2.32.1)
+  { id: '2S.1', phase: '2Sγ', number: '2S.1', description: 'Flamme sacrée: monstre fait jet DEX', target: 'Jet affiché' },
+  { id: '2S.2', phase: '2Sγ', number: '2S.2', description: 'Flamme sacrée: save réussi = 0 dégâts', target: '0 dmg' },
+  { id: '2S.3', phase: '2Sγ', number: '2S.3', description: 'Glas funèbre: monstre fait jet SAG', target: 'Jet affiché' },
+  { id: '2S.4', phase: '2Sγ', number: '2S.4', description: 'Glas: cible blessée = 1d12 au lieu de 1d8', target: 'Dés changés' },
+  { id: '2S.5', phase: '2Sγ', number: '2S.5', description: 'Affichage RÉUSSIE/RATÉE clair', target: 'Visible' },
+  { id: '2S.6', phase: '2Sγ', number: '2S.6', description: 'Vague tonnante: save CON demi-dégâts', target: '÷2 si save' },
+  
   // Phase 3γ - BOSS
-  { id: '3.1', phase: '3γ', number: '3.1', description: 'Boss apparaît au bon étage', target: 'Étage 5+' },
+  { id: '3.1', phase: '3γ', number: '3.1', description: 'Boss apparaît au bon étage', target: 'Après X salles' },
   { id: '3.2', phase: '3γ', number: '3.2', description: 'Boss a le sprite/nom correct', target: 'Visible' },
-  { id: '3.3', phase: '3γ', number: '3.3', description: 'Boss utilise ses compétences', target: 'Skills activés' },
+  { id: '3.3', phase: '3γ', number: '3.3', description: 'Boss utilise ses compétences', target: 'Nom skill affiché' },
   { id: '3.4', phase: '3γ', number: '3.4', description: 'Boss ne bloque pas le combat', target: 'Pas de freeze' },
   { id: '3.5', phase: '3γ', number: '3.5', description: 'Boss peut être vaincu', target: 'Mort possible' },
-  { id: '3.6', phase: '3γ', number: '3.6', description: 'Victoire boss donne XP', target: 'XP reçu' },
+  { id: '3.6', phase: '3γ', number: '3.6', description: 'Victoire boss donne XP', target: 'XP dans log' },
   { id: '3.7', phase: '3γ', number: '3.7', description: 'Victoire boss donne loot', target: 'Items reçus' },
-  { id: '3.8', phase: '3γ', number: '3.8', description: 'Combat boss = défi sans frustration', target: 'Faisable' },
+  { id: '3.8', phase: '3γ', number: '3.8', description: 'Combat boss = défi équilibré', target: '8-15 tours' },
   
   // Phase 4γ - PROGRESSION
   { id: '4.1', phase: '4γ', number: '4.1', description: 'XP gagné après combat', target: '> 0' },
   { id: '4.2', phase: '4γ', number: '4.2', description: 'XP affiché sur fiche personnage', target: 'Visible' },
-  { id: '4.3', phase: '4γ', number: '4.3', description: 'Barre XP progresse', target: 'Visuellement' },
+  { id: '4.3', phase: '4γ', number: '4.3', description: 'Barre XP progresse visuellement', target: 'Animation' },
   { id: '4.4', phase: '4γ', number: '4.4', description: 'Level up à 50 XP (niveau 1)', target: 'Correct' },
-  { id: '4.5', phase: '4γ', number: '4.5', description: 'Stats augmentent au level up', target: '+HP, +stats' },
-  { id: '4.6', phase: '4γ', number: '4.6', description: 'Nouvelles compétences débloquées', target: 'Si applicable' },
+  { id: '4.5', phase: '4γ', number: '4.5', description: 'Fenêtre level up affiche gains', target: 'Stats visibles' },
+  { id: '4.6', phase: '4γ', number: '4.6', description: 'XP boss affiché dans historique', target: 'Log visible' },
   
   // Phase 5γ - INVENTAIRE
   { id: '5.1', phase: '5γ', number: '5.1', description: 'Inventaire accessible (touche I)', target: 'Oui' },
   { id: '5.2', phase: '5γ', number: '5.2', description: 'Inventaire accessible (clic perso)', target: 'Oui' },
   { id: '5.3', phase: '5γ', number: '5.3', description: 'Items affichés correctement', target: 'Visible' },
   { id: '5.4', phase: '5γ', number: '5.4', description: 'Équipement applicable', target: 'Équipable' },
-  { id: '5.5', phase: '5γ', number: '5.5', description: 'Bonus équipement appliqué', target: 'Stats modifiées' },
+  { id: '5.5', phase: '5γ', number: '5.5', description: 'Bonus équipement affiché historique', target: 'Message log' },
   { id: '5.6', phase: '5γ', number: '5.6', description: 'Arme change les dégâts', target: 'Dégâts diff.' },
   { id: '5.7', phase: '5γ', number: '5.7', description: 'Armure change la CA', target: 'CA modifiée' },
   
@@ -83,25 +91,27 @@ const GAMMA_TESTS: Omit<TestItem, 'result' | 'notes'>[] = [
   { id: '6.1', phase: '6γ', number: '6.1', description: 'Événements se déclenchent', target: 'Oui' },
   { id: '6.2', phase: '6γ', number: '6.2', description: 'Événement positif = effet positif', target: 'Buff/heal' },
   { id: '6.3', phase: '6γ', number: '6.3', description: 'Événement négatif = effet négatif', target: 'Debuff/dmg' },
-  { id: '6.4', phase: '6γ', number: '6.4', description: 'Valeurs événements équilibrées', target: 'Pas excessif' },
+  { id: '6.4', phase: '6γ', number: '6.4', description: 'Valeurs événements équilibrées', target: '+1 à +3 / 5-15 HP' },
   { id: '6.5', phase: '6γ', number: '6.5', description: 'Événement ne casse pas le jeu', target: 'Pas de freeze' },
   
   // Phase 7γ - UI/UX
   { id: '7.1', phase: '7γ', number: '7.1', description: 'Boutons répondent au clic', target: '< 200ms' },
   { id: '7.2', phase: '7γ', number: '7.2', description: 'Animations fluides (mode On)', target: 'Smooth' },
-  { id: '7.3', phase: '7γ', number: '7.3', description: 'Mode Skip fonctionne', target: 'Pas d\'anim' },
-  { id: '7.4', phase: '7γ', number: '7.4', description: 'Affichage central jets (Skip)', target: 'Visible' },
-  { id: '7.5', phase: '7γ', number: '7.5', description: 'Tooltips lisibles', target: 'Pas coupés' },
+  { id: '7.3', phase: '7γ', number: '7.3', description: 'Mode Skip fonctionne', target: 'Résultat direct' },
+  { id: '7.4', phase: '7γ', number: '7.4', description: 'Affichage central jets (Skip)', target: 'roll+bonus=total' },
+  { id: '7.5', phase: '7γ', number: '7.5', description: 'Tooltips lisibles (z-index)', target: 'Pas coupés' },
   { id: '7.6', phase: '7γ', number: '7.6', description: 'Bouton passer tour fonctionne', target: 'Tour passé' },
   { id: '7.7', phase: '7γ', number: '7.7', description: 'Bouton retarder tour fonctionne', target: 'Tour décalé' },
-  { id: '7.8', phase: '7γ', number: '7.8', description: 'Historique combat lisible', target: 'Scrollable' },
-  { id: '7.9', phase: '7γ', number: '7.9', description: 'Ordre initiative affiché', target: 'Visible' },
-  { id: '7.10', phase: '7γ', number: '7.10', description: 'Responsive mobile (si testé)', target: 'Utilisable' },
+  { id: '7.8', phase: '7γ', number: '7.8', description: 'Historique combat détaillé', target: 'XP+items' },
+  { id: '7.9', phase: '7γ', number: '7.9', description: 'Initiative: roll + bonus = total', target: 'Détail visible' },
+  { id: '7.10', phase: '7γ', number: '7.10', description: 'Compteur salles dynamique', target: 'X/roomsPerLevel' },
+  { id: '7.11', phase: '7γ', number: '7.11', description: 'Modal Loot sans scroll', target: 'Tout visible' },
+  { id: '7.12', phase: '7γ', number: '7.12', description: 'Déblocage si joueur coincé', target: 'Salle trouvée' },
 ];
 
-// Configuration des métriques
+// Configuration des métriques (v2.32.1)
 const GAMMA_METRICS: Omit<MetricItem, 'value'>[] = [
-  // Combat
+  // Combat Base
   { id: 'm1', phase: '1γ', name: 'Tours pour tuer monstre', target: '2-4', unit: 'tours' },
   { id: 'm2', phase: '1γ', name: 'HP perdus par combat', target: '30-60', unit: '%' },
   { id: 'm3', phase: '1γ', name: 'Dégâts moyens attaque', target: '5-12', unit: 'HP' },
@@ -109,18 +119,25 @@ const GAMMA_METRICS: Omit<MetricItem, 'value'>[] = [
   { id: 'm4', phase: '2γ', name: 'Dégâts skill offensif', target: '8-18', unit: 'HP' },
   { id: 'm5', phase: '2γ', name: 'HP soignés par heal', target: '10-25', unit: 'HP' },
   { id: 'm6', phase: '2γ', name: 'Bonus buff appliqué', target: '+1 à +3', unit: '' },
+  // Jets de Sauvegarde (NOUVEAU)
+  { id: 'm7', phase: '2Sγ', name: 'DC Flamme sacrée', target: '13', unit: 'DD' },
+  { id: 'm8', phase: '2Sγ', name: 'DC Glas funèbre', target: '13', unit: 'DD' },
+  { id: 'm9', phase: '2Sγ', name: 'Dégâts Glas (blessé)', target: '1d12', unit: 'dés' },
   // Boss
-  { id: 'm7', phase: '3γ', name: 'Tours pour vaincre boss', target: '8-12', unit: 'tours' },
-  { id: 'm8', phase: '3γ', name: 'HP perdus contre boss', target: '60-90', unit: '%' },
-  { id: 'm9', phase: '3γ', name: 'HP du boss observé', target: '50-80', unit: 'HP' },
+  { id: 'm10', phase: '3γ', name: 'Tours pour vaincre boss', target: '8-15', unit: 'tours' },
+  { id: 'm11', phase: '3γ', name: 'HP perdus contre boss', target: '60-90', unit: '%' },
+  { id: 'm12', phase: '3γ', name: 'HP du boss niveau 1', target: '50-85', unit: 'HP' },
   // Progression
-  { id: 'm10', phase: '4γ', name: 'XP par monstre', target: '10-20', unit: 'XP' },
-  { id: 'm11', phase: '4γ', name: 'XP par boss', target: '30-50', unit: 'XP' },
-  { id: 'm12', phase: '4γ', name: 'Combats pour level up', target: '3-6', unit: 'combats' },
+  { id: 'm13', phase: '4γ', name: 'XP par monstre', target: '10-20', unit: 'XP' },
+  { id: 'm14', phase: '4γ', name: 'XP par boss', target: '30-100', unit: 'XP' },
+  { id: 'm15', phase: '4γ', name: 'Combats pour level up', target: '3-6', unit: 'combats' },
   // Events
-  { id: 'm13', phase: '6γ', name: 'Buff événement observé', target: '+1 à +3', unit: '' },
-  { id: 'm14', phase: '6γ', name: 'Heal événement observé', target: '5-15', unit: 'HP' },
-  { id: 'm15', phase: '6γ', name: 'Dégâts événement observé', target: '4-12', unit: 'HP' },
+  { id: 'm16', phase: '6γ', name: 'Buff événement observé', target: '+1 à +3', unit: '' },
+  { id: 'm17', phase: '6γ', name: 'Heal événement observé', target: '5-15', unit: 'HP' },
+  { id: 'm18', phase: '6γ', name: 'Dégâts événement observé', target: '4-12', unit: 'HP' },
+  // UI/UX
+  { id: 'm19', phase: '7γ', name: 'Initiative affichée', target: 'roll+mod=total', unit: '' },
+  { id: 'm20', phase: '7γ', name: 'Salles avant boss (niv.1)', target: '4-10', unit: 'salles' },
 ];
 
 // Noms des phases
@@ -128,6 +145,7 @@ const PHASE_NAMES: Record<string, string> = {
   '0γ': 'INIT',
   '1γ': 'COMBAT BASE',
   '2γ': 'COMBAT SKILLS',
+  '2Sγ': 'JETS DE SAUVEGARDE',
   '3γ': 'BOSS',
   '4γ': 'PROGRESSION',
   '5γ': 'INVENTAIRE',
