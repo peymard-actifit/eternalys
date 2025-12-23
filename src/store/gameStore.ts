@@ -1059,6 +1059,7 @@ export const gameStore = {
       { dx: 1, dy: 0 }   // Droite
     ];
     
+    // Chercher les salles adjacentes non visitées
     directions.forEach(({ dx, dy }) => {
       const nx = x + dx;
       const ny = y + dy;
@@ -1066,6 +1067,36 @@ export const gameStore = {
         adjacent.push({ x: nx, y: ny });
       }
     });
+    
+    // === DÉBLOCAGE : Si aucune salle adjacente, trouver la plus proche non visitée ===
+    if (adjacent.length === 0) {
+      // BFS pour trouver la salle non visitée la plus proche
+      const visited = new Set<string>();
+      const queue: { x: number; y: number; dist: number }[] = [{ x, y, dist: 0 }];
+      visited.add(`${x},${y}`);
+      
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        
+        for (const { dx, dy } of directions) {
+          const nx = current.x + dx;
+          const ny = current.y + dy;
+          const key = `${nx},${ny}`;
+          
+          if (nx >= 0 && nx < 20 && ny >= 0 && ny < 20 && !visited.has(key)) {
+            visited.add(key);
+            
+            if (!state.rooms[ny][nx].visited) {
+              // Trouvé une salle non visitée !
+              adjacent.push({ x: nx, y: ny });
+              return adjacent; // Retourner la première trouvée
+            }
+            
+            queue.push({ x: nx, y: ny, dist: current.dist + 1 });
+          }
+        }
+      }
+    }
     
     return adjacent;
   },

@@ -2559,6 +2559,7 @@ export function CombatPage() {
         
         let hit = true;
         let isCritical = false;
+        let saveSucceeded = false; // Track si la sauvegarde a réussi (pour demi-dégâts)
         
         if (needsAttackRoll) {
           // === JET DE TOUCHE D&D 5e POUR COMPÉTENCE DE JOUEUR ===
@@ -2673,10 +2674,10 @@ export function CombatPage() {
               });
             });
           } else if (isSkip) {
-            // Mode Skip : affichage central
+            // Mode Skip : affichage central - AFFICHER CLAIREMENT LE RÉSULTAT
             setCentralDisplay({
               type: 'attack',
-              result: saveResult.success ? '✓ SAUVEGARDE' : '✗ RATÉ',
+              result: saveResult.success ? '✓ SAUVEGARDE RÉUSSIE' : '✗ SAUVEGARDE RATÉE',
               details: `🎲 ${chosenSaveRoll}+${saveResult.totalBonus}=${saveResult.roll.total} vs DD ${skill.savingThrow.dc}`,
               isHit: !saveResult.success, // isHit = true si la sauvegarde rate (dégâts complets)
               isCritical: false
@@ -2685,14 +2686,18 @@ export function CombatPage() {
           }
           
           if (saveResult.success) {
-            // Sauvegarde réussie - dégâts réduits de moitié ou annulés
-            const halfDamage = skill.halfDamageOnSave !== false; // Par défaut demi-dégâts
-            if (halfDamage) {
+            // Sauvegarde réussie - dégâts réduits de moitié ou annulés selon halfDamageOnSave
+            const allowsHalfDamage = skill.halfDamageOnSave !== false; // Par défaut demi-dégâts (pour compatibilité D&D)
+            if (allowsHalfDamage) {
               hit = true; // On va calculer les dégâts mais divisés par 2
+              saveSucceeded = true; // Marquer pour diviser les dégâts plus tard
               logs.push(`✓ Sauvegarde réussie ! Dégâts réduits de moitié.`);
             } else {
+              // halfDamageOnSave === false signifie que la sauvegarde annule COMPLÈTEMENT les dégâts
               hit = false;
-              logs.push(`✓ ${target.name} résiste complètement à ${skill.name} !`);
+              logs.push(`✓ ${target.name} résiste complètement à ${skill.name} ! (0 dégâts)`);
+              
+              // Afficher dans l'historique
               addCombatHistoryEntry({
                 turn: combatTurn,
                 actor: attacker.name,
@@ -2703,13 +2708,25 @@ export function CombatPage() {
                 isPlayerAction: true,
                 damageType
               });
+              
+              // Afficher aussi dans le central display (skip mode)
+              if (isSkip) {
+                setCentralDisplay({
+                  type: 'damage',
+                  result: '🛡️ 0 DÉGÂTS (RÉSISTÉ)',
+                  details: `${target.name} évite complètement ${skill.name}`,
+                  isCritical: false
+                });
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+              
               checkCombatEnd(logs, attacker.id, undefined, enemies);
               setIsAnimating(false);
               return;
             }
           } else {
             // Sauvegarde ratée - dégâts complets
-            logs.push(`✗ Sauvegarde ratée !`);
+            logs.push(`✗ Sauvegarde ratée ! Dégâts complets !`);
             hit = true;
           }
         } else {
@@ -2725,11 +2742,11 @@ export function CombatPage() {
         let effectiveDamageDice = skill.damageDice;
         if (skill.woundedDamageDice && targetIsWounded) {
           effectiveDamageDice = skill.woundedDamageDice;
-          logs.push(`💀 ${target.name} est blessé - dégâts augmentés (${skill.woundedDamageDice}) !`);
+          logs.push(`💀 ${target.name} est blessé - dégâts augmentés ! (${skill.damageDice} → ${skill.woundedDamageDice})`);
         }
         
-        // Si sauvegarde réussie et demi-dégâts, on divise à la fin
-        const halfDamageOnSave = skill.savingThrow && hit && !isCritical;
+        // Si sauvegarde réussie ET demi-dégâts autorisés, on divise à la fin
+        const shouldHalveDamage = saveSucceeded && skill.halfDamageOnSave !== false;
         
         // TOUCHÉ ! Calcul des dégâts D&D
         let actualDamage: number;
@@ -2746,8 +2763,8 @@ export function CombatPage() {
           damageRolls = damageResult.damageRoll.rolls;
           damageModifier = damageResult.damageRoll.modifier;
           
-          // Appliquer demi-dégâts si sauvegarde réussie
-          if (halfDamageOnSave) {
+          // Appliquer demi-dégâts si sauvegarde réussie avec halfDamageOnSave
+          if (shouldHalveDamage) {
             actualDamage = Math.floor(actualDamage / 2);
             logs.push(`🎲 Dégâts: ${damageResult.damageRoll.rolls.join('+')}${damageResult.damageRoll.modifier !== 0 ? (damageResult.damageRoll.modifier > 0 ? '+' : '') + damageResult.damageRoll.modifier : ''} = ${damageResult.totalDamage} ÷ 2 = ${actualDamage}`);
           } else {
@@ -2756,7 +2773,7 @@ export function CombatPage() {
         } else {
           // Dégâts fixes
           actualDamage = calculateDamage(damage, attacker, target, damageType, skill, isCritical);
-          if (halfDamageOnSave) {
+          if (shouldHalveDamage) {
             actualDamage = Math.floor(actualDamage / 2);
           }
           damageRolls = [actualDamage];
@@ -2768,7 +2785,7 @@ export function CombatPage() {
           // Mode Skip : affichage central
           setCentralDisplay({
             type: 'damage',
-            result: `⚔️ ${actualDamage} DÉGÂTS${halfDamageOnSave ? ' (½)' : ''}`,
+            result: `⚔️ ${actualDamage} DÉGÂTS${shouldHalveDamage ? ' (½)' : ''}`,
             details: hasEffectiveDice ? `🎲 ${damageRolls.join('+')}${damageModifier > 0 ? '+' + damageModifier : ''}` : skill.name,
             isCritical
           });

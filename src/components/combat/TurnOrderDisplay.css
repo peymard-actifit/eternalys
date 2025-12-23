@@ -58,6 +58,16 @@
   margin-top: 4px;
 }
 
+.current-turn-init {
+  display: block;
+  font-size: 0.75rem;
+  color: #ffd700;
+  margin-top: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
 /* Liste des tours */
 .turn-list {
   display: flex;
@@ -99,15 +109,31 @@
   font-size: 1.2rem;
 }
 
-.turn-init {
-  font-size: 0.85rem;
+.turn-init-detail {
+  display: flex;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.init-roll {
+  color: #fff;
+}
+
+.init-bonus {
+  color: #aaa;
+}
+
+.turn-init-total {
+  font-size: 0.9rem;
   font-weight: bold;
   color: #ffd700;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 8px;
   border-radius: 4px;
-  min-width: 24px;
+  min-width: 28px;
   text-align: center;
+  margin-left: auto;
 }
 
 .turn-arrow {

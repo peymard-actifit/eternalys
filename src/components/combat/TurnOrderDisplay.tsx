@@ -13,6 +13,11 @@ export function TurnOrderDisplay({ turnOrder, currentTurnIndex }: TurnOrderDispl
   const currentName = currentEntity ? ('name' in currentEntity ? currentEntity.name : 'Inconnu') : '';
   const isPlayerTurn = currentEntity && 'class' in currentEntity;
   
+  // Récupérer les infos d'initiative de l'entité courante
+  const currentInitTotal = currentEntity?.initiativeTotal ?? 0;
+  const currentInitRoll = currentEntity?.initiativeRoll ?? 0;
+  const currentInitBonus = currentEntity?.initiativeBonus ?? 0;
+  
   return (
     <div className="turn-order">
       <h4>⚔️ Initiative</h4>
@@ -22,6 +27,9 @@ export function TurnOrderDisplay({ turnOrder, currentTurnIndex }: TurnOrderDispl
         <span className="current-turn-label">Tour de</span>
         <span className="current-turn-name">
           {'portrait' in currentEntity && currentEntity.portrait} {currentName}
+        </span>
+        <span className="current-turn-init">
+          🎲 {currentInitRoll} {currentInitBonus >= 0 ? '+' : ''}{currentInitBonus} = <strong>{currentInitTotal}</strong>
         </span>
       </div>
       
@@ -33,14 +41,21 @@ export function TurnOrderDisplay({ turnOrder, currentTurnIndex }: TurnOrderDispl
           const initBonus = entity.initiativeBonus ?? 0;
           const isPlayer = 'class' in entity;
           
+          // Formatage du bonus d'initiative
+          const bonusText = initBonus >= 0 ? `+${initBonus}` : `${initBonus}`;
+          
           return (
             <div 
               key={i} 
               className={`turn-item ${i === currentTurnIndex ? 'current' : ''} ${isDead ? 'dead' : ''} ${isPlayer ? 'player' : 'enemy'}`}
-              title={`${entity.name}: 🎲 ${initRoll} + ${initBonus} = ${initTotal}`}
+              title={`${entity.name}: 🎲 ${initRoll} ${bonusText} = ${initTotal}`}
             >
               <span className="turn-portrait">{'portrait' in entity && entity.portrait}</span>
-              <span className="turn-init">{initTotal}</span>
+              <span className="turn-init-detail">
+                <span className="init-roll">{initRoll}</span>
+                <span className="init-bonus">{bonusText}</span>
+              </span>
+              <span className="turn-init-total">{initTotal}</span>
               {i === currentTurnIndex && <span className="turn-arrow">▶</span>}
             </div>
           );

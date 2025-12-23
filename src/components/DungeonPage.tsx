@@ -16,7 +16,7 @@ export function DungeonPage() {
   }, []);
 
   const adjacentRooms = gameStore.getAdjacentRooms();
-  const { team, currentRoom, rooms, encounterCount, history, pendingTreasures } = state;
+  const { team, currentRoom, rooms, encounterCount, history, pendingTreasures, roomsPerLevel, dungeonLevel } = state;
 
   // Calcul dynamique de la couleur de la barre de vie
   const getHpBarColor = (currentHp: number, maxHp: number): string => {
@@ -228,8 +228,8 @@ export function DungeonPage() {
         <h2>🏰 Exploration du Donjon</h2>
         <div className="encounter-counter">
           <span className="counter-label">Salles explorées :</span>
-          <span className="counter-value">{encounterCount}/9</span>
-          {encounterCount >= 9 && <span className="boss-warning">⚠️ Prochaine salle : BOSS !</span>}
+          <span className="counter-value">{encounterCount}/{roomsPerLevel}</span>
+          {encounterCount >= roomsPerLevel && <span className="boss-warning">⚠️ Prochaine salle : BOSS !</span>}
         </div>
       </div>
 

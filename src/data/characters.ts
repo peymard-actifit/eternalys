@@ -460,6 +460,7 @@ export const AVAILABLE_CHARACTERS: Character[] = [
         targetType: 'enemy',
         requiresAttackRoll: false,
         savingThrow: { ability: 'dexterity', dc: 13 },
+        halfDamageOnSave: false, // Annulé complètement sur sauvegarde réussie (D&D)
         cooldown: 0,
         description: 'Sort mineur. 1d8 radiant, jet de sauvegarde DEX pour annuler.'
       }
